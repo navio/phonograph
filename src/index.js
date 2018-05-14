@@ -19,7 +19,10 @@ class App extends Component {
     this.setState({src});
   }
   componentDidMount(){
-    Parser.parseURL(CORS_PROXY+url)
+    let url_string = window.location.href
+    let url = new window.URL(url_string);
+    let podcast = url.searchParams.get("podcast") || URL;
+    Parser.parseURL(CORS_PROXY+podcast)
     .then(x=>this.setState({items:x.items}));
   }
   toMinutes(time){
@@ -31,7 +34,7 @@ class App extends Component {
         <audio autoPlay="true" src={this.state.src} ref="player"/>
         <ol>
          {this.state.items && 
-          this.state.items.map(item=><li><a href="{item.link}">
+          this.state.items.map(item=><li key={item.link}><a href="{item.link}">
           {item.title}</a> ({this.toMinutes(item.itunes.duration)}) <a onClick={this.playerHandler} data-src={item.enclosure.url}>PLAY</a><br />{item.content}
           
           </li>)}
