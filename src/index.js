@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { render } from 'react-dom';
 let Parser = new window.RSSParser();
 const CORS_PROXY = "/rss/"; 
-const url = "www.npr.org/rss/podcast.php?id=510289";
+const URL_D = "www.npr.org/rss/podcast.php?id=510289";
 
 class App extends Component {
   constructor() {
@@ -20,8 +20,8 @@ class App extends Component {
   }
   componentDidMount(){
     let url_string = window.location.href
-    let url = new window.URL(url_string);
-    let podcast = url.searchParams.get("podcast") || URL;
+    let url_podcast = new window.URL(url_string);
+    let podcast = url_podcast.searchParams.get("podcast") || URL_D;
     Parser.parseURL(CORS_PROXY+podcast)
     .then(x=>this.setState({items:x.items}));
   }
