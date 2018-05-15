@@ -51,7 +51,7 @@ class App extends Component {
       Parser.parseURL(CORS_PROXY + podcast)
         .then((RSS) => {
           this.setState({ items: RSS.items });
-          this.loadEpisodes(content.items);
+          this.loadEpisodes(RSS.items);
           window.localStorage.setItem(podcast, JSON.stringify(RSS));
         });
       this.episodes.clear();
