@@ -10,7 +10,6 @@ import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
 import PlayButton from 'material-ui/svg-icons/av/play-arrow';
 import PauseButton from 'material-ui/svg-icons/av/pause';
-import IconButton from 'material-ui/IconButton';
 
 const iconButtonElement = (
   <IconButton
