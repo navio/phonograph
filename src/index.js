@@ -2,42 +2,107 @@ import React, { Component } from 'react';
 import { render } from 'react-dom';
 let Parser = new window.RSSParser();
 const CORS_PROXY = "/rss/"; 
-const URL_D = "www.npr.org/rss/podcast.php?id=510289";
+const DEFAULTCAST = "www.npr.org/rss/podcast.php?id=510289";
 
 class App extends Component {
   constructor() {
     super();
     this.state = {
-      name: 'React',
+      playing: null,
       items: null,
-      src:null
+      episode: null,
+      author: null,
+      status: null
     };
-    this.playerHandler = this.playerHandler.bind(this);
+    this.episodes = new Map();
   }
-  playerHandler(ev){
-    let src = ev.target.getAttribute('data-src');
-    this.setState({src});
+
+  playerHandler(ev) {
+    let guid = ev.target.getAttribute('data-guid');
+    let episode = this.episodes.get(guid);
+    if (this.state.playing === guid && this.state.status === 'pause') {
+      this.refs.player.play();
+      this.setState({ status: 'playing' });
+    } else {
+      this.refs.player.setAttribute("src", episode.enclosure.url);
+      this.setState({
+        episode: episode.title,
+        author: episode.itunes.author,
+        playing: guid,
+        status: 'playing'
+      });
+    }
   }
-  componentDidMount(){
-    let url_string = window.location.href
-    let url_podcast = new window.URL(url_string);
-    let podcast = url_podcast.searchParams.get("podcast") || URL_D;
-    Parser.parseURL(CORS_PROXY+podcast)
-    .then(x=>this.setState({items:x.items}));
+
+  playerHandlerPause(ev) {
+    this.setState({ status: 'pause' });
+    this.refs.player.pause();
   }
-  toMinutes(time){
-    return Math.floor( 1* time / 60 ) + ':'+ (1*time%60);
+
+  loadEpisodes(RSS) {
+    RSS.forEach(item => this.episodes.set(item.guid, item));
   }
+
+  fillPodcastContent(found, podcast) {
+    if (!found) {
+      Parser.parseURL(CORS_PROXY + podcast)
+        .then((RSS) => {
+          this.setState({ items: RSS.items });
+          this.loadEpisodes(content.items);
+          window.localStorage.setItem(podcast, JSON.stringify(RSS));
+        });
+      this.episodes.clear();
+    } else {
+      let content = JSON.parse(found);
+      this.setState({ items: content.items });
+      this.loadEpisodes(content.items);
+      Parser.parseURL(CORS_PROXY + podcast) //Background.
+        .then((RSS) => {
+          this.setState({ items: RSS.items });
+          window.localStorage.setItem(podcast, JSON.stringify(RSS));
+        });
+    }
+  }
+
+  checkIfNewPodcast() {
+    let urlString = window.location.href;
+    let urlPodcast = new window.URL(urlString);
+    let podcast = urlPodcast.searchParams.get("podcast");
+    return podcast;
+  }
+
+  componentDidMount() {
+    let podcast = this.checkIfNewPodcast() || DEFAULTCAST;
+    let found = window.localStorage.getItem(podcast);
+    this.fillPodcastContent.call(this, found, podcast);
+    this.refs.player.addEventListener('ended', function () {
+      this.setState({
+        episode: null,
+        author: null,
+        playing: null
+      });
+    });
+  }
+
+  toHumans(time) {
+    return Math.floor(1 * time / 60) + ':' + (1 * time % 60);
+  }
+
   render() {
     return (
       <div>
-        <audio autoPlay="true" src={this.state.src} ref="player"/>
+        {this.state.status && <div>Playing: {this.state.episode} by {this.state.author}</div>}
+        <audio autoPlay="true" ref="player" />
         <ol>
-         {this.state.items && 
-          this.state.items.map(item=><li key={item.link}><a href="{item.link}">
-          {item.title}</a> ({this.toMinutes(item.itunes.duration)}) <a onClick={this.playerHandler} data-src={item.enclosure.url}>PLAY</a><br />{item.content}
-          
-          </li>)}
+          {this.state.items &&
+            this.state.items.map(item => <li key={item.guid}><a href="{item.link}">
+              {item.title}</a> ({this.toHumans(item.itunes.duration)})
+              {(this.state.playing === item.guid && this.state.status != 'pause') ?
+                <a onClick={this.playerHandlerPause.bind(this)} >PAUSE</a> :
+                <a onClick={this.playerHandler.bind(this)} data-guid={item.guid}>PLAY</a>}
+              <br />{item.content}
+
+            </li>)}
         </ol>
       </div>
     );
