@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { render } from 'react-dom';
 let Parser = new window.RSSParser();
 const CORS_PROXY = "/rss/"; 
-const DEFAULTCAST = "www.npr.org/rss/podcast.php?id=510289";
+const DEFAULTCAST = "www.npr.org/rss/podcast.php?id=510325";
+// "www.npr.org/rss/podcast.php?id=510289";
 
 class App extends Component {
   constructor() {
