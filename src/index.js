@@ -48,21 +48,28 @@ class App extends Component {
 
   fillPodcastContent(found, podcast) {
     if (!found) {
+      this.episodes.clear();
       Parser.parseURL(CORS_PROXY + podcast)
         .then((RSS) => {
           this.setState({ items: RSS.items });
           this.loadEpisodes(RSS.items);
           window.localStorage.setItem(podcast, JSON.stringify(RSS));
         });
-      this.episodes.clear();
     } else {
       let content = JSON.parse(found);
       this.setState({ items: content.items });
+      this.episodes.clear();
       this.loadEpisodes(content.items);
       Parser.parseURL(CORS_PROXY + podcast) //Background.
         .then((RSS) => {
-          this.setState({ items: RSS.items });
-          window.localStorage.setItem(podcast, JSON.stringify(RSS));
+          let newReading = JSON.stringify(RSS);
+          if(newReading !== found ){
+            console.log('Updated');
+            window.localStorage.setItem(podcast, JSON.stringify(RSS));
+            this.setState({ items: RSS.items });
+            this.episodes.clear();
+            this.loadEpisodes(RSS.items);
+          }
         });
     }
   }
@@ -85,10 +92,6 @@ class App extends Component {
         playing: null
       });
     });
-  }
-
-  toHumans(time) {
-    return Math.floor(1 * time / 60) + ':' + (1 * time % 60);
   }
 
   render() {
