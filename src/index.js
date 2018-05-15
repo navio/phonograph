@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { render } from 'react-dom';
+import EpisodeList from "./EpisodeList";
 let Parser = new window.RSSParser();
+
 const CORS_PROXY = "/rss/"; 
-const DEFAULTCAST = "www.npr.org/rss/podcast.php?id=510325";
-// "www.npr.org/rss/podcast.php?id=510289";
+const DEFAULTCAST = "www.npr.org/rss/podcast.php?id=510289";
 
 class App extends Component {
   constructor() {
@@ -18,12 +19,18 @@ class App extends Component {
     this.episodes = new Map();
   }
 
-  playerHandler(ev) {
-    let guid = ev.target.getAttribute('data-guid');
+  clickHandler(ev) {
+    let guid = ev.currentTarget.getAttribute('data-guid');
     let episode = this.episodes.get(guid);
-    if (this.state.playing === guid && this.state.status === 'pause') {
-      this.refs.player.play();
-      this.setState({ status: 'playing' });
+
+    if (this.state.playing === guid) {
+      if(this.state.status === 'pause'){
+        this.refs.player.play();
+        this.setState({ status: 'playing' });
+      }else{
+        this.setState({ status: 'pause' });
+        this.refs.player.pause();
+      }
     } else {
       this.refs.player.setAttribute("src", episode.enclosure.url);
       this.setState({
@@ -35,11 +42,6 @@ class App extends Component {
     }
   }
 
-  playerHandlerPause(ev) {
-    this.setState({ status: 'pause' });
-    this.refs.player.pause();
-  }
-
   loadEpisodes(RSS) {
     RSS.forEach(item => this.episodes.set(item.guid, item));
   }
@@ -49,7 +51,7 @@ class App extends Component {
       Parser.parseURL(CORS_PROXY + podcast)
         .then((RSS) => {
           this.setState({ items: RSS.items });
-          this.loadEpisodes(RSS.items);
+          this.loadEpisodes(content.items);
           window.localStorage.setItem(podcast, JSON.stringify(RSS));
         });
       this.episodes.clear();
@@ -92,19 +94,13 @@ class App extends Component {
   render() {
     return (
       <div>
-        {this.state.status && <div>Playing: {this.state.episode} by {this.state.author}</div>}
+       {this.state.status && <div>Playing: {this.state.episode} by {this.state.author}</div>}
+        <EpisodeList episodes={this.state.items}
+        handler={this.clickHandler.bind(this)} 
+        status={this.state.status}
+        playing={this.state.playing}
+        />
         <audio autoPlay="true" ref="player" />
-        <ol>
-          {this.state.items &&
-            this.state.items.map(item => <li key={item.guid}><a href="{item.link}">
-              {item.title}</a> ({this.toHumans(item.itunes.duration)})
-              {(this.state.playing === item.guid && this.state.status != 'pause') ?
-                <a onClick={this.playerHandlerPause.bind(this)} >PAUSE</a> :
-                <a onClick={this.playerHandler.bind(this)} data-guid={item.guid}>PLAY</a>}
-              <br />{item.content}
-
-            </li>)}
-        </ol>
       </div>
     );
   }
