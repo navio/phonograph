@@ -1,13 +1,13 @@
-import React, { Component, createRef } from 'react';
+import React, { Component } from 'react';
 import EpisodeList from "./EpisodeList";
 import PodcastHeader from './PodcastHeader';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import { render } from 'react-dom';
 
 const Parser = new window.RSSParser();
-const CORS_PROXY = "/rss/";
-const CORS_PROXY_LESS = "/rss-less/";
-// const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
+
+const PROXY = {'https:':'/rss/','http:':'/rss-less/'};
+//const PROXY = {'https:':'https://cors-anywhere.herokuapp.com/','http:':'https://cors-anywhere.herokuapp.com/'};
 
 const DEFAULTCAST = "www.npr.org/rss/podcast.php?id=510289";
 
@@ -66,13 +66,14 @@ class App extends Component {
   }
 
   fillPodcastContent(found, podcast) {
+    let CORS_PROXY = PROXY[podcast.protocol];
     if (!found) {
       this.episodes.clear();
-      Parser.parseURL(CORS_PROXY + podcast)
-        .then((RSS) => {
+      Parser.parseURL(CORS_PROXY + podcast.domain)
+        .then((RSS) => { 
           this.setState({ items: RSS.items.slice(0, 20) });
           this.loadEpisodes(RSS.items);
-          window.localStorage.setItem(podcast, JSON.stringify(RSS));
+          window.localStorage.setItem(podcast.domain, JSON.stringify(RSS));
         });
     } else {
       let content = JSON.parse(found);
@@ -85,12 +86,12 @@ class App extends Component {
       });
       this.episodes.clear();
       this.loadEpisodes(content.items);
-      Parser.parseURL(CORS_PROXY + podcast) //Background.
-        .then((RSS) => {
+      Parser.parseURL(CORS_PROXY + podcast.domain) //Background.
+        .then((RSS) => { 
           let newReading = JSON.stringify(RSS);
           if (newReading !== found) {
             console.log('Updated');
-            window.localStorage.setItem(podcast, JSON.stringify(RSS));
+            window.localStorage.setItem(podcast.domain, JSON.stringify(RSS));
             this.setState({
               items: RSS.items.slice(0, 20)
             });
@@ -106,17 +107,23 @@ class App extends Component {
     let urlPodcast = new window.URL(urlString);
     let podcast = urlPodcast.searchParams.get("podcast");
     try{
-      podcast = new URL(podcast);
-      return podcast;
+      if(podcast){
+        podcast = new URL(podcast);
+        return podcast;
+      }
     }catch(err){
       console.error('Invalid URL');
     }
   }
 
   componentDidMount() {
-    let podcast = this.checkIfNewPodcast() || DEFAULTCAST;
-    let found = window.localStorage.getItem(podcast);
-    this.fillPodcastContent.call(this, found, podcast);
+    let podcast = this.checkIfNewPodcast() ;
+    let url = ( podcast && podcast.href && podcast.href.replace(/(^\w+:|^)\/\//, '') ) || DEFAULTCAST;
+    let protocol = (podcast && podcast.protocol) || "https:";
+    let domain = { domain:url, protocol };
+
+    let found = window.localStorage.getItem(url);
+    this.fillPodcastContent.call(this, found, domain);
     this.refs.player.addEventListener('ended', function () {
       this.setState({
         episode: null,
@@ -129,7 +136,7 @@ class App extends Component {
   render() {
     let episode = this.episodes.get(this.state.episode) || null;
     return (
-      <MuiThemeProvider>
+      <MuiThemeProvider><div>
         <PodcastHeader
           title={this.state.title}
           image={this.state.image}
@@ -142,7 +149,7 @@ class App extends Component {
           playing={this.state.playing}
         />
         <audio autoPlay="true" ref="player" />
-      </MuiThemeProvider>
+      </div></MuiThemeProvider>
     );
   }
 }
