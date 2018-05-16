@@ -5,9 +5,10 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import { render } from 'react-dom';
 
 const Parser = new window.RSSParser();
-
-const PROXY = {'https:':'/rss/','http:':'/rss-less/'};
-//const PROXY = {'https:':'https://cors-anywhere.herokuapp.com/','http:':'https://cors-anywhere.herokuapp.com/'};
+let PROXY = {'https:':'/rss/','http:':'/rss-less/'};
+if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+  PROXY = {'https:':'https://cors-anywhere.herokuapp.com/','http:':'https://cors-anywhere.herokuapp.com/'};
+}
 
 const DEFAULTCAST = "www.npr.org/rss/podcast.php?id=510289";
 
@@ -65,8 +66,11 @@ class App extends Component {
     RSS.forEach(item => this.episodes.set(item.guid, item));
   }
 
-  fillPodcastContent(found, podcast) {
+  fillPodcastContent(podcast) {
+
     let CORS_PROXY = PROXY[podcast.protocol];
+    let found = window.localStorage.getItem(podcast.domain);
+    
     if (!found) {
       this.episodes.clear();
       Parser.parseURL(CORS_PROXY + podcast.domain)
@@ -109,7 +113,9 @@ class App extends Component {
     try{
       if(podcast){
         podcast = new URL(podcast);
-        return podcast;
+        let domain =   podcast.href.replace(/(^\w+:|^)\/\//, '');
+        let protocol = podcast.protocol
+        return { domain , protocol };
       }
     }catch(err){
       console.error('Invalid URL');
@@ -117,20 +123,16 @@ class App extends Component {
   }
 
   componentDidMount() {
-    let podcast = this.checkIfNewPodcast() ;
-    let url = ( podcast && podcast.href && podcast.href.replace(/(^\w+:|^)\/\//, '') ) || DEFAULTCAST;
-    let protocol = (podcast && podcast.protocol) || "https:";
-    let domain = { domain:url, protocol };
-
-    let found = window.localStorage.getItem(url);
-    this.fillPodcastContent.call(this, found, domain);
-    this.refs.player.addEventListener('ended', function () {
-      this.setState({
-        episode: null,
-        author: null,
-        playing: null
-      });
-    });
+    let podcast = this.checkIfNewPodcast() || { domain: DEFAULTCAST , protocol:'https:'} ;
+    this.fillPodcastContent.call(this, podcast);
+    window.player = this.refs.player;
+    // this.refs.player.addEventListener('ended', function () {
+    //   this.setState({
+    //     episode: null,
+    //     author: null,
+    //     playing: null
+    //   });
+    // });
   }
 
   render() {
@@ -142,6 +144,7 @@ class App extends Component {
           image={this.state.image}
           description={this.state.description} 
           episode={episode}
+          player={this.refs.player}
           />
         <EpisodeList episodes={this.state.items}
           handler={this.clickHandler.bind(this)}

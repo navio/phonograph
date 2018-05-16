@@ -1,7 +1,8 @@
 import React from 'react';
 import { Card, CardActions, CardHeader, CardMedia, CardTitle, CardText } from 'material-ui/Card';
 import FlatButton from 'material-ui/FlatButton';
-import {clearText} from './index';
+// import Typography from '@material-ui/core/Typography';
+import { clearText } from './index';
 // <CardHeader
 //   title="URL Avatar"
 //   subtitle="Subtitle"
@@ -17,20 +18,18 @@ const imageStyle = {
 
 const PodcastHeader = (props) => {
   let date = null
-  if(props.episode && props.episode.pubDate){
+  if (props.episode && props.episode.pubDate) {
     date = new Date(props.episode.pubDate);
     date = date.toLocaleString();
   }
   return (
     <Card>
-      <CardMedia
-        overlay={<CardTitle title={props.title} subtitle={clearText(props.description)} />}
-      >
-        <img src={props.image} alt="Logo" />
+      <CardMedia overlay={<CardTitle title={props.title} />} >
+        {props.image && <img src={props.image} alt="Podcast Logo" />}
       </CardMedia>
       {props.episode &&
         (<span>
-        <CardTitle title={props.episode.title} subtitle={date} />
+          <CardTitle title={props.episode.title} subtitle={date} />
           <CardText>
             {clearText(props.episode.content)}
           </CardText>

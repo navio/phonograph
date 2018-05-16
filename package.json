@@ -3,12 +3,10 @@
   "description": "",
   "homepage": "/",
   "dependencies": {
-    "react": "16.2.0",
-    "react-dom": "16.1.1",
-    "react-scripts": "1.0.10",
-    "url": "0.11.0",
-    "timers": "0.1.1",
-    "material-ui": "0.20.1"
+    "material-ui": "0.20.1",
+    "react": "^16.3.0",
+    "react-dom": "^16.3.1",
+    "react-scripts": "1.0.10"
   },
   "version": "0.1.0",
   "private": true,
@@ -18,7 +16,6 @@
       "secure": true
     }
   },
-  
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
