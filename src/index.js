@@ -5,8 +5,8 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import { render } from 'react-dom';
 
 const Parser = new window.RSSParser();
-// const CORS_PROXY = "/rss/";
-const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
+const CORS_PROXY = "/rss/";
+// const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
 
 const DEFAULTCAST = "www.npr.org/rss/podcast.php?id=510289";
 
