@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { render } from 'react-dom';
 import EpisodeList from "./EpisodeList";
+import PodcastHeader from './PodcastHeader';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 let Parser = new window.RSSParser();
