@@ -6,6 +6,7 @@ import { render } from 'react-dom';
 
 const Parser = new window.RSSParser();
 const CORS_PROXY = "/rss/";
+const CORS_PROXY_LESS = "/rss-less/";
 // const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
 
 const DEFAULTCAST = "www.npr.org/rss/podcast.php?id=510289";
@@ -17,6 +18,7 @@ export const clearText = (html) =>{
 }
 
 class App extends Component {
+
   constructor() {
     super();
     this.state = {
@@ -49,6 +51,7 @@ class App extends Component {
 
     } else {
       this.refs.player.setAttribute("src", episode.enclosure.url);
+      this.refs.player.play();
       this.setState({
         episode: episode.guid,
         author: episode.itunes.author,
@@ -61,8 +64,6 @@ class App extends Component {
   loadEpisodes(RSS) {
     RSS.forEach(item => this.episodes.set(item.guid, item));
   }
-
-  
 
   fillPodcastContent(found, podcast) {
     if (!found) {
@@ -104,7 +105,12 @@ class App extends Component {
     let urlString = window.location.href;
     let urlPodcast = new window.URL(urlString);
     let podcast = urlPodcast.searchParams.get("podcast");
-    return podcast;
+    try{
+      podcast = new URL(podcast);
+      return podcast;
+    }catch(err){
+      console.error('Invalid URL');
+    }
   }
 
   componentDidMount() {
@@ -119,8 +125,6 @@ class App extends Component {
       });
     });
   }
-
-
 
   render() {
     let episode = this.episodes.get(this.state.episode) || null;
@@ -144,16 +148,3 @@ class App extends Component {
 }
 
 render(<App />, document.getElementById('root'));
-//        {this.state.status && <div>Playing: {this.state.episode} by {this.state.author}</div>}
-
-// <ol>
-//           {this.state.items &&
-//             this.state.items.map(item => <li key={item.guid}><a href="{item.link}">
-//               {item.title}</a> ({this.toHumans(item.itunes.duration)})
-//               {(this.state.playing === item.guid && this.state.status != 'pause') ?
-//                 <a onClick={this.clickHandlerPause.bind(this)} >PAUSE</a> :
-//                 <a onClick={this.clickHandler.bind(this)} data-guid={item.guid}>PLAY</a>}
-//               <br />{item.content}
-
-//             </li>)}
-//         </ol>
