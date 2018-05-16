@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { render } from 'react-dom';
 import EpisodeList from "./EpisodeList";
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+
 let Parser = new window.RSSParser();
 
 const CORS_PROXY = "/rss/"; 
@@ -13,8 +15,13 @@ class App extends Component {
       playing: null,
       items: null,
       episode: null,
+
       author: null,
-      status: null
+      status: null,
+      title: '',
+      description: '',
+      image: null,
+      link: null
     };
     this.episodes = new Map();
   }
@@ -24,17 +31,18 @@ class App extends Component {
     let episode = this.episodes.get(guid);
 
     if (this.state.playing === guid) {
-      if(this.state.status === 'pause'){
+      if (this.state.status === 'pause') {
         this.refs.player.play();
         this.setState({ status: 'playing' });
-      }else{
+      } else {
         this.setState({ status: 'pause' });
         this.refs.player.pause();
       }
+
     } else {
       this.refs.player.setAttribute("src", episode.enclosure.url);
       this.setState({
-        episode: episode.title,
+        episode: episode.guid,
         author: episode.itunes.author,
         playing: guid,
         status: 'playing'
@@ -51,22 +59,30 @@ class App extends Component {
       this.episodes.clear();
       Parser.parseURL(CORS_PROXY + podcast)
         .then((RSS) => {
-          this.setState({ items: RSS.items });
+          this.setState({ items: RSS.items.slice(0, 20) });
           this.loadEpisodes(RSS.items);
           window.localStorage.setItem(podcast, JSON.stringify(RSS));
         });
     } else {
       let content = JSON.parse(found);
-      this.setState({ items: content.items });
+      this.setState({
+        items: content.items.slice(0, 20),
+        title: content.title,
+        description: content.description,
+        image: content.itunes.image,
+        link: content.link
+      });
       this.episodes.clear();
       this.loadEpisodes(content.items);
       Parser.parseURL(CORS_PROXY + podcast) //Background.
         .then((RSS) => {
           let newReading = JSON.stringify(RSS);
-          if(newReading !== found ){
+          if (newReading !== found) {
             console.log('Updated');
             window.localStorage.setItem(podcast, JSON.stringify(RSS));
-            this.setState({ items: RSS.items });
+            this.setState({
+              items: RSS.items.slice(0, 20)
+            });
             this.episodes.clear();
             this.loadEpisodes(RSS.items);
           }
@@ -94,17 +110,25 @@ class App extends Component {
     });
   }
 
+
+
   render() {
+    let episode = this.episodes.get(this.state.episode) || null;
     return (
-      <div>
-       {this.state.status && <div>Playing: {this.state.episode} by {this.state.author}</div>}
+      <MuiThemeProvider>
+        <PodcastHeader
+          title={this.state.title}
+          image={this.state.image}
+          description={this.state.description} 
+          episode={episode}
+          />
         <EpisodeList episodes={this.state.items}
-        handler={this.clickHandler.bind(this)} 
-        status={this.state.status}
-        playing={this.state.playing}
+          handler={this.clickHandler.bind(this)}
+          status={this.state.status}
+          playing={this.state.playing}
         />
         <audio autoPlay="true" ref="player" />
-      </div>
+      </MuiThemeProvider>
     );
   }
 }
