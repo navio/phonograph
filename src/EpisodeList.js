@@ -1,7 +1,6 @@
 import React from 'react';
 import {List, ListItem} from 'material-ui/List';
 import Divider from 'material-ui/Divider';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import Avatar from 'material-ui/Avatar';
 import {grey400, darkBlack, lightBlack, blue300} from 'material-ui/styles/colors';
 import IconButton from 'material-ui/IconButton';
@@ -10,6 +9,9 @@ import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
 import PlayButton from 'material-ui/svg-icons/av/play-arrow';
 import PauseButton from 'material-ui/svg-icons/av/pause';
+import IconButton from 'material-ui/IconButton';
+
+import {clearText} from './index';
 
 const iconButtonElement = (
   <IconButton
@@ -35,26 +37,28 @@ const clickHanlder = (play,pause,status) => {
   return status === 'pause' ? play : pause;
 };
 
+ const toMinutes = (time) => {
+    return Math.floor(1 * time / 60) + ':' + (1 * time % 60);
+  }
+
 const EpisodeList = (props) => (
-  <MuiThemeProvider>
       <List>
         {props.episodes && props.episodes.map(episode =>
-        <div>
-        <ListItem key={episode.guid} onClick={ props.handler } data-guid={episode.guid}
+        <div key={episode.guid}>
+        <ListItem  onClick={ props.handler } data-guid={episode.guid}
           leftAvatar={<Avatar color={darkBlack}  
                       backgroundColor={lightBlack} 
                       icon={ (props.playing === episode.guid && props.status != 'pause') ? <PauseButton /> : <PlayButton />} />}
                       primaryText={episode.title}
           rightIconButton={rightIconMenu}
           secondaryText={
-            <p>{episode.content}</p>
+            <p>{clearText(episode.content)}</p>
           }
           secondaryTextLines={2}
         /><Divider />
         </div>)
         }
-      </List>
-  </MuiThemeProvider>)
+      </List>)
 
 
 export default EpisodeList;

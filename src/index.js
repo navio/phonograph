@@ -1,13 +1,20 @@
-import React, { Component } from 'react';
-import { render } from 'react-dom';
+import React, { Component, createRef } from 'react';
 import EpisodeList from "./EpisodeList";
 import PodcastHeader from './PodcastHeader';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
+import { render } from 'react-dom';
 
-let Parser = new window.RSSParser();
+const Parser = new window.RSSParser();
+// const CORS_PROXY = "/rss/";
+const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
 
-const CORS_PROXY = "/rss/"; 
 const DEFAULTCAST = "www.npr.org/rss/podcast.php?id=510289";
+
+export const clearText = (html) =>{
+    let tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText;
+}
 
 class App extends Component {
   constructor() {
@@ -54,6 +61,8 @@ class App extends Component {
   loadEpisodes(RSS) {
     RSS.forEach(item => this.episodes.set(item.guid, item));
   }
+
+  
 
   fillPodcastContent(found, podcast) {
     if (!found) {
@@ -135,3 +144,16 @@ class App extends Component {
 }
 
 render(<App />, document.getElementById('root'));
+//        {this.state.status && <div>Playing: {this.state.episode} by {this.state.author}</div>}
+
+// <ol>
+//           {this.state.items &&
+//             this.state.items.map(item => <li key={item.guid}><a href="{item.link}">
+//               {item.title}</a> ({this.toHumans(item.itunes.duration)})
+//               {(this.state.playing === item.guid && this.state.status != 'pause') ?
+//                 <a onClick={this.clickHandlerPause.bind(this)} >PAUSE</a> :
+//                 <a onClick={this.clickHandler.bind(this)} data-guid={item.guid}>PLAY</a>}
+//               <br />{item.content}
+
+//             </li>)}
+//         </ol>
