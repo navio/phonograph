@@ -32,7 +32,8 @@ class App extends Component {
       title: '',
       description: '',
       image: null,
-      link: null
+      link: null,
+      loading:false
     };
     this.episodes = new Map();
   }
@@ -130,18 +131,27 @@ class App extends Component {
     }
   }
 
+  completedLoading(ev){
+    this.setState({loading:'loaded'});
+  }
+
+  completedPlaying(ev){
+    this.setState({
+      episode: null,
+      author: null,
+      playing: null,
+      status:null
+    });
+  }
+
   componentDidMount() {
     let podcast = this.checkIfNewPodcast() || { domain: DEFAULTCAST , protocol:'https:'} ;
     this.fillPodcastContent.call(this, podcast);
-    window.player = this.refs.player;
-    // this.refs.player.
-    // this.refs.player.addEventListener('ended', function () {
-    //   this.setState({
-    //     episode: null,
-    //     author: null,
-    //     playing: null
-    //   });
-    // });
+    let player = this.refs.player;
+    window.player = player;
+    // player.addEventListener('loadeddata',this.startLoading.bind(this));
+    player.addEventListener('canplay',this.completedLoading(this))
+    player.addEventListener('ended', this.completedPlaying(this));
   }
 
   render() {
@@ -163,6 +173,7 @@ class App extends Component {
             handler={this.clickHandler.bind(this)}
             forward={this.forward30Seconds.bind(this)}
             rewind={this.rewind10Seconds.bind(this)}
+            loading={this.state.loading}
           />
 
         <EpisodeList 

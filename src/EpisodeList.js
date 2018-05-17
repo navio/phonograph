@@ -8,6 +8,7 @@ import Divider from "@material-ui/core/Divider";
 import Card from "@material-ui/core/Card";
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import PauseIcon from '@material-ui/icons/Pause';
+import Typography from '@material-ui/core/Typography';
 
 const toMinutes = time => {
   return Math.floor(1 * time / 60) + ":" + (1 * time) % 60;
@@ -21,7 +22,6 @@ const styles = theme => ({
 
 function EpisodeList(props) {
   const { classes } = props;
-  console.log(props.guid,props.status)
   return (
     <div className={classes.root}>
       <Card>
@@ -38,9 +38,9 @@ function EpisodeList(props) {
               <PauseIcon className={classes.playIcon} /> :
               <PlayArrowIcon className={classes.playIcon} />
             }
-                  <ListItemText
-                    primary={episode.title}
-                    secondary={episode.content}
+                  <ListItemText 
+                    primary={<Typography variant="subheading" noWrap>{episode.title}</Typography>}
+                    secondary={<Typography variant="secondary" noWrap>{episode.content}</Typography>}
                   />
                 </ListItem>
                 <Divider />

@@ -47,18 +47,14 @@ const styles = theme => ({
 
 function MediaControlCard(props) {
   const { classes, theme } = props;
-  props.episode && console.log(props.episode);
+  // props.episode && console.log(props.episode);
+  console.log('player state',props.loading)
   return (
     <div>
       {props.episode && <Card className={classes.card}>
         <div className={classes.details}>
-          <CardContent className={classes.content}>
-            <Typography variant="headline">{props.episode.title}</Typography>
-            <Typography variant="subheading" color="textSecondary">
-              {props.episode.content}
-            </Typography>
-          </CardContent>
-          <div className={classes.controls}>
+        
+        {props.loading && props.loading === 'loaded' && <div className={classes.controls}>
             <IconButton aria-label="Previous" onClick={props.rewind}>
               { theme.direction === "rtl" ? <SkipNextIcon className={classes.controlIcon} /> : <SkipPreviousIcon  className={classes.controlIcon} /> }
             </IconButton>
@@ -73,7 +69,13 @@ function MediaControlCard(props) {
             <IconButton aria-label="Next" onClick={props.forward}>
               {theme.direction === "rtl" ? <SkipPreviousIcon className={classes.controlIcon}  />: <SkipNextIcon className={classes.controlIcon} />}
             </IconButton>
-          </div>
+          </div> }
+          <CardContent className={classes.content}>
+            <Typography variant="title">{props.episode.title}</Typography>
+            <Typography style={{ paddingTop: 10 }} color="textSecondary">
+              {props.episode.content}
+            </Typography>
+          </CardContent>
         </div>
         {/* <CardMedia
           className={classes.cover}
