@@ -169,7 +169,7 @@ class App extends Component {
           handler={this.clickHandler.bind(this)}
           playing={this.state.playing} />
 
-        <video  autoPlay="true" 
+        <audio autoPlay="true" 
                 ref="player" 
                 title={(episode && episode.title) ||''} 
                 poster={(episode && episode.itunes && episode.itunes.image) ||''} />
