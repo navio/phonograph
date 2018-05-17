@@ -168,6 +168,7 @@ class App extends Component {
         <EpisodeList 
           episodes={this.state.items}           
           handler={this.clickHandler.bind(this)}
+          status={this.state.status}
           playing={this.state.playing} />
 
         <audio autoPlay="true" 

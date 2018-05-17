@@ -6,6 +6,8 @@ import CardContent from "@material-ui/core/CardContent";
 import CardMedia from "@material-ui/core/CardMedia";
 import Typography from "@material-ui/core/Typography";
 
+import {clearText} from './index';
+
 const styles = {
 
   media: {
@@ -28,7 +30,7 @@ function PodcastHeader(props) {
             {props.title}
           </Typography>
           <Typography component="p">
-          {props.description}
+          {clearText(props.description)}
           </Typography>
         </CardContent>}
       </Card>
