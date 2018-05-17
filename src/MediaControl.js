@@ -10,6 +10,7 @@ import SkipPreviousIcon from '@material-ui/icons/Replay10';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import PauseIcon from '@material-ui/icons/Pause';
 import SkipNextIcon from '@material-ui/icons/Forward30';
+import {clearText} from './index'
 
 const styles = theme => ({
   card: {
@@ -72,8 +73,7 @@ function MediaControlCard(props) {
           </div> }
           <CardContent className={classes.content}>
             <Typography variant="title">{props.episode.title}</Typography>
-            <Typography style={{ paddingTop: 10 }} color="textSecondary">
-              {props.episode.content}
+            <Typography style={{ paddingTop: 10 }} color="textSecondary" dangerouslySetInnerHTML={{__html: props.episode.content}} >
             </Typography>
           </CardContent>
         </div>

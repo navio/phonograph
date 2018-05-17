@@ -132,7 +132,7 @@ class App extends Component {
   }
 
   completedLoading(ev){
-    this.setState({loading:'lośaded'});
+    this.setState({loading:'loaded'});
   }
 
   completedPlaying(ev){

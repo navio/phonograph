@@ -23,10 +23,10 @@ const styles = theme => ({
     flex: '1 0 auto',
   },
   cover: {
-    width: 151,
-    height: 151,
-    paddingLeft:100,
-    margin:10
+    width: 80,
+    margin: 10,
+    height: 40,
+    padding: 40
   },
   playIcon: {
     height: 38,
