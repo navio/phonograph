@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import EpisodeList from "./EpisodeList";
 import PodcastHeader from './PodcastHeader';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
+import MediaControl from './MediaControl';
 import { render } from 'react-dom';
 
 const Parser = new window.RSSParser();
@@ -38,6 +38,7 @@ class App extends Component {
   }
 
   clickHandler(ev) {
+    console.log(ev.currentTarget,this.refs)
     let guid = ev.currentTarget.getAttribute('data-guid');
     let episode = this.episodes.get(guid);
 
@@ -138,21 +139,28 @@ class App extends Component {
   render() {
     let episode = this.episodes.get(this.state.episode) || null;
     return (
-      <MuiThemeProvider><div>
+      <div>
         <PodcastHeader
           title={this.state.title}
           image={this.state.image}
-          description={this.state.description} 
-          episode={episode}
-          player={this.refs.player}
+          description={this.state.description}
+          episode={episode}  
           />
-        <EpisodeList episodes={this.state.items}
+
+        <MediaControl 
+            episode={episode} 
+            player={this.refs.player}
+            status={this.state.status}
+            playing={this.state.playing}
+            handler={this.clickHandler.bind(this)}
+          />
+
+        <EpisodeList 
+          episodes={this.state.items}           
           handler={this.clickHandler.bind(this)}
-          status={this.state.status}
-          playing={this.state.playing}
-        />
+          playing={this.state.playing} />
         <audio autoPlay="true" ref="player" />
-      </div></MuiThemeProvider>
+      </div>
     );
   }
 }

@@ -1,46 +1,42 @@
-import React from 'react';
-import { Card, CardActions, CardHeader, CardMedia, CardTitle, CardText } from 'material-ui/Card';
-import FlatButton from 'material-ui/FlatButton';
-// import Typography from '@material-ui/core/Typography';
-import { clearText } from './index';
-// <CardHeader
-//   title="URL Avatar"
-//   subtitle="Subtitle"
-//   avatar="images/jsa-128.jpg"
-// />
+import React from "react";
+import PropTypes from "prop-types";
+import { withStyles } from "@material-ui/core/styles";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
+import CardMedia from "@material-ui/core/CardMedia";
+import Typography from "@material-ui/core/Typography";
 
-const imageStyle = {
-  height: 100,
-  width: 100,
-  margin: 20,
-  textAlign: 'center',
-}
+const styles = {
 
-const PodcastHeader = (props) => {
-  let date = null
-  if (props.episode && props.episode.pubDate) {
-    date = new Date(props.episode.pubDate);
-    date = date.toLocaleString();
+  media: {
+    paddingTop: "100%" // 16:9
   }
+};
+
+function PodcastHeader(props) {
+  const { classes } = props;
   return (
-    <Card>
-      <CardMedia overlay={<CardTitle title={props.title} />} >
-        {props.image && <img src={props.image} alt="Podcast Logo" />}
-      </CardMedia>
-      {props.episode &&
-        (<span>
-          <CardTitle title={props.episode.title} subtitle={date} />
-          <CardText>
-            {clearText(props.episode.content)}
-          </CardText>
-        </span>)
-      }
-    </Card>
+      <Card>
+        {props.image && <CardMedia
+          className={classes.media}
+          image={props.image}
+          title={`Cover for ${props.title}`}
+        />}
+        {!props.episode &&
+        <CardContent>
+          <Typography variant="headline" component="h2">
+            {props.title}
+          </Typography>
+          <Typography component="p">
+          {props.description}
+          </Typography>
+        </CardContent>}
+      </Card>
   );
 }
 
-export default PodcastHeader;
-    // { <CardActions>
-    //   <FlatButton label="Action1" />
-    //   <FlatButton label="Action2" />
-    //  </CardActions> }
+PodcastHeader.propTypes = {
+  classes: PropTypes.object.isRequired
+};
+
+export default withStyles(styles)(PodcastHeader);

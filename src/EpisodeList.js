@@ -1,62 +1,54 @@
-import React from 'react';
-import { List, ListItem } from 'material-ui/List';
-import Divider from 'material-ui/Divider';
-import Avatar from 'material-ui/Avatar';
-import { grey400, darkBlack, lightBlack, blue300 } from 'material-ui/styles/colors';
-import IconButton from 'material-ui/IconButton';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
-import IconMenu from 'material-ui/IconMenu';
-import MenuItem from 'material-ui/MenuItem';
-import PlayButton from 'material-ui/svg-icons/av/play-arrow';
-import PauseButton from 'material-ui/svg-icons/av/pause';
+import React from "react";
+import PropTypes from "prop-types";
+import { withStyles } from "@material-ui/core/styles";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
+import Checkbox from "@material-ui/core/Checkbox";
+import Divider from "@material-ui/core/Divider";
+import Card from "@material-ui/core/Card";
 
-import { clearText } from './index';
-
-const iconButtonElement = (
-  <IconButton
-    touch={true}
-    tooltip="more"
-    tooltipPosition="bottom-left"
-  >
-    <MoreVertIcon color={grey400} />
-  </IconButton>
-);
-
-const rightIconMenu = (
-  <IconMenu iconButtonElement={iconButtonElement}>
-    <MenuItem>Queue</MenuItem>
-    <MenuItem>Mark As Listened</MenuItem>
-    <MenuItem>Delete</MenuItem>
-  </IconMenu>
-);
-
-const clickHanlder = (play, pause, status) => {
-  console.log(play, pause, status);
-  if (!status) return play;
-  return status === 'pause' ? play : pause;
+const toMinutes = time => {
+  return Math.floor(1 * time / 60) + ":" + (1 * time) % 60;
 };
 
-const toMinutes = (time) => {
-  return Math.floor(1 * time / 60) + ':' + (1 * time % 60);
+const styles = theme => ({
+  root: {
+    width: "100%"
+  }
+});
+
+function EpisodeList(props) {
+  const { classes } = props;
+  return (
+    <div className={classes.root}>
+      <Card>
+        <List>
+          {props.episodes &&
+            props.episodes.map(episode => (
+              <div key={episode.guid}>
+                <ListItem
+                  button
+                  onClick={props.handler}
+                  data-guid={episode.guid}
+                >
+                  <Checkbox tabIndex={-1} disableRipple />
+                  <ListItemText
+                    primary={episode.title}
+                    secondary={episode.content}
+                  />
+                </ListItem>
+                <Divider />
+              </div>
+            ))}
+        </List>
+      </Card>
+    </div>
+  );
 }
 
-const EpisodeList = (props) => (
-  <List>
-    {props.episodes && props.episodes.map(episode =>
-      <div key={episode.guid}>
-        <ListItem onClick={props.handler} data-guid={episode.guid}
-          leftAvatar={<Avatar color={darkBlack}
-            backgroundColor={lightBlack}
-            icon={(props.playing === episode.guid && props.status !== 'pause') ? <PauseButton /> : <PlayButton />} />}
-          primaryText={episode.title}
-          rightIconButton={rightIconMenu}
-          secondaryText={
-            <p>{clearText(episode.content)}</p>
-          }
-          secondaryTextLines={2}
-        /><Divider />
-      </div>)}
-  </List>)
+EpisodeList.propTypes = {
+  classes: PropTypes.object.isRequired
+};
 
-
-export default EpisodeList;
+export default withStyles(styles)(EpisodeList);
