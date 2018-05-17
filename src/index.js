@@ -38,7 +38,6 @@ class App extends Component {
   }
 
   clickHandler(ev) {
-    console.log(ev.currentTarget,this.refs)
     let guid = ev.currentTarget.getAttribute('data-guid');
     let episode = this.episodes.get(guid);
 
@@ -61,6 +60,13 @@ class App extends Component {
         status: 'playing'
       });
     }
+  }
+
+  forward30Seconds(ev){
+    this.refs.player.currentTime += 30;
+  }
+  rewind10Seconds(ev){
+    this.refs.player.currentTime -= 10;
   }
 
   loadEpisodes(RSS) {
@@ -127,6 +133,7 @@ class App extends Component {
     let podcast = this.checkIfNewPodcast() || { domain: DEFAULTCAST , protocol:'https:'} ;
     this.fillPodcastContent.call(this, podcast);
     window.player = this.refs.player;
+    // this.refs.player.
     // this.refs.player.addEventListener('ended', function () {
     //   this.setState({
     //     episode: null,
@@ -153,13 +160,19 @@ class App extends Component {
             status={this.state.status}
             playing={this.state.playing}
             handler={this.clickHandler.bind(this)}
+            forward={this.forward30Seconds.bind(this)}
+            rewind={this.rewind10Seconds.bind(this)}
           />
 
         <EpisodeList 
           episodes={this.state.items}           
           handler={this.clickHandler.bind(this)}
           playing={this.state.playing} />
-        <audio autoPlay="true" ref="player" />
+
+        <video  autoPlay="true" 
+                ref="player" 
+                title={(episode && episode.title) ||''} 
+                poster={(episode && episode.itunes && episode.itunes.image) ||''} />
       </div>
     );
   }

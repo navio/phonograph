@@ -47,7 +47,7 @@ const styles = theme => ({
 
 function MediaControlCard(props) {
   const { classes, theme } = props;
-    console.log(props.episode);
+  props.episode && console.log(props.episode);
   return (
     <div>
       {props.episode && <Card className={classes.card}>
@@ -59,7 +59,7 @@ function MediaControlCard(props) {
             </Typography>
           </CardContent>
           <div className={classes.controls}>
-            <IconButton aria-label="Previous">
+            <IconButton aria-label="Previous" onClick={props.rewind}>
               { theme.direction === "rtl" ? <SkipNextIcon className={classes.controlIcon} /> : <SkipPreviousIcon  className={classes.controlIcon} /> }
             </IconButton>
 
@@ -70,7 +70,7 @@ function MediaControlCard(props) {
             }
             </IconButton>
             
-            <IconButton aria-label="Next">
+            <IconButton aria-label="Next" onClick={props.forward}>
               {theme.direction === "rtl" ? <SkipPreviousIcon className={classes.controlIcon}  />: <SkipNextIcon className={classes.controlIcon} />}
             </IconButton>
           </div>
