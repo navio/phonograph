@@ -119,6 +119,7 @@ class App extends Component {
     let podcast = urlPodcast.searchParams.get("podcast");
     try{
       if(podcast){
+        podcast = podcast.search("http") < 0 ? `https://${podcast}`: podcast;
         podcast = new URL(podcast);
         let domain =   podcast.href.replace(/(^\w+:|^)\/\//, '');
         let protocol = podcast.protocol
