@@ -119,7 +119,7 @@ class App extends Component {
     let urlPodcast = new window.URL(urlString);
     let podcast = urlPodcast.searchParams.get("podcast");
     try{
-      if(podcast){
+      if(podcast){ // Todo: try https, then http otherwise fail. Add Fail message.
         podcast = podcast.search("http") < 0 ? `https://${podcast}`: podcast;
         podcast = new URL(podcast);
         let domain =   podcast.href.replace(/(^\w+:|^)\/\//, '');
