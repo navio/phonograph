@@ -3,14 +3,14 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
+// import CardMedia from '@material-ui/core/CardMedia';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import SkipPreviousIcon from '@material-ui/icons/Replay10';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import PauseIcon from '@material-ui/icons/Pause';
 import SkipNextIcon from '@material-ui/icons/Forward30';
-import {clearText} from './index'
+// import {clearText} from './index'
 
 const styles = theme => ({
   card: {
@@ -49,7 +49,7 @@ const styles = theme => ({
 function MediaControlCard(props) {
   const { classes, theme } = props;
   // props.episode && console.log(props.episode);
-  console.log('player state',props.loading)
+  // console.log('player state',props.loading)
   return (
     <div>
       {props.episode && <Card className={classes.card}>
@@ -73,8 +73,7 @@ function MediaControlCard(props) {
           </div> }
           <CardContent className={classes.content}>
             <Typography variant="title">{props.episode.title}</Typography>
-            <Typography style={{ paddingTop: 10 }} color="textSecondary" dangerouslySetInnerHTML={{__html: props.episode.content}} >
-            </Typography>
+            <Typography style={{ paddingTop: 10 }} color="textSecondary" dangerouslySetInnerHTML={{__html: props.episode.content}} />
           </CardContent>
         </div>
         {/* <CardMedia

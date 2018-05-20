@@ -10,9 +10,9 @@ import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import PauseIcon from '@material-ui/icons/Pause';
 import Typography from '@material-ui/core/Typography';
 import {clearText} from './index';
-const toMinutes = time => {
-  return Math.floor(1 * time / 60) + ":" + (1 * time) % 60;
-};
+// const toMinutes = time => {
+//   return Math.floor(1 * time / 60) + ":" + (1 * time) % 60;
+// };
 
 const styles = theme => ({
   root: {
@@ -39,8 +39,8 @@ function EpisodeList(props) {
               <PlayArrowIcon className={classes.playIcon} />
             }
                   <ListItemText 
-                    primary={<Typography variant="subheading" noWrap>{clearText(episode.title)}</Typography>}
-                    secondary={<Typography variant="secondary" noWrap>{clearText(episode.content)}</Typography>}
+                    primary={<Typography component="span" variant="subheading" noWrap>{clearText(episode.title)}</Typography>}
+                    secondary={<Typography component="span" color="textSecondary" noWrap>{clearText(episode.content)}</Typography>}
                   />
                 </ListItem>
                 <Divider />

@@ -4,11 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
-import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
-import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
-import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import SkipNextIcon from '@material-ui/icons/SkipNext';
 import {clearText} from './index'
 
 const styles = theme => ({
@@ -35,16 +31,16 @@ const styles = theme => ({
 });
 
 function MediaControlCard(props) {
-  const { classes, theme } = props;
+  const { classes } = props;
 
   return (
     <div>
       <Card className={classes.card}>
-      <CardMedia
+      {props.image && <CardMedia
           className={classes.cover}
           image={props.image}
           title="Live from space album cover"
-        />
+        />}
         <div className={classes.details}>
           <CardContent className={classes.content}>
             <Typography variant="headline">{props.title}</Typography>

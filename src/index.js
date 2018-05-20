@@ -156,6 +156,7 @@ class App extends Component {
 
   render() {
     let episode = this.episodes.get(this.state.episode) || null;
+    // episode && console.log(episode)
     return (
       <div>
         <PodcastHeader
@@ -169,6 +170,7 @@ class App extends Component {
             episode={episode} 
             player={this.refs.player}
             status={this.state.status}
+
             playing={this.state.playing}
             handler={this.clickHandler.bind(this)}
             forward={this.forward30Seconds.bind(this)}
