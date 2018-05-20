@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import EpisodeList from "./EpisodeList";
 import PodcastHeader from './PodcastHeader';
 import MediaControl from './MediaControl';
+import Header from './Header';
+import Footer from './Footer';
+import CssBaseline from '@material-ui/core/CssBaseline';
 import { render } from 'react-dom';
 
 const Parser = new window.RSSParser();
@@ -158,7 +161,8 @@ class App extends Component {
     let episode = this.episodes.get(this.state.episode) || null;
     // episode && console.log(episode)
     return (
-      <div>
+      <div><CssBaseline />
+        <Header />
         <PodcastHeader
           title={this.state.title}
           image={this.state.image}
@@ -178,16 +182,17 @@ class App extends Component {
             loading={this.state.loading}
           />
 
-        <EpisodeList 
+        {<EpisodeList 
           episodes={this.state.items}           
           handler={this.clickHandler.bind(this)}
           status={this.state.status}
-          playing={this.state.playing} />
-
+          playing={this.state.playing} />}
+        <Footer />
         <audio autoPlay="true" 
                 ref="player" 
                 title={(episode && episode.title) ||''} 
                 poster={(episode && episode.itunes && episode.itunes.image) ||''} />
+        
       </div>
     );
   }

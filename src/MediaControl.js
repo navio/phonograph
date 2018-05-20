@@ -19,6 +19,7 @@ const styles = theme => ({
   details: {
     display: 'flex',
     flexDirection: 'column',
+    paddingTop: theme.spacing.unit,
   },
   content: {
     flex: '1 0 auto',
