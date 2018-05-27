@@ -39,7 +39,7 @@ function MediaControlCard(props) {
       {props.image && <CardMedia
           className={classes.cover}
           image={props.image}
-          title="Live from space album cover"
+          title={`${props.title} cover`}
         />}
         <div className={classes.details}>
           <CardContent className={classes.content}>

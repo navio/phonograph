@@ -29,6 +29,7 @@ class App extends Component {
       playing: null,
       items: null,
       episode: null,
+      loaded: 0,
 
       author: null,
       status: null,
@@ -39,6 +40,7 @@ class App extends Component {
       loading:false
     };
     this.episodes = new Map();
+    this.loading = this.loading.bind(this);
   }
 
   clickHandler(ev) {
@@ -139,6 +141,7 @@ class App extends Component {
   }
 
   completedPlaying(ev){
+    console.log('ended-->')
     this.setState({
       episode: null,
       author: null,
@@ -147,14 +150,67 @@ class App extends Component {
     });
   }
 
+  eventEcho(ev){
+    console.log(ev.type,window.player.buffered,ev)
+  }
+
+  showBufferProgress(ev){
+    // let buffered = ev.target.buffered.end(ev.target.buffered.length-1);
+    // let duration = ev.target.duration;
+    // let buffered_percentage = (buffered / duration) * 100;
+    // console.log(buffered_percentage);
+    // console.log(ev.target.buffered.end(0),ev.target.buffered)
+
+  }
+
+  loading() {
+    let buffered = this.refs.player.buffered;
+    
+    if (buffered.length) {
+      let loaded = 100 * buffered.end(0) / this.refs.player.duration;
+      // played = 100 * audio.currentTime / audio.duration;
+      this.setState({buffered:loaded.toFixed(2)});
+      //console.log(loaded)
+      // percentages[0].innerHTML = loaded.toFixed(2);
+      // percentages[1].innerHTML = played.toFixed(2);
+      
+    }
+    setTimeout(this.loading, 50);
+  }
+
+  playTick(ev){
+    this.tick = setInterval(()=>{ 
+      this.setState({currentTime:this.refs.player.currentTime, duration: this.refs.player.duration });
+    },1000);
+  }
+
+  pauseTick(ev){
+    clearInterval(this.tick);
+  }
+
+  attachEvents(player){
+    // Initialization
+    player.addEventListener('loadstart',this.loading.bind(this)); 
+    player.addEventListener('loadeddata',this.eventEcho.bind(this)); 
+    player.addEventListener('progress',this.showBufferProgress.bind(this));
+    player.addEventListener('canplaythrough',this.eventEcho.bind(this));
+
+    // User Events
+    player.addEventListener('play',this.playTick.bind(this));
+    player.addEventListener('pause',this.pauseTick.bind(this));
+    
+    // Media Events
+    player.addEventListener('canplay',this.completedLoading.bind(this))
+    player.addEventListener('ended', this.completedPlaying.bind(this));
+  }
+
   componentDidMount() {
     let podcast = this.checkIfNewPodcast() || { domain: DEFAULTCAST , protocol:'https:'} ;
     this.fillPodcastContent.call(this, podcast);
     let player = this.refs.player;
+    this.attachEvents.call(this,player);
+
     window.player = player;
-    // player.addEventListener('loadeddata',this.startLoading.bind(this));
-    player.addEventListener('canplay',this.completedLoading(this))
-    player.addEventListener('ended', this.completedPlaying(this));
   }
 
   render() {
@@ -174,12 +230,14 @@ class App extends Component {
             episode={episode} 
             player={this.refs.player}
             status={this.state.status}
-
+            totalTime={this.state.duration}
+            currentTime={this.state.currentTime}
             playing={this.state.playing}
             handler={this.clickHandler.bind(this)}
             forward={this.forward30Seconds.bind(this)}
             rewind={this.rewind10Seconds.bind(this)}
             loading={this.state.loading}
+            buffered={this.state.buffered}
           />
 
         {<EpisodeList 
