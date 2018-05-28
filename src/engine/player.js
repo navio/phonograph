@@ -1,11 +1,27 @@
 
 
 export const forward30Seconds = 
-    function(){  console.log(this.refs.player)
-        this.refs.player.currentTime += 30;
+    function(){  
+        let player = this.refs.player;
+        player.currentTime += 30;
+
+        let loaded = (player.buffered.length) ? (100 * player.buffered.end(0) / player.duration) : 0;
+  
+        this.setState({ loaded, 
+                        played: (100 * player.currentTime / player.duration), 
+                        currentTime: player.currentTime, 
+                        duration: player.duration });
     }
 
 export const rewind10Seconds = 
     function (){
-        this.refs.player.currentTime -= 10;
+        let player = this.refs.player;
+        player.currentTime -= 10;
+
+        let loaded = (player.buffered.length) ? (100 * player.buffered.end(0) / player.duration) : 0;
+  
+        this.setState({ loaded, 
+                        played: (100 * player.currentTime / player.duration), 
+                        currentTime: player.currentTime, 
+                        duration: player.duration });
     }

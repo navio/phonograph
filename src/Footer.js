@@ -13,6 +13,7 @@ const styles = {
         position: 'fixed',
         bottom: 0,
         width: '100%',
+        borderTop: '1px solid rgba(0, 0, 0, 0.12)'
     }
 };
 

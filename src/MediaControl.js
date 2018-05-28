@@ -58,8 +58,13 @@ const styles = theme => ({
     paddingLeft: 20,
     paddingRight: 20,
   },
-  root: {
-    flexGrow: 1
+  root:{
+    borderTop: '1px solid rgba(0, 0, 0, 0.12)',
+    position: 'fixed',
+    bottom: 56,
+    width: '100%',
+    backgroundColor:'#fff',
+    zIndex:50
   }
 });
 
@@ -72,11 +77,10 @@ const convertMinsToHrsMins = (mins) => {
   return `${h}:${m}`;
 }
 
-const toMinutes = theTime => {
-  theTime = Math.floor(theTime);
-  if(!Number.isInteger(theTime)) return 'Loading';
-
-  return ( Math.floor(1 * theTime / 60) + ":" + (1 * theTime) % 60 );
+const toMinutes = (totalTime , currentTime) => {
+  totalTime = Math.floor(totalTime - currentTime);
+  if(!Number.isInteger(totalTime)) return '∞';
+  return ( '- '+ convertMinsToHrsMins(totalTime) );
 }
 
 const toMin = (theTime) =>  
@@ -87,9 +91,9 @@ function MediaControlCard(props) {
   const { classes, theme } = props;
 
   return (
-    <div>
+    <div className={classes.root}>
       {props.episode && (
-        <Card className={classes.card}>
+        <div className={classes.card}>
           <div className={classes.details}>
             
             <CardContent className={classes.content}>
@@ -109,7 +113,7 @@ function MediaControlCard(props) {
                 <LinearProgress variant="buffer" className={classes.line} value={props.played} valueBuffer={props.loaded} />
               </Grid>
               <Grid item xs={2} className={classes.right}>
-                <span>{toMinutes(props.totalTime)}</span>
+                <span>{toMinutes(props.totalTime,props.currentTime)}</span>
               </Grid>
             </Grid>
 
@@ -151,7 +155,7 @@ function MediaControlCard(props) {
 
 
           </div>
-        </Card>
+        </div>
       )}
     </div>
   );

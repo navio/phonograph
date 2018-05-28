@@ -143,7 +143,6 @@ class App extends Component {
   }
 
   completedPlaying(ev){
-    console.log('ended-->')
     this.setState({
       episode: null,
       author: null,
@@ -156,27 +155,24 @@ class App extends Component {
     if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') console.log(ev.type,window.player.buffered,ev);
   }
 
-  showBufferProgress(ev){
-    // let buffered = ev.target.buffered.end(ev.target.buffered.length-1);
-    // let duration = ev.target.duration;
-    // let buffered_percentage = (buffered / duration) * 100;
-    // console.log(buffered_percentage);
-    // console.log(ev.target.buffered.end(0),ev.target.buffered)
-
-  }
-
   playTick(ev){
     this.tick = setInterval(()=>{ 
       let player = this.refs.player;
-      let loaded = (player.buffered.length) ? (100 * player.buffered.end(0) / player.duration) : 100;
+      let loaded = (player.buffered.length) ? (100 * player.buffered.end(0) / player.duration) : 0;
   
-      this.setState({ loaded, 
+      this.setState({ loaded,
+                      status: 'playing',
                       played: (100 * player.currentTime / player.duration), 
-                      currentTime:player.currentTime, 
-                      duration:player.duration });
-
+                      currentTime: player.currentTime, 
+                      duration: player.duration });
 
     },500);
+  }
+  
+  progress(ev){
+    let player = this.refs.player;
+    let loaded = (player.buffered.length) ? (100 * player.buffered.end(0) / player.duration) : 100;
+    this.setState({loaded, status: 'pause'});
   }
 
   pauseTick(ev){
@@ -187,7 +183,7 @@ class App extends Component {
     // Initialization
     // player.addEventListener('loadstart',this.loading.bind(this)); 
     player.addEventListener('loadeddata',this.eventEcho.bind(this)); 
-    player.addEventListener('progress',this.showBufferProgress.bind(this));
+    player.addEventListener('progress',this.eventEcho.bind(this));
     player.addEventListener('canplaythrough',this.eventEcho.bind(this));
 
     // User Events
@@ -210,16 +206,23 @@ class App extends Component {
 
   render() {
     let episode = this.episodes.get(this.state.episode) || null;
-    // episode && console.log(episode)
+
     return (
-      <div><CssBaseline />
+      <div>
+        <CssBaseline />
         <Header />
+        
         <PodcastHeader
           title={this.state.title}
           image={this.state.image}
           description={this.state.description}
           episode={episode}  
           />
+        <EpisodeList 
+          episodes={this.state.items}           
+          handler={this.clickHandler.bind(this)}
+          status={this.state.status}
+          playing={this.state.playing} />
 
         <MediaControl 
             episode={episode} 
@@ -235,15 +238,10 @@ class App extends Component {
             loaded={this.state.loaded}
             played={this.state.played}
           />
-
-        {<EpisodeList 
-          episodes={this.state.items}           
-          handler={this.clickHandler.bind(this)}
-          status={this.state.status}
-          playing={this.state.playing} />}
         <Footer />
         <audio autoPlay="true" 
                 ref="player" 
+                preload="auto" 
                 title={(episode && episode.title) ||''} 
                 poster={(episode && episode.itunes && episode.itunes.image) ||''} />
         
