@@ -98,11 +98,11 @@ function MediaControlCard(props) {
             
             <CardContent className={classes.content}>
               <Typography variant="title">{props.episode.title}</Typography>
-              <Typography
+              {/*<Typography
                 style={{ paddingTop: 10 }}
                 color="textSecondary"
                 dangerouslySetInnerHTML={{ __html: props.episode.content }}
-              />
+              />*/}
             </CardContent>
 
            <Grid container className={classes.player}>
