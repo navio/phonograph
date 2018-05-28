@@ -34,6 +34,7 @@ class App extends Component {
       items: null,
       episode: null,
       loaded: 0,
+      played: 0,
 
       author: null,
       status: null,

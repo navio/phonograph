@@ -17,11 +17,9 @@ import Grid from "@material-ui/core/Grid";
 
 const styles = theme => ({
   card: {
-
     width:'100%'
   },
   details: {
-
     flexDirection: "column",
   },
   content: {
@@ -39,6 +37,9 @@ const styles = theme => ({
   left: {
     textAlign: "left"
   },
+  line:{
+    marginTop: "5px"
+  },
   right: {
     textAlign: "right"
   },
@@ -53,9 +54,9 @@ const styles = theme => ({
     height: 30,
     width: 30
   },
-  spaceAround:{
+  player:{
     paddingLeft: 20,
-    paddingRight: 20
+    paddingRight: 20,
   },
   root: {
     flexGrow: 1
@@ -72,25 +73,47 @@ const convertMinsToHrsMins = (mins) => {
 }
 
 const toMinutes = theTime => {
-theTime = Math.floor(theTime);
-if(!Number.isInteger(theTime)) return 'Loading';
+  theTime = Math.floor(theTime);
+  if(!Number.isInteger(theTime)) return 'Loading';
 
-return ( Math.floor(1 * theTime / 60) + ":" + (1 * theTime) % 60 );
+  return ( Math.floor(1 * theTime / 60) + ":" + (1 * theTime) % 60 );
 }
 
-const toMin = (theTime) => ( typeof theTime === 'number' ) ? convertMinsToHrsMins(Math.floor(theTime)) : `00:00` ;
+const toMin = (theTime) =>  
+typeof theTime === 'number'  ? convertMinsToHrsMins(Math.floor(theTime)) : `00:00` ;
 
 
 function MediaControlCard(props) {
   const { classes, theme } = props;
-  // props.episode && console.log(props.episode);
 
   return (
     <div>
       {props.episode && (
         <Card className={classes.card}>
           <div className={classes.details}>
-            <Grid container>
+            
+            <CardContent className={classes.content}>
+              <Typography variant="title">{props.episode.title}</Typography>
+              <Typography
+                style={{ paddingTop: 10 }}
+                color="textSecondary"
+                dangerouslySetInnerHTML={{ __html: props.episode.content }}
+              />
+            </CardContent>
+
+           <Grid container className={classes.player}>
+              <Grid item xs={2}>
+                <span>{toMin(props.currentTime)}</span>
+              </Grid>
+              <Grid item xs={8}>
+                <LinearProgress variant="buffer" className={classes.line} value={props.played} valueBuffer={props.loaded} />
+              </Grid>
+              <Grid item xs={2} className={classes.right}>
+                <span>{toMinutes(props.totalTime)}</span>
+              </Grid>
+            </Grid>
+
+            <Grid container className={classes.controls} >
               <Grid className={classes.right} item xs={4}>
                 <IconButton aria-label="Previous" onClick={props.rewind}>
                   {theme.direction === "rtl" ? (
@@ -124,25 +147,8 @@ function MediaControlCard(props) {
                 </IconButton>
               </Grid>
             </Grid>
-            <Grid container className={classes.spaceAround}>
-              <Grid item xs={2}>
-                <span>{toMin(props.currentTime)}</span>
-              </Grid>
-              <Grid item xs={8}>
-                <LinearProgress variant="buffer" value={props.played} valueBuffer={props.loaded} />
-              </Grid>
-              <Grid item xs={2} className={classes.right}>
-                <span>{toMinutes(props.totalTime)}</span>
-              </Grid>
-            </Grid>
-            <CardContent className={classes.content}>
-              <Typography variant="title">{props.episode.title}</Typography>
-              <Typography
-                style={{ paddingTop: 10 }}
-                color="textSecondary"
-                dangerouslySetInnerHTML={{ __html: props.episode.content }}
-              />
-            </CardContent>
+
+
 
           </div>
         </Card>
