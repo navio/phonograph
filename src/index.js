@@ -7,8 +7,12 @@ import Footer from './Footer';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { render } from 'react-dom';
 
+// Engine
+import {forward30Seconds, rewind10Seconds} from './engine/player';
+
 const Parser = new window.RSSParser();
 let PROXY = {'https:':'/rss/','http:':'/rss-less/'};
+
 if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
   PROXY = {'https:':'https://cors-anywhere.herokuapp.com/','http:':'https://cors-anywhere.herokuapp.com/'};
 }
@@ -40,7 +44,10 @@ class App extends Component {
       loading:false
     };
     this.episodes = new Map();
-    this.loading = this.loading.bind(this);
+
+    this.forward30Seconds = forward30Seconds.bind(this);
+    this.rewind10Seconds = rewind10Seconds.bind(this);
+
   }
 
   clickHandler(ev) {
@@ -68,12 +75,6 @@ class App extends Component {
     }
   }
 
-  forward30Seconds(ev){
-    this.refs.player.currentTime += 30;
-  }
-  rewind10Seconds(ev){
-    this.refs.player.currentTime -= 10;
-  }
 
   loadEpisodes(RSS) {
     RSS.forEach(item => this.episodes.set(item.guid, item));
@@ -151,7 +152,7 @@ class App extends Component {
   }
 
   eventEcho(ev){
-    console.log(ev.type,window.player.buffered,ev)
+    if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') console.log(ev.type,window.player.buffered,ev);
   }
 
   showBufferProgress(ev){
@@ -163,25 +164,18 @@ class App extends Component {
 
   }
 
-  loading() {
-    let buffered = this.refs.player.buffered;
-    
-    if (buffered.length) {
-      let loaded = 100 * buffered.end(0) / this.refs.player.duration;
-      // played = 100 * audio.currentTime / audio.duration;
-      this.setState({buffered:loaded.toFixed(2)});
-      //console.log(loaded)
-      // percentages[0].innerHTML = loaded.toFixed(2);
-      // percentages[1].innerHTML = played.toFixed(2);
-      
-    }
-    setTimeout(this.loading, 50);
-  }
-
   playTick(ev){
     this.tick = setInterval(()=>{ 
-      this.setState({currentTime:this.refs.player.currentTime, duration: this.refs.player.duration });
-    },1000);
+      let player = this.refs.player;
+      let loaded = (player.buffered.length) ? (100 * player.buffered.end(0) / player.duration) : 100;
+  
+      this.setState({ loaded, 
+                      played: (100 * player.currentTime / player.duration), 
+                      currentTime:player.currentTime, 
+                      duration:player.duration });
+
+
+    },500);
   }
 
   pauseTick(ev){
@@ -190,7 +184,7 @@ class App extends Component {
 
   attachEvents(player){
     // Initialization
-    player.addEventListener('loadstart',this.loading.bind(this)); 
+    // player.addEventListener('loadstart',this.loading.bind(this)); 
     player.addEventListener('loadeddata',this.eventEcho.bind(this)); 
     player.addEventListener('progress',this.showBufferProgress.bind(this));
     player.addEventListener('canplaythrough',this.eventEcho.bind(this));
@@ -237,7 +231,8 @@ class App extends Component {
             forward={this.forward30Seconds.bind(this)}
             rewind={this.rewind10Seconds.bind(this)}
             loading={this.state.loading}
-            buffered={this.state.buffered}
+            loaded={this.state.loaded}
+            played={this.state.played}
           />
 
         {<EpisodeList 

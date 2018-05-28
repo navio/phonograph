@@ -4,7 +4,7 @@ import { withStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 
-import CardMedia from "@material-ui/core/CardMedia";
+// import CardMedia from "@material-ui/core/CardMedia";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
 import SkipPreviousIcon from "@material-ui/icons/Replay10";
@@ -63,6 +63,7 @@ const styles = theme => ({
 });
 
 const convertMinsToHrsMins = (mins) => {
+  if (!Number.isInteger(mins)) return '';
   let h = Math.floor(mins / 60);
   let m = mins % 60;
   h = h < 10 ? '0' + h : h;
@@ -70,10 +71,10 @@ const convertMinsToHrsMins = (mins) => {
   return `${h}:${m}`;
 }
 
-const toMinutes = theTime =>{
-
-if(typeof theTime !== 'number') return 'Loading';
+const toMinutes = theTime => {
 theTime = Math.floor(theTime);
+if(!Number.isInteger(theTime)) return 'Loading';
+
 return ( Math.floor(1 * theTime / 60) + ":" + (1 * theTime) % 60 );
 }
 
@@ -83,7 +84,6 @@ const toMin = (theTime) => ( typeof theTime === 'number' ) ? convertMinsToHrsMin
 function MediaControlCard(props) {
   const { classes, theme } = props;
   // props.episode && console.log(props.episode);
-  console.log('player state',props.buffered)
 
   return (
     <div>
@@ -129,7 +129,7 @@ function MediaControlCard(props) {
                 <span>{toMin(props.currentTime)}</span>
               </Grid>
               <Grid item xs={8}>
-                <LinearProgress variant="buffer" value={props.currentTime} valueBuffer={props.buffered} />
+                <LinearProgress variant="buffer" value={props.played} valueBuffer={props.loaded} />
               </Grid>
               <Grid item xs={2} className={classes.right}>
                 <span>{toMinutes(props.totalTime)}</span>
