@@ -20,7 +20,7 @@ const styles = {
     marginRight: 20,
   },
   behindButton:{
-    paddingTop: 51
+    paddingTop: 62
   }
 };
 

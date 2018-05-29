@@ -58,6 +58,10 @@ const styles = theme => ({
     paddingLeft: 20,
     paddingRight: 20,
   },
+  undeground:{
+    height:130,
+    width:'100%'
+  },
   root:{
     borderTop: '1px solid rgba(0, 0, 0, 0.12)',
     position: 'fixed',
@@ -91,6 +95,7 @@ function MediaControlCard(props) {
   const { classes, theme } = props;
 
   return (
+    <div>
     <div className={classes.root}>
       {props.episode && (
         <div className={classes.card}>
@@ -157,6 +162,8 @@ function MediaControlCard(props) {
           </div>
         </div>
       )}
+    </div>
+    { props.episode && <div className={classes.undeground}></div> }
     </div>
   );
 }

@@ -25,3 +25,31 @@ export const rewind10Seconds =
                         currentTime: player.currentTime, 
                         duration: player.duration });
     }
+
+export const playButton = 
+    function(ev) {
+        let guid = ev.currentTarget.getAttribute('data-guid');
+        let episode = this.episodes.get(guid);
+
+        if (this.state.playing === guid) {
+            
+            if (this.state.status === 'pause') {
+                this.refs.player.play();
+                this.setState({ status: 'playing' });
+            } else {
+                this.setState({ status: 'pause' });
+                this.refs.player.pause();
+            }
+
+        } else {
+
+            this.refs.player.setAttribute("src", episode.enclosure.url);
+            this.refs.player.play();
+            this.setState({
+                episode: episode.guid,
+                author: episode.itunes.author,
+                playing: guid,
+                status: 'playing'
+            });
+        }
+  }

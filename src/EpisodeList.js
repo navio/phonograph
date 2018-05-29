@@ -17,6 +17,9 @@ import {clearText} from './index';
 const styles = theme => ({
   root: {
     width: "100%"
+  },
+  selected:{
+    backgroundColor:'aliceblue'
   }
 });
 
@@ -29,7 +32,7 @@ function EpisodeList(props) {
           {props.episodes &&
             props.episodes.map(episode => (
               <div key={episode.guid}>
-                <ListItem
+                <ListItem className={(props.playing === episode.guid ? classes.selected : null)}
                   button
                   onClick={props.handler}
                   data-guid={episode.guid}

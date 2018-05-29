@@ -8,16 +8,19 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import { render } from 'react-dom';
 
 // Engine
-import {forward30Seconds, rewind10Seconds} from './engine/player';
+import {forward30Seconds, rewind10Seconds, playButton} from './engine/player';
+import {fillPodcastContent,checkIfNewPodcast} from './engine/podcast';
+import attachEvents from './engine/events'
 
-const Parser = new window.RSSParser();
-let PROXY = {'https:':'/rss/','http:':'/rss-less/'};
 
-if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
-  PROXY = {'https:':'https://cors-anywhere.herokuapp.com/','http:':'https://cors-anywhere.herokuapp.com/'};
-}
+// const Parser = new window.RSSParser();
+// let PROXY = {'https:':'/rss/','http:':'/rss-less/'};
 
-const DEFAULTCAST = "www.npr.org/rss/podcast.php?id=510289";
+// if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+//   PROXY = {'https:':'https://cors-anywhere.herokuapp.com/','http:':'https://cors-anywhere.herokuapp.com/'};
+// }
+
+// const DEFAULTCAST = "www.npr.org/rss/podcast.php?id=510289";
 
 export const clearText = (html) =>{
     let tmp = document.createElement('div');
@@ -44,163 +47,24 @@ class App extends Component {
       link: null,
       loading:false
     };
+
     this.episodes = new Map();
 
     this.forward30Seconds = forward30Seconds.bind(this);
     this.rewind10Seconds = rewind10Seconds.bind(this);
+    this.playButton = playButton.bind(this);
 
   }
 
-  clickHandler(ev) {
-    let guid = ev.currentTarget.getAttribute('data-guid');
-    let episode = this.episodes.get(guid);
-
-    if (this.state.playing === guid) {
-      if (this.state.status === 'pause') {
-        this.refs.player.play();
-        this.setState({ status: 'playing' });
-      } else {
-        this.setState({ status: 'pause' });
-        this.refs.player.pause();
-      }
-
-    } else {
-      this.refs.player.setAttribute("src", episode.enclosure.url);
-      this.refs.player.play();
-      this.setState({
-        episode: episode.guid,
-        author: episode.itunes.author,
-        playing: guid,
-        status: 'playing'
-      });
-    }
-  }
-
-
-  loadEpisodes(RSS) {
-    RSS.forEach(item => this.episodes.set(item.guid, item));
-  }
-
-  fillPodcastContent(podcast) {
-
-    let CORS_PROXY = PROXY[podcast.protocol];
-    let found = window.localStorage.getItem(podcast.domain);
-    
-    if (!found) {
-      this.episodes.clear();
-      Parser.parseURL(CORS_PROXY + podcast.domain)
-        .then((RSS) => { 
-          this.setState({ items: RSS.items.slice(0, 20) });
-          this.loadEpisodes(RSS.items);
-          window.localStorage.setItem(podcast.domain, JSON.stringify(RSS));
-        });
-    } else {
-      let content = JSON.parse(found);
-      this.setState({
-        items: content.items.slice(0, 20),
-        title: content.title,
-        description: content.description,
-        image: content.itunes.image,
-        link: content.link
-      });
-      this.episodes.clear();
-      this.loadEpisodes(content.items);
-      Parser.parseURL(CORS_PROXY + podcast.domain) //Background.
-        .then((RSS) => { 
-          let newReading = JSON.stringify(RSS);
-          if (newReading !== found) {
-            console.log('Updated');
-            window.localStorage.setItem(podcast.domain, JSON.stringify(RSS));
-            this.setState({
-              items: RSS.items.slice(0, 20)
-            });
-            this.episodes.clear();
-            this.loadEpisodes(RSS.items);
-          }
-        });
-    }
-  }
-
-  checkIfNewPodcast() {
-    let urlString = window.location.href;
-    let urlPodcast = new window.URL(urlString);
-    let podcast = urlPodcast.searchParams.get("podcast");
-    try{
-      if(podcast){ // Todo: try https, then http otherwise fail. Add Fail message.
-        podcast = podcast.search("http") < 0 ? `https://${podcast}`: podcast;
-        podcast = new URL(podcast);
-        let domain =   podcast.href.replace(/(^\w+:|^)\/\//, '');
-        let protocol = podcast.protocol
-        return { domain , protocol };
-      }
-    }catch(err){
-      console.error('Invalid URL');
-    }
-  }
-
-  completedLoading(ev){
-    this.setState({loading:'loaded'});
-  }
-
-  completedPlaying(ev){
-    this.setState({
-      episode: null,
-      author: null,
-      playing: null,
-      status:null
-    });
-  }
-
-  eventEcho(ev){
-    if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') console.log(ev.type,window.player.buffered,ev);
-  }
-
-  playTick(ev){
-    this.tick = setInterval(()=>{ 
-      let player = this.refs.player;
-      let loaded = (player.buffered.length) ? (100 * player.buffered.end(0) / player.duration) : 0;
-  
-      this.setState({ loaded,
-                      status: 'playing',
-                      played: (100 * player.currentTime / player.duration), 
-                      currentTime: player.currentTime, 
-                      duration: player.duration });
-
-    },500);
-  }
-  
-  progress(ev){
-    let player = this.refs.player;
-    let loaded = (player.buffered.length) ? (100 * player.buffered.end(0) / player.duration) : 100;
-    this.setState({loaded, status: 'pause'});
-  }
-
-  pauseTick(ev){
-    clearInterval(this.tick);
-  }
-
-  attachEvents(player){
-    // Initialization
-    // player.addEventListener('loadstart',this.loading.bind(this)); 
-    player.addEventListener('loadeddata',this.eventEcho.bind(this)); 
-    player.addEventListener('progress',this.eventEcho.bind(this));
-    player.addEventListener('canplaythrough',this.eventEcho.bind(this));
-
-    // User Events
-    player.addEventListener('play',this.playTick.bind(this));
-    player.addEventListener('pause',this.pauseTick.bind(this));
-    
-    // Media Events
-    player.addEventListener('canplay',this.completedLoading.bind(this))
-    player.addEventListener('ended', this.completedPlaying.bind(this));
-  }
 
   componentDidMount() {
-    let podcast = this.checkIfNewPodcast() || { domain: DEFAULTCAST , protocol:'https:'} ;
-    this.fillPodcastContent.call(this, podcast);
+    let podcast = checkIfNewPodcast.call(this);
     let player = this.refs.player;
-    this.attachEvents.call(this,player);
+    console.log('aa',podcast);
 
+    fillPodcastContent.call(this, podcast);
+    attachEvents.call(this,player);
+    
     window.player = player;
   }
 
@@ -220,7 +84,7 @@ class App extends Component {
           />
         <EpisodeList 
           episodes={this.state.items}           
-          handler={this.clickHandler.bind(this)}
+          handler={this.playButton.bind(this)}
           status={this.state.status}
           playing={this.state.playing} />
 
@@ -231,7 +95,7 @@ class App extends Component {
             totalTime={this.state.duration}
             currentTime={this.state.currentTime}
             playing={this.state.playing}
-            handler={this.clickHandler.bind(this)}
+            handler={this.playButton.bind(this)}
             forward={this.forward30Seconds.bind(this)}
             rewind={this.rewind10Seconds.bind(this)}
             loading={this.state.loading}

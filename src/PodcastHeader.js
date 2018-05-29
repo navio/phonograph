@@ -28,6 +28,10 @@ const styles = theme => ({
     height: 38,
     width: 38,
   },
+  desc:{
+    maxHeight: '100px',
+    overflow: 'hidden'
+  }
 });
 
 function MediaControlCard(props) {
@@ -43,8 +47,8 @@ function MediaControlCard(props) {
         />}
         <div className={classes.details}>
           <CardContent className={classes.content}>
-            <Typography variant="headline">{props.title}</Typography>
-            <Typography color="textSecondary">
+            <Typography variant="headline" noWrap>{props.title}</Typography>
+            <Typography className={classes.desc} color="textSecondary">
               {clearText(props.description)}
             </Typography>
           </CardContent>

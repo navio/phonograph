@@ -14,6 +14,10 @@ const styles = {
         bottom: 0,
         width: '100%',
         borderTop: '1px solid rgba(0, 0, 0, 0.12)'
+    },
+    underground:{
+      height:48,
+      width:'100%'
     }
 };
 
@@ -24,7 +28,7 @@ class SimpleBottomNavigation extends React.Component {
     // const { value } = this.state;
 
     return (
-    <Paper className={classes.root} elevation={4}>
+    <div><Paper className={classes.root} elevation={4}>
       <BottomNavigation
         // value={value}
         onChange={this.handleChange}
@@ -35,7 +39,7 @@ class SimpleBottomNavigation extends React.Component {
         <BottomNavigationAction label="Discover" icon={<FavoriteIcon />} />
         <BottomNavigationAction label="Settings" icon={<LocationOnIcon />} />
       </BottomNavigation>
-    </Paper>
+    </Paper><div className={classes.underground}></div></div>
     );
   }
 }
