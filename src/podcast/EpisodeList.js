@@ -9,10 +9,15 @@ import Card from "@material-ui/core/Card";
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import PauseIcon from '@material-ui/icons/Pause';
 import Typography from '@material-ui/core/Typography';
-import {clearText} from './index';
 // const toMinutes = time => {
 //   return Math.floor(1 * time / 60) + ":" + (1 * time) % 60;
 // };
+
+export const clearText = (html) =>{
+  let tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText;
+}
 
 const styles = theme => ({
   root: {

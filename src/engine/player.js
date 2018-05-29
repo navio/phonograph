@@ -1,5 +1,14 @@
 
 
+// const state = {
+//     loaded:null,
+//     played:null,
+//     currentTime:0,
+//     duration:0,
+//     status:null,
+
+// }
+
 export const forward30Seconds = 
     function(){  
         let player = this.refs.player;

@@ -5,7 +5,7 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
-import {clearText} from './index'
+import {clearText} from './EpisodeList'
 
 const styles = theme => ({
   card: {
@@ -34,7 +34,8 @@ const styles = theme => ({
   }
 });
 
-function MediaControlCard(props) {
+
+function PodcastHeader(props) {
   const { classes } = props;
 
   return (
@@ -58,9 +59,9 @@ function MediaControlCard(props) {
   );
 }
 
-MediaControlCard.propTypes = {
+PodcastHeader.propTypes = {
   classes: PropTypes.object.isRequired,
   theme: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles, { withTheme: true })(MediaControlCard);
+export default withStyles(styles, { withTheme: true })(PodcastHeader);

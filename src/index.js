@@ -1,32 +1,21 @@
 import React, { Component } from 'react';
-import EpisodeList from "./EpisodeList";
-import PodcastHeader from './PodcastHeader';
-import MediaControl from './MediaControl';
-import Header from './Header';
-import Footer from './Footer';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import { render } from 'react-dom';
+import CssBaseline from '@material-ui/core/CssBaseline';
 
+import MediaControl from './app/MediaControl';
+import Header from './app/Header';
+import Footer from './app/Footer';
+
+// Podcast
+import EpisodeList from "./podcast/EpisodeList";
+import PodcastHeader from './podcast/PodcastHeader';
 // Engine
 import {forward30Seconds, rewind10Seconds, playButton} from './engine/player';
 import {fillPodcastContent,checkIfNewPodcast} from './engine/podcast';
 import attachEvents from './engine/events'
 
 
-// const Parser = new window.RSSParser();
-// let PROXY = {'https:':'/rss/','http:':'/rss-less/'};
 
-// if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
-//   PROXY = {'https:':'https://cors-anywhere.herokuapp.com/','http:':'https://cors-anywhere.herokuapp.com/'};
-// }
-
-// const DEFAULTCAST = "www.npr.org/rss/podcast.php?id=510289";
-
-export const clearText = (html) =>{
-    let tmp = document.createElement('div');
-    tmp.innerHTML = html;
-    return tmp.textContent || tmp.innerText;
-}
 
 class App extends Component {
 
