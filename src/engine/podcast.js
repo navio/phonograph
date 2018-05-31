@@ -1,4 +1,4 @@
-const Parser = new window.RSSParser();
+import Parser from './parser';
 
 let PROXY = {'https:':'/rss/','http:':'/rss-less/'};
 
@@ -7,6 +7,7 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
 }
 
 const DEFAULTCAST = "www.npr.org/rss/podcast.php?id=510289";
+
 
 
 const loadEpisodes = function(RSS) {
@@ -20,9 +21,15 @@ export const fillPodcastContent = function(podcast) {
     
     if (!found) {
       this.episodes.clear();
-      Parser.parseURL(CORS_PROXY + podcast.domain)
+      Parser(CORS_PROXY + podcast.domain)
         .then((RSS) => { 
-          this.setState({ items: RSS.items.slice(0, 20) });
+          this.setState({ 
+            items: RSS.items.slice(0, 20),
+            title: RSS.title,
+            image: RSS.image,
+            link: RSS.url,
+            description: RSS.description
+          });
           loadEpisodes.call(this,RSS.items);
           window.localStorage.setItem(podcast.domain, JSON.stringify(RSS));
         });
@@ -32,13 +39,13 @@ export const fillPodcastContent = function(podcast) {
         items: content.items.slice(0, 20),
         title: content.title,
         description: content.description,
-        image: content.itunes.image,
-        link: content.link
+        image: content.image,
+        link: content.url
       });
 
       this.episodes.clear();
       loadEpisodes.call(this,content.items);
-      Parser.parseURL(CORS_PROXY + podcast.domain) //Background.
+      Parser(CORS_PROXY + podcast.domain) //Background.
         .then((RSS) => { 
             let newReading = JSON.stringify(RSS);
             if (newReading !== found) {

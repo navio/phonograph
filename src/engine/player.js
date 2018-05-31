@@ -51,12 +51,11 @@ export const playButton =
             }
 
         } else {
-
-            this.refs.player.setAttribute("src", episode.enclosure.url);
+            this.refs.player.setAttribute("src", episode.enclosures[0].url);
             this.refs.player.play();
             this.setState({
                 episode: episode.guid,
-                author: episode.itunes.author,
+                author: episode.itunes_author,
                 playing: guid,
                 status: 'playing'
             });

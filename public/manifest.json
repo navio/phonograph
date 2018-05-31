@@ -1,11 +1,11 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Podcast Player",
+  "name": "PWA Podcast",
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "favico.svg",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/svg"
     }
   ],
   "start_url": "./index.html",

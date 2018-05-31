@@ -48,7 +48,7 @@ function EpisodeList(props) {
             }
                   <ListItemText 
                     primary={<Typography component="span" variant="subheading" noWrap>{clearText(episode.title)}</Typography>}
-                    secondary={<Typography component="span" color="textSecondary" noWrap>{clearText(episode.content)}</Typography>}
+                    secondary={<Typography component="span" color="textSecondary" noWrap>{clearText(episode.description)}</Typography>}
                   />
                 </ListItem>
                 <Divider />

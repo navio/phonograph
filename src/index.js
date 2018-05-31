@@ -15,8 +15,6 @@ import {fillPodcastContent,checkIfNewPodcast} from './engine/podcast';
 import attachEvents from './engine/events'
 
 
-
-
 class App extends Component {
 
   constructor() {
@@ -49,7 +47,6 @@ class App extends Component {
   componentDidMount() {
     let podcast = checkIfNewPodcast.call(this);
     let player = this.refs.player;
-    console.log('aa',podcast);
 
     fillPodcastContent.call(this, podcast);
     attachEvents.call(this,player);
