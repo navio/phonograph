@@ -1,4 +1,4 @@
-import Parser from './parser';
+import Parser,{load,fetchRSS} from './parser';
 
 let PROXY = {'https:':'/rss/','http:':'/rss-less/'};
 
@@ -52,13 +52,24 @@ export const fillPodcastContent = function(podcast) {
             console.log('Updated');
             window.localStorage.setItem(podcast.domain, JSON.stringify(RSS));
             this.setState({
-                items: RSS.items.slice(0, 20)
+                items: RSS.items.slice(0, 20),
+                title: RSS.title,
+                image: RSS.image,
+                link: RSS.url,
+                description: RSS.description
             });
             this.episodes.clear();
             loadEpisodes.call(this,RSS.items);
             }
         });
     }
+}
+
+export const getPodcasts = function(podcasts){
+  Promise.all(podcasts.map(cast => fetchRSS('https://cors-anywhere.herokuapp.com/' + cast)))
+  .then(RSS => {
+    console.log(RSS);
+  })
 }
 
 export const checkIfNewPodcast = function() {

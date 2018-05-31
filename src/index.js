@@ -9,9 +9,11 @@ import Footer from './app/Footer';
 // Podcast
 import EpisodeList from "./podcast/EpisodeList";
 import PodcastHeader from './podcast/PodcastHeader';
+import Podcasts from './podcast/podcast';
+
 // Engine
 import {forward30Seconds, rewind10Seconds, playButton} from './engine/player';
-import {fillPodcastContent,checkIfNewPodcast} from './engine/podcast';
+import {fillPodcastContent,checkIfNewPodcast,getPodcasts} from './engine/podcast';
 import attachEvents from './engine/events'
 
 
@@ -48,6 +50,8 @@ class App extends Component {
     let podcast = checkIfNewPodcast.call(this);
     let player = this.refs.player;
 
+    // getPodcasts(Podcasts);
+
     fillPodcastContent.call(this, podcast);
     attachEvents.call(this,player);
     
@@ -60,7 +64,7 @@ class App extends Component {
     return (
       <div>
         <CssBaseline />
-        <Header />
+        {/* <Header /> */}
         
         <PodcastHeader
           title={this.state.title}
@@ -88,7 +92,10 @@ class App extends Component {
             loaded={this.state.loaded}
             played={this.state.played}
           />
+
+        
         <Footer />
+
         <audio autoPlay="true" 
                 ref="player" 
                 preload="auto" 

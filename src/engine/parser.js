@@ -1,32 +1,36 @@
 import xml2js from 'xml2js';
 
-  const load = (url, callback) => {
+const parser = new xml2js.Parser({ trim: false, normalize: true, mergeAttrs: true });
+
+export const fetchRSS = (url) => fetch(url,{method:'GET', headers: {
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:45.0) Gecko/20100101 Firefox/45.0',
+    'Accept': 'text/html,application/xhtml+xml'
+  }});
+export const load = (url) => {
     return new Promise((accept,reject)=>{
-      fetch(url,{method:'GET', headers: {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:45.0) Gecko/20100101 Firefox/45.0',
-        'Accept': 'text/html,application/xhtml+xml'
-      }})
+      fetchRSS(url)
       .then(((res) => {
 
         if(!res.ok) reject(res);
-        const parser = new xml2js.Parser({ trim: false, normalize: true, mergeAttrs: true });
-
-        parser.addListener("error", function (err) {
-          reject(err);
-        });
 
         res.text()
         .catch(error=>reject(error))
-        .then(content => 
-          parser.parseString(content,(err, result) =>{
-            if(err) reject(err);
-            accept(pars(result));
-          }));
+        .then(content => parse(content)
+                         .catch(per=>reject(per))
+                         .then(rss=>accept(rss)));
       
         }));
     });
   };
-  const pars = (json) => {
+
+export const parse = (content) => new Promise((accept,reject)=>{
+    parser.parseString(content,(err, result) =>{
+      if(err) reject(err);
+      accept(cleanXML(result));
+    });
+  });
+  
+export const cleanXML = (json) => {
     var channel = json.rss.channel;
     var rss = { items: [] };
     if (Array.isArray(json.rss.channel))

@@ -1,4 +1,4 @@
-export default  podcast = 
+const podcasts = 
 ["http://rss.art19.com/the-daily"
 ,"https://www.npr.org/rss/podcast.php?id=510318"
 ,"http://www.npr.org/rss/podcast.php?id=510289"
@@ -62,3 +62,5 @@ export default  podcast =
 ,"https://www.apatheticenthusiasm.com/feed/rickandmortypodcast/"
 ,"http://feeds.gimletmedia.com/heavyweightpodcast"
 ,"https://feeds.megaphone.fm/mupe"]
+
+export default podcasts;
