@@ -37,6 +37,9 @@
 
   const pauseTick = function(ev){
     clearInterval(this.tick);
+    this.setState({
+      status:'pause'
+    });
   }
 
   export default function(player){

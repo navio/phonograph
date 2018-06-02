@@ -65,7 +65,7 @@ export const cleanXML = (json) => {
         obj.title = (val.title) ? val.title[0] : '';
         obj.description = (val.description) ? val.description[0] : '';
         obj.url = obj.link = (val.link) ? val.link[0] : '';
-		obj.guid = val.guid && val.guid[0];
+		    obj.guid = val.guid && val.guid[0] && ( val.guid[0]['_'] || val.guid[0] );
 
         if (val['itunes:subtitle']) {
           obj.itunes_subtitle = val['itunes:subtitle'][0];
@@ -92,7 +92,6 @@ export const cleanXML = (json) => {
           obj.itunes_episodeType = val['itunes:episodeType'][0];
         }
         if (val.pubDate) {
-          //lets try basis js date parsing for now
           obj.created = Date.parse(val.pubDate[0]);
         }
         if (val['media:content']) {
