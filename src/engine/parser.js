@@ -18,16 +18,21 @@ export const load = (url) => {
         .then(content => parse(content)
                          .catch(per=>reject(per))
                          .then(rss=>accept(rss)));
-      
         }));
     });
   };
 
 export const parse = (content) => new Promise((accept,reject)=>{
+  // parser.reset()
+  try{
     parser.parseString(content,(err, result) =>{
-      if(err) reject(err);
+      if(err){ accept({error:true}); console.error('Error Parsing') }
       accept(cleanXML(result));
     });
+  }catch(error){
+    reject(error)
+  }
+    
   });
   
 export const cleanXML = (json) => {

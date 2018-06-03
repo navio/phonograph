@@ -96,13 +96,13 @@ function MediaControlCard(props) {
 
   return (
     <div>
-    <div className={classes.root}>
+    <div className={classes.root} onClick={props.toCurrentPodcast}>
       {props.episode && (
         <div className={classes.card}>
           <div className={classes.details}>
             
             <CardContent className={classes.content}>
-              <Typography variant="title">{props.episode.title}</Typography>
+              <Typography onClick={props.toCurrentPodcast} variant="title">{props.episode.title}</Typography>
               {/*<Typography
                 style={{ paddingTop: 10 }}
                 color="textSecondary"

@@ -1,56 +1,46 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import GridList from '@material-ui/core/GridList';
-import GridListTile from '@material-ui/core/GridListTile';
-import GridListTileBar from '@material-ui/core/GridListTileBar';
-import ListSubheader from '@material-ui/core/ListSubheader';
+import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import InfoIcon from '@material-ui/icons/Info';
-import tileData from './tileData';
+import Card from '@material-ui/core/Card';
+import CardMedia from '@material-ui/core/CardMedia';
+import CardContent from '@material-ui/core/CardContent';
 
 const styles = theme => ({
-  root: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    overflow: 'hidden',
-    backgroundColor: theme.palette.background.paper,
+  podcastMedia:{
+    paddingTop: '100%',
+    position:'relative',
+    cursor: 'pointer'
   },
-  gridList: {
-    width: '100%',
-    height: '100%',
-  },
-  icon: {
-    color: 'rgba(255, 255, 255, 0.54)',
-  },
+  podcastData:{
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    color:'000',
+    position:'absolute',
+    bottom:0,
+    width:'100%'
+  }
 });
 
 function PodCastGrid(props) {
   const { classes } = props;
 
   return (
-    <div className={classes.root}>
-      <GridList cellHeight={180} className={classes.gridList}>
-        <GridListTile key="Subheader" cols={2} style={{ height: 'auto' }}>
-          <ListSubheader component="div">December</ListSubheader>
-        </GridListTile>
-        {tileData.map(tile => (
-          <GridListTile key={tile.img}>
-            <img src={tile.img} alt={tile.title} />
-            <GridListTileBar
-              title={tile.title}
-              subtitle={<span>by: {tile.author}</span>}
-              actionIcon={
-                <IconButton className={classes.icon}>
-                  <InfoIcon />
-                </IconButton>
-              }
-            />
-          </GridListTile>
-        ))}
-      </GridList>
-    </div>
+    <Grid container spacing={0} direction={'row'}>
+      {props.casts && props.casts.map(cast =>
+        <Grid item xs={4} sm={3} md={2} key={cast.domain} >
+        <Card>
+          <CardMedia onClick={props.selectPodcast} domain={cast.domain} title={cast.title} className={classes.podcastMedia} image={cast.image}>
+          {/* <CardContent className={classes.podcastData}>
+            {cast.title}
+          </CardContent> */}
+          </CardMedia>
+          
+        </Card>
+        </Grid> 
+       )}
+    </Grid>
   );
 }
 

@@ -35,7 +35,7 @@ class SimpleBottomNavigation extends React.Component {
         showLabels
         className={classes.root}
       >
-        <BottomNavigationAction label="Podcasts" icon={<RestoreIcon />} />
+        <BottomNavigationAction label="Podcasts" onClick={this.props.toPodcasts} icon={<RestoreIcon />} />
         <BottomNavigationAction label="Discover" icon={<FavoriteIcon />} />
         <BottomNavigationAction label="Settings" icon={<LocationOnIcon />} />
       </BottomNavigation>
