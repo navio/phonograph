@@ -16,7 +16,7 @@ import PodcastGrid from './podcast/PodcastGrid';
 import {forward30Seconds, rewind10Seconds, playButton} from './engine/player';
 import {fillPodcastContent,checkIfNewPodcast,loadPodcast} from './engine/podcast';
 import attachEvents from './engine/events'
-import {viewAll,viewCurrenPodcast} from './engine/views';
+import {viewAll,viewCurrenPodcast} from './engine/routes';
 
 
 class App extends Component {
@@ -83,10 +83,13 @@ class App extends Component {
       <div>
         <CssBaseline />
         
-        {view === 'all' && <div><Header />
-        <PodcastGrid casts={this.state.podcasts} selectPodcast={this.loadPodcast} /></div>}
+        {view === 'all' && <div>
+          <Header />
+          <PodcastGrid casts={this.state.podcasts} selectPodcast={this.loadPodcast} />
+        </div>}
 
-        {view === 'podcast' && <div><PodcastHeader
+        {view === 'podcast' && <div>
+          <PodcastHeader
           title={this.state.title}
           image={this.state.image}
           description={this.state.description}
@@ -96,7 +99,8 @@ class App extends Component {
           episodes={this.state.items}           
           handler={this.playButton.bind(this)}
           status={this.state.status}
-          playing={this.state.playing} /> </div>}
+          playing={this.state.playing} /> 
+          </div>}
 
         <MediaControl 
             toCurrentPodcast={viewCurrenPodcast.bind(this)}
@@ -106,9 +110,9 @@ class App extends Component {
             totalTime={this.state.duration}
             currentTime={this.state.currentTime}
             playing={this.state.playing}
-            handler={this.playButton.bind(this)}
-            forward={this.forward30Seconds.bind(this)}
-            rewind={this.rewind10Seconds.bind(this)}
+            handler={this.playButton}
+            forward={this.forward30Seconds}
+            rewind={this.rewind10Seconds}
             loading={this.state.loading}
             loaded={this.state.loaded}
             played={this.state.played}

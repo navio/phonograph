@@ -29,6 +29,7 @@ const styles = theme => ({
 });
 
 function EpisodeList(props) {
+  window && window.scrollTo && window.scrollTo(0, 0);
   const { classes } = props;
   return (
     <div className={classes.root}>
