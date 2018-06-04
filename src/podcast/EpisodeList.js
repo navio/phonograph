@@ -28,10 +28,16 @@ const styles = theme => ({
   }
 });
 
-function EpisodeList(props) {
-  window && window.scrollTo && window.scrollTo(0, 0);
-  const { classes } = props;
-  return (
+class EpisodeList extends React.Component{
+  constructor(props){
+    super();
+    window && window.scrollTo && window.scrollTo(0, 0)
+  }
+
+  render(){
+    let props = this.props;
+    let { classes } = this.props;
+    return (
     <div className={classes.root}>
       <Card>
         <List>
@@ -58,8 +64,9 @@ function EpisodeList(props) {
         </List>
       </Card>
     </div>
-  );
-}
+    );
+  }
+};
 
 EpisodeList.propTypes = {
   classes: PropTypes.object.isRequired

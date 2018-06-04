@@ -27,7 +27,8 @@ export const fillPodcastContent = function(cast) {
               title: RSS.title,
               image: RSS.image,
               link: RSS.url,
-              description: RSS.description
+              description: RSS.description,
+              podcast: podcast.domain
             });
             loadEpisodes.call(this,RSS.items);
             window.localStorage.setItem('current'+podcast.domain, JSON.stringify(RSS));
@@ -40,7 +41,8 @@ export const fillPodcastContent = function(cast) {
           title: content.title,
           description: content.description,
           image: content.image,
-          link: content.url
+          link: content.url,
+          podcast: podcast.domain
         });
         
         this.episodes.clear();
@@ -56,7 +58,8 @@ export const fillPodcastContent = function(cast) {
                   title: RSS.title,
                   image: RSS.image,
                   link: RSS.url,
-                  description: RSS.description
+                  description: RSS.description,
+                  podcast: podcast.domain
               });
               this.episodes.clear();
               loadEpisodes.call(this,RSS.items);
@@ -136,6 +139,7 @@ export const loadPodcast = function(ev){
         title,
         image,
         description,
+        podcast
       })
     }
       fillPodcastContent.call(this,podcast)

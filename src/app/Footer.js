@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import BottomNavigation from '@material-ui/core/BottomNavigation';
 import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
-import RestoreIcon from '@material-ui/icons/Restore';
+import Headset from '@material-ui/icons/Headset';
 import FavoriteIcon from '@material-ui/icons/Favorite';
-import LocationOnIcon from '@material-ui/icons/LocationOn';
+import Ballot from '@material-ui/icons/Dvr';
 import Paper from '@material-ui/core/Paper';
 
 const styles = {
@@ -35,9 +35,9 @@ class SimpleBottomNavigation extends React.Component {
         showLabels
         className={classes.root}
       >
-        <BottomNavigationAction label="Podcasts" onClick={this.props.toPodcasts} icon={<RestoreIcon />} />
+        <BottomNavigationAction label="Podcasts" onClick={this.props.toPodcasts} icon={<Headset />} />
         <BottomNavigationAction label="Discover" icon={<FavoriteIcon />} />
-        <BottomNavigationAction label="Settings" icon={<LocationOnIcon />} />
+        <BottomNavigationAction label="Settings" icon={<Ballot />} />
       </BottomNavigation>
     </Paper><div className={classes.underground}></div></div>
     );

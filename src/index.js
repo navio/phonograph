@@ -71,8 +71,6 @@ class App extends Component {
       podcasts.forEach(cast => this.podcasts.set(cast.domain, cast));
     }
 
-    
-
     window.player = player;
   }
 
@@ -84,23 +82,25 @@ class App extends Component {
         <CssBaseline />
         
         {view === 'all' && <div>
-          <Header />
+          {/* <Header /> */}
           <PodcastGrid casts={this.state.podcasts} selectPodcast={this.loadPodcast} />
         </div>}
 
         {view === 'podcast' && <div>
           <PodcastHeader
-          title={this.state.title}
-          image={this.state.image}
-          description={this.state.description}
-          episode={episode}  
+            title={this.state.title}
+            image={this.state.image}
+            description={this.state.description}
+            episode={episode}  
           />
-        <EpisodeList 
-          episodes={this.state.items}           
-          handler={this.playButton.bind(this)}
-          status={this.state.status}
-          playing={this.state.playing} /> 
-          </div>}
+        
+          <EpisodeList 
+            episodes={this.state.items}           
+            handler={this.playButton.bind(this)}
+            status={this.state.status}
+            playing={this.state.playing} 
+          /> 
+        </div>}
 
         <MediaControl 
             toCurrentPodcast={viewCurrenPodcast.bind(this)}
@@ -116,16 +116,16 @@ class App extends Component {
             loading={this.state.loading}
             loaded={this.state.loaded}
             played={this.state.played}
-          />
+        />
 
-        
         <Footer toPodcasts={viewAll.bind(this)} />
 
         <audio autoPlay="true" 
                 ref="player" 
                 preload="auto" 
                 title={(episode && episode.title) ||''} 
-                poster={(episode && episode.itunes && episode.itunes.image) ||''} />
+                poster={(episode && episode.itunes && episode.itunes.image) ||''} 
+        />
         
       </div>
     );
