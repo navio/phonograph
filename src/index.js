@@ -18,6 +18,7 @@ import {fillPodcastContent,checkIfNewPodcast,loadPodcast} from './engine/podcast
 import attachEvents from './engine/events'
 import {viewAll,viewCurrenPodcast} from './engine/routes';
 
+import registerServiceWorker from './registerServiceWorker';
 
 class App extends Component {
 
@@ -30,7 +31,6 @@ class App extends Component {
       episode: null,
       loaded: 0,
       played: 0,
-
       author: null,
       status: null,
       title: '',
@@ -133,3 +133,4 @@ class App extends Component {
 }
 
 render(<App />, document.getElementById('root'));
+registerServiceWorker();

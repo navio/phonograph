@@ -3,8 +3,9 @@ import Parser,{load} from './parser';
 const DEFAULTCAST = { domain: "www.npr.org/rss/podcast.php?id=510289" , protocol:'https:'};
 
 let PROXY = {'https:':'/rss/','http:':'/rss-less/'};
-
+let DEBUG = false;
 if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+    DEBUG = true;
     PROXY = {'https:':'https://cors-anywhere.herokuapp.com/','http:':'https://cors-anywhere.herokuapp.com/'};
 }
 
@@ -85,6 +86,11 @@ export const createCast = (url) =>{ // Todo: try https, then http otherwise fail
     console.info('Error Parsing Domain');
     return null;
   }
+}
+
+export const driveThruDNS = (url) =>{
+  let r = createCast(url);
+  return DEBUG ? url : `${PROXY[r.protocol]}${r.domain}`;
 }
 
 export const getPodcasts = function(podcasts){

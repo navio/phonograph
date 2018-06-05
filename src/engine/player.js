@@ -1,4 +1,5 @@
 
+import {driveThruDNS} from './podcast';
 export const forward30Seconds = 
     function(){  
         let player = this.refs.player;
@@ -29,19 +30,21 @@ export const playButton =
     function(ev) {
         let guid = ev.currentTarget.getAttribute('data-guid');
         let episode = this.episodes.get(guid);
-
+        console.log(ev)
         if (this.state.playing === guid) {
             
             if (this.state.status === 'pause') {
+                console.log('playing');
                 this.refs.player.play();
                 this.setState({ status: 'playing' });
             } else {
+                console.log('pause');
                 this.setState({ status: 'pause' });
                 this.refs.player.pause();
             }
 
-        } else {
-            this.refs.player.setAttribute("src", episode.enclosures[0].url);
+        } else { console.log('playing')
+            this.refs.player.setAttribute("src", driveThruDNS(episode.enclosures[0].url));
             this.refs.player.play();
             this.setState({
                 episode: episode.guid,

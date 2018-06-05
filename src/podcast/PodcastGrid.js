@@ -7,7 +7,7 @@ import InfoIcon from '@material-ui/icons/Info';
 import Card from '@material-ui/core/Card';
 import CardMedia from '@material-ui/core/CardMedia';
 import CardContent from '@material-ui/core/CardContent';
-
+import {driveThruDNS} from '../engine/podcast';
 const styles = theme => ({
   podcastMedia:{
     paddingTop: '100%',
@@ -31,7 +31,7 @@ function PodCastGrid(props) {
       {props.casts && props.casts.map(cast =>
         <Grid item xs={4} sm={3} md={2} key={cast.domain} >
         <Card>
-          <CardMedia onClick={props.selectPodcast} domain={cast.domain} title={cast.title} className={classes.podcastMedia} image={cast.image}>
+          <CardMedia onClick={props.selectPodcast} domain={cast.domain} title={cast.title} className={classes.podcastMedia} image={driveThruDNS(cast.image)}>
           {/* <CardContent className={classes.podcastData}>
             {cast.title}
           </CardContent> */}
