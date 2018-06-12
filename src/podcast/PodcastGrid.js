@@ -29,7 +29,7 @@ function PodCastGrid(props) {
   return (
     <Grid container spacing={0} direction={'row'}>
       {props.casts && props.casts.map(cast =>
-        <Grid item xs={4} sm={3} md={2} key={cast.domain} >
+        <Grid item xs={3} sm={2} md={1} key={cast.domain} >
         <Card>
           <CardMedia onClick={props.selectPodcast} domain={cast.domain} title={cast.title} className={classes.podcastMedia} image={driveThruDNS(cast.image)}>
           {/* <CardContent className={classes.podcastData}>

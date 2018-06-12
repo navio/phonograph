@@ -1,5 +1,16 @@
 
 import {driveThruDNS} from './podcast';
+export const seek = 
+    function(ev,value){
+        let player = this.refs.player;
+        let current = Math.floor(( value * player.duration ) / 100);
+        player.currentTime = current;
+        
+        this.setState({
+            currentTime: player.currentTime, 
+            duration: player.duration
+        });
+    }
 export const forward30Seconds = 
     function(){  
         let player = this.refs.player;

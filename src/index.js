@@ -13,12 +13,12 @@ import {defaultCasts} from './podcast/podcast';
 import PodcastGrid from './podcast/PodcastGrid';
 
 // Engine
-import {forward30Seconds, rewind10Seconds, playButton} from './engine/player';
+import {forward30Seconds, rewind10Seconds, playButton, seek} from './engine/player';
 import {fillPodcastContent,checkIfNewPodcast,loadPodcast} from './engine/podcast';
 import attachEvents from './engine/events'
 import {viewAll,viewCurrenPodcast} from './engine/routes';
 
-import registerServiceWorker from './registerServiceWorker';
+import { unregister } from './registerServiceWorker';
 
 class App extends Component {
 
@@ -45,6 +45,7 @@ class App extends Component {
 
     this.forward30Seconds = forward30Seconds.bind(this);
     this.rewind10Seconds = rewind10Seconds.bind(this);
+    this.seek = seek.bind(this);
     this.playButton = playButton.bind(this);
     this.loadPodcast = loadPodcast.bind(this);
 
@@ -116,6 +117,7 @@ class App extends Component {
             loading={this.state.loading}
             loaded={this.state.loaded}
             played={this.state.played}
+            seek={this.seek}
         />
 
         <Footer toPodcasts={viewAll.bind(this)} />
@@ -133,4 +135,4 @@ class App extends Component {
 }
 
 render(<App />, document.getElementById('root'));
-registerServiceWorker();
+unregister();

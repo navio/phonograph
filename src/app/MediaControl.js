@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 // import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
+import Slider from '@material-ui/lab/Slider';
 
 // import CardMedia from "@material-ui/core/CardMedia";
 import IconButton from "@material-ui/core/IconButton";
@@ -14,6 +15,7 @@ import SkipNextIcon from "@material-ui/icons/Forward30";
 // import {clearText} from './index'
 import LinearProgress from "@material-ui/core/LinearProgress";
 import Grid from "@material-ui/core/Grid";
+
 
 const styles = theme => ({
   card: {
@@ -38,7 +40,12 @@ const styles = theme => ({
     textAlign: "left"
   },
   line:{
-    marginTop: "5px"
+    position:"absolute",
+    top:"-13.5px",
+    width:"100%"
+  },
+  trackAfter:{
+    display:"none"
   },
   right: {
     textAlign: "right"
@@ -61,6 +68,12 @@ const styles = theme => ({
   undeground:{
     height:130,
     width:'100%'
+  },
+  classNameProp:{
+    position: 'absolute'
+  },
+  container:{
+    position: 'relative'
   },
   root:{
     borderTop: '1px solid rgba(0, 0, 0, 0.12)',
@@ -93,7 +106,7 @@ typeof theTime === 'number'  ? convertMinsToHrsMins(Math.floor(theTime)) : `00:0
 
 function MediaControlCard(props) {
   const { classes, theme } = props;
-
+  console.log(props.played,props.loaded);
   return (
     <div>
     <div className={classes.root} onClick={props.toCurrentPodcast}>
@@ -102,7 +115,7 @@ function MediaControlCard(props) {
           <div className={classes.details}>
             
             <CardContent className={classes.content}>
-              <Typography onClick={props.toCurrentPodcast} variant="title">{props.episode.title}</Typography>
+              <Typography onClick={props.toCurrentPodcast} variant="body1">{props.episode.title}</Typography>
               {/*<Typography
                 style={{ paddingTop: 10 }}
                 color="textSecondary"
@@ -114,8 +127,11 @@ function MediaControlCard(props) {
               <Grid item xs={2}>
                 <span>{toMin(props.currentTime)}</span>
               </Grid>
-              <Grid item xs={8}>
-                <LinearProgress variant="buffer" className={classes.line} value={props.played} valueBuffer={props.loaded} />
+              <Grid className={classes.container} item xs={8}>
+                <LinearProgress variant="buffer" value={props.played} valueBuffer={props.loaded} />
+                <div className={classes.line}>
+                  <Slider value={props.played} aria-labelledby="audio" onChange={props.seek} />
+                </div>
               </Grid>
               <Grid item xs={2} className={classes.right}>
                 <span>{toMinutes(props.totalTime,props.currentTime)}</span>
