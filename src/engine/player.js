@@ -5,10 +5,11 @@ export const seek =
         let player = this.refs.player;
         let current = Math.floor(( value * player.duration ) / 100);
         player.currentTime = current;
-        
-        this.setState({
+        let loaded = (player.buffered.length) ? (100 * player.buffered.end(0) / player.duration) : 0;
+        this.setState({ loaded,
             currentTime: player.currentTime, 
-            duration: player.duration
+            duration: player.duration,
+            played: (100 * player.currentTime / player.duration),
         });
     }
 export const forward30Seconds = 
