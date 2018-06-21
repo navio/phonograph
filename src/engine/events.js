@@ -19,6 +19,7 @@
   const playTick = function(ev){
     this.setState({status: 'playing'});
     this.tick = setInterval(()=>{ 
+      console.log('running');
       let player = this.refs.player;
       let loaded = (player.buffered.length) ? (100 * player.buffered.end(0) / player.duration) : 0;
       this.setState({ loaded,
@@ -42,6 +43,10 @@
     });
   }
 
+  const stopTick = function(ev){
+    clearInterval(this.tick);
+  }
+
   export default function(player){
     // Initialization
     // player.addEventListener('loadstart',this.loading.bind(this)); 
@@ -52,6 +57,7 @@
     // User Events
     player.addEventListener('play',playTick.bind(this));
     player.addEventListener('pause',pauseTick.bind(this));
+    player.addEventListener('abort',stopTick.bind(this))
     
     // Media Events
     player.addEventListener('canplay',completedLoading.bind(this))
