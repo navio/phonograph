@@ -17,12 +17,12 @@
   }
 
   const playTick = function(ev){
+    this.setState({status: 'playing'});
     this.tick = setInterval(()=>{ 
       let player = this.refs.player;
       let loaded = (player.buffered.length) ? (100 * player.buffered.end(0) / player.duration) : 0;
-  
       this.setState({ loaded,
-                      status: 'playing',
+                      
                       played: (100 * player.currentTime / player.duration), 
                       currentTime: player.currentTime, 
                       duration: player.duration });

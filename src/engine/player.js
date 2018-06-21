@@ -41,20 +41,20 @@ export const playButton =
     function(ev) {
         let guid = ev.currentTarget.getAttribute('data-guid');
         let episode = this.episodes.get(guid);
-        console.log(ev)
+        
         if (this.state.playing === guid) {
             
             if (this.state.status === 'pause') {
-                console.log('playing');
+                console.log('playing-same');
                 this.refs.player.play();
                 this.setState({ status: 'playing' });
             } else {
-                console.log('pause');
-                this.setState({ status: 'pause' });
+                console.log('pause-same');
                 this.refs.player.pause();
+                this.setState({ status: 'pause' });
             }
 
-        } else { console.log('playing')
+        } else { console.log('playing-change')
             this.refs.player.setAttribute("src", driveThruDNS(episode.enclosures[0].url));
             this.refs.player.play();
             this.setState({

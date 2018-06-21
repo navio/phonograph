@@ -106,7 +106,6 @@ typeof theTime === 'number'  ? convertMinsToHrsMins(Math.floor(theTime)) : `00:0
 
 function MediaControlCard(props) {
   const { classes, theme } = props;
-  console.log(props.played,props.loaded);
   return (
     <div>
     <div className={classes.root} onClick={props.toCurrentPodcast}>
