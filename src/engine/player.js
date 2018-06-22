@@ -45,16 +45,14 @@ export const playButton =
         if (this.state.playing === guid) {
             
             if (this.state.status === 'pause') {
-                console.log('playing-same');
                 this.refs.player.play();
                 this.setState({ status: 'playing' });
             } else {
-                console.log('pause-same');
                 this.refs.player.pause();
                 this.setState({ status: 'pause' });
             }
 
-        } else { console.log('playing-change')
+        } else {
             this.refs.player.setAttribute("src", driveThruDNS(episode.enclosures[0].url));
             this.refs.player.play();
             this.setState({
