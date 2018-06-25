@@ -1,23 +1,38 @@
 import Parser,{load} from './parser'; 
+import {CASTVIEW,STORAGEID} from '../constants';
+import {defaultCasts} from '../podcast/podcast';
 
 const DEFAULTCAST = { domain: "www.npr.org/rss/podcast.php?id=510289" , protocol:'https:'};
 
 let PROXY = {'https:':'/rss/','http:':'/rss-less/'};
 let DEBUG = false;
+
 if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
     DEBUG = true;
     PROXY = {'https:':'https://cors-anywhere.herokuapp.com/','http:':'https://cors-anywhere.herokuapp.com/'};
+}
+
+export const clearDomain = (domain) => domain.replace(/(^\w+:|^)\/\//, '');
+
+export const addPodcastToLibrary = function (podcast){
+  let podcastToAdd = Object.assign(podcast);
+  delete podcastToAdd['items']
+  this.podcasts.set(podcastToAdd.domain,podcastToAdd);
+  let podcasts = [...this.podcasts.values()];
+  this.setState({podcasts});
 }
 
 export const loadEpisodes = function(RSS) {
     RSS.forEach(item => this.episodes.set(item.guid, item));
 }
 
+
 export const fillPodcastContent = function(cast) {
-    let podcast = (typeof cast === 'string') ? createCast(cast) : cast;
+    let podcast = (typeof cast === 'string') ? convertURLToPodcast(cast) : cast;
 
     let CORS_PROXY = PROXY[podcast.protocol];
-    let found = window.localStorage.getItem('current'+podcast.domain);
+    let found = localStorage.getItem('current'+podcast.domain);
+
     return new Promise((accept,reject) => {
       if (!found) {
         this.episodes.clear();
@@ -32,8 +47,8 @@ export const fillPodcastContent = function(cast) {
               podcast: podcast.domain
             });
             loadEpisodes.call(this,RSS.items);
-            window.localStorage.setItem('current'+podcast.domain, JSON.stringify(RSS));
-            accept(RSS);
+            localStorage.setItem('current'+podcast.domain, JSON.stringify(RSS));
+            accept(Object.assign(RSS,podcast));
           });
       } else {
         let content = JSON.parse(found);
@@ -66,15 +81,27 @@ export const fillPodcastContent = function(cast) {
               loadEpisodes.call(this,RSS.items);
               }
           });
-        accept(content);
+        accept(Object.assign(content,podcast));
       }
     })
 
 }
 
-export const clearDomain = (domain) => domain.replace(/(^\w+:|^)\/\//, '');
+export const buildLibrary = function(){
 
-export const createCast = (url) =>{ // Todo: try https, then http otherwise fail.
+  const addToLibrary = 
+  cast => !this.podcasts.has(cast.domain) && this.podcasts.set(cast.domain,cast);
+  
+  // Check LS
+  let memoryCasts = localStorage.getItem(STORAGEID) || [];
+
+  // Add Casts
+  defaultCasts.forEach(addToLibrary);
+  memoryCasts.forEach(addToLibrary);
+
+}
+
+export const convertURLToPodcast = (url) =>{ // Todo: try https, then http otherwise fail.
   if (!url) return null;
   let fixURL = url.search("http") < 0 ? `https://${url}`: url;
   try{
@@ -89,14 +116,14 @@ export const createCast = (url) =>{ // Todo: try https, then http otherwise fail
 }
 
 export const driveThruDNS = (url) =>{
-  let r = createCast(url);
+  let r = convertURLToPodcast(url);
   return DEBUG ? url : `${PROXY[r.protocol]}${r.domain}`;
 }
 
 export const getPodcasts = function(podcasts){
   return new Promise((acc,rej) => {
     Promise.all(podcasts.map(cast =>{
-      let podcast = createCast(cast);
+      let podcast = convertURLToPodcast(cast);
       let CORS_PROXY = PROXY[podcast.protocol];
       let found = window.localStorage.getItem(podcast.domain);
       if(found){
@@ -126,19 +153,18 @@ export const getPodcasts = function(podcasts){
   })
 }
 
-export const checkIfNewPodcast = function() {
+export const checkIfNewPodcastInURL = function() {
     if(!window && !window.location ) return DEFAULTCAST;
 
     let urlPodcast = new window.URL(window.location.href);
     let podcast = urlPodcast.searchParams.get("podcast");
 
-    return createCast(podcast);
-
+    return convertURLToPodcast(podcast);
 }
 
-export const loadPodcast = function(ev){
+export const loadPodcastToView = function(ev){
  
-    let podcast = ev.currentTarget.getAttribute('domain');
+    let podcast = ev && ev.currentTarget && ev.currentTarget.getAttribute('domain');
     if(this.podcasts.has(podcast)){
       let {title,image,description} = this.podcasts.get(podcast);
       this.setState({
@@ -148,10 +174,10 @@ export const loadPodcast = function(ev){
         podcast
       })
     }
-      fillPodcastContent.call(this,podcast)
-      .then((data)=>{
-        this.setState({
-          view:'podcast'
-        });
-      })
+    fillPodcastContent.call(this,podcast)
+    .then((data)=>{
+      this.setState({
+        view:CASTVIEW
+      });
+    })
 }

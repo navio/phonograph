@@ -9,7 +9,8 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 
 const styles = {
-  root: {    position: 'fixed',
+  root: {    
+    position: 'fixed',
     top: 0,
     width:'100%',
     margin:0,
