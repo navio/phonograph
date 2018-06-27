@@ -3,12 +3,13 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
-import InfoIcon from '@material-ui/icons/Info';
+// import InfoIcon from '@material-ui/icons/Info';
 import Card from '@material-ui/core/Card';
 import CardMedia from '@material-ui/core/CardMedia';
-import CardContent from '@material-ui/core/CardContent';
+// import CardContent from '@material-ui/core/CardContent';
 import Add from '@material-ui/icons/Add';
 import {driveThruDNS} from '../engine/podcast';
+import {viewCurrenPodcast} from '../engine/routes';
 const styles = theme => ({
   podcastMedia:{
     paddingTop: '100%',
@@ -33,10 +34,11 @@ const styles = theme => ({
 });
 const addMore = 'addmore';
 
+
 function PodCastGrid(props) {
   const { classes } = props;
-  let casts = (props.casts && [...props.casts]) || [];
-  casts.push({domain: addMore, title:'Add more', onClick:()=>{ let cast = prompt('URL or Name of Podcast')}});
+  let casts = (props.podcasts && [...props.podcasts]) || [];
+  casts.push({domain: addMore, title:'Add more', onClick:()=>{ props.addPodcastHandler(viewCurrenPodcast)} });
   return (
     <Grid container spacing={0} direction={'row'}>
       { casts && casts.map(cast =>

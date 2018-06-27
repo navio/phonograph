@@ -28,14 +28,14 @@
     },500);
   }
 
-  const updateStatus = function(){
-    let player = this.refs.player;
-    let loaded = (player.buffered.length) ? (100 * player.buffered.end(0) / player.duration) : 0;
-    this.setState({ loaded,
-      played: (100 * player.currentTime / player.duration),
-      currentTime: player.currentTime,
-      duration: player.duration });
-  }
+  // const updateStatus = function(){
+  //   let player = this.refs.player;
+  //   let loaded = (player.buffered.length) ? (100 * player.buffered.end(0) / player.duration) : 0;
+  //   this.setState({ loaded,
+  //     played: (100 * player.currentTime / player.duration),
+  //     currentTime: player.currentTime,
+  //     duration: player.duration });
+  // }
   
   const progress = function(ev){
     let player = this.refs.player;

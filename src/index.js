@@ -21,8 +21,8 @@ import { forward30Seconds, rewind10Seconds, playButton, seek } from './engine/pl
 import {  checkIfNewPodcastInURL, 
           loadPodcastToView, 
           buildLibrary, 
-          fillPodcastContent,
-          addPodcastToLibrary
+          addNewPodcast,
+          askForPodcast
         } from './engine/podcast';
 
 import attachEvents from './engine/events'
@@ -61,6 +61,7 @@ class App extends Component {
     this.seek = seek.bind(this);
     this.playButton = playButton.bind(this);
     this.loadPodcastToView = loadPodcastToView.bind(this);
+    this.askForPodcast = askForPodcast.bind(this);
 
   }
 
@@ -77,26 +78,27 @@ class App extends Component {
     
     // Mode
     let newPodcast = checkIfNewPodcastInURL.call(this);
-    if(newPodcast){
-      fillPodcastContent.call(this, newPodcast)
-      .then(podcast => addPodcastToLibrary.call(this,podcast));
-      viewCurrenPodcast.call(this);
-    }
+    newPodcast && addNewPodcast.call(this,newPodcast,viewCurrenPodcast);
 
     // Debug
     window.player = player;
   }
+  // askForPodcast.call(this,viewCurrenPodcast)
 
   render() {
     let episode = this.episodes.get(this.state.episode) || null;
-    let view = this.state.view && this.state.view;
+    let {view,podcasts} = this.state;
     return (
       <div>
         <CssBaseline />
         
         { view === LIBVIEW && 
           <div>
-            <PodcastGrid casts={this.state.podcasts} selectPodcast={this.loadPodcastToView} />
+            <PodcastGrid 
+              podcasts={podcasts}
+              selectPodcast={this.loadPodcastToView}
+              addPodcastHandler={this.askForPodcast}
+            />
           </div>
         }
 

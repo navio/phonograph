@@ -1,5 +1,5 @@
 import Parser,{load} from './parser'; 
-import {CASTVIEW,STORAGEID,CURRENTPODCAST} from '../constants';
+import {CASTVIEW,STORAGEID} from '../constants';
 import {defaultCasts} from '../podcast/podcast';
 
 const DEFAULTCAST = { domain: "www.npr.org/rss/podcast.php?id=510289" , protocol:'https:'};
@@ -27,7 +27,6 @@ export const addPodcastToLibrary = function (podcast){
 export const loadEpisodes = function(RSS) {
     RSS.forEach(item => this.episodes.set(item.guid, item));
 }
-
 
 export const fillPodcastContent = function(cast) {
     let podcast = (typeof cast === 'string') ? convertURLToPodcast(cast) : cast;
@@ -164,6 +163,28 @@ export const checkIfNewPodcastInURL = function() {
     return convertURLToPodcast(podcast);
 }
 
+export const addNewPodcast = function(newPodcast,callback){
+
+  fillPodcastContent.call(this, newPodcast)
+  .then(podcast => addPodcastToLibrary.call(this,podcast));
+  callback.call(this);
+
+}
+
+//Events
+
+// Ask for podcast URL.
+export const askForPodcast = function(callback){
+  let input = prompt('URL or Name of Podcast');
+      if(!input) return;
+      input = input.trim();
+  try{
+    (new URL(input)) && addNewPodcast.call(this,convertURLToPodcast(input),callback);
+  }catch(err){ // Maybe search the string?
+    console.log('error',err);
+  }  
+}
+// Load current Selectedt Podcast into View
 export const loadPodcastToView = function(ev){
  
     let podcast = ev && ev.currentTarget && ev.currentTarget.getAttribute('domain');
