@@ -1,5 +1,5 @@
 import Parser,{load} from './parser'; 
-import {CASTVIEW,STORAGEID} from '../constants';
+import {CASTVIEW,STORAGEID,CURRENTPODCAST} from '../constants';
 import {defaultCasts} from '../podcast/podcast';
 
 const DEFAULTCAST = { domain: "www.npr.org/rss/podcast.php?id=510289" , protocol:'https:'};
@@ -19,6 +19,8 @@ export const addPodcastToLibrary = function (podcast){
   delete podcastToAdd['items']
   this.podcasts.set(podcastToAdd.domain,podcastToAdd);
   let podcasts = [...this.podcasts.values()];
+  localStorage.setItem(STORAGEID,JSON.stringify(podcasts));
+
   this.setState({podcasts});
 }
 
@@ -31,7 +33,7 @@ export const fillPodcastContent = function(cast) {
     let podcast = (typeof cast === 'string') ? convertURLToPodcast(cast) : cast;
 
     let CORS_PROXY = PROXY[podcast.protocol];
-    let found = localStorage.getItem('current'+podcast.domain);
+    let found = sessionStorage.getItem(podcast.domain);
 
     return new Promise((accept,reject) => {
       if (!found) {
@@ -47,7 +49,7 @@ export const fillPodcastContent = function(cast) {
               podcast: podcast.domain
             });
             loadEpisodes.call(this,RSS.items);
-            localStorage.setItem('current'+podcast.domain, JSON.stringify(RSS));
+            sessionStorage.setItem(podcast.domain, JSON.stringify(RSS));
             accept(Object.assign(RSS,podcast));
           });
       } else {
@@ -68,7 +70,7 @@ export const fillPodcastContent = function(cast) {
               let newReading = JSON.stringify(RSS);
               if (newReading !== found) {
               console.log('Updated');
-              window.localStorage.setItem('current'+podcast.domain, JSON.stringify(RSS));
+              sessionStorage.setItem(podcast.domain, JSON.stringify(RSS));
               this.setState({
                   items: RSS.items.slice(0, 20),
                   title: RSS.title,
@@ -93,7 +95,7 @@ export const buildLibrary = function(){
   cast => !this.podcasts.has(cast.domain) && this.podcasts.set(cast.domain,cast);
   
   // Check LS
-  let memoryCasts = localStorage.getItem(STORAGEID) || [];
+  let memoryCasts = localStorage.getItem(STORAGEID) ? JSON.parse(localStorage.getItem(STORAGEID)) :[];
 
   // Add Casts
   defaultCasts.forEach(addToLibrary);
@@ -125,7 +127,7 @@ export const getPodcasts = function(podcasts){
     Promise.all(podcasts.map(cast =>{
       let podcast = convertURLToPodcast(cast);
       let CORS_PROXY = PROXY[podcast.protocol];
-      let found = window.localStorage.getItem(podcast.domain);
+      let found = sessionStorage.getItem(podcast.domain);
       if(found){
         return Promise.resolve(JSON.parse(found));
       }else{
@@ -143,7 +145,7 @@ export const getPodcasts = function(podcasts){
     .then(RSS => {
       let clean = RSS.filter(rss=>rss['error']?false:true); 
       clean.forEach((rss)=>{console.log('Saving',rss.domain);
-        window.localStorage.setItem(rss.domain,JSON.stringify(rss))
+        sessionStorage.setItem(rss.domain,JSON.stringify(rss))
       })
       console.log(clean);
       acc(clean);
