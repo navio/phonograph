@@ -8,6 +8,7 @@
     "@material-ui/lab": "latest",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
+    "smallfetch": "^1.0.8",
     "tapable": "^1.0.0",
     "webpack-sources": "^1.1.0",
     "xml2js": "^0.4.19"

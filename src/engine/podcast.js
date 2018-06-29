@@ -1,15 +1,18 @@
 import Parser,{load} from './parser'; 
 import {CASTVIEW,STORAGEID} from '../constants';
 import {defaultCasts} from '../podcast/podcast';
+import fetchJ from 'smallfetch';
 
 const DEFAULTCAST = { domain: "www.npr.org/rss/podcast.php?id=510289" , protocol:'https:'};
 
 let PROXY = {'https:':'/rss/','http:':'/rss-less/'};
+let SEARCH = "/podcasts/";
 let DEBUG = false;
 
 if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
     DEBUG = true;
     PROXY = {'https:':'https://cors-anywhere.herokuapp.com/','http:':'https://cors-anywhere.herokuapp.com/'};
+    SEARCH = `https://cors-anywhere.herokuapp.com/feedwrangler.net/api/v2/podcasts/`;
 }
 
 export const clearDomain = (domain) => domain.replace(/(^\w+:|^)\/\//, '');
@@ -167,8 +170,16 @@ export const addNewPodcast = function(newPodcast,callback){
 
   fillPodcastContent.call(this, newPodcast)
   .then(podcast => addPodcastToLibrary.call(this,podcast));
-  callback.call(this);
+  callback && callback.call(this);
 
+}
+
+export const getPopularPodcasts = function(){
+  return new Promise( function(acc,rej){
+    fetchJ(`${SEARCH}/popular`)
+    .then(data=>acc(data.podcasts))
+    .catch(err=>rej(err));
+  })
 }
 
 //Events

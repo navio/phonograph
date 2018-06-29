@@ -36,8 +36,8 @@ class SimpleBottomNavigation extends React.Component {
         className={classes.root}
       >
         <BottomNavigationAction label="Podcasts" onClick={this.props.toPodcasts} icon={<Headset />} />
-        <BottomNavigationAction label="Discover" icon={<FavoriteIcon />} />
-        <BottomNavigationAction label="Settings" icon={<Ballot />} />
+        <BottomNavigationAction label="Discover" onClick={this.props.toDiscover} icon={<FavoriteIcon />} />
+        <BottomNavigationAction label="Settings" onClick={this.props.toSettings} icon={<Ballot />} />
       </BottomNavigation>
     </Paper><div className={classes.underground}></div></div>
     );

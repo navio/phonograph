@@ -1,4 +1,4 @@
-import {LIBVIEW, CASTVIEW} from '../constants'
+import {LIBVIEW, CASTVIEW, DISCOVERVIEW,SETTINGSVIEW} from '../constants'
 
 export const viewAll = function(ev){
     this.setState({view:LIBVIEW});
@@ -9,5 +9,9 @@ export const viewCurrenPodcast = function(ev){
 }
 
 export const viewSettings = function(ev){
-    this.setState({view:CASTVIEW});
+    this.setState({view:SETTINGSVIEW});
+}
+
+export const viewDiscover = function(){
+    this.setState({view:DISCOVERVIEW});
 }

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { render } from 'react-dom';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
-import { LIBVIEW, CASTVIEW } from './constants';
+import { LIBVIEW, CASTVIEW, DISCOVERVIEW, SETTINGSVIEW } from './constants';
 
 // App Components
 // import Header from './app/Header';
@@ -13,6 +13,7 @@ import MediaControl from './app/MediaControl';
 import EpisodeList from "./podcast/EpisodeList";
 import PodcastHeader from './podcast/PodcastHeader';
 import PodcastGrid from './podcast/PodcastGrid';
+import Discover from './podcast/Discover';
 
 // Engine - Player Interactions
 import { forward30Seconds, rewind10Seconds, playButton, seek } from './engine/player';
@@ -28,7 +29,7 @@ import {  checkIfNewPodcastInURL,
 import attachEvents from './engine/events'
 
 // Router Views
-import { viewAll, viewCurrenPodcast } from './engine/routes';
+import { viewAll, viewCurrenPodcast, viewDiscover, viewSettings } from './engine/routes';
 
 import { unregister } from './registerServiceWorker';
 
@@ -63,6 +64,8 @@ class App extends Component {
     this.loadPodcastToView = loadPodcastToView.bind(this);
     this.askForPodcast = askForPodcast.bind(this);
 
+    
+
   }
 
   componentDidMount() {
@@ -83,6 +86,8 @@ class App extends Component {
     // Debug
     window.player = player;
   }
+
+
   // askForPodcast.call(this,viewCurrenPodcast)
 
   render() {
@@ -119,6 +124,21 @@ class App extends Component {
           </div>
         }
 
+        { view === DISCOVERVIEW && 
+          <Discover
+            addPodcastHandler={addNewPodcast.bind(this)}
+            actionAfterClick={viewCurrenPodcast.bind(this)}
+          />
+        }
+
+        { view === SETTINGSVIEW && 
+          <div>
+            Settings
+          </div>
+        }
+
+        
+
         <MediaControl 
             toCurrentPodcast={viewCurrenPodcast.bind(this)}
             episode={episode} 
@@ -136,7 +156,11 @@ class App extends Component {
             seek={this.seek}
         />
 
-        <Footer toPodcasts={viewAll.bind(this)} />
+        <Footer 
+          toPodcasts={viewAll.bind(this)}
+          toDiscover={viewDiscover.bind(this)}
+          toSettings={viewSettings.bind(this)}
+        />
 
         <audio autoPlay="true" 
                 ref="player" 

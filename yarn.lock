@@ -5932,7 +5932,7 @@ react-popper@^0.10.0:
     popper.js "^1.14.1"
     prop-types "^15.6.1"
 
-react-scripts@^1.1.4:
+react-scripts@latest:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/react-scripts/-/react-scripts-1.1.4.tgz#d5c230e707918d6dd2d06f303b10f5222d017c88"
   dependencies:
@@ -6532,6 +6532,10 @@ slice-ansi@1.0.0:
   resolved "https://registry.yarnpkg.com/slice-ansi/-/slice-ansi-1.0.0.tgz#044f1a49d8842ff307aad6b505ed178bd950134d"
   dependencies:
     is-fullwidth-code-point "^2.0.0"
+
+smallfetch@^1.0.8:
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/smallfetch/-/smallfetch-1.0.8.tgz#5e82c923eb4a4be385cf994d4c43b4e850090663"
 
 snapdragon-node@^2.0.1:
   version "2.1.1"

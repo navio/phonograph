@@ -10,7 +10,8 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Add from '@material-ui/icons/Add';
 import {driveThruDNS} from '../engine/podcast';
 import {viewCurrenPodcast} from '../engine/routes';
-const styles = theme => ({
+
+export const styles = theme => ({
   podcastMedia:{
     paddingTop: '100%',
     position:'relative',
