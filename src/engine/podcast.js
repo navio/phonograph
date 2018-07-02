@@ -177,7 +177,7 @@ export const addNewPodcast = function(newPodcast,callback){
 export const getPopularPodcasts = function(){
   return new Promise( function(acc,rej){
     fetchJ(`${SEARCH}/popular`)
-    .then(data=>acc(data.podcasts))
+    .then(data=>acc(data))
     .catch(err=>rej(err));
   })
 }
