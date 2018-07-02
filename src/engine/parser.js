@@ -3,8 +3,8 @@ import xml2js from 'xml2js';
 const parser = new xml2js.Parser({ trim: false, normalize: true, mergeAttrs: true });
 
 export const fetchRSS = (url) => fetch(url,{method:'GET', headers: {
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:45.0) Gecko/20100101 Firefox/45.0',
-    'Accept': 'text/html,application/xhtml+xml'
+      'User-Agent': 'rss-parser',
+      'Accept': 'application/rss+xml'
   }});
 export const load = (url) => {
     return new Promise((accept,reject)=>{
