@@ -1,3 +1,4 @@
 /rss/* https://:splat 200
 /rss-less/* http://:splat 200
+/podcasts/popular https://finalredirect-dotifanpnr.now.sh 200
 /podcasts/* https://feedwrangler.net/api/v2/podcasts/:splat 200
