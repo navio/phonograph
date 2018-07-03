@@ -12,12 +12,13 @@ export const load = (url) => {
       .then(((res) => {
 
         if(!res.ok) reject(res);
-
+        let contentType = (new Map(res.headers.entries())).get('content-type');
+        contentType && ( contentType.indexOf('text/html') === -1 ) &&
         res.text()
         .catch(error=>reject(error))
         .then(content => parse(content)
-                         .catch(per=>reject(per))
-                         .then(rss=>accept(rss)));
+                         .catch(reject)
+                         .then(accept));
         }));
     });
   };
