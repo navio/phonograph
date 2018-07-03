@@ -12,10 +12,11 @@ let DEBUG = false;
 if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
     DEBUG = true;
     PROXY = {'https:':'https://cors-anywhere.herokuapp.com/','http:':'https://cors-anywhere.herokuapp.com/'};
-    SEARCH = `https://cors-anywhere.herokuapp.com/feedwrangler.net/api/v2/podcasts/`;
+    SEARCH = `https://cors-anywhere.herokuapp.com/https://finalredirect-dotifanpnr.now.sh`;
 }
 
-export const clearDomain = (domain) => domain.replace(/(^\w+:|^)\/\//, '');
+export const clearDomain = 
+  (domain) => domain.replace(/(^\w+:|^)\/\//, '');
 
 export const addPodcastToLibrary = function (podcast){
   let podcastToAdd = Object.assign(podcast);
@@ -134,7 +135,6 @@ export const getPodcasts = function(podcasts){
         return Promise.resolve(JSON.parse(found));
       }else{
         return new Promise((resolve,reject)=>{
-          console.log("fetching:",podcast.domain)
           load(CORS_PROXY + podcast.domain)
           .then(RSS =>{
               delete RSS['items'];
@@ -149,7 +149,6 @@ export const getPodcasts = function(podcasts){
       clean.forEach((rss)=>{console.log('Saving',rss.domain);
         sessionStorage.setItem(rss.domain,JSON.stringify(rss))
       })
-      console.log(clean);
       acc(clean);
     })
 
@@ -209,7 +208,7 @@ export const loadPodcastToView = function(ev){
       })
     }
     fillPodcastContent.call(this,podcast)
-    .then((data)=>{
+    .then(()=>{
       this.setState({
         view:CASTVIEW
       });

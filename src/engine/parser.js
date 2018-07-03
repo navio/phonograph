@@ -13,12 +13,21 @@ export const load = (url) => {
 
         if(!res.ok) reject(res);
         let contentType = (new Map(res.headers.entries())).get('content-type');
-        contentType && ( contentType.indexOf('text/html') === -1 ) &&
-        res.text()
-        .catch(error=>reject(error))
-        .then(content => parse(content)
-                         .catch(reject)
-                         .then(accept));
+
+        if(contentType){
+          ( contentType.indexOf('text/html') > -1 ) &&
+          fetchRSS(url+'?format=xml')
+          .then( fxml =>  fxml.ok && fxml.text() )
+          .then(parse)
+          .then(accept)
+          .catch(reject)
+        }else{
+          res.text()
+          .then(parse)
+          .then(accept)
+          .catch(reject)
+        }
+
         }));
     });
   };

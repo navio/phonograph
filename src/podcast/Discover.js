@@ -21,13 +21,8 @@ class Discover extends Component {
 	}
 	componentDidMount() {
 		getPopularPodcasts()
-        .then(podcasts => {
-            this.setState({podcasts});
-            console.log(podcasts);
-        })
-        .catch(el => {
-            this.setState({'podcasts':[],'error':el});
-        });
+        .then( podcasts => this.setState({podcasts}) )
+        .catch( el => this.setState({'podcasts':[],'error':el}) );
 	}
 
     getClickHandler(domain){
