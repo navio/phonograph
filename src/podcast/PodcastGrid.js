@@ -33,8 +33,7 @@ export const styles = theme => ({
   },
   addIcon:{
     width:'3em',
-    height:'3em',
-    margin: '1em auto'
+    height:'3em'
   },
   card:{
     height:'100%',
