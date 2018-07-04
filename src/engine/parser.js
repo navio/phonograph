@@ -13,13 +13,13 @@ export const load = (url) => {
     return new Promise((accept,reject)=>{
       fetchRSS(url,{signal})
       .then(((res) => {
-        if(!res.ok){ reject(res); console.log('Error first',res) };
+        if(!res.ok){ reject(res); };
         let contentType = (new Map(res.headers.entries())).get('content-type');
         console.log(contentType);
         if(contentType && ( contentType.indexOf('text/html') > -1 )){ // Todo better validation.
           cr.abort();
           fetchRSS(url+'?format=xml')
-          .then( fxml =>{ console.log('Loading second',fxml); return fxml.ok && fxml.text() } )
+          .then( fxml =>{ console.log('FeedBurnerFix'); return fxml.ok && fxml.text() } )
           .then(parse)
           .then(accept)
           .catch(reject)
@@ -34,7 +34,6 @@ export const load = (url) => {
   };
 
 export const parse = (content) => new Promise((accept,reject)=>{
-  // parser.reset()
   try{
     parser.parseString(content,(err, result) =>{
       if(err){ accept({error:true}); console.error('Error Parsing') }

@@ -6,9 +6,9 @@ import IconButton from '@material-ui/core/IconButton';
 // import InfoIcon from '@material-ui/icons/Info';
 import Card from '@material-ui/core/Card';
 import CardMedia from '@material-ui/core/CardMedia';
-// import CardContent from '@material-ui/core/CardContent';
+import CardContent from '@material-ui/core/CardContent';
 import Add from '@material-ui/icons/Add';
-import {driveThruDNS} from '../engine/podcast';
+import {driveThruDNS,getPodcastColor} from '../engine/podcast';
 import {viewCurrenPodcast} from '../engine/routes';
 
 export const styles = theme => ({
@@ -24,9 +24,17 @@ export const styles = theme => ({
     bottom:0,
     width:'100%'
   },
+  cardContent: {
+      position:'absolute'
+      ,width:0
+  },
+  relativeContainer:{
+    position:"relative"
+  },
   addIcon:{
     width:'3em',
-    height:'3em'
+    height:'3em',
+    margin: '1em auto'
   },
   card:{
     height:'100%',
@@ -35,27 +43,34 @@ export const styles = theme => ({
 });
 const addMore = 'addmore';
 
+const getMyColor = (cast) =>(cast.domain === addMore) ? {backgroundColor:'white'}: getPodcastColor(cast);
 
 function PodCastGrid(props) {
   const { classes } = props;
   let casts = (props.podcasts && [...props.podcasts]) || [];
-  casts.push({domain: addMore, title:'Add more', onClick:()=>{ props.addPodcastHandler(viewCurrenPodcast)} });
+  
+casts.push({domain: addMore, title:'Add more', onClick:()=>{ props.addPodcastHandler(viewCurrenPodcast)} });
+
   return (
     <Grid container spacing={0} direction={'row'}>
       { casts && casts.map(cast =>
         <Grid item xs={3} sm={2} md={1} key={cast.domain} >
-          <Card classes={{root:classes.card}}>
+          <Card classes={{root:classes.card}} style={getMyColor(cast)}>
             { cast.domain === addMore
             ? <IconButton onClick={cast.onClick} classes={{root:classes.card}}>
                 <Add classes={{root:classes.addIcon}} />
               </IconButton>
-            : <CardMedia 
+            : <div className={classes.relativeContainer}>
+                <CardContent className={classes.cardContent}>
+                  {cast.title}
+                </CardContent>
+                <CardMedia 
                 onClick={props.selectPodcast} 
                 domain={cast.domain} title={cast.title} 
                 className={classes.podcastMedia} 
                 image={driveThruDNS(cast.image)}
-              >
-            </CardMedia>}
+                />
+              </div>}
           </Card>
         </Grid> 
        )}

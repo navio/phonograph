@@ -6,6 +6,7 @@
     "@material-ui/core": "^1.2.1",
     "@material-ui/icons": "^1.1.0",
     "@material-ui/lab": "latest",
+    "randomcolor": "^0.5.3",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
     "smallfetch": "^1.0.8",

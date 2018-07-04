@@ -2,6 +2,7 @@ import Parser,{load} from './parser';
 import {CASTVIEW,STORAGEID} from '../constants';
 import {defaultCasts} from '../podcast/podcast';
 import fetchJ from 'smallfetch';
+import randomColor from 'randomcolor';
 
 const DEFAULTCAST = { domain: "www.npr.org/rss/podcast.php?id=510289" , protocol:'https:'};
 
@@ -30,6 +31,18 @@ export const addPodcastToLibrary = function (podcast){
 
 export const loadEpisodes = function(RSS) {
     RSS.forEach(item => this.episodes.set(item.guid, item));
+}
+
+export const removeCurrentPodcast = function(){
+  this.setState({ 
+    items: null,
+    title: '',
+    image: null,
+    link: null,
+    description: '',
+    podcast: null
+  });
+  this.episodes.clear();
 }
 
 export const fillPodcastContent = function(cast) {
@@ -166,7 +179,7 @@ export const checkIfNewPodcastInURL = function() {
 }
 
 export const addNewPodcast = function(newPodcast,callback){
-
+  removeCurrentPodcast.call(this);
   fillPodcastContent.call(this, newPodcast)
   .then(podcast => addPodcastToLibrary.call(this,podcast));
   callback && callback.call(this);
@@ -180,6 +193,9 @@ export const getPopularPodcasts = function(){
     .catch(err=>rej(err));
   })
 }
+
+export const getPodcastColor = (cast) => { return { backgroundColor:randomColor({seed:cast.title,luminosity:'dark'}) } }
+
 
 //Events
 
@@ -196,7 +212,6 @@ export const askForPodcast = function(callback){
 }
 // Load current Selectedt Podcast into View
 export const loadPodcastToView = function(ev){
- 
     let podcast = ev && ev.currentTarget && ev.currentTarget.getAttribute('domain');
     if(this.podcasts.has(podcast)){
       let {title,image,description} = this.podcasts.get(podcast);

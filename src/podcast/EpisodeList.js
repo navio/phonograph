@@ -9,6 +9,7 @@ import Card from "@material-ui/core/Card";
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import PauseIcon from '@material-ui/icons/Pause';
 import Typography from '@material-ui/core/Typography';
+import CircularProgress from '@material-ui/core/CircularProgress';
 // const toMinutes = time => {
 //   return Math.floor(1 * time / 60) + ":" + (1 * time) % 60;
 // };
@@ -25,6 +26,13 @@ const styles = theme => ({
   },
   selected:{
     backgroundColor:'aliceblue'
+  },
+  progress: {
+    margin: theme.spacing.unit * 2,
+  },
+  progressContainer:{
+    width: 0,
+    margin: 'auto'
   }
 });
 
@@ -40,9 +48,9 @@ class EpisodeList extends React.Component{
     return (
     <div className={classes.root}>
       <Card>
-        <List>
-          {props.episodes &&
-            props.episodes.map(episode => (
+        
+        { props.episodes ? <List>
+          {props.episodes.map(episode => (
               <div key={episode.guid}>
                 <ListItem className={(props.playing === episode.guid ? classes.selected : null)}
                   button
@@ -61,7 +69,8 @@ class EpisodeList extends React.Component{
                 <Divider />
               </div>
             ))}
-        </List>
+        </List>: <div className={classes.progressContainer}><CircularProgress className={classes.progress} /></div>}
+
       </Card>
     </div>
     );
