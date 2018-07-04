@@ -36,8 +36,8 @@ class Discover extends Component {
 	render() {
 		return (
             <Grid container spacing={0} direction={'row'}>
-            { this.state.podcasts.map(cast =>
-              <Grid item xs={3} sm={2} md={1} key={cast.domain} >
+            { this.state.podcasts.map( (cast,ins) =>
+              <Grid item xs={3} sm={2} md={1} key={ins} >
                 <Card classes={{root:this.props.classes.card}}>
                    <CardMedia
                       onClick={this.getClickHandler.call(this,cast.feed_url)}

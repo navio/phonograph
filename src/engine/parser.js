@@ -2,22 +2,24 @@ import xml2js from 'xml2js';
 
 const parser = new xml2js.Parser({ trim: false, normalize: true, mergeAttrs: true });
 
-export const fetchRSS = (url) => fetch(url,{method:'GET', headers: {
+export const fetchRSS = (url,options) => fetch(url,{method:'GET', headers: {
       'User-Agent': 'rss-parser',
       'Accept': 'application/rss+xml'
-  }});
+  },...options});
+
 export const load = (url) => {
+    let cr = new window.AbortController();
+    let signal = cr.signal;
     return new Promise((accept,reject)=>{
-      fetchRSS(url)
+      fetchRSS(url,{signal})
       .then(((res) => {
-
-        if(!res.ok) reject(res);
+        if(!res.ok){ reject(res); console.log('Error first',res) };
         let contentType = (new Map(res.headers.entries())).get('content-type');
-
-        if(contentType){
-          ( contentType.indexOf('text/html') > -1 ) &&
+        console.log(contentType);
+        if(contentType && ( contentType.indexOf('text/html') > -1 )){
+          cr.abort();
           fetchRSS(url+'?format=xml')
-          .then( fxml =>  fxml.ok && fxml.text() )
+          .then( fxml =>{ console.log('Loading second',fxml); return fxml.ok && fxml.text() } )
           .then(parse)
           .then(accept)
           .catch(reject)
@@ -27,8 +29,7 @@ export const load = (url) => {
           .then(accept)
           .catch(reject)
         }
-
-        }));
+      }));
     });
   };
 
