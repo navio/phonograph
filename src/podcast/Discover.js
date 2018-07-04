@@ -39,7 +39,7 @@ class Discover extends Component {
   
 	render() {
 
-    let podcasts = this.state.podcasts.slice(0,20);
+    let podcasts = this.state.podcasts.slice(0,24);
     let classes = this.props.classes;
 		return (
             <Grid container spacing={0} direction={'row'}>
