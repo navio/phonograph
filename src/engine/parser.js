@@ -16,7 +16,7 @@ export const load = (url) => {
         if(!res.ok){ reject(res); console.log('Error first',res) };
         let contentType = (new Map(res.headers.entries())).get('content-type');
         console.log(contentType);
-        if(contentType && ( contentType.indexOf('text/html') > -1 )){
+        if(contentType && ( contentType.indexOf('text/html') > -1 )){ // Todo better validation.
           cr.abort();
           fetchRSS(url+'?format=xml')
           .then( fxml =>{ console.log('Loading second',fxml); return fxml.ok && fxml.text() } )
