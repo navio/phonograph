@@ -29,7 +29,13 @@
   status = 200
 
 [[redirects]]
-  from="/podcasts/img/*"
-  to ="https://:Space"
+  from="/cacheds/*"
+  to ="https://:splat"
+  [redirects.headers]
+    max-age="180000"
+
+[[redirects]]
+  from="/cached/*"
+  to ="http://:splat"
   [redirects.headers]
     max-age="180000"

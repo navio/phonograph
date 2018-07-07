@@ -8,7 +8,7 @@ import Card from '@material-ui/core/Card';
 import CardMedia from '@material-ui/core/CardMedia';
 import CardContent from '@material-ui/core/CardContent';
 import Add from '@material-ui/icons/Add';
-import {driveThruDNS,getPodcastColor} from '../engine/podcast';
+import {getPodcastColor,cachedContent} from '../engine/podcast';
 import {viewCurrenPodcast} from '../engine/routes';
 
 export const styles = theme => ({
@@ -64,10 +64,10 @@ casts.push({domain: addMore, title:'Add more', onClick:()=>{ props.addPodcastHan
                   {cast.title}
                 </CardContent>
                 <CardMedia 
-                onClick={props.selectPodcast} 
-                domain={cast.domain} title={cast.title} 
-                className={classes.podcastMedia} 
-                image={driveThruDNS(cast.image)}
+                  onClick={props.selectPodcast} 
+                  domain={cast.domain} title={cast.title} 
+                  className={classes.podcastMedia} 
+                  image={cachedContent(cast.image)}
                 />
               </div>}
           </Card>

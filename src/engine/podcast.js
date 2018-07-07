@@ -7,12 +7,14 @@ import randomColor from 'randomcolor';
 const DEFAULTCAST = { domain: "www.npr.org/rss/podcast.php?id=510289" , protocol:'https:'};
 
 let PROXY = {'https:':'/rss/','http:':'/rss-less/'};
+let CACHED = {'https:':'/cacheds/','http:':'/cached/'};
 let SEARCH = "/podcasts/";
 let DEBUG = false;
 
 if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
     DEBUG = true;
     PROXY = {'https:':'https://cors-anywhere.herokuapp.com/','http:':'https://cors-anywhere.herokuapp.com/'};
+    CACHED = {'https:':'https://cors-anywhere.herokuapp.com/','http:':'https://cors-anywhere.herokuapp.com/'};
     SEARCH = `https://cors-anywhere.herokuapp.com/https://finalredirect-dotifanpnr.now.sh`;
 }
 
@@ -124,16 +126,26 @@ export const convertURLToPodcast = (url) =>{ // Todo: try https, then http other
   let fixURL = url.search("http") < 0 ? `https://${url}`: url;
   try{
     let podcast = new URL(fixURL);
-    let domain =   clearDomain(podcast.href);
+    let domain =  clearDomain(podcast.href);
     let protocol = podcast.protocol
     return { domain , protocol };
   }catch(error){
-    console.info('Error Parsing Domain');
+    console.error('Error Parsing Domain',error);
     return null;
   }
 }
 
 export const driveThruDNS = (url) =>{
+  let r = convertURLToPodcast(url);
+  return DEBUG ? url : `${PROXY[r.protocol]}${r.domain}`;
+}
+
+export const cachedContent = (url) =>{
+  let r = convertURLToPodcast(url);
+  return DEBUG ? url : `${CACHED[r.protocol]}${r.domain}`;
+}
+
+export const cacheImage= (url) =>{
   let r = convertURLToPodcast(url);
   return DEBUG ? url : `${PROXY[r.protocol]}${r.domain}`;
 }
