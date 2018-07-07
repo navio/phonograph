@@ -1,0 +1,35 @@
+[build]
+  base    = "/"
+  publish = "/build"
+  command = "yarn build"
+
+[[redirects]]
+  from = "/rss/*"
+  to = "https://:splat"
+  status = 200
+
+[[redirects]]
+  from = "/rss-less/*"
+  to = "http://:splat"
+  status = 200
+
+[[redirects]]
+  from = "/rss-less/*"
+  to = "http://:splat"
+  status = 200
+
+[[redirects]]
+  from = "/podcasts/popular"
+  to = "http://popular-redirect.hosts.mx/"
+  status = 200
+
+[[redirects]]
+  from = "/podcasts/*"
+  to = "https://feedwrangler.net/api/v2/podcasts/:splat"
+  status = 200
+
+[[redirects]]
+  from="/podcasts/img/*"
+  to ="https://:Space"
+  [redirects.headers]
+    max-age="180000"
