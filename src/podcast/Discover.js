@@ -28,13 +28,13 @@ class Discover extends Component {
         .catch( el => this.setState({'podcasts':[],'error':el}) );
 	}
 
-    getClickHandler(domain){
-        let addPodcastHandler =  this.props.addPodcastHandler;
-        let actionAfterClick = this.props.actionAfterClick;
-        return function(){
-            addPodcastHandler(convertURLToPodcast(domain),actionAfterClick);
-        }
-    }
+  getClickHandler(domain){
+      let addPodcastHandler =  this.props.addPodcastHandler;
+      let actionAfterClick = this.props.actionAfterClick;
+      return function(){
+          addPodcastHandler(convertURLToPodcast(domain),actionAfterClick);
+      }
+  }
   
   
 	render() {

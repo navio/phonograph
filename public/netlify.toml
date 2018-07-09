@@ -38,4 +38,4 @@
   from="/cached/*"
   to ="http://:splat"
   [redirects.headers]
-    max-age="180000"
+    cache-control="public, max-age=18000"

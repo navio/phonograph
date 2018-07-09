@@ -14,6 +14,7 @@ import EpisodeList from "./podcast/EpisodeList";
 import PodcastHeader from './podcast/PodcastHeader';
 import PodcastGrid from './podcast/PodcastGrid';
 import Discover from './podcast/Discover';
+import Settings from './podcast/Settings';
 
 // Engine - Player Interactions
 import { forward30Seconds, rewind10Seconds, playButton, seek } from './engine/player';
@@ -23,7 +24,8 @@ import {  checkIfNewPodcastInURL,
           loadPodcastToView, 
           buildLibrary, 
           addNewPodcast,
-          askForPodcast
+          askForPodcast,
+          removePodcastFromLibrary
         } from './engine/podcast';
 
 import attachEvents from './engine/events'
@@ -39,10 +41,9 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
-      view:LIBVIEW,
+      view:SETTINGSVIEW,
       playing: null,
       items: null,
-      episode: null,
       loaded: 0,
       played: 0,
       author: null,
@@ -132,12 +133,11 @@ class App extends Component {
         }
 
         { view === SETTINGSVIEW && 
-          <div>
-            Settings
-          </div>
+          <Settings
+            removePodcast={removePodcastFromLibrary.bind(this)}
+            podcasts={podcasts}
+          />
         }
-
-        
 
         <MediaControl 
             toCurrentPodcast={viewCurrenPodcast.bind(this)}

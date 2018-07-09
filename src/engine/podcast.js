@@ -27,7 +27,13 @@ export const addPodcastToLibrary = function (podcast){
   this.podcasts.set(podcastToAdd.domain,podcastToAdd);
   let podcasts = [...this.podcasts.values()];
   localStorage.setItem(STORAGEID,JSON.stringify(podcasts));
+  this.setState({podcasts});
+}
 
+export const removePodcastFromLibrary = function(cast){
+  this.podcasts.delete(cast);
+  let podcasts = [...this.podcasts.values()];
+  localStorage.setItem(STORAGEID,JSON.stringify(podcasts));
   this.setState({podcasts});
 }
 
