@@ -20,7 +20,7 @@
 
 [[redirects]]
   from = "/podcasts/popular"
-  to = "http://popular-redirect.hosts.mx/"
+  to = "https://popular-redirect.hosts.mx/"
   status = 200
 
 [[redirects]]
