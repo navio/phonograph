@@ -41,7 +41,7 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
-      view:SETTINGSVIEW,
+      view:LIBVIEW,
       playing: null,
       items: null,
       loaded: 0,
