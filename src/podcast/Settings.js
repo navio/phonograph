@@ -7,7 +7,9 @@ import Divider from "@material-ui/core/Divider";
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
-
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import Typography from '@material-ui/core/Typography';
 
 const styles = theme => ({
   root: {
@@ -25,22 +27,28 @@ const eraseThisPodcast = function(domain,fn){
 
 const GeneraList = (props) =>{
   
-  return <List>
-          {props.podcasts && props.removePodcast &&
-           props.podcasts.map(podcast => 
-              <div key={podcast.domain}>
-                <ListItem >
-                  <ListItemText secondary={podcast.title} />
-                  <ListItemSecondaryAction>
-                    <IconButton aria-label="Delete">
-                      <DeleteIcon onClick={eraseThisPodcast(podcast.domain,props.removePodcast)} />
-                    </IconButton>
-                  </ListItemSecondaryAction>
-                </ListItem>
-                <Divider />
-              </div>
-          )}
-        </List>;
+  return <Card>
+          <CardContent>
+            <Typography variant="headline" component="h2" >Settings</Typography>
+          </CardContent>
+          <List>
+            <Divider />
+              {props.podcasts && props.removePodcast &&
+                props.podcasts.map(podcast =>
+                  <div key={podcast.domain}>
+                    <ListItem >
+                      <ListItemText secondary={podcast.title} />
+                      <ListItemSecondaryAction>
+                        <IconButton aria-label="Delete">
+                          <DeleteIcon onClick={eraseThisPodcast(podcast.domain,props.removePodcast)} />
+                        </IconButton>
+                      </ListItemSecondaryAction>
+                    </ListItem>
+                    <Divider />
+                  </div>
+              )}
+            </List>
+          </Card>;
 };
 
 export default withStyles(styles)(GeneraList);
