@@ -28,12 +28,14 @@ import {  checkIfNewPodcastInURL,
           removePodcastFromLibrary
         } from './engine/podcast';
 
-import attachEvents from './engine/events'
+import attachEvents from './engine/events';
+
+// SW
 
 // Router Views
 import { viewAll, viewCurrenPodcast, viewDiscover, viewSettings } from './engine/routes';
 
-import { unregister } from './registerServiceWorker';
+import register from './registerServiceWorker';
 
 
 class App extends Component {
@@ -172,6 +174,5 @@ class App extends Component {
     );
   }
 }
-
+register();
 render(<App />, document.getElementById('root'));
-unregister();
