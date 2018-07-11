@@ -41,7 +41,7 @@
           // }
           return caches.open(staticCacheName).then(function(cache) {
             if (event.request.url.indexOf('/rss') < 0) {
-              cache.put(event.request.url, response.clone());
+              cache.put(event.request.url, response);
             }
             return response;
           });
