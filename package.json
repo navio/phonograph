@@ -3,26 +3,25 @@
   "description": "",
   "homepage": "/",
   "dependencies": {
-    "@material-ui/core": "^1.2.1",
+    "@material-ui/core": "^1.3.1",
     "@material-ui/icons": "^1.1.0",
-    "@material-ui/lab": "latest",
+    "@material-ui/lab": "^1.0.0-alpha.5",
+    "prop-types": "^15.6.2",
     "randomcolor": "^0.5.3",
-    "react": "^16.4.0",
-    "react-dom": "^16.4.0",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
     "smallfetch": "^1.0.8",
-    "tapable": "^1.0.0",
-    "webpack-sources": "^1.1.0",
     "xml2js": "^0.4.19"
   },
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "start": "parcel public/index.html",
+    "build": "parcel build public/index.html",
+    "serve": "parcel serve public/index.html"
   },
   "devDependencies": {
-    "react-scripts": "latest"
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "parcel-bundler": "^1.9.6"
   }
 }

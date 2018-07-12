@@ -1,6 +1,6 @@
 {
-  "short_name": "Podcast Player",
-  "name": "PWA Podcast",
+  "short_name": "Phonograph",
+  "name": "Phonograph App ",
   "icons": [
     {
       "src": "favico.svg",

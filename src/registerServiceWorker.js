@@ -30,11 +30,10 @@ export default function register() {
     }
     
     window.addEventListener('load', () => {
-      const swUrl = `${process.env.PUBLIC_URL}/sw.js`;
 
       if (isLocalhost) {
         // This is running on localhost. Lets check if a service worker still exists or not.
-        checkValidServiceWorker(swUrl);
+        checkValidServiceWorker();
 
         // Add some additional logging to localhost, pointing developers to the
         // service worker/PWA documentation.
@@ -46,15 +45,15 @@ export default function register() {
         });
       } else {
         // Is not local host. Just register service worker
-        registerValidSW(swUrl);
+        registerValidSW();
       }
     });
   }
 }
 
-function registerValidSW(swUrl) {
+function registerValidSW() {
   navigator.serviceWorker
-    .register(swUrl)
+    .register("./sw.js")
     .then(registration => {
       registration.onupdatefound = () => {
         const installingWorker = registration.installing;
@@ -81,9 +80,9 @@ function registerValidSW(swUrl) {
     });
 }
 
-function checkValidServiceWorker(swUrl) {
+function checkValidServiceWorker() {
   // Check if the service worker can be found. If it can't reload the page.
-  fetch(swUrl)
+  fetch("/sw.js")
     .then(response => {
       // Ensure service worker exists, and that we really are getting a JS file.
       if (
@@ -98,7 +97,7 @@ function checkValidServiceWorker(swUrl) {
         });
       } else {
         // Service worker found. Proceed as normal.
-        registerValidSW(swUrl);
+        registerValidSW("./sw.js");
       }
     })
     .catch(() => {
