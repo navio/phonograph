@@ -24,7 +24,12 @@ self.addEventListener('fetch', fetchEvent => {
       const responseFromFetch = await fetchPromise;
       const responseCopy = responseFromFetch.clone();
       const myCache = await caches.open(cacheName);
-      return myCache.put(request, responseCopy);
+      try{
+        return myCache.put(request, responseCopy);
+      }catch(error){
+        return;
+      }
+      
     }());
     if (request.headers.get('Accept').includes('text/html')) {
       try {
