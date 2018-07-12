@@ -10,9 +10,9 @@ const cacheName = 'files';
 const rss = 'rss-pg';
 const rssless = 'rss-less-pg';
 
-addEventListener('fetch',  fetchEvent => {
+self.addEventListener('fetch', fetchEvent => {
   const request = fetchEvent.request;
-  
+
   if (request.method !== 'GET') return;
   if ( (request.url.indexOf(rss) > -1 ) || (request.url.indexOf(rssless) > -1 ) ) return;
 
