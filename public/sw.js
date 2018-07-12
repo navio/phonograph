@@ -14,7 +14,9 @@ self.addEventListener('fetch', fetchEvent => {
   const request = fetchEvent.request;
 
   if (request.method !== 'GET') return;
-  if ( (request.url.indexOf(rss) > -1 ) || (request.url.indexOf(rssless) > -1 ) ) return;
+  if ( (request.url.indexOf(rss) > -1 ) || 
+       (request.url.indexOf(rssless) > -1 ) ||
+       (request.url.indexOf("http:") > -1 ) ) return;
 
   fetchEvent.respondWith(async function() {
     const fetchPromise = fetch(request);
