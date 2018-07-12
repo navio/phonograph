@@ -6,7 +6,7 @@ import randomColor from 'randomcolor';
 
 const DEFAULTCAST = { domain: "www.npr.org/rss/podcast.php?id=510289" , protocol:'https:'};
 
-let PROXY = {'https:':'/rss/','http:':'/rss-less/'};
+let PROXY = {'https:':'/rss-pg/','http:':'/rss-less-pg/'};
 let CACHED = {'https:':'/cacheds/','http:':'/cached/'};
 let SEARCH = "/podcasts/";
 let DEBUG = false;

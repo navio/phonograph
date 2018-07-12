@@ -35,7 +35,7 @@ import attachEvents from './engine/events';
 // Router Views
 import { viewAll, viewCurrenPodcast, viewDiscover, viewSettings } from './engine/routes';
 
-// import register from './registerServiceWorker';
+import register from './registerServiceWorker';
 
 
 class App extends Component {
@@ -174,5 +174,5 @@ class App extends Component {
     );
   }
 }
-// register();
+register();
 render(<App />, document.getElementById('root'));

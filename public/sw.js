@@ -1,75 +1,39 @@
-(function() {
-  'use strict';
+// Licensed under a CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
+// http://creativecommons.org/publicdomain/zero/1.0/
 
-  // var filesToCache = [
-  //   '.',
-  //   'style/main.css',
-  //   'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700',
-  //   'images/still_life-1600_large_2x.jpg',
-  //   'images/still_life-800_large_1x.jpg',
-  //   'images/still_life_small.jpg',
-  //   'images/still_life_medium.jpg',
-  //   'index.html',
-  //   'pages/offline.html',
-  //   'pages/404.html'
-  // ];
+// HTML files: try the network first, then the cache.
+// Other files: try the cache first, then the network.
+// Both: cache a fresh version if possible.
+// (beware: the cache will grow and grow; there's no cleanup)
 
-  var staticCacheName = 'cacheall';
+const cacheName = 'files';
+const rss = 'rss-pg';
+const rssless = 'rss-less-pg';
 
-  self.addEventListener('install', function(event) {
-    console.log('Attempting to install service worker and cache static assets');
-    // event.waitUntil(
-    //   caches.open(staticCacheName)
-    //   .then(function(cache) {
-    //     return cache.addAll(filesToCache);
-    //   })
-    // );
-  });
+addEventListener('fetch',  fetchEvent => {
+  const request = fetchEvent.request;
+  
+  if (request.method !== 'GET') return;
+  if ( (request.url.indexOf(rss) > -1 ) || (request.url.indexOf(rssless) > -1 ) ) return;
 
-  self.addEventListener('fetch', function(event) {
-    console.log('Fetch event for ', event.request.url);
-    event.respondWith(
-      caches.match(event.request).then(function(response) {
-        if (response) {
-          console.log('Found ', event.request.url, ' in cache');
-          return response;
-        }
-        console.log('Network request for ', event.request.url);
-        return fetch(event.request).then(function(response) {
-          // if (response.status === 404) {
-          //   return caches.match('pages/404.html');
-          // }
-          return caches.open(staticCacheName).then(function(cache) {
-            if (event.request.url.indexOf('/rss') < 0) {
-              cache.put(event.request.url, response);
-            }
-            return response;
-          });
-        });
-      }).catch(function(error) {
-        console.log('Error, ', error);
-        // Offline Maybe? 
-        // return caches.match('pages/offline.html');
-      })
-    );
-  });
-
-  self.addEventListener('activate', function(event) {
-    console.log('Activating new service worker...');
-
-    var cacheWhitelist = [staticCacheName];
-
-    event.waitUntil(
-      caches.keys().then(function(cacheNames) {
-        return Promise.all(
-          cacheNames.map(function(cacheName) {
-            if (cacheWhitelist.indexOf(cacheName) === -1) {
-              return caches.delete(cacheName);
-            }
-          })
-        );
-      })
-    );
-  });
-
-})();
+  fetchEvent.respondWith(async function() {
+    const fetchPromise = fetch(request);
+    fetchEvent.waitUntil(async function() {
+      const responseFromFetch = await fetchPromise;
+      const responseCopy = responseFromFetch.clone();
+      const myCache = await caches.open(cacheName);
+      return myCache.put(request, responseCopy);
+    }());
+    if (request.headers.get('Accept').includes('text/html')) {
+      try {
+        return fetchPromise;
+      }
+      catch(error) {
+        return caches.match(request);
+      }
+    } else {
+      const responseFromCache = await caches.match(request);
+      return responseFromCache || fetchPromise;
+    }
+  }());
+});

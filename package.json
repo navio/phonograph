@@ -16,12 +16,6 @@
   },
   "version": "0.1.0",
   "private": true,
-  "proxy": {
-    "/rss/": {
-      "target": "https://player.netlify.com",
-      "secure": true
-    }
-  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
