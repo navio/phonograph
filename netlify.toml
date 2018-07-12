@@ -15,7 +15,7 @@
 
 [[redirects]]
   from = "/podcasts/popular"
-  to = "https://popular-redirect.hosts.mx/"
+  to = "https://popular-podcast.glitch.me/"
   status = 200
 
 [[redirects]]
