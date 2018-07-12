@@ -5,7 +5,7 @@
 // Other files: try the cache first, then the network.
 // Both: cache a fresh version if possible.
 // (beware: the cache will grow and grow; there's no cleanup)
-
+/*
 const cacheName = 'files';
 const rss = 'rss-pg';
 const rssless = 'rss-less-pg';
@@ -44,3 +44,12 @@ self.addEventListener('fetch', fetchEvent => {
     }
   }());
 });
+*/
+if(window.navigator && navigator.serviceWorker) {
+  navigator.serviceWorker.getRegistrations()
+  .then(function(registrations) {
+    for(let registration of registrations) {
+      registration.unregister();
+    }
+  });
+}
