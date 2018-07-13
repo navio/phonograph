@@ -212,7 +212,7 @@ export const getPopularPodcasts = function(){
   })
 }
 
-export const getPodcastColor = (cast) => { return { backgroundColor:randomColor({seed:cast.title,luminosity:'dark'}) } }
+export const getPodcastColor = (cast) => { return { backgroundColor:randomColor({seed:cast.title,luminosity:'dark',hue:'blue'}) } }
 
 
 //Events
