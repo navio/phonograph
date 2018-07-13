@@ -67,7 +67,7 @@ casts.push({domain: addMore, title:'Add more', onClick:()=>{ props.addPodcastHan
                   onClick={props.selectPodcast} 
                   domain={cast.domain} title={cast.title} 
                   className={classes.podcastMedia} 
-                  image={cachedContent(cast.image)}
+                  image={cast.image}
                 />
               </div>}
           </Card>
