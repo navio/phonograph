@@ -8,8 +8,10 @@
     "@material-ui/lab": "^1.0.0-alpha.5",
     "prop-types": "^15.6.2",
     "randomcolor": "^0.5.3",
-    "react": "^16.4.1",
+    "react": ">=15",
     "react-dom": "^16.4.1",
+    "react-router": "^4.3.1",
+    "react-router-dom": "^4.3.1",
     "smallfetch": "^1.0.8",
     "xml2js": "^0.4.19"
   },

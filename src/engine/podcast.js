@@ -200,7 +200,7 @@ export const addNewPodcast = function(newPodcast,callback){
   removeCurrentPodcast.call(this);
   fillPodcastContent.call(this, newPodcast)
   .then(podcast => addPodcastToLibrary.call(this,podcast));
-  callback && callback.call(this);
+  callback && callback.call(this,newPodcast.domain);
 
 }
 
@@ -240,10 +240,5 @@ export const loadPodcastToView = function(ev){
         podcast
       })
     }
-    fillPodcastContent.call(this,podcast)
-    .then(()=>{
-      this.setState({
-        view:CASTVIEW
-      });
-    })
+    return fillPodcastContent.call(this,podcast);
 }
