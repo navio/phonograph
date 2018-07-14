@@ -15,7 +15,7 @@ import SkipNextIcon from "@material-ui/icons/Forward30";
 // import {clearText} from './index'
 import LinearProgress from "@material-ui/core/LinearProgress";
 import Grid from "@material-ui/core/Grid";
-
+import { Link } from "react-router-dom";
 
 const styles = theme => ({
   card: {
@@ -108,19 +108,17 @@ function MediaControlCard(props) {
   const { classes, theme } = props;
   return (
     <div>
-    <div className={classes.root} onClick={props.toCurrentPodcast}>
+    <div className={classes.root} >
+    
       {props.episode && (
         <div className={classes.card}>
+
           <div className={classes.details}>
-            
+            <Link to="/podcast">
             <CardContent className={classes.content}>
-              <Typography onClick={props.toCurrentPodcast} variant="body1">{props.episode.title}</Typography>
-              {/*<Typography
-                style={{ paddingTop: 10 }}
-                color="textSecondary"
-                dangerouslySetInnerHTML={{ __html: props.episode.content }}
-              />*/}
+              <Typography  variant="body1">{props.episode.title}</Typography>
             </CardContent>
+            </Link>
 
            <Grid container className={classes.player}>
               <Grid item xs={2}>

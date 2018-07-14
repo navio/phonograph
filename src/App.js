@@ -39,13 +39,6 @@ import attachEvents from "./engine/events";
 // Router
 import { Route, Link } from "react-router-dom";
 
-// Router Views
-import {
-  viewAll,
-  viewCurrenPodcast,
-  viewDiscover,
-  viewSettings
-} from "./engine/routes";
 
 export default class App extends Component {
   constructor() {
@@ -154,7 +147,7 @@ export default class App extends Component {
         />
 
         <MediaControl
-          toCurrentPodcast={viewCurrenPodcast.bind(this)}
+          toCurrentPodcast={() => history.push("/podcast/")}
           episode={episode}
           player={this.refs.player}
           status={this.state.status}
@@ -170,11 +163,7 @@ export default class App extends Component {
           seek={this.seek}
         />
 
-        <Footer
-          toPodcasts={viewAll.bind(this)}
-          toDiscover={viewDiscover.bind(this)}
-          toSettings={viewSettings.bind(this)}
-        />
+        <Footer />
 
         <audio
           autoPlay="true"
