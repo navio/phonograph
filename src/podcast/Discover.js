@@ -7,7 +7,7 @@ import CardMedia from '@material-ui/core/CardMedia';
 import CardContent from '@material-ui/core/CardContent';
 import {driveThruDNS,getPodcastColor,convertURLToPodcast} from '../engine/podcast';
 import {styles} from './PodcastGrid';
-
+import CircularProgress from '@material-ui/core/CircularProgress';
 import { getPopularPodcasts } from '../engine/podcast';
 
 
@@ -41,8 +41,8 @@ class Discover extends Component {
 
     let podcasts = this.state.podcasts.slice(0,24);
     let classes = this.props.classes;
-		return (
-            <Grid container spacing={0} direction={'row'}>
+		return ( podcasts ? 
+           <Grid container spacing={0} direction={'row'}>
             { podcasts.map( (cast,ins) =>
               <Grid item xs={3} sm={2} md={1} key={ins} >
                 <Card classes={{root:this.props.classes.card}} style={getPodcastColor(cast)}>
@@ -58,9 +58,12 @@ class Discover extends Component {
                     />
                 </div>
                 </Card>
-              </Grid> 
+              </Grid>
              )}
-          </Grid>
+          </Grid> : 
+          <div className={classes.progressContainer}>
+            <CircularProgress className={classes.progress} />
+          </div> 
         );
 	}
 }
