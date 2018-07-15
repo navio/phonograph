@@ -23,6 +23,7 @@
   to = "https://feedwrangler.net/api/v2/podcasts/:splat"
   status = 200
 
+
 [[redirects]]
   from="/cacheds/*"
   to ="https://:splat"
@@ -32,5 +33,9 @@
 [[redirects]]
   from="/cached/*"
   to ="http://:splat"
-  [redirects.headers]
-    cache-control="public, max-age=18000"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+

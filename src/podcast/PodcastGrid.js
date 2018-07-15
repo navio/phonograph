@@ -9,7 +9,6 @@ import CardMedia from '@material-ui/core/CardMedia';
 import CardContent from '@material-ui/core/CardContent';
 import Add from '@material-ui/icons/Add';
 import {getPodcastColor,cachedContent} from '../engine/podcast';
-import {viewCurrenPodcast} from '../engine/routes';
 
 export const styles = theme => ({
   podcastMedia:{
