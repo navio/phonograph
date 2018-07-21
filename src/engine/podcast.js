@@ -8,14 +8,14 @@ const DEFAULTCAST = { domain: "www.npr.org/rss/podcast.php?id=510289" , protocol
 
 let PROXY = {'https:':'/rss-pg/','http:':'/rss-less-pg/'};
 let CACHED = {'https:':'/cacheds/','http:':'/cached/'};
-let SEARCH = "/podcasts/";
+let API = "/podcasts/";
 let DEBUG = false;
 
 if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
     DEBUG = true;
     PROXY = {'https:':'https://cors-anywhere.herokuapp.com/','http:':'https://cors-anywhere.herokuapp.com/'};
     CACHED = {'https:':'https://cors-anywhere.herokuapp.com/','http:':'https://cors-anywhere.herokuapp.com/'};
-    SEARCH = `https://cors-anywhere.herokuapp.com/https://feedwrangler.net/api/v2/podcasts/`;
+    API = `https://cors-anywhere.herokuapp.com/https://feedwrangler.net/api/v2/podcasts/`;
 }
 
 export const clearDomain = 
@@ -209,19 +209,40 @@ export const addNewPodcast = function(newPodcast,callback){
 
 export const getPopularPodcasts = function(){
   return new Promise( function(acc,rej){
-    fetchJ(`${SEARCH}/popular`)
+    fetchJ(`${API}/popular`)
     .then(data=>acc(data.podcasts))
     .catch(err=>rej(err));
   })
 }
 
+
+
+export class PodcastSearcher {
+  constructor(){
+    let currentRequest = null;
+  }
+  search(term){
+    this.currentRequest && this.currentRequest.abort();
+    this.currentRequest = new AbortController();
+    let {signal} = this.currentRequest;
+    console.log();
+    return new Promise((accept,reject) => 
+                        fetch(`${API}/search?search_term=${term}`,{signal})
+                        .then(result => result.ok && result.json().then(accept).catch(reject) || reject(result))
+                        .catch(reject))
+  }
+}
+
+const SFP = new PodcastSearcher();
 export const searchForPodcasts = function(search){
   return new Promise( function(acc,rej){
-    fetchJ(`${SEARCH}/search?search_term=${search}`)
+    SFP.search(search)
     .then(data=>acc(data.podcasts))
-    .catch(err=>rej(err));
-  })
+    .catch(rej);
+  });
 }
+
+
 
 export const getPodcastColor = (cast) => ({ backgroundColor:randomColor({seed:cast.title,luminosity:'dark',hue:'blue'}) } );
 
