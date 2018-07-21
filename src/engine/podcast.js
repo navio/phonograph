@@ -15,7 +15,7 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
     DEBUG = true;
     PROXY = {'https:':'https://cors-anywhere.herokuapp.com/','http:':'https://cors-anywhere.herokuapp.com/'};
     CACHED = {'https:':'https://cors-anywhere.herokuapp.com/','http:':'https://cors-anywhere.herokuapp.com/'};
-    SEARCH = `https://cors-anywhere.herokuapp.com/https://finalredirect-dotifanpnr.now.sh`;
+    SEARCH = `https://cors-anywhere.herokuapp.com/https://feedwrangler.net/api/v2/podcasts/`;
 }
 
 export const clearDomain = 
@@ -210,7 +210,15 @@ export const addNewPodcast = function(newPodcast,callback){
 export const getPopularPodcasts = function(){
   return new Promise( function(acc,rej){
     fetchJ(`${SEARCH}/popular`)
-    .then(data=>acc(data))
+    .then(data=>acc(data.podcasts))
+    .catch(err=>rej(err));
+  })
+}
+
+export const searchForPodcasts = function(search){
+  return new Promise( function(acc,rej){
+    fetchJ(`${SEARCH}/search?search_term=${search}`)
+    .then(data=>acc(data.podcasts))
     .catch(err=>rej(err));
   })
 }
