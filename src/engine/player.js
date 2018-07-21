@@ -64,3 +64,7 @@ export const playButton =
             });
         }
   }
+
+  export const navigateTo = function(path){
+    return () => this.props.history.push(path);
+ };

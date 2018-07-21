@@ -49,7 +49,7 @@ class SimpleBottomNavigation extends React.Component {
             />
             <BottomNavigationAction
               label="Settings"
-              onClick={this.handleRedirect('settings')}
+              onClick={this.handleRedirect('/settings')}
               icon={<Ballot />}
             />
           </BottomNavigation>

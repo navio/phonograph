@@ -1,5 +1,5 @@
-export const LIBVIEW = 'all';
-export const CASTVIEW = 'podcast';
 export const STORAGEID = 'library';
-export const DISCOVERVIEW = 'discover'
-export const SETTINGSVIEW = 'settings';
+export const LIBVIEW = '/';
+export const PODCASTVIEW = '/podcast';
+export const DISCOVERVIEW = '/discover'
+export const SETTINGSVIEW = '/settings';

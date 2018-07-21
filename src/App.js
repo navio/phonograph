@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { render } from "react-dom";
 import CssBaseline from "@material-ui/core/CssBaseline";
 
-import { LIBVIEW, CASTVIEW, DISCOVERVIEW, SETTINGSVIEW } from "./constants";
+import { LIBVIEW, PODCASTVIEW, DISCOVERVIEW, SETTINGSVIEW } from "./constants";
 
 // App Components
 // import Header from './app/Header';
@@ -21,7 +21,8 @@ import {
   forward30Seconds,
   rewind10Seconds,
   playButton,
-  seek
+  seek,
+  navigateTo
 } from "./engine/player";
 
 // Podcast Engine
@@ -37,14 +38,14 @@ import {
 import attachEvents from "./engine/events";
 
 // Router
-import { Route, Link } from "react-router-dom";
+import { Route, withRouter, Redirect } from "react-router-dom";
 
 
-export default class App extends Component {
+
+class App extends Component {
   constructor() {
     super();
     this.state = {
-      view: LIBVIEW,
       playing: null,
       items: null,
       loaded: 0,
@@ -60,6 +61,7 @@ export default class App extends Component {
 
     this.episodes = new Map();
     this.podcasts = new Map();
+    this.navigateTo = navigateTo.bind(this);
 
     this.forward30Seconds = forward30Seconds.bind(this);
     this.rewind10Seconds = rewind10Seconds.bind(this);
@@ -81,35 +83,37 @@ export default class App extends Component {
 
     // Mode
     let newPodcast = checkIfNewPodcastInURL.call(this);
-    newPodcast && addNewPodcast.call(this, newPodcast, viewCurrenPodcast);
+    newPodcast && addNewPodcast.call(newPodcast, ()=>{this.history.push("/podcast/")})
+    //.call(this, newPodcast, viewCurrenPodcast);
 
     // Debug
     window.player = player;
   }
 
+
   render() {
     let episode = this.episodes.get(this.state.episode) || null;
-    let { view, podcasts } = this.state;
+    let { podcasts } = this.state;
     return (
       <div>
         <CssBaseline />
         <Route
           exact
-          path="/"
+          path={LIBVIEW}
           render={({ history }) => (
             <PodcastGrid
               podcasts={podcasts}
               selectPodcast={this.loadPodcastToView}
               addPodcastHandler={this.askForPodcast}
-              actionAfterSelectPodcast={(url) => history.push("/podcast/")}
+              actionAfterSelectPodcast={this.navigateTo(PODCASTVIEW)}
             />
           )}
         />
 
         <Route
-          path="/podcast/"
+          path={PODCASTVIEW}
           render={() => (
-            <div>
+            this.state.title ?<div>
               <PodcastHeader
                 title={this.state.title}
                 image={this.state.image}
@@ -122,22 +126,22 @@ export default class App extends Component {
                 status={this.state.status}
                 playing={this.state.playing}
               />
-            </div>
+            </div>:<Redirect to={LIBVIEW} />
           )}
         />
 
         <Route
-          path="/discover"
+          path={DISCOVERVIEW}
           render={({ history }) => (
             <Discover
               addPodcastHandler={addNewPodcast.bind(this)}
-              actionAfterClick={() => history.push("/podcast/")}
+              actionAfterClick={this.navigateTo(PODCASTVIEW)}
             />
           )}
         />
 
         <Route
-          path="/settings"
+          path={SETTINGSVIEW}
           render={() => (
             <Settings
               removePodcast={removePodcastFromLibrary.bind(this)}
@@ -147,7 +151,7 @@ export default class App extends Component {
         />
 
         <MediaControl
-          toCurrentPodcast={() => history.push("/podcast/")}
+          toCurrentPodcast={this.navigateTo(PODCASTVIEW)}
           episode={episode}
           player={this.refs.player}
           status={this.state.status}
@@ -176,3 +180,5 @@ export default class App extends Component {
     );
   }
 }
+
+export default withRouter(App);

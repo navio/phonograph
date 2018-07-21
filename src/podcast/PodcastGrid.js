@@ -46,7 +46,7 @@ const getMyColor = (cast) =>(cast.domain === addMore) ? {backgroundColor:'white'
 function PodCastGrid(props) {
   const { classes } = props;
   let casts = (props.podcasts && [...props.podcasts]) || [];
-  casts.push({domain: addMore, title:'Add more', onClick:()=>{ props.addPodcastHandler(viewCurrenPodcast)} });
+  casts.push({domain: addMore, title:'Add more', onClick:()=>{ props.addPodcastHandler() } });
   
   function processClick(ev){
         props.selectPodcast(ev)
