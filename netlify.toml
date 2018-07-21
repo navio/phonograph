@@ -9,7 +9,7 @@
   status = 200
 
 [[redirects]]
-  from = "/rss-less-pg*"
+  from = "/rss-less-pg/*"
   to = "http://:splat"
   status = 200
 
@@ -23,16 +23,19 @@
   to = "https://feedwrangler.net/api/v2/podcasts/:splat"
   status = 200
 
-
 [[redirects]]
   from="/cacheds/*"
   to ="https://:splat"
+  status = 200
   [redirects.headers]
     max-age="180000"
-
+    
 [[redirects]]
   from="/cached/*"
   to ="http://:splat"
+  status = 200
+  [redirects.headers]
+    max-age="180000"
 
 [[redirects]]
   from = "/*"

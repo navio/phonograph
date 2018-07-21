@@ -20,7 +20,7 @@ export const clearText = (html) =>{
   return tmp.textContent || tmp.innerText;
 }
 
-const styles = theme => ({
+export const styles = theme => ({
   root: {
     width: "100%"
   },

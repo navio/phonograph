@@ -37,6 +37,13 @@ export const styles = theme => ({
   card:{
     height:'100%',
     width:'100%'
+  },
+  progress: {
+    margin: theme.spacing.unit * 2,
+  },
+  progressContainer:{
+    width: 0,
+    margin: 'auto'
   }
 });
 const addMore = 'addmore';
