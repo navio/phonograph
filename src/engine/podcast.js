@@ -199,8 +199,11 @@ export const checkIfNewPodcastInURL = function() {
 export const addNewPodcast = function(newPodcast,callback){
   removeCurrentPodcast.call(this);
   fillPodcastContent.call(this, newPodcast)
-  .then(podcast => addPodcastToLibrary.call(this,podcast));
-  callback && callback.call(this,newPodcast.domain);
+  .then(podcast => { 
+    addPodcastToLibrary.call(this,podcast);
+    callback && callback();
+  });
+  
 
 }
 

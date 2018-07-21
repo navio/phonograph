@@ -83,8 +83,7 @@ class App extends Component {
 
     // Mode
     let newPodcast = checkIfNewPodcastInURL.call(this);
-    newPodcast && addNewPodcast.call(newPodcast, ()=>{this.history.push("/podcast/")})
-    //.call(this, newPodcast, viewCurrenPodcast);
+    newPodcast && addNewPodcast.call(this,newPodcast,this.navigateTo(PODCASTVIEW))
 
     // Debug
     window.player = player;
