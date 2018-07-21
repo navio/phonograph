@@ -11,13 +11,14 @@ import {styles} from './PodcastGrid';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { getPopularPodcasts, searchForPodcasts } from '../engine/podcast';
 import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
 
 class Discover extends Component {
 	constructor(props) {
-        
 		super();
 		this.state = {
-            loading: true,
+            init: true,
+            loading: false,
             podcasts: [],
             error:null
         }
@@ -26,10 +27,10 @@ class Discover extends Component {
         // this.addPodcast = this.props.addPodcast;
 	}
 	componentDidMount() {
-    this.setState({loading:true});
-		getPopularPodcasts()
-        .then( podcasts => this.setState({podcasts,loading:false}) )
-        .catch( el => this.setState({'podcasts':[],'error':el}) );
+    // this.setState({loading:true});
+		// getPopularPodcasts()
+    //     .then( podcasts => this.setState({podcasts,loading:false}) )
+    //     .catch( el => this.setState({'podcasts':[],'error':el}) );
 	}
 
   getClickHandler(domain){
@@ -45,7 +46,7 @@ class Discover extends Component {
     if(search.length > 2) {
       this.setState({loading:true});
       this.searchForPodcasts(search)
-      .then( podcasts => this.setState({podcasts,loading:false}) )
+      .then( podcasts => this.setState({podcasts,loading:false,init:false}) )
       .catch( el => this.setState({'podcasts':[],'error':el}) );
     }
   }
@@ -57,17 +58,17 @@ class Discover extends Component {
 		return ( 
           <div>
             <Grid container spacing={24} alignItems="center">
-              <Grid item xs={12}>
-                <TextField 
+              <Grid item xs={12 } >
+                <TextField
                     id="podcast" 
-                    style={{width:'90%',margin:'20px'}} 
-                    label="Podcast Name" 
+                    style={{width:'90%',marginLeft:'20px'}} 
+                    label="Type Podcast Name" 
                     onChange={this.handleChange}
                 />
               </Grid>
             </Grid>
             { ( podcasts && podcasts.length > 0 ) ?
-            <Grid container spacing={0} direction={'row'}>
+            <Grid style={{paddingTop:'2em'}} container spacing={0} direction={'row'}>
               { podcasts.map( (cast,ins) =>
                 <Grid item xs={3} sm={2} md={1} key={ins} >
                   <Card classes={{root:this.props.classes.card}} style={getPodcastColor(cast)}>
@@ -88,7 +89,9 @@ class Discover extends Component {
             </Grid>: this.state.loading ?
             <div className={classes.progressContainer}>
               <CircularProgress className={classes.progress} />
-            </div> : <Grid container> Nothing Found </Grid> }
+            </div> : <Grid container style={{padding:"2em"}}>
+                      <Typography variant="display1">{this.state.init ? "Search for Podcasts":"Nothing Found"}</Typography> 
+                     </Grid> }
         </div>);
 	}
 }
