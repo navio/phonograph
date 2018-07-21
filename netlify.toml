@@ -14,11 +14,6 @@
   status = 200
 
 [[redirects]]
-  from = "/podcasts/popular"
-  to = "https://popular-podcast.glitch.me/"
-  status = 200
-
-[[redirects]]
   from = "/podcasts/*"
   to = "https://feedwrangler.net/api/v2/podcasts/:splat"
   status = 200
@@ -42,3 +37,7 @@
   to = "/index.html"
   status = 200
 
+# [[redirects]]
+#   from = "/podcasts/popular"
+#   to = "https://popular-podcast.glitch.me/"
+#   status = 200

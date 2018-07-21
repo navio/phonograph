@@ -51,7 +51,7 @@ class Discover extends Component {
   }
   
 	render() {
-    let podcasts = this.state.podcasts.slice(0,24);
+    let podcasts = this.state.podcasts;
     let classes = this.props.classes;
 
 		return ( 
