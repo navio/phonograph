@@ -3,11 +3,10 @@ import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import BottomNavigation from "@material-ui/core/BottomNavigation";
 import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
-import Headset from "@material-ui/icons/Headset";
-import FavoriteIcon from "@material-ui/icons/Favorite";
-import Ballot from "@material-ui/icons/Dvr";
+import Favorite from "@material-ui/icons/Favorite"; //Headsert
+import FavoriteIcon from "@material-ui/icons/Search";
+import Settings from "@material-ui/icons/Settings";
 import Paper from "@material-ui/core/Paper";
-import { Link } from "react-router-dom";
 import { withRouter } from "react-router-dom";
 const styles = {
   root: {
@@ -38,19 +37,19 @@ class SimpleBottomNavigation extends React.Component {
             className={classes.root}
           >
             <BottomNavigationAction
-              label="Podcasts"
+              label="Library"
               onClick={this.handleRedirect('/')}
-              icon={<Headset />}
+              icon={<Favorite />}
             />
             <BottomNavigationAction
-              label="Discover"
+              label="Search"
               onClick={this.handleRedirect('/discover')}
               icon={<FavoriteIcon />}
             />
             <BottomNavigationAction
               label="Settings"
               onClick={this.handleRedirect('/settings')}
-              icon={<Ballot />}
+              icon={<Settings />}
             />
           </BottomNavigation>
         </Paper>
