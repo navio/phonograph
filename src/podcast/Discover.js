@@ -64,9 +64,8 @@ class Discover extends Component {
   render() {
     let podcasts = this.state.podcasts;
     let classes = this.props.classes;
-    console.log(podcasts);
     return (
-      <Card style={{ height: 0, paddingBottom: "100%" }}>
+      <Card >
         <CardContent>
           <Typography variant="headline" component="h2">
             Search
