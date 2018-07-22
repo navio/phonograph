@@ -27,7 +27,7 @@ const eraseThisPodcast = function(domain,fn){
 
 const GeneraList = (props) =>{
   
-  return <Card>
+  return <Card style={{ height: 0, paddingBottom: "100%" }}>
           <CardContent>
             <Typography variant="headline" component="h2" >Settings</Typography>
           </CardContent>
