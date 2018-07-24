@@ -1,8 +1,9 @@
-import Parser,{load} from './parser'; 
-import {CASTVIEW,STORAGEID} from '../constants';
-import {defaultCasts} from '../podcast/podcast';
+import Parser,{load} from '../parser'; 
+import {CASTVIEW,STORAGEID} from '../../constants';
+import {defaultCasts} from '../../podcast/podcast';
 import fetchJ from 'smallfetch';
 import randomColor from 'randomcolor';
+import DB from './db';
 
 const DEFAULTCAST = { domain: "www.npr.org/rss/podcast.php?id=510289" , protocol:'https:'};
 
@@ -21,36 +22,34 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
 export const clearDomain = 
   (domain) => domain.replace(/(^\w+:|^)\/\//, '');
 
+
+// Add & Remove Podcast
 export const addPodcastToLibrary = function (podcast){
-  let podcastToAdd = Object.assign(podcast);
-  delete podcastToAdd['items']
-  this.podcasts.set(podcastToAdd.domain,podcastToAdd);
-  let podcasts = [...this.podcasts.values()];
-  localStorage.setItem(STORAGEID,JSON.stringify(podcasts));
-  this.setState({podcasts});
+  DB.table('podcasts').add({
+    ...podcast,
+    lastUpdated:(Date.now())
+  }).then(()=>{
+    DB.table('podcasts')
+    .toArray().then(podcasts=>this.setState({podcasts}));
+  });
 }
 
 export const removePodcastFromLibrary = function(cast){
-  this.podcasts.delete(cast);
-  let podcasts = [...this.podcasts.values()];
-  localStorage.setItem(STORAGEID,JSON.stringify(podcasts));
-  this.setState({podcasts});
+  console.log(cast);
+  DB.table('podcasts')
+    .where('domain')
+    .equals(cast)
+    .delete()
+    .then(() => {
+      DB.table('podcasts')
+      .toArray().then(podcasts=>this.setState({podcasts}));
+    })
 }
+
+
 
 export const loadEpisodes = function(RSS) {
-    RSS.forEach(item => this.episodes.set(item.guid, item));
-}
-
-export const removeCurrentPodcast = function(){
-  this.setState({ 
-    items: null,
-    title: '',
-    image: null,
-    link: null,
-    description: '',
-    podcast: null
-  });
-  this.episodes.clear();
+  RSS.forEach(item => this.episodes.set(item.guid, item));
 }
 
 export const fillPodcastContent = function(cast) {
@@ -61,6 +60,7 @@ export const fillPodcastContent = function(cast) {
 
     return new Promise((accept,reject) => {
       if (!found) {
+        console.log('no kidding huh?')
         this.episodes.clear();
         Parser(CORS_PROXY + podcast.domain)
           .then((RSS) => { 
@@ -119,12 +119,12 @@ export const buildLibrary = function(){
   cast => !this.podcasts.has(cast.domain) && this.podcasts.set(cast.domain,cast);
   
   // Check LS
-  let memoryCasts = localStorage.getItem(STORAGEID) ? JSON.parse(localStorage.getItem(STORAGEID)) :[];
+  //let memoryCasts = localStorage.getItem(STORAGEID) ? JSON.parse(localStorage.getItem(STORAGEID)) :[];
 
   // Add Casts
-  defaultCasts.forEach(addToLibrary);
-  memoryCasts.forEach(addToLibrary);
-
+  // defaultCasts.forEach(addToLibrary);
+  // memoryCasts.forEach(addToLibrary);
+  return DB.table('podcasts').bulkAdd(defaultCasts)
 }
 
 export const convertURLToPodcast = (url) =>{ // Todo: try https, then http otherwise fail.
@@ -196,6 +196,17 @@ export const checkIfNewPodcastInURL = function() {
     return convertURLToPodcast(podcast);
 }
 
+export const removeCurrentPodcast = function(){
+  this.setState({ 
+    items: null,
+    title: '',
+    image: null,
+    link: null,
+    description: '',
+    podcast: null
+  });
+  this.episodes.clear();
+}
 export const addNewPodcast = function(newPodcast,callback){
   removeCurrentPodcast.call(this);
   fillPodcastContent.call(this, newPodcast)

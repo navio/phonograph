@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { render } from "react-dom";
 import CssBaseline from "@material-ui/core/CssBaseline";
+import DB from './engine/podcast/db';
 
 import { LIBVIEW, PODCASTVIEW, DISCOVERVIEW, SETTINGSVIEW } from "./constants";
 
@@ -77,10 +78,13 @@ class App extends Component {
     attachEvents.call(this, player);
 
     // Podcasts
-    buildLibrary.call(this);
-    let podcasts = [...this.podcasts.values()];
-    this.setState({ podcasts });
-
+    // buildLibrary.call(this).then(()=>{});
+    // let podcasts = [...this.podcasts.values()];
+    // this.setState({ podcasts });
+    DB.table('podcasts')
+    .toArray()
+    .then( podcasts => this.setState({ podcasts }));
+    
     // Mode
     let newPodcast = checkIfNewPodcastInURL.call(this);
     newPodcast && addNewPodcast.call(this,newPodcast,this.navigateTo(PODCASTVIEW))
