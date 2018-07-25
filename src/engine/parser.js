@@ -23,22 +23,27 @@ export const load = (url) => {
 				if (!res.ok) {
 					reject(res);
 				};
-				let contentType = (new Map(res.headers.entries())).get('content-type');
-				console.log(contentType);
+				let hd = (new Map(res.headers.entries()));
+				let contentType = hd.get('content-type');
+				let contentLength = hd.get('content-length');
 				if (contentType && (contentType.indexOf('text/html') > -1)) { // Todo better validation.
 					cr.abort();
 					fetchRSS(url + '?format=xml')
 						.then(fxml => {
 							console.log('FeedBurnerFix');
-							return fxml.ok && fxml.text()
+							hd = (new Map(fxml.headers.entries()));
+							contentLength = hd.get('content-length');
+							fxml.ok && 
+							fxml.text()
+							.then(parse)
+							.then( a => { a['len'] =contentLength; accept(a) })
+						 .catch(reject)	
 						})
-						.then(parse)
-						.then(accept)
-						.catch(reject)
+						
 				} else {
 					res.text()
 						.then(parse)
-						.then(accept)
+						.then(a => { a['len'] = contentLength; accept(a) })
 						.catch(reject)
 				}
 			}));

@@ -69,9 +69,7 @@ export const fillPodcastContent = function(cast) {
           },() => {
             loadEpisodes.call(this,cast.items.slice(0,20));
             accept({...cast,...podcast});
-            console.log( cast.lastUpdated, Date.now() - cast.lastUpdated , 600000);
-            (( Date.now() - cast.lastUpdated ) < 600000 ) && // 6 Mins
-            console.log('Checking if updates.')
+            // (( Date.now() - cast.lastUpdated ) < 600000 ) && // 6 Mins
             Parser(CORS_PROXY + podcast.domain)
             .then((RSS) => { 
               if (cast.items[0].title !== RSS.items[0].title){
