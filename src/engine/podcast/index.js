@@ -127,11 +127,16 @@ export const buildLibrary = function(){
     if(podcasts.length){
       this.setState({ podcasts }) 
     }else{
-      return DB.table('podcasts')
-      .bulkAdd(defaultCasts)
-      .then(() => {
-        this.setState({ podcasts:defaultCasts });
-      })
+      defaultCasts.forEach(cast => {
+        fillPodcastContent.call(this,cast);
+      });
+      
+      // return DB.table('podcasts')
+      // .bulkAdd(defaultCasts)
+      // .then(() => {
+      //   this.setState({ podcasts:defaultCasts });
+      // })
+
     } 
   });  
 }
