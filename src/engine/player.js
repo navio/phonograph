@@ -41,6 +41,7 @@ export const rewind10Seconds =
 export const playButton = 
     function(ev) {
         let guid = ev.currentTarget.getAttribute('data-guid');
+        console.log(guid)
         let episode = this.episodes.get(guid);
         
         if (this.state.playing === guid) {

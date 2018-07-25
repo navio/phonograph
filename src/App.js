@@ -78,12 +78,7 @@ class App extends Component {
     attachEvents.call(this, player);
 
     // Podcasts
-    // buildLibrary.call(this).then(()=>{});
-    // let podcasts = [...this.podcasts.values()];
-    // this.setState({ podcasts });
-    DB.table('podcasts')
-    .toArray()
-    .then( podcasts => this.setState({ podcasts }));
+    buildLibrary.call(this);
     
     // Mode
     let newPodcast = checkIfNewPodcastInURL.call(this);
@@ -95,8 +90,7 @@ class App extends Component {
 
 
   render() {
-    let episode = this.episodes.get(this.state.episode) || null;
-    let { podcasts } = this.state;
+    let episode = this.episodes.get(this.state.episode);
     return (
       <div>
         <CssBaseline />
@@ -105,7 +99,7 @@ class App extends Component {
           path={LIBVIEW}
           render={({ history }) => (
             <PodcastGrid
-              podcasts={podcasts}
+              podcasts={this.state.podcasts}
               selectPodcast={this.loadPodcastToView}
               addPodcastHandler={this.askForPodcast}
               actionAfterSelectPodcast={this.navigateTo(PODCASTVIEW)}
@@ -121,7 +115,6 @@ class App extends Component {
                 title={this.state.title}
                 image={this.state.image}
                 description={this.state.description}
-                episode={episode}
               />
               <EpisodeList
                 episodes={this.state.items}
@@ -148,7 +141,7 @@ class App extends Component {
           render={() => (
             <Settings
               removePodcast={removePodcastFromLibrary.bind(this)}
-              podcasts={podcasts}
+              podcasts={this.state.podcasts}
             />
           )}
         />
