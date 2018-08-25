@@ -3,7 +3,6 @@ import {CASTVIEW,STORAGEID} from '../../constants';
 import {defaultCasts} from '../../podcast/podcast';
 import fetchJ from 'smallfetch';
 import randomColor from 'randomcolor';
-import Dexie from 'dexie';
 import DB from './db';
 
 const DEFAULTCAST = { domain: "www.npr.org/rss/podcast.php?id=510289" , protocol:'https:'};
@@ -109,7 +108,7 @@ export const fillPodcastContent = function(cast) {
         }
        })
     }).then(x=>console.log(x,'then..->'))
-      .catch(x=>console.log('Error with Dexie',x))
+      .catch(x=>console.log('Error with DB',x))
 }
 
 export const buildLibrary = function(){
