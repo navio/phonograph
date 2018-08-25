@@ -3,7 +3,8 @@ import {CASTVIEW,STORAGEID} from '../../constants';
 import {defaultCasts} from '../../podcast/podcast';
 import fetchJ from 'smallfetch';
 import randomColor from 'randomcolor';
-import DB from './db';
+import Dexie from 'dexie';
+import DB, {findPodcast, getTable, cf} from './db';
 
 const DEFAULTCAST = { domain: "www.npr.org/rss/podcast.php?id=510289" , protocol:'https:'};
 
@@ -25,22 +26,22 @@ export const clearDomain =
 
 // Add & Remove Podcast
 export const addPodcastToLibrary = function (podcast){
-  DB.table('podcasts').add({
+  DB.table(cf.name).add({
     ...podcast,
     lastUpdated:(Date.now())
   }).then(()=>{
-    DB.table('podcasts')
+    DB.table(cf.name)
     .toArray().then(podcasts=>this.setState({podcasts}));
   });
 }
 
 export const removePodcastFromLibrary = function(cast){
-  DB.table('podcasts')
+  DB.table(cf.name)
     .where('domain')
     .equals(cast)
     .delete()
     .then(() => {
-      DB.table('podcasts')
+      DB.table(cf.name)
       .toArray().then(podcasts=>this.setState({podcasts}));
     })
 }
@@ -55,11 +56,12 @@ export const fillPodcastContent = function(cast) {
     let CORS_PROXY = PROXY[podcast.protocol];
 
     return new Promise((accept,reject) => {
-      DB.table('podcasts')
-      .where('domain')
-      .equals(podcast.domain)
-      .last().then(cast => {
-        if(cast){
+
+      findPodcast('domain',podcast.domain)
+      .toArray()
+      .then(cast => {
+        console.log('here',cast)
+        if(cast.length === 0 ){
           this.setState({
             items: cast.items.slice(0,20),
             title: cast.title,
@@ -72,32 +74,31 @@ export const fillPodcastContent = function(cast) {
             // (( Date.now() - cast.lastUpdated ) < 600000 ) && // 6 Mins
             Parser(CORS_PROXY + podcast.domain)
             .then((RSS) => { 
-              if (cast.items[0].title !== RSS.items[0].title){
-                onsole.log('Updating')
-                DB.table('podcasts')
-                .when("domain")
-                .equals(podcast.domain)
-                .put({
+           if (cast.items[0].title !== RSS.items[0].title){
+                console.log('Updating');
+                findPodcast('domain',podcast.domain)
+                .modify({
                   ...RSS, 
                   ...podcast,
                   lastUpdated:(Date.now())
                 })
-                .then(() => {
-                  DB.table('podcasts')
-                  .toArray().then(podcasts=>this.setState({podcasts}));
+                .then((x) => { console.log("Updated Values",x)
+                  getTable().toArray()
+                  .then(podcasts=>console.log('updating view') && this.setState({podcasts}));
                 });
-              }
+            }
             });
           })
         }else{
           Parser(CORS_PROXY + podcast.domain)
           .then((RSS) => {
-            DB.table('podcasts').add({
-              ...RSS, 
+            getTable()
+            .add({
+              ...RSS,
               ...podcast,
               lastUpdated:(Date.now())
             }).then(() =>{
-              DB.table('podcasts')
+              getTable()
               .toArray()
               .then((podcasts) => {
                 this.setState({ 
@@ -115,21 +116,24 @@ export const fillPodcastContent = function(cast) {
             })
           });
         }
-      });
-    })
+
+       })
+      .catch(e=>console.log('yup here',e));    
+    }).then(x=>console.log(x,'then..->'))
+      .catch(x=>console.log('Error with Dexie',x))
 }
 
 export const buildLibrary = function(){
-  DB.table('podcasts')
+  getTable()
   .toArray()
   .then( podcasts => { 
     
     if(podcasts.length){
       this.setState({ podcasts }) 
     }else{
-      defaultCasts.forEach(cast => {
-        fillPodcastContent.call(this,cast);
-      });
+      // defaultCasts.forEach(cast => {
+      //   fillPodcastContent.call(this,cast);
+      // });
       
       // return DB.table('podcasts')
       // .bulkAdd(defaultCasts)
@@ -224,7 +228,6 @@ export const removeCurrentPodcast = function(){
 
 export const addNewPodcast = function(newPodcast,callback){
   removeCurrentPodcast.call(this);
-  
   fillPodcastContent.call(this, newPodcast)
   .then(podcast => { 
     callback && callback();

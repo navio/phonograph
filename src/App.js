@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { render } from "react-dom";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import DB from './engine/podcast/db';
+// import "babel-polyfill";
 
 import { LIBVIEW, PODCASTVIEW, DISCOVERVIEW, SETTINGSVIEW } from "./constants";
 
