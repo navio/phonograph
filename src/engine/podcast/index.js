@@ -4,7 +4,7 @@ import {defaultCasts} from '../../podcast/podcast';
 import fetchJ from 'smallfetch';
 import randomColor from 'randomcolor';
 import Dexie from 'dexie';
-import DB, {findPodcast, getTable, cf} from './db';
+import DB from './db';
 
 const DEFAULTCAST = { domain: "www.npr.org/rss/podcast.php?id=510289" , protocol:'https:'};
 
@@ -25,25 +25,25 @@ export const clearDomain =
 
 
 // Add & Remove Podcast
-export const addPodcastToLibrary = function (podcast){
-  DB.table(cf.name).add({
+export const addPodcastToLibrary = function (podcast) {
+  DB.set(podcast.domain,{
     ...podcast,
     lastUpdated:(Date.now())
-  }).then(()=>{
-    DB.table(cf.name)
-    .toArray().then(podcasts=>this.setState({podcasts}));
+  })
+  .then(()=>{
+    let podcasts = this.state.podcasts;
+    podcasts.push(podcast);
+    this.setState({podcasts});
   });
 }
 
 export const removePodcastFromLibrary = function(cast){
-  DB.table(cf.name)
-    .where('domain')
-    .equals(cast)
-    .delete()
-    .then(() => {
-      DB.table(cf.name)
-      .toArray().then(podcasts=>this.setState({podcasts}));
-    })
+  DB.del(cast)
+  .then(() =>{
+    let podcasts = this.state.podcasts;
+    delete podcasts[cast];
+    this.setState({podcasts})
+  });
 }
 
 export const loadEpisodes = function(RSS) {
@@ -56,12 +56,9 @@ export const fillPodcastContent = function(cast) {
     let CORS_PROXY = PROXY[podcast.protocol];
 
     return new Promise((accept,reject) => {
-
-      findPodcast('domain',podcast.domain)
-      .toArray()
+      DB.get(podcast.domain)
       .then(cast => {
-        console.log('here',cast)
-        if(cast.length === 0 ){
+        if(cast){
           this.setState({
             items: cast.items.slice(0,20),
             title: cast.title,
@@ -92,55 +89,36 @@ export const fillPodcastContent = function(cast) {
         }else{
           Parser(CORS_PROXY + podcast.domain)
           .then((RSS) => {
-            getTable()
-            .add({
+            DB.set(podcast.domain,{
               ...RSS,
               ...podcast,
               lastUpdated:(Date.now())
-            }).then(() =>{
-              getTable()
-              .toArray()
-              .then((podcasts) => {
-                this.setState({ 
-                  items: RSS.items.slice(0,20),
-                  title: RSS.title,
-                  image: RSS.image,
-                  link: RSS.url,
-                  description: RSS.description,
-                  podcasts
-                },() => {
-                  loadEpisodes.call(this,RSS.items.slice(0,20))
-                  accept({...RSS,...podcast});
-                });
-              });
-            })
+            });
+            DB.toArray(podcasts => this.setState({ 
+              items: RSS.items.slice(0,20),
+              title: RSS.title,
+              image: RSS.image,
+              link: RSS.url,
+              description: RSS.description,
+              podcasts
+            },() => {
+              loadEpisodes.call(this,RSS.items.slice(0,20))
+              accept({...RSS,...podcast});
+            }))
           });
         }
-
        })
-      .catch(e=>console.log('yup here',e));    
     }).then(x=>console.log(x,'then..->'))
       .catch(x=>console.log('Error with Dexie',x))
 }
 
 export const buildLibrary = function(){
-  getTable()
-  .toArray()
+  DB.toArray()
   .then( podcasts => { 
-    
     if(podcasts.length){
       this.setState({ podcasts }) 
     }else{
-      // defaultCasts.forEach(cast => {
-      //   fillPodcastContent.call(this,cast);
-      // });
-      
-      // return DB.table('podcasts')
-      // .bulkAdd(defaultCasts)
-      // .then(() => {
-      //   this.setState({ podcasts:defaultCasts });
-      // })
-
+      /// something
     } 
   });  
 }
@@ -154,7 +132,6 @@ export const convertURLToPodcast = (url) =>{ // Todo: try https, then http other
     let protocol = podcast.protocol
     return { domain , protocol };
   }catch(error){
-    console.error('Error Parsing Domain',error);
     return null;
   }
 }
@@ -174,36 +151,34 @@ export const driveThruDNS = (url) =>{
 //   return DEBUG ? url : `${PROXY[r.protocol]}${r.domain}`;
 // }
 
-export const getPodcasts = function(podcasts){
-  return new Promise((acc,rej) => {
-    Promise.all(podcasts.map(cast =>{
-      let podcast = convertURLToPodcast(cast);
-      let CORS_PROXY = PROXY[podcast.protocol];
-      let found = sessionStorage.getItem(podcast.domain);
-      if(found){
-        return Promise.resolve(JSON.parse(found));
-      }else{
-        return new Promise((resolve,reject)=>{
-          load(CORS_PROXY + podcast.domain)
-          .then(RSS =>{
-              delete RSS['items'];
-              RSS.domain = podcast.domain;
-              resolve(RSS)
-          });
-        })
-      }
-    }))
-    .then(RSS => {
-      let clean = RSS.filter(rss=>rss['error']?false:true); 
-      clean.forEach((rss)=>{console.log('Saving',rss.domain);
-        sessionStorage.setItem(rss.domain,JSON.stringify(rss))
-      })
-      acc(clean);
-    })
-
-
-  })
-}
+// export const getPodcasts = function(podcasts){
+//   return new Promise((acc,rej) => {
+//     Promise.all(podcasts.map(cast =>{
+//       let podcast = convertURLToPodcast(cast);
+//       let CORS_PROXY = PROXY[podcast.protocol];
+//       let found = sessionStorage.getItem(podcast.domain);
+//       if(found){
+//         return Promise.resolve(JSON.parse(found));
+//       }else{
+//         return new Promise((resolve,reject)=>{
+//           load(CORS_PROXY + podcast.domain)
+//           .then(RSS =>{
+//               delete RSS['items'];
+//               RSS.domain = podcast.domain;
+//               resolve(RSS)
+//           });
+//         })
+//       }
+//     }))
+//     .then(RSS => {
+//       let clean = RSS.filter(rss=>rss['error']?false:true); 
+//       clean.forEach((rss)=>{console.log('Saving',rss.domain);
+//         sessionStorage.setItem(rss.domain,JSON.stringify(rss))
+//       })
+//       acc(clean);
+//     })
+//   })
+// }
 
 export const checkIfNewPodcastInURL = function() {
     if(!window && !window.location ) return DEFAULTCAST;
@@ -251,7 +226,6 @@ export class PodcastSearcher {
     this.currentRequest && this.currentRequest.abort();
     this.currentRequest = new AbortController();
     let {signal} = this.currentRequest;
-    console.log();
     return new Promise((accept,reject) => 
                         fetch(`${API}/search?search_term=${term}`,{signal})
                         .then(result => result.ok && result.json().then(accept).catch(reject) || reject(result))
@@ -270,7 +244,6 @@ export const searchForPodcasts = function(search){
 
 export const getPodcastColor = 
 (cast) => ({ backgroundColor:randomColor({seed:cast.title,luminosity:'dark',hue:'blue'}) } );
-
 //Events
 
 // Ask for podcast URL.
@@ -285,16 +258,23 @@ export const askForPodcast = function(callback){
   }  
 }
 // Load current Selectedt Podcast into View
-export const loadPodcastToView = function(ev){
+export const loadPodcastToView = function(ev) {
     let podcast = ev && ev.currentTarget && ev.currentTarget.getAttribute('domain');
-    if(this.podcasts.has(podcast)){
-      let {title,image,description} = this.podcasts.get(podcast);
-      this.setState({
-        title,
-        image,
-        description,
-        podcast
+    return new Promise(acc => {
+      DB.get(podcast)
+      .then(cast =>{
+        if(cast){
+          let {title,image,description} = cast;
+          this.setState({
+            title,
+            image,
+            description,
+            podcast
+          })
+        }
+        fillPodcastContent.call(this,podcast);
+        acc(cast)
       })
-    }
-    return fillPodcastContent.call(this,podcast);
+    })
+    
 }

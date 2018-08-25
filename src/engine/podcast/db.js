@@ -1,20 +1,8 @@
-import Dexie from 'dexie';
+import { set,get,keys,del } from 'idb-keyval';
 
-export const cf = {
-    name: 'podcasts'
-}
-const db = new Dexie(cf.name);
-
-db.version(2).stores({
-    podcasts: `title,description,domain,image,protocol,url,items,len,updated`
+const toArray = () => new Promise(acc=>{
+  keys().then(keys => acc(Promise.all(keys.map( (key) => get(key) ))));
 });
 
-window.db = db;
 
-
-
-export const findPodcast = (column,value) => db.podcasts.where(column).equals(value);
-
-export const getTable = () => db.podcasts;
-
-export default db;
+export default { set,get,keys,del,toArray };
