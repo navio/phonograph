@@ -31,7 +31,7 @@ export const addPodcastToLibrary = function (podcast) {
   })
   .then(()=>{
     let podcasts = this.state.podcasts;
-    podcasts.push(podcast);
+    podcasts[podcast.domain] = podcast;
     this.setState({podcasts});
   });
 }
@@ -39,8 +39,8 @@ export const addPodcastToLibrary = function (podcast) {
 export const removePodcastFromLibrary = function(cast){
   DB.del(cast)
   .then(() =>{
-    let podcasts = this.state.podcasts;
-    delete podcasts[cast];
+    let podcastsState = this.state.podcasts;
+    let podcasts = podcastsState.filter(podcast => podcast.domain !== cast);
     this.setState({podcasts})
   });
 }
@@ -51,67 +51,77 @@ export const loadEpisodes = function(RSS) {
 
 export const fillPodcastContent = function(cast) {
     let podcast = (typeof cast === 'string') ? convertURLToPodcast(cast) : cast;
-    
     let CORS_PROXY = PROXY[podcast.protocol];
 
-    return new Promise((accept,reject) => {
+    return new Promise((accept) => {
       DB.get(podcast.domain)
       .then(cast => {
-        if(cast){
+        if(cast){ console.log('From Memory');
           this.setState({
             items: cast.items.slice(0,20),
             title: cast.title,
             description: cast.description,
             image: cast.image,
             link: cast.url,
+            ...podcast
           },() => {
+            // (( Date.now() - cast.lastUpdated ) < 600000 ) && // 6 Mins
             loadEpisodes.call(this,cast.items.slice(0,20));
             accept({...cast,...podcast});
-            // (( Date.now() - cast.lastUpdated ) < 600000 ) && // 6 Mins
             Parser(CORS_PROXY + podcast.domain)
             .then((RSS) => { 
-           if (cast.items[0].title !== RSS.items[0].title){
-                console.log('Updating');
-                findPodcast('domain',podcast.domain)
-                .modify({
+              if (cast.items[0].title !== RSS.items[0].title){
+                DB.set(podcast.domain,{
                   ...RSS, 
                   ...podcast,
                   lastUpdated:(Date.now())
                 })
-                .then((x) => { console.log("Updated Values",x)
-                  getTable().toArray()
-                  .then(podcasts=>console.log('updating view') && this.setState({podcasts}));
+                .then((x) => { 
+                  console.log("Updated Values")
+                  // getTable().toArray()
+                  // .then(podcasts=>this.setState({podcasts}));
                 });
-            }
+              }
             });
           })
-        }else{
+        }else{ console.log('From Web');
           Parser(CORS_PROXY + podcast.domain)
           .then((RSS) => {
+            console.log(RSS);
             DB.set(podcast.domain,{
               ...RSS,
               ...podcast,
               lastUpdated:(Date.now())
+            })
+            .then(()=>{
+              let items = [...RSS.items].slice(0,20);
+              let cast = {...RSS};
+              cast['items'] = items;
+              cast['domain'] = podcast.domain; 
+              let podcasts = [cast,...this.state.podcasts];
+
+              this.setState({
+                title: RSS.title,
+                image: RSS.image,
+                link: RSS.url,
+                description: RSS.description,
+                domain: podcast.domain,
+                items,
+                podcasts,
+              },() => { 
+                loadEpisodes.call(this,items)
+                accept({...RSS,...podcast});
+              });
+              
             });
-            DB.toArray(podcasts => this.setState({ 
-              items: RSS.items.slice(0,20),
-              title: RSS.title,
-              image: RSS.image,
-              link: RSS.url,
-              description: RSS.description,
-              podcasts
-            },() => {
-              loadEpisodes.call(this,RSS.items.slice(0,20))
-              accept({...RSS,...podcast});
-            }))
           });
         }
        })
-    }).then(x=>console.log(x,'then..->'))
-      .catch(x=>console.log('Error with DB',x))
+    })
+    .catch(x=>console.log('Error with fillPodcastContent',x))
 }
 
-export const buildLibrary = function(){
+export const buildLibrary = function() {
   DB.toArray()
   .then( podcasts => { 
     if(podcasts.length){
@@ -181,7 +191,6 @@ export const driveThruDNS = (url) =>{
 
 export const checkIfNewPodcastInURL = function() {
     if(!window && !window.location ) return DEFAULTCAST;
-
     let urlPodcast = new window.URL(window.location.href);
     let podcast = urlPodcast.searchParams.get("podcast");
 
@@ -259,6 +268,7 @@ export const askForPodcast = function(callback){
 // Load current Selectedt Podcast into View
 export const loadPodcastToView = function(ev) {
     let podcast = ev && ev.currentTarget && ev.currentTarget.getAttribute('domain');
+    console.log(podcast);
     return new Promise(acc => {
       DB.get(podcast)
       .then(cast =>{
