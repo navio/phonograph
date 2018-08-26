@@ -102,7 +102,7 @@ class App extends Component {
             <PodcastGrid
               podcasts={this.state.podcasts}
               selectPodcast={this.loadPodcastToView}
-              addPodcastHandler={this.askForPodcast}
+              addPodcastHandler={this.navigateTo(DISCOVERVIEW)} //{this.askForPodcast}
               actionAfterSelectPodcast={this.navigateTo(PODCASTVIEW)}
             />
           )}
