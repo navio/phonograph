@@ -112,7 +112,7 @@ export const fillPodcastContent = function(cast) {
                 loadEpisodes.call(this,items)
                 accept({...RSS,...podcast});
               });
-              
+
             });
           });
         }
