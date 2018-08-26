@@ -66,17 +66,7 @@ export const podcasts =
 // ,"http://feeds.gimletmedia.com/heavyweightpodcast"
 
 export const defaultCasts = [
-	{
-		"title": "The Daily",
-		"description": "<p>This is what the news should sound like. The biggest stories of our time, told by the best journalists in the world. Hosted by Michael Barbaro. Twenty minutes a day, five days a week, ready by 6 a.m.</p>",
-		"url": "https://art19.com/shows/the-daily",
-		"image": "https://dfkfj8j276wwv.cloudfront.net/images/01/1b/f3/d6/011bf3d6-a448-4533-967b-e2f19e376480/7fdd4469c1b5cb3b66aa7dcc9fa21f138efe9a0310a8a269f3dcd07c83a552844fcc445ea2d53db1e55d6fb077aeaa8a1566851f8f2d8ac4349d9d23a87a69f5.jpeg",
-		"domain": "rss.art19.com/the-daily"
-	}, {
-		"title": "Up First",
-		"description": "NPR's <em>Up First</em> is the news you need to start your day. The biggest stories and ideas — from politics to pop culture — in 10 minutes. Hosted by Rachel Martin, David Greene and Steve Inskeep, with reporting and analysis from NPR News. Available weekdays by 6 a.m. ET. Subscribe and listen, then support your local NPR station at donate.npr.org.",
-		"url": "http://www.npr.org/programs/morning-edition/",
-		"image": "https://media.npr.org/assets/img/2017/03/21/upfirst_sq-ffcb53c89446b62b66fefb97b9356ad49b31bc5d.png?s=200",
-		"domain": "www.npr.org/rss/podcast.php?id=510318"
-	}
-];
+    "http://rss.art19.com/the-daily",
+    "https://www.npr.org/rss/podcast.php?id=510318", 
+    "http://www.npr.org/rss/podcast.php?id=510289"
+    ];

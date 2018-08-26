@@ -7,13 +7,14 @@ import CardMedia from "@material-ui/core/CardMedia";
 import CardContent from "@material-ui/core/CardContent";
 import Paper from "@material-ui/core/Paper";
 import {
-  driveThruDNS,
+  driveThruDNS, 
+  getPopularPodcasts, 
+  searchForPodcasts,
   getPodcastColor,
   convertURLToPodcast
 } from "../engine/podcast";
 import { styles } from "./PodcastGrid";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { getPopularPodcasts, searchForPodcasts } from "../engine/podcast";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import InputAdornment from '@material-ui/core/InputAdornment';
