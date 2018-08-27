@@ -50,7 +50,7 @@ class Discover extends Component {
 
   handleChange(ev) {
     let search = ev.target.value;
-    if (search.length > 2) {
+    if (search) {
       this.setState({ loading: true });
       this.searchForPodcasts(search)
         .then(podcasts =>

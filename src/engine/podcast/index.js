@@ -214,12 +214,12 @@ export const getPopularPodcasts = function(){
   })
 }
 
-const SFP = new PodcastSearcher();
+const SFP = new PodcastSearcher(API);
 export const searchForPodcasts = function(search){
   return new Promise( function(acc,rej){
     SFP.search(search)
     .then(data=>acc(data.podcasts))
-    .catch(rej);
+    .catch(console.error);
   });
 }
 
