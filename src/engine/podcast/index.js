@@ -1,6 +1,7 @@
 import Parser,{load} from '../parser'; 
 import {CASTVIEW,STORAGEID} from '../../constants';
 import {defaultCasts} from '../../podcast/podcast';
+import PodcastSearcher from './PodcastSearcher';
 import fetchJ from 'smallfetch';
 import randomColor from 'randomcolor';
 import DB from './db';
@@ -31,7 +32,8 @@ export const addPodcastToLibrary = function (podcast) {
   })
   .then(()=>{
     let podcasts = this.state.podcasts;
-    podcasts[podcast.domain] = podcast;
+    podcast.items = podcast.items.slice(0,20);
+    podcasts.push(podcast);
     this.setState({podcasts});
   });
 }
@@ -45,15 +47,28 @@ export const removePodcastFromLibrary = function(cast){
   });
 }
 
-export const loadEpisodes = function(RSS) {
+export const loadEpisodesToMemory = function(RSS) {
   RSS.forEach(item => this.episodes.set(item.guid, item));
 }
 
-export const fillPodcastContent = function(cast) {
+export const removePodcastFromState = function(){
+  this.setState({ 
+    items: null,
+    title: '',
+    image: null,
+    link: null,
+    description: '',
+    podcast: null
+  });
+  this.episodes.clear();
+}
+
+export const retrievePodcast = function(cast) {
     let podcast = (typeof cast === 'string') ? convertURLToPodcast(cast) : cast;
     let CORS_PROXY = PROXY[podcast.protocol];
 
     return new Promise((accept) => {
+      console.log('Retrieve Podcast')
       DB.get(podcast.domain)
       .then(cast => {
         if(cast){ console.log('From Memory');
@@ -63,11 +78,13 @@ export const fillPodcastContent = function(cast) {
             description: cast.description,
             image: cast.image,
             link: cast.url,
+            lastUpdated:(Date.now()),
             ...podcast
           },() => {
-            // (( Date.now() - cast.lastUpdated ) < 600000 ) && // 6 Mins
-            loadEpisodes.call(this,cast.items.slice(0,20));
+             // 6 Mins
+            loadEpisodesToMemory.call(this,cast.items.slice(0,20));
             accept({...cast,...podcast});
+            (( Date.now() - cast.lastUpdated ) < 600000 ) &&
             Parser(CORS_PROXY + podcast.domain)
             .then((RSS) => { 
               if (cast.items[0].title !== RSS.items[0].title){
@@ -78,16 +95,28 @@ export const fillPodcastContent = function(cast) {
                 })
                 .then((x) => { 
                   console.log("Updated Values")
-                  // getTable().toArray()
-                  // .then(podcasts=>this.setState({podcasts}));
+                  this.setState({
+                    title: RSS.title,
+                    image: RSS.image,
+                    link: RSS.url,
+                    description: RSS.description,
+                    domain: podcast.domain,
+                    lastUpdated:(Date.now()),
+                    items,
+                    podcasts,
+                  },() => { 
+                    loadEpisodesToMemory.call(this,items)
+                    accept({...RSS,...podcast});
+                  });
                 });
               }
             });
+
           })
         }else{ console.log('From Web');
           Parser(CORS_PROXY + podcast.domain)
           .then((RSS) => {
-            console.log(RSS);
+            //console.log(RSS);
             DB.set(podcast.domain,{
               ...RSS,
               ...podcast,
@@ -106,10 +135,11 @@ export const fillPodcastContent = function(cast) {
                 link: RSS.url,
                 description: RSS.description,
                 domain: podcast.domain,
+                lastUpdated:(Date.now()),
                 items,
                 podcasts,
               },() => { 
-                loadEpisodes.call(this,items)
+                loadEpisodesToMemory.call(this,items)
                 accept({...RSS,...podcast});
               });
 
@@ -118,16 +148,25 @@ export const fillPodcastContent = function(cast) {
         }
        })
     })
-    .catch(x=>console.log('Error with fillPodcastContent',x))
+    .catch(x=>console.log('Error with retrievePodcast',x))
 }
 
-export const buildLibrary = function() {
+export const initializeLibrary = function() {
   DB.toArray()
   .then( podcasts => { 
     if(podcasts.length){
       this.setState({ podcasts }) 
     }else{
-      /// something
+      let casts =
+      defaultCasts
+      .map(cast => retrievePodcast.call(this,cast)
+                                  .then( x => { 
+                                    let clean = x; 
+                                    clean.items = clean.items.slice(0,20); 
+                                    return Promise.resolve(clean); 
+                                  }));
+      Promise.all(casts)
+      .then( cs =>this.setState({podcasts:cs}) );
     } 
   });  
 }
@@ -150,45 +189,6 @@ export const driveThruDNS = (url) =>{
   return DEBUG ? url : `${PROXY[r.protocol]}${r.domain}`;
 }
 
-// export const cachedContent = (url) =>{
-//   let r = convertURLToPodcast(url);
-//   return DEBUG ? url : `${CACHED[r.protocol]}${r.domain}`;
-// }
-
-// export const cacheImage= (url) =>{
-//   let r = convertURLToPodcast(url);
-//   return DEBUG ? url : `${PROXY[r.protocol]}${r.domain}`;
-// }
-
-// export const getPodcasts = function(podcasts){
-//   return new Promise((acc,rej) => {
-//     Promise.all(podcasts.map(cast =>{
-//       let podcast = convertURLToPodcast(cast);
-//       let CORS_PROXY = PROXY[podcast.protocol];
-//       let found = sessionStorage.getItem(podcast.domain);
-//       if(found){
-//         return Promise.resolve(JSON.parse(found));
-//       }else{
-//         return new Promise((resolve,reject)=>{
-//           load(CORS_PROXY + podcast.domain)
-//           .then(RSS =>{
-//               delete RSS['items'];
-//               RSS.domain = podcast.domain;
-//               resolve(RSS)
-//           });
-//         })
-//       }
-//     }))
-//     .then(RSS => {
-//       let clean = RSS.filter(rss=>rss['error']?false:true); 
-//       clean.forEach((rss)=>{console.log('Saving',rss.domain);
-//         sessionStorage.setItem(rss.domain,JSON.stringify(rss))
-//       })
-//       acc(clean);
-//     })
-//   })
-// }
-
 export const checkIfNewPodcastInURL = function() {
     if(!window && !window.location ) return DEFAULTCAST;
     let urlPodcast = new window.URL(window.location.href);
@@ -197,21 +197,9 @@ export const checkIfNewPodcastInURL = function() {
     return convertURLToPodcast(podcast);
 }
 
-export const removeCurrentPodcast = function(){
-  this.setState({ 
-    items: null,
-    title: '',
-    image: null,
-    link: null,
-    description: '',
-    podcast: null
-  });
-  this.episodes.clear();
-}
-
 export const addNewPodcast = function(newPodcast,callback){
-  removeCurrentPodcast.call(this);
-  fillPodcastContent.call(this, newPodcast)
+  removePodcastFromState.call(this); // Remove Current Podcast
+  retrievePodcast.call(this, newPodcast) // RetrievePodcast
   .then(podcast => { 
     callback && callback();
   });
@@ -224,21 +212,6 @@ export const getPopularPodcasts = function(){
     .then(data=>acc(data.podcasts))
     .catch(err=>rej(err));
   })
-}
-
-export class PodcastSearcher {
-  constructor(){
-    let currentRequest = null;
-  }
-  search(term){
-    this.currentRequest && this.currentRequest.abort();
-    this.currentRequest = new AbortController();
-    let {signal} = this.currentRequest;
-    return new Promise((accept,reject) => 
-                        fetch(`${API}/search?search_term=${term}`,{signal})
-                        .then(result => result.ok && result.json().then(accept).catch(reject) || reject(result))
-                        .catch(reject))
-  }
 }
 
 const SFP = new PodcastSearcher();
@@ -281,7 +254,7 @@ export const loadPodcastToView = function(ev) {
             podcast
           })
         }
-        fillPodcastContent.call(this,podcast);
+        retrievePodcast.call(this,podcast);
         acc(cast)
       })
     })

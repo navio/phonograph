@@ -31,7 +31,7 @@ import {
 import {
   checkIfNewPodcastInURL,
   loadPodcastToView,
-  buildLibrary,
+  initializeLibrary,
   addNewPodcast,
   askForPodcast,
   removePodcastFromLibrary
@@ -79,11 +79,11 @@ class App extends Component {
     attachEvents.call(this, player);
 
     // Podcasts
-    buildLibrary.call(this);
+    initializeLibrary.call(this);
     
     // Mode
     let newPodcast = checkIfNewPodcastInURL.call(this);
-    newPodcast && addNewPodcast.call(this,newPodcast,this.navigateTo(PODCASTVIEW))
+        newPodcast && addNewPodcast.call(this,newPodcast,this.navigateTo(PODCASTVIEW))
 
     // Debug
     window.player = player;
