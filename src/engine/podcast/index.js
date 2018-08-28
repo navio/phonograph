@@ -154,20 +154,19 @@ export const retrievePodcast = function(cast) {
 export const initializeLibrary = function() {
   DB.toArray()
   .then( podcasts => { 
-    // if(podcasts.length > 0 ){
-    //   this.setState({ podcasts }) 
-    // }else{
-      let casts =
-      defaultCasts
+    if(podcasts.length > 0 ){
+      this.setState({ podcasts }) 
+    }else{
+      let casts = defaultCasts
       .map(cast => retrievePodcast.call(this,cast)
                                   .then( x => { 
                                     let clean = x; 
                                     clean.items = clean.items.slice(0,20); 
                                     return Promise.resolve(clean); 
                                   }));
-      // Promise.all(casts)
-      // .then( cs => console.log('promissing?') && this.setState({podcasts:cs},(a)=>console.log('ra')) );
-   // } 
+      Promise.all(casts)
+      .then( cs => console.log('promissing?') && this.setState({podcasts:cs},(a)=>console.log('ra')) );
+   } 
   });  
 }
 
