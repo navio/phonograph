@@ -58,7 +58,8 @@ class App extends Component {
       description: "",
       image: null,
       link: null,
-      loading: false
+      loading: false,
+      podcasts:[]
     };
 
     this.episodes = new Map();

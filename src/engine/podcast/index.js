@@ -154,9 +154,9 @@ export const retrievePodcast = function(cast) {
 export const initializeLibrary = function() {
   DB.toArray()
   .then( podcasts => { 
-    if(podcasts.length){
-      this.setState({ podcasts }) 
-    }else{
+    // if(podcasts.length > 0 ){
+    //   this.setState({ podcasts }) 
+    // }else{
       let casts =
       defaultCasts
       .map(cast => retrievePodcast.call(this,cast)
@@ -165,9 +165,9 @@ export const initializeLibrary = function() {
                                     clean.items = clean.items.slice(0,20); 
                                     return Promise.resolve(clean); 
                                   }));
-      Promise.all(casts)
-      .then( cs =>this.setState({podcasts:cs}) );
-    } 
+      // Promise.all(casts)
+      // .then( cs => console.log('promissing?') && this.setState({podcasts:cs},(a)=>console.log('ra')) );
+   // } 
   });  
 }
 
