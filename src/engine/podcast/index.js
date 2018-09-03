@@ -61,7 +61,22 @@ export const removePodcastFromState = function(){
   this.episodes.clear();
 }
 
-export const retrievePodcast = function(cast) {
+export const saveToLibraryFromView = function(){
+  const { title, image, link, description, domain } = this.state;
+  const items = Array.from(this.episodes.values());
+  DB.set(domain,{
+    title, 
+    image, 
+    link, 
+    description, 
+    items,
+    domain,
+    lastUpdated:(Date.now()),
+  })
+  // const items
+}
+
+export const retrievePodcast = function(cast, shouldSave=true) {
     let podcast = (typeof cast === 'string') ? convertURLToPodcast(cast) : cast;
     let CORS_PROXY = PROXY[podcast.protocol];
 
@@ -103,7 +118,6 @@ export const retrievePodcast = function(cast) {
                     link: RSS.url,
                     description: RSS.description,
                     domain: podcast.domain,
-                    lastUpdated:(Date.now()),
                     items,
                     podcasts,
                   },() => { 
@@ -119,19 +133,35 @@ export const retrievePodcast = function(cast) {
         }else{ console.log('From Web');
           Parser(CORS_PROXY + podcast.domain)
           .then((RSS) => {
-            //console.log(RSS);
-            DB.set(podcast.domain,{
-              ...RSS,
-              ...podcast,
-              lastUpdated:(Date.now())
-            })
-            .then(()=>{
-              let items = [...RSS.items].slice(0,20);
-              let cast = {...RSS};
-              cast['items'] = items;
-              cast['domain'] = podcast.domain; 
-              let podcasts = [cast,...this.state.podcasts];
+            let items = [...RSS.items].slice(0,20);
+            let cast = {...RSS};
+            cast['items'] = items;
+            cast['domain'] = podcast.domain; 
+            let podcasts = [cast,...this.state.podcasts];
 
+            if(shouldSave){
+              DB.set(podcast.domain,{
+                ...RSS,
+                ...podcast,
+                lastUpdated:(Date.now())
+              })
+              .then(()=>{
+                this.setState({
+                  title: RSS.title,
+                  image: RSS.image,
+                  link: RSS.url,
+                  description: RSS.description,
+                  domain: podcast.domain,
+                  lastUpdated:(Date.now()),
+                  items,
+                  podcasts,
+                },() => { 
+                  loadEpisodesToMemory.call(this,items)
+                  accept({...RSS,...podcast});
+                });
+  
+              });
+            }else{
               this.setState({
                 title: RSS.title,
                 image: RSS.image,
@@ -141,12 +171,13 @@ export const retrievePodcast = function(cast) {
                 lastUpdated:(Date.now()),
                 items,
                 podcasts,
-              },() => { 
+              },()=>{
                 loadEpisodesToMemory.call(this,items)
                 accept({...RSS,...podcast});
               });
 
-            });
+            }
+
           });
         }
        })
