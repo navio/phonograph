@@ -20,9 +20,7 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
     API = `https://cors-anywhere.herokuapp.com/https://feedwrangler.net/api/v2/podcasts/`;
 }
 
-export const clearDomain = 
-  (domain) => domain.replace(/(^\w+:|^)\/\//, '');
-
+export const clearDomain = (domain) => domain.replace(/(^\w+:|^)\/\//, '');
 
 // Add & Remove Podcast
 export const addPodcastToLibrary = function (podcast) {
@@ -84,7 +82,8 @@ export const retrievePodcast = function(cast) {
              // 6 Mins
             loadEpisodesToMemory.call(this,cast.items.slice(0,20));
             accept({...cast,...podcast});
-            (( Date.now() - cast.lastUpdated ) < 600000 ) &&
+           console.log(Date.now() - cast.lastUpdated, (( Date.now() - cast.lastUpdated ) > 600000 ) );
+           if(( Date.now() - cast.lastUpdated ) > 600000 ){
             Parser(CORS_PROXY + podcast.domain)
             .then((RSS) => { 
               if (cast.items[0].title !== RSS.items[0].title){
@@ -94,7 +93,11 @@ export const retrievePodcast = function(cast) {
                   lastUpdated:(Date.now())
                 })
                 .then((x) => { 
-                  console.log("Updated Values")
+                  let items = [...RSS.items].slice(0,20);
+                  let ncast = {...RSS};
+                  ncast['items'] = items;
+                  ncast['domain'] = podcast.domain;
+                  let podcasts = [ncast,...this.state.podcasts];
                   this.setState({
                     title: RSS.title,
                     image: RSS.image,
@@ -111,6 +114,7 @@ export const retrievePodcast = function(cast) {
                 });
               }
             });
+           }
 
           })
         }else{ console.log('From Web');
