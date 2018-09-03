@@ -82,7 +82,6 @@ export const retrievePodcast = function(cast) {
              // 6 Mins
             loadEpisodesToMemory.call(this,cast.items.slice(0,20));
             accept({...cast,...podcast});
-           console.log(Date.now() - cast.lastUpdated, (( Date.now() - cast.lastUpdated ) > 600000 ) );
            if(( Date.now() - cast.lastUpdated ) > 600000 ){
             Parser(CORS_PROXY + podcast.domain)
             .then((RSS) => { 
