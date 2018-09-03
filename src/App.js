@@ -1,7 +1,5 @@
 import React, { Component } from "react";
-import { render } from "react-dom";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import DB from './engine/podcast/db';
 // import "babel-polyfill";
 
 import { LIBVIEW, PODCASTVIEW, DISCOVERVIEW, SETTINGSVIEW } from "./constants";
@@ -10,6 +8,7 @@ import { LIBVIEW, PODCASTVIEW, DISCOVERVIEW, SETTINGSVIEW } from "./constants";
 // import Header from './app/Header';
 import Footer from "./app/Footer";
 import MediaControl from "./app/MediaControl";
+import Snackbar from '@material-ui/core/Snackbar';
 
 // Podcast Views
 import EpisodeList from "./podcast/EpisodeList";
@@ -17,6 +16,8 @@ import PodcastHeader from "./podcast/PodcastHeader";
 import PodcastGrid from "./podcast/PodcastGrid";
 import Discover from "./podcast/Discover";
 import Settings from "./podcast/Settings";
+
+
 
 // Engine - Player Interactions
 import {
