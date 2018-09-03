@@ -166,7 +166,7 @@ class App extends Component {
           seek={this.seek}
         />
 
-        <Footer />
+        <Footer path={this.props.location.pathname} />
 
         <audio
           autoPlay="true"

@@ -26,28 +26,32 @@ class SimpleBottomNavigation extends React.Component {
     return () => this.props.history.push(url);
   }
   render() {
-    const { classes } = this.props;
-
+    const classes  = this.props.classes;
+    const selected = this.props.path.substring(1) || 'library';
     return (
       <div>
         <Paper className={classes.root} elevation={4}>
           <BottomNavigation
+            value={selected}
             onChange={this.handleChange}
             showLabels
             className={classes.root}
           >
             <BottomNavigationAction
               label="Library"
+              value="library"
               onClick={this.handleRedirect('/')}
               icon={<Favorite />}
             />
             <BottomNavigationAction
               label="Search"
+              value="discover"
               onClick={this.handleRedirect('/discover')}
               icon={<FavoriteIcon />}
             />
             <BottomNavigationAction
               label="Settings"
+              value="settings"
               onClick={this.handleRedirect('/settings')}
               icon={<Settings />}
             />
