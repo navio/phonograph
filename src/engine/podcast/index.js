@@ -24,11 +24,13 @@ export const clearDomain = (domain) => domain.replace(/(^\w+:|^)\/\//, '');
 
 // Add & Remove Podcast
 export const addPodcastToLibrary = function (podcast) {
+  
   DB.set(podcast.domain,{
     ...podcast,
     lastUpdated:(Date.now())
   })
   .then(()=>{
+    console.log('im here...but shouldn')
     let podcasts = this.state.podcasts;
     podcast.items = podcast.items.slice(0,20);
     podcasts.push(podcast);
@@ -62,18 +64,11 @@ export const removePodcastFromState = function(){
 }
 
 export const saveToLibraryFromView = function(){
-  const { title, image, link, description, domain } = this.state;
+  const { status, protocol, podcast, playing, played,domain, podcasts, ...cast } = this.state;
   const items = Array.from(this.episodes.values());
-  DB.set(domain,{
-    title, 
-    image, 
-    link, 
-    description, 
-    items,
-    domain,
-    lastUpdated:(Date.now()),
-  })
-  // const items
+  let tmCast = {...cast, items};
+  DB.set(domain,tmCast)
+  .then(() => this.setState({ ...tmCast, podcasts:[cast,...podcasts]}));
 }
 
 export const retrievePodcast = function(cast, shouldSave=true) {
@@ -170,7 +165,6 @@ export const retrievePodcast = function(cast, shouldSave=true) {
                 domain: podcast.domain,
                 lastUpdated:(Date.now()),
                 items,
-                podcasts,
               },()=>{
                 loadEpisodesToMemory.call(this,items)
                 accept({...RSS,...podcast});
@@ -183,6 +177,10 @@ export const retrievePodcast = function(cast, shouldSave=true) {
        })
     })
     .catch(x=>console.log('Error with retrievePodcast',x))
+}
+
+export const isPodcastInLibrary = function(){
+  return this.state.podcasts.find(cast => cast.domain === this.state.domain);
 }
 
 export const initializeLibrary = function() {
@@ -232,7 +230,7 @@ export const checkIfNewPodcastInURL = function() {
 
 export const addNewPodcast = function(newPodcast,callback){
   removePodcastFromState.call(this); // Remove Current Podcast
-  retrievePodcast.call(this, newPodcast) // RetrievePodcast
+  retrievePodcast.call(this, newPodcast, false) // RetrievePodcast
   .then(podcast => { 
     callback && callback();
   });
