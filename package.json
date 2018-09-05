@@ -21,7 +21,7 @@
   "private": true,
   "scripts": {
     "start": "parcel public/index.html",
-    "build": "parcel build public/index.html",
+    "build": "parcel build public/index.html --target=electron",
     "serve": "parcel serve public/index.html"
   },
   "devDependencies": {
