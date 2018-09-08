@@ -22,6 +22,24 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
 
 export const clearDomain = (domain) => domain.replace(/(^\w+:|^)\/\//, '');
 
+export class Podcast{
+    constructor(podcast){
+        this.podcast = podcast || null;
+    }
+    get(){
+      return this.podcast;
+    }
+
+    set(podcast){
+      this.podcast = podcast;
+    }
+
+    clear(){
+      this.podcast = null;
+    }
+}
+const current = new Podcast();
+
 // Add & Remove Podcast
 export const addPodcastToLibrary = function (podcast) {
   
@@ -64,11 +82,20 @@ export const removePodcastFromState = function(){
 }
 
 export const saveToLibraryFromView = function(){
-  const { status, protocol, podcast, playing, played,domain, podcasts, ...cast } = this.state;
-  const items = Array.from(this.episodes.values());
-  let tmCast = {...cast, items};
-  DB.set(domain,tmCast)
-  .then(() => this.setState({ ...tmCast, podcasts:[cast,...podcasts]}));
+  let inMemory = current.get();
+  let podcasts = this.state.podcasts;
+  DB.set(inMemory.domain,inMemory)
+  .then(() => this.setState({
+    title: inMemory.title,
+    image: inMemory.image,
+    link: inMemory.url,
+    description: inMemory.description,
+    domain: inMemory.domain,
+    items: inMemory.items.slice(0,20),
+    podcasts:[inMemory,...podcasts],
+  },() => { 
+    loadEpisodesToMemory.call(this,inMemory.items);
+  }) );
 }
 
 export const retrievePodcast = function(cast, shouldSave=true) {
@@ -80,7 +107,7 @@ export const retrievePodcast = function(cast, shouldSave=true) {
       DB.get(podcast.domain)
       .then(cast => {
         if(cast){ console.log('From Memory');
-          this.setState({
+          let newState = {
             items: cast.items.slice(0,20),
             title: cast.title,
             description: cast.description,
@@ -88,11 +115,11 @@ export const retrievePodcast = function(cast, shouldSave=true) {
             link: cast.url,
             lastUpdated:(Date.now()),
             ...podcast
-          },() => {
-             // 6 Mins
+          };
+          this.setState(newState,() => {
             loadEpisodesToMemory.call(this,cast.items.slice(0,20));
             accept({...cast,...podcast});
-           if(( Date.now() - cast.lastUpdated ) > 600000 ){
+           if(( Date.now() - cast.lastUpdated ) > 600000 ){ // Background Updated.
             Parser(CORS_PROXY + podcast.domain)
             .then((RSS) => { 
               if (cast.items[0].title !== RSS.items[0].title){
@@ -129,17 +156,19 @@ export const retrievePodcast = function(cast, shouldSave=true) {
           Parser(CORS_PROXY + podcast.domain)
           .then((RSS) => {
             let items = [...RSS.items].slice(0,20);
-            let cast = {...RSS};
+            let cast = { ...RSS };
             cast['items'] = items;
             cast['domain'] = podcast.domain; 
             let podcasts = [cast,...this.state.podcasts];
 
+            let podcastToSave = {
+              ...RSS,
+              ...podcast,
+              lastUpdated:Date.now()
+            };
+
             if(shouldSave){
-              DB.set(podcast.domain,{
-                ...RSS,
-                ...podcast,
-                lastUpdated:(Date.now())
-              })
+              DB.set(podcastToSave.domain,podcastToSave)
               .then(()=>{
                 this.setState({
                   title: RSS.title,
@@ -152,9 +181,8 @@ export const retrievePodcast = function(cast, shouldSave=true) {
                   podcasts,
                 },() => { 
                   loadEpisodesToMemory.call(this,items)
-                  accept({...RSS,...podcast});
+                  accept(podcastToSave);
                 });
-  
               });
             }else{
               this.setState({
@@ -167,9 +195,9 @@ export const retrievePodcast = function(cast, shouldSave=true) {
                 items,
               },()=>{
                 loadEpisodesToMemory.call(this,items)
-                accept({...RSS,...podcast});
+                accept(podcastToSave);
+                current.set(podcastToSave);
               });
-
             }
 
           });
@@ -288,6 +316,5 @@ export const loadPodcastToView = function(ev) {
         retrievePodcast.call(this,podcast);
         acc(cast)
       })
-    })
-    
+    });  
 }
