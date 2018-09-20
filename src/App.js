@@ -7,8 +7,9 @@ import { LIBVIEW, PODCASTVIEW, DISCOVERVIEW, SETTINGSVIEW } from "./constants";
 // App Components
 // import Header from './app/Header';
 import Footer from "./app/Footer";
+import Notifications from "./app/Notifications";
 import MediaControl from "./app/MediaControl";
-import Snackbar from '@material-ui/core/Snackbar';
+import {clearNotification,addNotification} from './engine/notifications';
 
 // Podcast Views
 import EpisodeList from "./podcast/EpisodeList";
@@ -46,7 +47,6 @@ import attachEvents from "./engine/events";
 import { Route, withRouter, Redirect } from "react-router-dom";
 
 
-
 class App extends Component {
   constructor() {
     super();
@@ -62,7 +62,7 @@ class App extends Component {
       image: null,
       link: null,
       loading: false,
-      podcasts:[]
+      podcasts:[],
     };
 
     this.episodes = new Map();
@@ -75,6 +75,9 @@ class App extends Component {
     this.playButton = playButton.bind(this);
     this.loadPodcastToView = loadPodcastToView.bind(this);
     this.askForPodcast = askForPodcast.bind(this);
+
+    this.clearNotification = clearNotification.bind(this);
+    this.addNotification = addNotification.bind(this);
   }
 
   componentDidMount() {
@@ -91,14 +94,17 @@ class App extends Component {
 
     // Debug
     window.player = player;
-  }
 
+    this.addNotification('Loaded', 'success', 'short')
+  }
 
   render() {
     let episode = this.episodes.get(this.state.episode);
+    let shouldShow = !this.state.notification;
     return (
       <div>
         <CssBaseline />
+        <Notifications show={shouldShow} callback={this.clearNotifications} {...this.state.notification} />
         <Route
           exact
           path={LIBVIEW}
@@ -140,6 +146,7 @@ class App extends Component {
             <Discover
               addPodcastHandler={addNewPodcast.bind(this)}
               actionAfterClick={this.navigateTo(PODCASTVIEW)}
+              showErrors={this.addNotification}
             />
           )}
         />

@@ -44,7 +44,7 @@ class Discover extends Component {
     let addPodcastHandler = this.props.addPodcastHandler;
     let actionAfterClick = this.props.actionAfterClick;
     return function() {
-      addPodcastHandler(convertURLToPodcast(domain), actionAfterClick);
+      addPodcastHandler(convertURLToPodcast(domain), actionAfterClick)
     };
   }
 
@@ -64,7 +64,7 @@ class Discover extends Component {
 
   render() {
     let podcasts = this.state.podcasts;
-    let classes = this.props.classes;
+    let {classes} = this.props;
     return (
       <Card >
         <CardContent>
