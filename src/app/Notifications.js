@@ -46,6 +46,14 @@ class Notifications extends Component{
     
   }
 
+  static get types() {
+    return types;
+  }
+
+  static get length() {
+    return length;
+  }
+
   handleClose(event, reason){
     this.setState({ open: false });
   };
@@ -54,9 +62,8 @@ class Notifications extends Component{
     const {open} = this.state;
     const {classes,message,action,label,type,duration,callback} = this.props;
     const variant = type || types.info;
-    const durationTime = duration || length.short;
+    const durationTime = length[duration] || length.short;
     const Icon = variantIcon[variant];
-  
     return (<Snackbar
       onExit={callback}
       anchorOrigin={{

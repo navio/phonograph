@@ -95,7 +95,7 @@ class App extends Component {
     // Debug
     window.player = player;
 
-    this.addNotification('Loaded', 'success', 'short')
+    this.addNotification('Loaded', Notifications.types.success, 'short')
   }
 
   render() {
