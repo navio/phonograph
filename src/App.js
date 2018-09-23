@@ -94,17 +94,17 @@ class App extends Component {
 
     // Debug
     window.player = player;
+    window.notification = this.addNotification;
 
-    this.addNotification('Loaded', Notifications.types.success, 'short')
   }
 
   render() {
     let episode = this.episodes.get(this.state.episode);
-    let shouldShow = !this.state.notification;
+    let shouldShow = !!this.state.showNotification;
     return (
       <div>
         <CssBaseline />
-        <Notifications show={shouldShow} callback={this.clearNotifications} {...this.state.notification} />
+        <Notifications show={shouldShow} callback={this.clearNotification} {...this.state.notification} />
         <Route
           exact
           path={LIBVIEW}
@@ -146,7 +146,7 @@ class App extends Component {
             <Discover
               addPodcastHandler={addNewPodcast.bind(this)}
               actionAfterClick={this.navigateTo(PODCASTVIEW)}
-              showErrors={this.addNotification}
+              notificaions={this.addNotification}
             />
           )}
         />

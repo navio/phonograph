@@ -21,62 +21,49 @@ const variantIcon = {
   info: InfoIcon,
 };
 
-export const types = Object.freeze({
+const types = Object.freeze({
     success:'success',
     warning:'warning',
     error:'error',
     info:'info'
 });
 
-export const length = Object.freeze({
+const durations = Object.freeze({
   short:2000,
   normal:4000,
   long:6000
-})
+});
 
 class Notifications extends Component{
   
   constructor(props){
     super(props);
-    this.state = {
-      open: props.show,
-    };
-
-    this.handleClose = this.handleClose.bind(this);
-    
+    this.cb = props.callback;
   }
 
   static get types() {
     return types;
   }
 
-  static get length() {
-    return length;
+  static get durations() {
+    return durations;
   }
 
-  handleClose(event, reason){
-    this.setState({ open: false });
-  };
-
   render(){
-    const {open} = this.state;
-    const {classes,message,action,label,type,duration,callback} = this.props;
+    const {classes,message,action,label,type,duration,callback,show} = this.props;
     const variant = type || types.info;
-    const durationTime = length[duration] || length.short;
     const Icon = variantIcon[variant];
+    const durationTime = duration || durations.normal;
+    
     return (<Snackbar
-      onExit={callback}
       anchorOrigin={{
         vertical: 'top',
         horizontal: 'center',
       }}
       className={classes[variant]}
-      open={open}
+      open={show}
       autoHideDuration={durationTime}
-      onClose={this.handleClose}
-      ContentProps={{
-        'aria-describedby': 'message-id',
-      }}
+      ContentProps={{'aria-describedby': 'message-id',}}
       message={<span id="message-id" className={classes.message} >
         <Icon className={classes.icon} />
         {message}
@@ -104,7 +91,7 @@ Notifications.propTypes = {
   action: PropTypes.func,
   label: PropTypes.string,
   type: PropTypes.oneOf(Object.keys(types)),
-  duration: PropTypes.oneOf(Object.keys(length)),
+  duration: PropTypes.number,
   callback: PropTypes.func,
 }
 
