@@ -10,9 +10,11 @@ import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import PauseIcon from '@material-ui/icons/Pause';
 import Typography from '@material-ui/core/Typography';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import timeago from 'timeago.js';
 // const toMinutes = time => {
 //   return Math.floor(1 * time / 60) + ":" + (1 * time) % 60;
 // };
+
 
 export const clearText = (html) =>{
   let tmp = document.createElement('div');
@@ -35,6 +37,9 @@ export const styles = theme => ({
     margin: 'auto'
   }
 });
+
+const timeagoInstance = timeago();
+const episodeDate = (date) => timeagoInstance.format(date);
 
 class EpisodeList extends React.Component{
   constructor(props){
@@ -62,8 +67,10 @@ class EpisodeList extends React.Component{
               <PlayArrowIcon className={classes.playIcon} />
             }
                   <ListItemText 
-                    primary={<Typography component="span" variant="subheading" noWrap>{clearText(episode.title)}</Typography>}
-                    secondary={<Typography component="span" color="textSecondary" noWrap>{clearText(episode.description)}</Typography>}
+                    primary={(<Typography component="span" variant="subheading" noWrap>
+                              {clearText(episode.title)} <Typography component="span" >{episodeDate(episode.created)}</Typography>
+                            </Typography>)}
+                    secondary={<Typography component="span" color="textSecondary" noWrap >{clearText(JSON.stringify(episode.description))}</Typography>}
                   />
                 </ListItem>
                 <Divider />
