@@ -26,7 +26,6 @@ const eraseThisPodcast = function(domain,fn){
 }
 
 const GeneraList = (props) =>{
-  console.log(props.podcasts);
   return <Card>
           <CardContent>
             <Typography variant="headline" component="h2" >Settings</Typography>
@@ -37,7 +36,7 @@ const GeneraList = (props) =>{
                 props.podcasts.map(podcast =>
                   <div key={podcast.domain}>
                     <ListItem >
-                      <ListItemText secondary={<span>{podcast.title} <Typography component="span" variant="caption">{(new Date(podcast.lastUpdated).toLocaleString())}</Typography></span>} />
+                      <ListItemText secondary={<Typography component="span" variant="subheading">{podcast.title} <Typography component="span" variant="caption">{(new Date(podcast.lastUpdated).toLocaleString())}</Typography></Typography>} />
                       <ListItemSecondaryAction>
                         <IconButton aria-label="Delete">
                           <DeleteIcon onClick={eraseThisPodcast(podcast.domain,props.removePodcast)} />
