@@ -181,7 +181,7 @@ class App extends Component {
         <Footer path={this.props.location.pathname} />
 
         <audio
-          autoPlay="true"
+          autoPlay={true}
           ref="player"
           preload="auto"
           title={(episode && episode.title) || ""}
