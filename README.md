@@ -7,8 +7,10 @@ This project is powered by Remote and Local Cache to provide a PWA
 https://phonograph.app
 
 # Architecture
+Todo
 
 # Goals
+Provide a First Class a PWA for Audio Execution. The first release focused on Podcasts.
 
 # Todo
 
