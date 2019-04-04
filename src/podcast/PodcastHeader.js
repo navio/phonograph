@@ -54,8 +54,7 @@ function PodcastHeader(props) {
   const isInLibrary = inLibrary();
   return (
     <Consumer>
-      {({state}) => 
-      <Card className={classes.card}>
+      {({state}) =>  ( <Card className={classes.card}>
       {state.image && <CardMedia
           className={classes.cover}
           image={state.image}
@@ -81,7 +80,7 @@ function PodcastHeader(props) {
             </Typography>
           </CardContent>
         </div>
-      </Card>
+      </Card>)
       }
     </Consumer>
   );

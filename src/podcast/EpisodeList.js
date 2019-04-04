@@ -49,18 +49,15 @@ class EpisodeList extends React.Component{
     window && window.scrollTo && window.scrollTo(0, 0)
   }
 
-  render(){
+  render() {
     let props = this.props;
     let { classes } = this.props;
-    return (
-    <Consumer>
-      { (state) =>
-      <div className={classes.root}>
+    return (<Consumer>{({state}) => <div className={classes.root}>
         <Card>
           { props.episodes ? <List>
             { props.episodes.map(episode => (
                 <div key={episode.guid}>
-                  <ListItem className={(state.playing === episode.guid ? classes.selected : null)}
+                  <ListItem className={(props.playing === episode.guid ? classes.selected : null)}
                     button
                     onClick={props.handler}
                     data-guid={episode.guid}
@@ -81,9 +78,7 @@ class EpisodeList extends React.Component{
               ))}
           </List>: <div className={classes.progressContainer}><CircularProgress className={classes.progress} /></div>}
         </Card>
-      </div>}
-    </Consumer>
-    );
+            </div> }</Consumer> );
   }
 };
 

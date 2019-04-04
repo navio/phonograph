@@ -63,8 +63,7 @@ class App extends Component {
       loading: false,
       podcasts:[],
     };
-    
-    
+
     this.episodes = new Map();
     this.podcasts = new Map();
     this.navigateTo = navigateTo.bind(this);
@@ -87,7 +86,7 @@ class App extends Component {
 
     // Podcasts
     initializeLibrary.call(this);
-    
+
     // Mode
     let newPodcast = checkIfNewPodcastInURL.call(this);
         newPodcast && addNewPodcast.call(this,newPodcast,this.navigateTo(PODCASTVIEW))
@@ -99,12 +98,12 @@ class App extends Component {
   }
 
   render() {
-    let episode = this.episodes.get(this.state.episode);
-    let shouldShow = !!this.state.showNotification;
+    const episode = this.episodes.get(this.state.episode);
     return (
-      <AppContext.Provider value={{ state: this.state, global: this }}>
+      <AppContext.Provider value={{ state: this.state, global: this, episode: episode }}>
         <CssBaseline />
-        <Notifications show={shouldShow} callback={this.clearNotification} {...this.state.notification} />
+        <Notifications show={!!this.state.showNotification} callback={this.clearNotification} {...this.state.notification} />
+        
         <Route
           exact
           path={LIBVIEW}
@@ -121,7 +120,6 @@ class App extends Component {
           render={() => (
             this.state.title ?<div>
               <PodcastHeader
-                description={this.state.description}
                 inLibrary={isPodcastInLibrary.bind(this)}
                 savePodcastToLibrary={saveToLibraryFromView.bind(this)}
                 removePodcast={removePodcastFromLibrary.bind(this)}
@@ -159,18 +157,10 @@ class App extends Component {
 
         <MediaControl
           toCurrentPodcast={this.navigateTo(PODCASTVIEW)}
-          episode={episode}
           player={this.refs.player}
-          status={this.state.status}
-          totalTime={this.state.duration}
-          currentTime={this.state.currentTime}
-          playing={this.state.playing}
           handler={this.playButton}
           forward={this.forward30Seconds}
           rewind={this.rewind10Seconds}
-          loading={this.state.loading}
-          loaded={this.state.loaded}
-          played={this.state.played}
           seek={this.seek}
         />
 
@@ -180,9 +170,10 @@ class App extends Component {
           autoPlay={true}
           ref="player"
           preload="auto"
-          title={(episode && episode.title) || ""}
-          poster={(episode && episode.itunes && episode.itunes.image) || ""}
+          title={ (episode && episode.title) || ""}
+          poster={ (episode && episode.itunes && episode.itunes.image) || ""}
         />
+
       </AppContext.Provider>
     );
   }

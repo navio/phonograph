@@ -102,25 +102,24 @@ const toMinutes = (totalTime , currentTime) => {
   return ( '- '+ convertMinsToHrsMins(totalTime) );
 }
 
-const toMin = (theTime) =>  
+const toMin = (theTime) =>
 typeof theTime === 'number'  ? convertMinsToHrsMins(Math.floor(theTime)) : `00:00` ;
 
-// 
 function MediaControlCard(props) {
   const { classes, theme } = props;
   return (
     <Consumer>
-    {({state}) => (
+    {({state, episode}) => (
     <div>
       <div className={classes.root} >
-      
-        {props.episode && (
+
+        {episode && (
           <div className={classes.card}>
 
             <div className={classes.details}>
               <Link to="/podcast">
               <CardContent className={classes.content}>
-                <Typography  variant="body1">{props.episode.title}</Typography>
+                <Typography  variant="body1">{episode.title}</Typography>
               </CardContent>
               </Link>
 
@@ -129,13 +128,13 @@ function MediaControlCard(props) {
                   <span>{toMin(state.currentTime)}</span>
                 </Grid>
                 <Grid className={classes.container} item xs={8}>
-                  <LinearProgress variant="buffer" value={state.played} valueBuffer={props.loaded} />
+                  <LinearProgress variant="buffer" value={state.played} valueBuffer={state.loaded} />
                   <div className={classes.line}>
                     <Slider value={state.played} aria-labelledby="audio" onChange={props.seek} />
                   </div>
                 </Grid>
                 <Grid item xs={2} className={classes.right}>
-                  <span>{toMinutes(state.totalTime,state.currentTime)}</span>
+                  <span>{toMinutes(state.duration, state.currentTime)}</span>
                 </Grid>
               </Grid>
 
@@ -155,7 +154,7 @@ function MediaControlCard(props) {
                     onClick={props.handler}
                     data-guid={state.playing}
                   >
-                    {state.playing === props.episode.guid &&
+                    {state.playing === episode.guid &&
                     state.status !== "pause" ? (
                       <PauseIcon className={classes.playIcon} />
                     ) : (
