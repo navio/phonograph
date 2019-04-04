@@ -161,16 +161,16 @@ class App extends Component {
           toCurrentPodcast={this.navigateTo(PODCASTVIEW)}
           episode={episode}
           player={this.refs.player}
-          // status={this.state.status}
-          // totalTime={this.state.duration}
-          // currentTime={this.state.currentTime}
-          // playing={this.state.playing}
+          status={this.state.status}
+          totalTime={this.state.duration}
+          currentTime={this.state.currentTime}
+          playing={this.state.playing}
           handler={this.playButton}
           forward={this.forward30Seconds}
           rewind={this.rewind10Seconds}
-          // loading={this.state.loading}
-          // loaded={this.state.loaded}
-          // played={this.state.played}
+          loading={this.state.loading}
+          loaded={this.state.loaded}
+          played={this.state.played}
           seek={this.seek}
         />
 
