@@ -13,6 +13,7 @@ import Favorite from "@material-ui/icons/Favorite";
 import AddIcon from '@material-ui/icons/Add';
 
 import {clearText} from './EpisodeList'
+import { Consumer } from "../App.js";
 
 const styles = theme => ({
   card: {
@@ -52,31 +53,37 @@ function PodcastHeader(props) {
   const { classes, inLibrary, savePodcastToLibrary, removePodcast } = props;
   const isInLibrary = inLibrary();
   return (
-    <div>
+    <Consumer>
+      {({state}) =>
       <Card className={classes.card}>
-      {props.image && <CardMedia
+      {state.image && <CardMedia
           className={classes.cover}
-          image={props.image}
-          title={`${props.title} cover`}
+          image={state.image}
+          title={`${state.title} cover`}
         />}
         <div className={classes.details}>
           <CardContent className={classes.content}>
-            <Typography className={classes.title} variant="headline" noWrap>{props.title}
+            <Typography className={classes.title} variant="headline" noWrap>{state.title}
               { isInLibrary ? 
                 <IconButton className={classes.addToLibrary} color="secondary" onClick={removePodcast} aria-label="Add" >
                   <Favorite />
                 </IconButton>:
-                <Button variant="outlined" size="small" color="primary" onClick={savePodcastToLibrary} className={classes.addToLibrary} >
+                <Button variant="outlined"
+                        size="small"
+                        color="primary"
+                        onClick={savePodcastToLibrary}
+                        className={classes.addToLibrary} >
                 <AddIcon />
               </Button> }
             </Typography>
             <Typography className={classes.desc} color="textSecondary">
-              {clearText(props.description)}
+              {clearText(state.description)}
             </Typography>
           </CardContent>
         </div>
       </Card>
-    </div>
+      }
+    </Consumer>
   );
 }
 

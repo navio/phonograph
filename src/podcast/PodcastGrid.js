@@ -9,6 +9,7 @@ import CardMedia from '@material-ui/core/CardMedia';
 import CardContent from '@material-ui/core/CardContent';
 import Add from '@material-ui/icons/Add';
 import {getPodcastColor,cachedContent} from '../engine/podcast';
+import { Consumer } from "../App.js";
 
 export const styles = theme => ({
   podcastMedia:{
@@ -52,38 +53,50 @@ const getMyColor = (cast) =>(cast.domain === addMore) ? {backgroundColor:'white'
 
 function PodCastGrid(props) {
   const { classes } = props;
-  let casts = (props.podcasts && [...props.podcasts]) || [];
-  casts.push({domain: addMore, title:'Add more', onClick:()=>{ props.addPodcastHandler() } });
   
-  function processClick(ev){
-        props.selectPodcast(ev)
-        .then( props.actionAfterSelectPodcast )
-  }
-
   return (
-    <Grid container spacing={0} direction={'row'}>
-      { casts && casts.map(cast =>
-        <Grid item xs={3} sm={2} md={1} key={cast.domain} >
-          <Card classes={{root:classes.card}} style={getMyColor(cast)}>
-            { cast.domain === addMore
-            ? <IconButton onClick={cast.onClick} classes={{root:classes.card}}>
-                <Add classes={{root:classes.addIcon}} />
-              </IconButton>
-            : <div className={classes.relativeContainer}>
-                <CardContent className={classes.cardContent}>
-                  {cast.title}
-                </CardContent>
-                <CardMedia 
-                  onClick={processClick} 
-                  domain={cast.domain} title={cast.title} 
-                  className={classes.podcastMedia} 
-                  image={cast.image}
-                />
-              </div>}
-          </Card>
-        </Grid> 
-       )}
-    </Grid>
+    <Consumer>
+      {({state, global }) => {
+
+      const processClick = (ev) => {
+        global.loadPodcastToView(ev)
+        .then( props.actionAfterSelectPodcast )
+      }
+
+      let casts = ( state.podcasts && [ ...state.podcasts ] ) || [];
+      casts.push({ domain: addMore,
+                   title:'Add more',
+                   onClick:()=>{
+                     props.addPodcastHandler()
+                   }
+                });
+
+      return (
+      <Grid container spacing={0} direction={'row'}>
+        { casts && casts.map(cast =>
+          <Grid item xs={3} sm={2} md={1} key={cast.domain} >
+            <Card classes={{root:classes.card}} style={getMyColor(cast)}>
+              { cast.domain === addMore
+              ? <IconButton onClick={cast.onClick} classes={{root:classes.card}}>
+                  <Add classes={{root:classes.addIcon}} />
+                </IconButton>
+              : <div className={classes.relativeContainer}>
+                  <CardContent className={classes.cardContent}>
+                    {cast.title}
+                  </CardContent>
+                  <CardMedia
+                    onClick={processClick}
+                    domain={cast.domain} title={cast.title}
+                    className={classes.podcastMedia}
+                    image={cast.image}
+                  />
+                </div> }
+            </Card>
+          </Grid>
+        )}
+      </Grid>)
+      }}
+    </Consumer>
   );
 }
 

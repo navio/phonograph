@@ -11,6 +11,8 @@ import PauseIcon from '@material-ui/icons/Pause';
 import Typography from '@material-ui/core/Typography';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import timeago from 'timeago.js';
+import { Consumer } from "../App.js";
+
 // const toMinutes = time => {
 //   return Math.floor(1 * time / 60) + ":" + (1 * time) % 60;
 // };
@@ -51,35 +53,36 @@ class EpisodeList extends React.Component{
     let props = this.props;
     let { classes } = this.props;
     return (
-    <div className={classes.root}>
-      <Card>
-        
-        { props.episodes ? <List>
-          {props.episodes.map(episode => (
-              <div key={episode.guid}>
-                <ListItem className={(props.playing === episode.guid ? classes.selected : null)}
-                  button
-                  onClick={props.handler}
-                  data-guid={episode.guid}
-                >
-                {(props.playing === episode.guid && props.status !== 'pause') ?
-              <PauseIcon className={classes.playIcon} /> :
-              <PlayArrowIcon className={classes.playIcon} />
-            }
-                  <ListItemText 
-                    primary={(<Typography component="span" variant="subheading" noWrap>
-                              {clearText(episode.title)} <Typography component="span" >{episodeDate(episode.created)}</Typography>
-                            </Typography>)}
-                    secondary={<Typography component="span" color="textSecondary" noWrap >{clearText(JSON.stringify(episode.description))}</Typography>}
-                  />
-                </ListItem>
-                <Divider />
-              </div>
-            ))}
-        </List>: <div className={classes.progressContainer}><CircularProgress className={classes.progress} /></div>}
-
-      </Card>
-    </div>
+    <Consumer>
+      { (state) =>
+      <div className={classes.root}>
+        <Card>
+          { props.episodes ? <List>
+            { props.episodes.map(episode => (
+                <div key={episode.guid}>
+                  <ListItem className={(state.playing === episode.guid ? classes.selected : null)}
+                    button
+                    onClick={props.handler}
+                    data-guid={episode.guid}
+                  >
+                  {( props.playing === episode.guid && props.status !== 'pause' ) ?
+                <PauseIcon className={classes.playIcon} /> :
+                <PlayArrowIcon className={classes.playIcon} />
+              }
+                    <ListItemText
+                      primary={(<Typography component="span" variant="subheading" noWrap>
+                                {clearText(episode.title)} <Typography component="span" >{episodeDate(episode.created)}</Typography>
+                              </Typography>)}
+                      secondary={<Typography component="span" color="textSecondary" noWrap >{clearText(JSON.stringify(episode.description))}</Typography>}
+                    />
+                  </ListItem>
+                  <Divider />
+                </div>
+              ))}
+          </List>: <div className={classes.progressContainer}><CircularProgress className={classes.progress} /></div>}
+        </Card>
+      </div>}
+    </Consumer>
     );
   }
 };

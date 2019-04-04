@@ -44,6 +44,7 @@ import attachEvents from "./engine/events";
 // Router
 import { Route, withRouter, Redirect } from "react-router-dom";
 
+const AppContext = React.createContext();
 
 class App extends Component {
   constructor() {
@@ -62,6 +63,7 @@ class App extends Component {
       loading: false,
       podcasts:[],
     };
+
 
     this.episodes = new Map();
     this.podcasts = new Map();
@@ -100,7 +102,7 @@ class App extends Component {
     let episode = this.episodes.get(this.state.episode);
     let shouldShow = !!this.state.showNotification;
     return (
-      <div>
+      <AppContext.Provider value={{ state: this.state, global: this }}>
         <CssBaseline />
         <Notifications show={shouldShow} callback={this.clearNotification} {...this.state.notification} />
         <Route
@@ -108,8 +110,6 @@ class App extends Component {
           path={LIBVIEW}
           render={({ history }) => (
             <PodcastGrid
-              podcasts={this.state.podcasts}
-              selectPodcast={this.loadPodcastToView}
               addPodcastHandler={this.navigateTo(DISCOVERVIEW)} //{this.askForPodcast}
               actionAfterSelectPodcast={this.navigateTo(PODCASTVIEW)}
             />
@@ -121,8 +121,6 @@ class App extends Component {
           render={() => (
             this.state.title ?<div>
               <PodcastHeader
-                title={this.state.title}
-                image={this.state.image}
                 description={this.state.description}
                 inLibrary={isPodcastInLibrary.bind(this)}
                 savePodcastToLibrary={saveToLibraryFromView.bind(this)}
@@ -163,16 +161,16 @@ class App extends Component {
           toCurrentPodcast={this.navigateTo(PODCASTVIEW)}
           episode={episode}
           player={this.refs.player}
-          status={this.state.status}
-          totalTime={this.state.duration}
-          currentTime={this.state.currentTime}
-          playing={this.state.playing}
+          // status={this.state.status}
+          // totalTime={this.state.duration}
+          // currentTime={this.state.currentTime}
+          // playing={this.state.playing}
           handler={this.playButton}
           forward={this.forward30Seconds}
           rewind={this.rewind10Seconds}
-          loading={this.state.loading}
-          loaded={this.state.loaded}
-          played={this.state.played}
+          // loading={this.state.loading}
+          // loaded={this.state.loaded}
+          // played={this.state.played}
           seek={this.seek}
         />
 
@@ -185,9 +183,10 @@ class App extends Component {
           title={(episode && episode.title) || ""}
           poster={(episode && episode.itunes && episode.itunes.image) || ""}
         />
-      </div>
+      </AppContext.Provider>
     );
   }
 }
 
 export default withRouter(App);
+export const Consumer =  AppContext.Consumer;
