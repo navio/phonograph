@@ -16,6 +16,8 @@ import SkipNextIcon from "@material-ui/icons/Forward30";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import Grid from "@material-ui/core/Grid";
 import { Link } from "react-router-dom";
+import { Consumer } from "../App.js";
+
 
 const styles = theme => ({
   card: {
@@ -103,81 +105,84 @@ const toMinutes = (totalTime , currentTime) => {
 const toMin = (theTime) =>  
 typeof theTime === 'number'  ? convertMinsToHrsMins(Math.floor(theTime)) : `00:00` ;
 
-
+// 
 function MediaControlCard(props) {
   const { classes, theme } = props;
   return (
+    <Consumer>
+    {({state}) => (
     <div>
-    <div className={classes.root} >
-    
-      {props.episode && (
-        <div className={classes.card}>
+      <div className={classes.root} >
+      
+        {props.episode && (
+          <div className={classes.card}>
 
-          <div className={classes.details}>
-            <Link to="/podcast">
-            <CardContent className={classes.content}>
-              <Typography  variant="body1">{props.episode.title}</Typography>
-            </CardContent>
-            </Link>
+            <div className={classes.details}>
+              <Link to="/podcast">
+              <CardContent className={classes.content}>
+                <Typography  variant="body1">{props.episode.title}</Typography>
+              </CardContent>
+              </Link>
 
-           <Grid container className={classes.player}>
-              <Grid item xs={2}>
-                <span>{toMin(props.currentTime)}</span>
+            <Grid container className={classes.player}>
+                <Grid item xs={2}>
+                  <span>{toMin(state.currentTime)}</span>
+                </Grid>
+                <Grid className={classes.container} item xs={8}>
+                  <LinearProgress variant="buffer" value={state.played} valueBuffer={props.loaded} />
+                  <div className={classes.line}>
+                    <Slider value={state.played} aria-labelledby="audio" onChange={props.seek} />
+                  </div>
+                </Grid>
+                <Grid item xs={2} className={classes.right}>
+                  <span>{toMinutes(state.totalTime,state.currentTime)}</span>
+                </Grid>
               </Grid>
-              <Grid className={classes.container} item xs={8}>
-                <LinearProgress variant="buffer" value={props.played} valueBuffer={props.loaded} />
-                <div className={classes.line}>
-                  <Slider value={props.played} aria-labelledby="audio" onChange={props.seek} />
-                </div>
-              </Grid>
-              <Grid item xs={2} className={classes.right}>
-                <span>{toMinutes(props.totalTime,props.currentTime)}</span>
-              </Grid>
-            </Grid>
 
-            <Grid container className={classes.controls} >
-              <Grid className={classes.right} item xs={4}>
-                <IconButton aria-label="Previous" onClick={props.rewind}>
-                  {theme.direction === "rtl" ? (
-                    <SkipNextIcon className={classes.controlIcon} />
-                  ) : (
-                    <SkipPreviousIcon className={classes.controlIcon} />
-                  )}
-                </IconButton>
+              <Grid container className={classes.controls} >
+                <Grid className={classes.right} item xs={4}>
+                  <IconButton aria-label="Previous" onClick={props.rewind}>
+                    {theme.direction === "rtl" ? (
+                      <SkipNextIcon className={classes.controlIcon} />
+                    ) : (
+                      <SkipPreviousIcon className={classes.controlIcon} />
+                    )}
+                  </IconButton>
+                </Grid>
+                <Grid item xs={4} className={classes.center}>
+                  <IconButton
+                    aria-label="Play/pause"
+                    onClick={props.handler}
+                    data-guid={state.playing}
+                  >
+                    {state.playing === props.episode.guid &&
+                    state.status !== "pause" ? (
+                      <PauseIcon className={classes.playIcon} />
+                    ) : (
+                      <PlayArrowIcon className={classes.playIcon} />
+                    )}
+                  </IconButton>
+                </Grid>
+                <Grid item xs={4} className={classes.left}>
+                  <IconButton aria-label="Next" onClick={props.forward}>
+                    {theme.direction === "rtl" ? (
+                      <SkipPreviousIcon className={classes.controlIcon} />
+                    ) : (
+                      <SkipNextIcon className={classes.controlIcon} />
+                    )}
+                  </IconButton>
+                </Grid>
               </Grid>
-              <Grid item xs={4} className={classes.center}>
-                <IconButton
-                  aria-label="Play/pause"
-                  onClick={props.handler}
-                  data-guid={props.playing}
-                >
-                  {props.playing === props.episode.guid &&
-                  props.status !== "pause" ? (
-                    <PauseIcon className={classes.playIcon} />
-                  ) : (
-                    <PlayArrowIcon className={classes.playIcon} />
-                  )}
-                </IconButton>
-              </Grid>
-              <Grid item xs={4} className={classes.left}>
-                <IconButton aria-label="Next" onClick={props.forward}>
-                  {theme.direction === "rtl" ? (
-                    <SkipPreviousIcon className={classes.controlIcon} />
-                  ) : (
-                    <SkipNextIcon className={classes.controlIcon} />
-                  )}
-                </IconButton>
-              </Grid>
-            </Grid>
 
 
 
+            </div>
           </div>
-        </div>
-      )}
-    </div>
-    { props.episode && <div className={classes.undeground}></div> }
-    </div>
+        )}
+      </div>
+      { props.episode && <div className={classes.undeground}></div> }
+    </div> )}
+    </Consumer>
   );
 }
 
