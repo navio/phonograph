@@ -1,95 +1,50 @@
 import Parser, {
 	load
 } from '../parser';
+
 import {
 	CASTVIEW,
 	STORAGEID
 } from '../../constants';
+
 import {
 	defaultCasts
 } from '../../podcast/podcast';
+
 import PodcastSearcher from './PodcastSearcher';
 import fetchJ from 'smallfetch';
 import randomColor from 'randomcolor';
-import DB from './db';
+import DB from './db/db.js';
+import { add as addPodcastToLibrary, remove as removePodcastFromLibrary } from "./db/index";
 
-const DEFAULTCAST = {
-	domain: "www.npr.org/rss/podcast.php?id=510289",
-	protocol: 'https:'
-};
+import Podcast from "./Podcast";
 
-let PROXY = {
-	'https:': '/rss-pg/',
-	'http:': '/rss-less-pg/'
-};
-let CACHED = {
-	'https:': '/cacheds/',
-	'http:': '/cached/'
-};
-let API = "/podcasts/";
-let DEBUG = false;
+const DEBUG = (!process.env.NODE_ENV || process.env.NODE_ENV === 'development');
 
-if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
-	DEBUG = true;
-	PROXY = {
+const API =  !DEBUG ? 
+	"/podcasts/" : 
+	"https://cors-anywhere.herokuapp.com/https://feedwrangler.net/api/v2/podcasts/";
+
+const PROXY = !DEBUG ? 
+	{
+		'https:': '/rss-pg/',
+		'http:': '/rss-less-pg/'
+	}:
+	{
 		'https:': 'https://cors-anywhere.herokuapp.com/',
 		'http:': 'https://cors-anywhere.herokuapp.com/'
 	};
-	CACHED = {
+
+const CACHED = !DEBUG ? 
+	{
+		'https:': '/cacheds/',
+		'http:': '/cached/'
+	}: 
+	{
 		'https:': 'https://cors-anywhere.herokuapp.com/',
 		'http:': 'https://cors-anywhere.herokuapp.com/'
 	};
-	API = `https://cors-anywhere.herokuapp.com/https://feedwrangler.net/api/v2/podcasts/`;
-}
 
-export const clearDomain = (domain) => domain.replace(/(^\w+:|^)\/\//, '');
-
-export class Podcast {
-	constructor(podcast) {
-		this.podcast = podcast || null;
-	}
-	get() {
-		return this.podcast;
-	}
-
-	set(podcast) {
-		this.podcast = podcast;
-	}
-
-	clear() {
-		this.podcast = null;
-	}
-}
-const current = new Podcast();
-
-// Add & Remove Podcast
-export const addPodcastToLibrary = function (podcast) {
-
-	DB.set(podcast.domain, {
-			...podcast,
-			lastUpdated: (Date.now())
-		})
-		.then(() => {
-			console.log('im here...but shouldn')
-			let podcasts = this.state.podcasts;
-			podcast.items = podcast.items.slice(0, 20);
-			podcasts.push(podcast);
-			this.setState({
-				podcasts
-			});
-		});
-}
-
-export const removePodcastFromLibrary = function (cast) {
-	DB.del(cast)
-		.then(() => {
-			let podcastsState = this.state.podcasts;
-			let podcasts = podcastsState.filter(podcast => podcast.domain !== cast);
-			this.setState({
-				podcasts
-			})
-		});
-}
 
 export const loadEpisodesToMemory = function (RSS) {
 	RSS.forEach(item => this.episodes.set(item.guid, item));
@@ -107,7 +62,73 @@ export const removePodcastFromState = function () {
 	this.episodes.clear();
 }
 
-export const saveToLibraryFromView = function () {
+/** LOCAL LIBRARY START */
+
+
+// Add & Remove Podcast START
+
+export { addPodcastToLibrary, removePodcastFromLibrary };
+
+// export const addPodcastToLibrary = function (podcast) {
+
+// 	DB.set(podcast.domain, {
+// 			...podcast,
+// 			lastUpdated: (Date.now())
+// 		})
+// 		.then(() => {
+// 			console.log('im here...but shouldn')
+// 			let podcasts = this.state.podcasts;
+// 			podcast.items = podcast.items.slice(0, 20);
+// 			podcasts.push(podcast);
+// 			this.setState({
+// 				podcasts
+// 			});
+// 		});
+// }
+
+// export const removePodcastFromLibrary = function (cast) {
+// 	DB.del(cast)
+// 		.then(() => {
+// 			let podcastsState = this.state.podcasts;
+// 			let podcasts = podcastsState.filter(podcast => podcast.domain !== cast);
+// 			this.setState({
+// 				podcasts
+// 			})
+// 		});
+// }
+
+// Add & Remove Podcast END
+
+// Load current Selectedt Podcast into View
+
+export const loadPodcastToView = function (ev) {
+	let podcast = ev && ev.currentTarget && ev.currentTarget.getAttribute('domain');
+	console.log(podcast);
+	return new Promise(acc => {
+		DB.get(podcast)
+			.then(cast => {
+				if (cast) {
+					let {
+						title,
+						image,
+						description
+					} = cast;
+					this.setState({
+						title,
+						image,
+						description,
+						podcast
+					})
+				}
+				retrievePodcast.call(this, podcast);
+				acc(cast)
+			})
+	});
+}
+
+const current = new Podcast();
+
+export const saveToLibrary = function () {
 	let inMemory = current.get();
 	let podcasts = this.state.podcasts;
 	DB.set(inMemory.domain, inMemory)
@@ -261,6 +282,21 @@ export const initializeLibrary = function () {
 		});
 }
 
+export const addNewPodcast = function (newPodcast, callback) {
+	removePodcastFromState.call(this); // Remove Current Podcast
+	retrievePodcast.call(this, newPodcast, false) // RetrievePodcast
+		.then(podcast => {
+			callback && callback();
+		});
+}
+
+/** LOCAL LIBRARY END */
+
+
+/********* UTILS START *********/ 
+
+export const clearDomain = (domain) => domain.replace(/(^\w+:|^)\/\//, '');
+
 export const convertURLToPodcast = (url) => { // Todo: try https, then http otherwise fail.
 	if (!url) return null;
 	let fixURL = url.search("http") < 0 ? `https://${url}` : url;
@@ -283,20 +319,14 @@ export const driveThruDNS = (url) => {
 }
 
 export const checkIfNewPodcastInURL = function () {
-	if (!window && !window.location) return DEFAULTCAST;
+	if (!window && !window.location) return {
+		domain: "www.npr.org/rss/podcast.php?id=510289",
+		protocol: 'https:'
+	};
 	let urlPodcast = new window.URL(window.location.href);
 	let podcast = urlPodcast.searchParams.get("podcast");
 
 	return convertURLToPodcast(podcast);
-}
-
-export const addNewPodcast = function (newPodcast, callback) {
-	removePodcastFromState.call(this); // Remove Current Podcast
-	retrievePodcast.call(this, newPodcast, false) // RetrievePodcast
-		.then(podcast => {
-			callback && callback();
-		});
-
 }
 
 export const getPopularPodcasts = function () {
@@ -307,6 +337,17 @@ export const getPopularPodcasts = function () {
 	})
 }
 
+export const getPodcastColor = (cast) => ({
+	backgroundColor: randomColor({
+		seed: cast.title,
+		luminosity: 'dark',
+		hue: 'blue'
+	})
+});
+
+/********* UTILS END *********/ 
+
+// SEARCH!!!
 const SFP = new PodcastSearcher(API);
 export const searchForPodcasts = function (search) {
 	return new Promise(function (acc, rej) {
@@ -316,15 +357,8 @@ export const searchForPodcasts = function (search) {
 	});
 }
 
-export const getPodcastColor = (cast) => ({
-		backgroundColor: randomColor({
-			seed: cast.title,
-			luminosity: 'dark',
-			hue: 'blue'
-		})
-	});
-//Events
 
+//Events
 // Ask for podcast URL.
 export const askForPodcast = function (callback) {
 	let input = prompt('URL or Name of Podcast');
@@ -336,28 +370,4 @@ export const askForPodcast = function (callback) {
 		console.log('error', err);
 	}
 }
-// Load current Selectedt Podcast into View
-export const loadPodcastToView = function (ev) {
-	let podcast = ev && ev.currentTarget && ev.currentTarget.getAttribute('domain');
-	console.log(podcast);
-	return new Promise(acc => {
-		DB.get(podcast)
-			.then(cast => {
-				if (cast) {
-					let {
-						title,
-						image,
-						description
-					} = cast;
-					this.setState({
-						title,
-						image,
-						description,
-						podcast
-					})
-				}
-				retrievePodcast.call(this, podcast);
-				acc(cast)
-			})
-	});
-}
+

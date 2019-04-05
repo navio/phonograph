@@ -36,7 +36,7 @@ import {
   askForPodcast,
   isPodcastInLibrary,
   removePodcastFromLibrary,
-  saveToLibraryFromView
+  saveToLibrary
 } from "./engine/podcast";
 
 import attachEvents from "./engine/events";
@@ -121,7 +121,7 @@ class App extends Component {
             this.state.title ?<div>
               <PodcastHeader
                 inLibrary={isPodcastInLibrary.bind(this)}
-                savePodcastToLibrary={saveToLibraryFromView.bind(this)}
+                savePodcastToLibrary={saveToLibrary.bind(this)}
                 removePodcast={removePodcastFromLibrary.bind(this)}
               />
               <EpisodeList
