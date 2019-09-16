@@ -57,18 +57,30 @@ function PodCastGrid(props) {
   return (
     <Consumer>
       {({state, global }) => {
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> cleanup
       const processClick = (ev) => {
         global.loadPodcastToView(ev)
         .then( props.actionAfterSelectPodcast )
       }
 
       let casts = ( state.podcasts && [ ...state.podcasts ] ) || [];
+<<<<<<< HEAD
       casts.push({ domain: addMore,
                    title:'Add more',
                    onClick:()=>{
                      props.addPodcastHandler()
                    }
+=======
+      casts.push({ domain: addMore, 
+                   title:'Add more', 
+                   onClick:()=>{ 
+                     props.addPodcastHandler() 
+                   } 
+>>>>>>> cleanup
                 });
 
       return (
@@ -84,15 +96,26 @@ function PodCastGrid(props) {
                   <CardContent className={classes.cardContent}>
                     {cast.title}
                   </CardContent>
+<<<<<<< HEAD
                   <CardMedia
                     onClick={processClick}
                     domain={cast.domain} title={cast.title}
                     className={classes.podcastMedia}
+=======
+                  <CardMedia 
+                    onClick={processClick} 
+                    domain={cast.domain} title={cast.title} 
+                    className={classes.podcastMedia} 
+>>>>>>> cleanup
                     image={cast.image}
                   />
                 </div> }
             </Card>
+<<<<<<< HEAD
           </Grid>
+=======
+          </Grid> 
+>>>>>>> cleanup
         )}
       </Grid>)
       }}

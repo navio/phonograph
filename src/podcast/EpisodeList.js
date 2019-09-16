@@ -49,7 +49,7 @@ class EpisodeList extends React.Component{
     window && window.scrollTo && window.scrollTo(0, 0)
   }
 
-  render(){
+  render() {
     let props = this.props;
     let { classes } = this.props;
     return (

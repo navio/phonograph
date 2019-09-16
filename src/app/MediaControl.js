@@ -102,25 +102,40 @@ const toMinutes = (totalTime , currentTime) => {
   return ( '- '+ convertMinsToHrsMins(totalTime) );
 }
 
-const toMin = (theTime) =>  
+const toMin = (theTime) =>
 typeof theTime === 'number'  ? convertMinsToHrsMins(Math.floor(theTime)) : `00:00` ;
 
+<<<<<<< HEAD
 //
+=======
+>>>>>>> cleanup
 function MediaControlCard(props) {
   const { classes, theme } = props;
   return (
     <Consumer>
+<<<<<<< HEAD
     {({state}) => (
     <div>
       <div className={classes.root} >
 
         {props.episode && (
+=======
+    {({state, episode}) => (
+    <div>
+      <div className={classes.root} >
+
+        {episode && (
+>>>>>>> cleanup
           <div className={classes.card}>
 
             <div className={classes.details}>
               <Link to="/podcast">
               <CardContent className={classes.content}>
+<<<<<<< HEAD
                 <Typography  variant="body1">{props.episode.title}</Typography>
+=======
+                <Typography  variant="body1">{episode.title}</Typography>
+>>>>>>> cleanup
               </CardContent>
               </Link>
 
@@ -129,13 +144,21 @@ function MediaControlCard(props) {
                   <span>{toMin(state.currentTime)}</span>
                 </Grid>
                 <Grid className={classes.container} item xs={8}>
+<<<<<<< HEAD
                   <LinearProgress variant="buffer" value={state.played} valueBuffer={props.loaded} />
+=======
+                  <LinearProgress variant="buffer" value={state.played} valueBuffer={state.loaded} />
+>>>>>>> cleanup
                   <div className={classes.line}>
                     <Slider value={state.played} aria-labelledby="audio" onChange={props.seek} />
                   </div>
                 </Grid>
                 <Grid item xs={2} className={classes.right}>
+<<<<<<< HEAD
                   <span>{toMinutes(state.totalTime,state.currentTime)}</span>
+=======
+                  <span>{toMinutes(state.duration, state.currentTime)}</span>
+>>>>>>> cleanup
                 </Grid>
               </Grid>
 
@@ -155,7 +178,11 @@ function MediaControlCard(props) {
                     onClick={props.handler}
                     data-guid={state.playing}
                   >
+<<<<<<< HEAD
                     {state.playing === props.episode.guid &&
+=======
+                    {state.playing === episode.guid &&
+>>>>>>> cleanup
                     state.status !== "pause" ? (
                       <PauseIcon className={classes.playIcon} />
                     ) : (
