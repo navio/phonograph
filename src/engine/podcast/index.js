@@ -155,6 +155,7 @@ export const addNewPodcast = function(newPodcast, callback) {
 
 /********* UTILS START *********/
 
+export const clearDomain = (domain) => domain.replace(/(^\w+:|^)\/\//, '');
 
 export const convertURLToPodcast = url => {
   // Todo: try https, then http otherwise fail.
