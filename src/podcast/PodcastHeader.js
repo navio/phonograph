@@ -54,12 +54,7 @@ function PodcastHeader(props) {
   const isInLibrary = inLibrary();
   return (
     <Consumer>
-<<<<<<< HEAD
-      {({state}) =>
-      <Card className={classes.card}>
-=======
       {({state}) =>  ( <Card className={classes.card}>
->>>>>>> cleanup
       {state.image && <CardMedia
           className={classes.cover}
           image={state.image}
@@ -73,15 +68,9 @@ function PodcastHeader(props) {
                   <Favorite />
                 </IconButton>:
                 <Button variant="outlined"
-<<<<<<< HEAD
-                        size="small"
-                        color="primary"
-                        onClick={savePodcastToLibrary}
-=======
                         size="small" 
                         color="primary" 
                         onClick={savePodcastToLibrary} 
->>>>>>> cleanup
                         className={classes.addToLibrary} >
                 <AddIcon />
               </Button> }
@@ -91,11 +80,7 @@ function PodcastHeader(props) {
             </Typography>
           </CardContent>
         </div>
-<<<<<<< HEAD
-      </Card>
-=======
       </Card>)
->>>>>>> cleanup
       }
     </Consumer>
   );
