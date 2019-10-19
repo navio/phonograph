@@ -63,7 +63,7 @@ export const loadPodcastToView = function(ev) {
   let podcast =
     ev && ev.currentTarget && ev.currentTarget.getAttribute("domain");
   return new Promise(acc => {
-    PodcastLibrary.getPodcast(podcast)
+    PodcastLibrary.getPodcast(nprRule(podcast))
       // DB.get(podcast)
       .then(cast => {
         if (cast) {
@@ -148,7 +148,7 @@ export const initializeLibrary = function() {
 };
 
 export const addNewPodcast = function(newPodcast, callback) {
-  const cast = nprRule(`${newPodcast.protocol}//${newPodcast.domain}`);
+  const cast = `${newPodcast.protocol}//${newPodcast.domain}`;
   retrievePodcast
     .call(this, cast, true) // RetrievePodcast
     .then(() => {
