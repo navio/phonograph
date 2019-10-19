@@ -1,5 +1,5 @@
 import { defaultCasts } from "../../podcast/podcast";
-
+import {toArray} from "./db/db";
 import PodcastSearcher from "./PodcastSearcher";
 import randomColor from "randomcolor";
 import PodcastEngine from "podcastsuite";
@@ -22,9 +22,9 @@ const PROXY = !DEBUG
       "http:": "https://cors-anywhere.herokuapp.com/"
     };
 
-const nprRule = (url) => (url.indexOf('npr') > -1) ? url.replace('http:', 'https:'):url;
+const forceHttps = (url) => (url.indexOf('http:') > -1) ? url.replace('http:', 'https:'):url;
 
-const initializeCast = defaultCasts.map(nprRule);
+const initializeCast = defaultCasts.map(forceHttps);
 
 const PodcastLibrary = new PodcastEngine({
   podcasts: initializeCast,
@@ -63,7 +63,7 @@ export const loadPodcastToView = function(ev) {
   let podcast =
     ev && ev.currentTarget && ev.currentTarget.getAttribute("domain");
   return new Promise(acc => {
-    PodcastLibrary.getPodcast(nprRule(podcast))
+    PodcastLibrary.getPodcast(forceHttps(podcast))
       // DB.get(podcast)
       .then(cast => {
         if (cast) {
@@ -102,7 +102,7 @@ export const saveToLibrary = function() {
 };
 
 export const retrievePodcast = function(castArg, save = false) {
-  const cast = nprRule(castArg);
+  const cast = forceHttps(castArg);
   current.clear();
   return new Promise(accept => {
     PodcastLibrary.getPodcast(cast, { save }).then(castContent => {
