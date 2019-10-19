@@ -129,20 +129,21 @@ export const isPodcastInLibrary = function() {
 };
 
 export const initializeLibrary = function() {
-  PodcastLibrary.getLibrary().then(podcastsArray => {
-    const podcastsData = Promise.all(
-      podcastsArray.map(podcastRaw => PodcastLibrary.getPodcast(podcastRaw))
-    );
-    podcastsData.then(podcasts => {
-      if (podcasts) {
-        const updatePodcasts = podcasts.map(podcast => ({
-          ...podcast,
-          domain: podcast.url
-        }));
-        this.setState({
-          podcasts: updatePodcasts
-        });
-      }
+  PodcastLibrary.ready.then( () => {
+    PodcastLibrary.getLibrary().then(podcastsArray => {
+      Promise.all(
+        podcastsArray.map(podcastRaw => PodcastLibrary.getPodcast(podcastRaw))
+      ).then(podcasts => {
+        if (podcasts) {
+          const updatePodcasts = podcasts.map(podcast => ({
+            ...podcast,
+            domain: podcast.url
+          }));
+          this.setState({
+            podcasts: updatePodcasts
+          });
+        }
+      });
     });
   });
 };
