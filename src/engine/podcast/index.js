@@ -22,8 +22,12 @@ const PROXY = !DEBUG
       "http:": "https://cors-anywhere.herokuapp.com/"
     };
 
+const nprRule = (url) => (url.indexOf('npr') > -1) ? url.replace('http:', 'https:'):url;
+
+const initializeCast = defaultCasts.map(nprRule);
+
 const PodcastLibrary = new PodcastEngine({
-  podcasts: defaultCasts,
+  podcasts: initializeCast,
   proxy: PROXY
 });
 const current = new Podcast();
@@ -59,7 +63,7 @@ export const loadPodcastToView = function(ev) {
   let podcast =
     ev && ev.currentTarget && ev.currentTarget.getAttribute("domain");
   return new Promise(acc => {
-    PodcastLibrary.getPodcast(podcast)
+    PodcastLibrary.getPodcast(nprRule(podcast))
       // DB.get(podcast)
       .then(cast => {
         if (cast) {
@@ -97,7 +101,8 @@ export const saveToLibrary = function() {
   });
 };
 
-export const retrievePodcast = function(cast, save = false) {
+export const retrievePodcast = function(castArg, save = false) {
+  const cast = nprRule(castArg);
   current.clear();
   return new Promise(accept => {
     PodcastLibrary.getPodcast(cast, { save }).then(castContent => {
@@ -124,20 +129,21 @@ export const isPodcastInLibrary = function() {
 };
 
 export const initializeLibrary = function() {
-  PodcastLibrary.getLibrary().then(podcastsArray => {
-    const podcastsData = Promise.all(
-      podcastsArray.map(podcastRaw => PodcastLibrary.getPodcast(podcastRaw))
-    );
-    podcastsData.then(podcasts => {
-      if (podcasts) {
-        const updatePodcasts = podcasts.map(podcast => ({
-          ...podcast,
-          domain: podcast.url
-        }));
-        this.setState({
-          podcasts: updatePodcasts
-        });
-      }
+  PodcastLibrary.ready.then( () => {
+    PodcastLibrary.getLibrary().then(podcastsArray => {
+      Promise.all(
+        podcastsArray.map(podcastRaw => PodcastLibrary.getPodcast(podcastRaw))
+      ).then(podcasts => {
+        if (podcasts) {
+          const updatePodcasts = podcasts.map(podcast => ({
+            ...podcast,
+            domain: podcast.url
+          }));
+          this.setState({
+            podcasts: updatePodcasts
+          });
+        }
+      });
     });
   });
 };
