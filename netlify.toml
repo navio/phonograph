@@ -12,7 +12,6 @@
   from = "/rss-less-pg/*"
   to = "http://:splat"
   status = 200
-  force = true
 
 [[redirects]]
   from = "/podcasts/*"

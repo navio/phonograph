@@ -22,8 +22,12 @@ const PROXY = !DEBUG
       "http:": "https://cors-anywhere.herokuapp.com/"
     };
 
+const nprRule = (url) => (url.indexOf('npr') > -1) ? url.replace('http:', 'https:'):url;
+
+const initializeCast = defaultCasts.map(nprRule);
+
 const PodcastLibrary = new PodcastEngine({
-  podcasts: defaultCasts,
+  podcasts: initializeCast,
   proxy: PROXY
 });
 const current = new Podcast();
@@ -97,7 +101,8 @@ export const saveToLibrary = function() {
   });
 };
 
-export const retrievePodcast = function(cast, save = false) {
+export const retrievePodcast = function(castArg, save = false) {
+  const cast = nprRule(castArg);
   current.clear();
   return new Promise(accept => {
     PodcastLibrary.getPodcast(cast, { save }).then(castContent => {
@@ -143,7 +148,7 @@ export const initializeLibrary = function() {
 };
 
 export const addNewPodcast = function(newPodcast, callback) {
-  const cast = `${newPodcast.protocol}//${newPodcast.domain}`;
+  const cast = nprRule(`${newPodcast.protocol}//${newPodcast.domain}`);
   retrievePodcast
     .call(this, cast, true) // RetrievePodcast
     .then(() => {
