@@ -41,22 +41,22 @@ const current = new Podcast();
 
 
 
-export const loadEpisodesToInAppMemory = function(RSS) {
-  RSS.forEach(item => this.episodes.set(item.guid, item));
-};
+// export const removePodcastFromState = function() {
+//   this.setState({
+//     items: null,
+//     title: "",
+//     image: null,
+//     link: null,
+//     description: "",
+//     podcast: null
+//   });
+//   this.episodes.clear();
+// };
 
-export const removePodcastFromState = function() {
-  this.setState({
-    items: null,
-    title: "",
-    image: null,
-    link: null,
-    description: "",
-    podcast: null
-  });
-  this.episodes.clear();
-};
-
+/*
+Removes a podcast from library and from the application state.
+@string: URL with the podcast
+*/
 export const removePodcastFromLibrary = function(domain) {
   const url = (typeof domain === "string") ?
        domain : 
@@ -112,6 +112,15 @@ Save Current Podcast into Database and notify State of new add.
 export const saveToLibrary = function() {
   const cu = current.get();
   retrievePodcast.call(this,cu.url,true);
+};
+
+/*
+Receives an array of episodes from a podcast and load them into episodes object.
+@string: URL with the podcast
+*/
+export const loadEpisodesToInAppMemory = function(RSS) {
+  // To Fix, remove old episodes.
+  RSS.forEach(item => this.episodes.set(item.guid, item));
 };
 
 /*
@@ -193,28 +202,30 @@ export const loadaNewPodcast = function(cast, callback) {
 
 /********* UTILS START *********/
 
-export const clearDomain = (domain) => domain.replace(/(^\w+:|^)\/\//, '');
+// export const convertURLToPodcast = url => {
+//   // Todo: try https, then http otherwise fail.
+//   const clearDomain = (domain) => domain.replace(/(^\w+:|^)\/\//, '');
 
-export const convertURLToPodcast = url => {
-  // Todo: try https, then http otherwise fail.
-  if (!url) return null;
-  let fixURL = url.search("http") < 0 ? `https://${url}` : url;
-  try {
-    let podcast = new URL(fixURL);
-    let domain = clearDomain(podcast.href);
-    let protocol = podcast.protocol;
-    return {
-      domain,
-      protocol
-    };
-  } catch (error) {
-    return null;
-  }
-};
+//   if (!url) return null;
+//   let fixURL = url.search("http") < 0 ? `https://${url}` : url;
+//   try {
+//     let podcast = new URL(fixURL);
+//     let domain = clearDomain(podcast.href);
+//     let protocol = podcast.protocol;
+//     return {
+//       domain,
+//       protocol
+//     };
+//   } catch (error) {
+//     return null;
+//   }
+// };
 
 export const driveThruDNS = url => {
-  let r = convertURLToPodcast(url);
-  return DEBUG ? url : `${PROXY[r.protocol]}${r.domain}`;
+  const urlObj = new URL(url);
+  const domain = urlObj.href.replace(urlObj.protocol, '').slice(2);
+  const protocol = urlObj.protocol;
+  return DEBUG ? urlObj.toString() : `${PROXY[protocol]}${domain}`;
 };
 
 export const checkIfNewPodcastInURL = function() {

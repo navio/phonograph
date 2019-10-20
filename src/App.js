@@ -66,7 +66,7 @@ class App extends Component {
 
 
     this.episodes = new Map();
-    this.podcasts = new Map();
+    // this.podcasts = new Map();
     this.navigateTo = navigateTo.bind(this);
 
     this.forward30Seconds = forward30Seconds.bind(this);
