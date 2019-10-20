@@ -36,7 +36,8 @@ const GeneraList = (props) =>{
                 props.podcasts.map(podcast =>
                   <div key={podcast.domain}>
                     <ListItem >
-                      <ListItemText secondary={<Typography component="span" variant="subheading">{podcast.title} <Typography component="span" variant="caption">{(new Date(podcast.lastUpdated).toLocaleString())}</Typography></Typography>} />
+                      <ListItemText secondary={<Typography component="span" variant="subheading">{podcast.title} 
+                      <Typography component="span" variant="caption">{(new Date(podcast.created).toLocaleString())}</Typography></Typography>} />
                       <ListItemSecondaryAction>
                         <IconButton aria-label="Delete">
                           <DeleteIcon onClick={eraseThisPodcast(podcast.domain,props.removePodcast)} />

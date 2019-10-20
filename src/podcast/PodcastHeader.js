@@ -64,7 +64,9 @@ function PodcastHeader(props) {
           <CardContent className={classes.content}>
             <Typography className={classes.title} variant="headline" noWrap>{state.title}
               { isInLibrary ? 
-                <IconButton className={classes.addToLibrary} color="secondary" onClick={removePodcast} aria-label="Add" >
+                <IconButton className={classes.addToLibrary} 
+                  color="secondary" 
+                  onClick={removePodcast} aria-label="Add" >
                   <Favorite />
                 </IconButton>:
                 <Button variant="outlined"

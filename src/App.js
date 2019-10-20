@@ -32,7 +32,7 @@ import {
   checkIfNewPodcastInURL,
   loadPodcastToView,
   initializeLibrary,
-  addNewPodcast,
+  loadaNewPodcast,
   askForPodcast,
   isPodcastInLibrary,
   removePodcastFromLibrary,
@@ -81,7 +81,7 @@ class App extends Component {
 
         // Mode
     const newPodcast = checkIfNewPodcastInURL.call(this);
-    newPodcast && addNewPodcast.call( this, newPodcast, this.navigateTo(PODCASTVIEW) )
+    newPodcast && loadaNewPodcast.call( this, newPodcast, this.navigateTo(PODCASTVIEW) )
   }
 
   componentDidMount() {
@@ -139,7 +139,7 @@ class App extends Component {
           path={DISCOVERVIEW}
           render={({ history }) => (
             <Discover
-              addPodcastHandler={addNewPodcast.bind(this)}
+              addPodcastHandler={loadaNewPodcast.bind(this)}
               actionAfterClick={this.navigateTo(PODCASTVIEW)}
               notificaions={this.addNotification}
             />

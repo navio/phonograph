@@ -5,13 +5,11 @@ import Grid from "@material-ui/core/Grid";
 import Card from "@material-ui/core/Card";
 import CardMedia from "@material-ui/core/CardMedia";
 import CardContent from "@material-ui/core/CardContent";
-import Paper from "@material-ui/core/Paper";
+
 import {
-  driveThruDNS, 
-  getPopularPodcasts, 
+  getPopularPodcasts,
   searchForPodcasts,
-  getPodcastColor,
-  convertURLToPodcast
+  getPodcastColor
 } from "../engine/podcast";
 import { styles } from "./PodcastGrid";
 import CircularProgress from "@material-ui/core/CircularProgress";
@@ -44,7 +42,7 @@ class Discover extends Component {
     let addPodcastHandler = this.props.addPodcastHandler;
     let actionAfterClick = this.props.actionAfterClick;
     return function() {
-      addPodcastHandler(convertURLToPodcast(domain), actionAfterClick)
+      addPodcastHandler(domain, actionAfterClick)
     };
   }
 

@@ -2,7 +2,6 @@ import { defaultCasts } from "../../podcast/podcast";
 import PodcastSearcher from "./PodcastSearcher";
 import randomColor from "randomcolor";
 import PodcastEngine from "podcastsuite";
-
 import Podcast from "./Podcast";
 
 const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
@@ -21,7 +20,8 @@ const PROXY = !DEBUG
       "http:": "https://cors-anywhere.herokuapp.com/"
     };
 
-const commonRules = (originalUrl) => {
+// Rules for URLS
+export const commonRules = (originalUrl) => {
   let url = originalUrl;
   url = ( url.indexOf('http:') > -1 ) ? url.replace('http:', 'https:'): url;
   url = ( url.search("http") < 0 ) ? "https://" + url : url;
@@ -38,7 +38,10 @@ const PodcastLibrary = new PodcastEngine({
 });
 const current = new Podcast();
 
-export const loadEpisodesToMemory = function(RSS) {
+
+
+
+export const loadEpisodesToInAppMemory = function(RSS) {
   RSS.forEach(item => this.episodes.set(item.guid, item));
 };
 
@@ -55,7 +58,9 @@ export const removePodcastFromState = function() {
 };
 
 export const removePodcastFromLibrary = function(domain) {
-  const url = domain || current.get().url;
+  const url = (typeof domain === "string") ?
+       domain : 
+       current.get().url;
   PodcastEngine.db.del(url).then(() => {
     let podcastsState = this.state.podcasts;
     let podcasts = podcastsState.filter(podcast => podcast.domain !== url);
@@ -65,8 +70,10 @@ export const removePodcastFromLibrary = function(domain) {
   });
 };
 
-
-
+/*
+Receives a Podcast URL and Loads into the View.
+@string: URL with the podcast
+*/
 export const fetchPodcastToView = function(podcast) {
   return new Promise(acc => {
     PodcastLibrary.getPodcast(commonRules(podcast))
@@ -87,36 +94,36 @@ export const fetchPodcastToView = function(podcast) {
   });
 };
 
-export const loadPodcastToView = function(ev) {
+/*
+Receives an Event from the view and gets the URL.
+@event from object with attribute to get URL
+@string attribute to get the URL, default domain.
+*/
+export const loadPodcastToView = function(ev, attribute = "domain") {
   const podcast = ev &&
                   ev.currentTarget &&
-                  ev.currentTarget.getAttribute("domain");
+                  ev.currentTarget.getAttribute(attribute);
   return fetchPodcastToView.call(this, podcast);
 };
 
+/*
+Save Current Podcast into Database and notify State of new add.
+*/
 export const saveToLibrary = function() {
   const cu = current.get();
-  const podcasts = this.state.podcasts;
-  PodcastLibrary.getPodcast(cu.url).then(inMemory => {
-    this.setState(
-      {
-        title: inMemory.title,
-        image: inMemory.image,
-        link: inMemory.link,
-        description: inMemory.description,
-        domain: inMemory.url,
-        items: inMemory.items.slice(0, 20),
-        podcasts: [{ ...inMemory, domain: inMemory.url }, ...podcasts]
-      },
-      () => loadEpisodesToMemory.call(this, inMemory.items)
-    );
-  });
+  retrievePodcast.call(this,cu.url,true);
 };
 
+/*
+Retrieves all Podcast content, if save
+@string of podcast
+@boolean if to save or not the podcast
+*/
 export const retrievePodcast = function(castArg, save = false) {
   const cast = commonRules(castArg);
   current.clear();
   return new Promise(accept => {
+
     PodcastLibrary.getPodcast(cast, { save }).then(castContent => {
       let newState = {
         items: castContent.items.slice(0, 20),
@@ -127,19 +134,29 @@ export const retrievePodcast = function(castArg, save = false) {
         lastUpdated: Date.now(),
         domain: cast
       };
+      if(save){
+        const podcasts = this.state.podcasts;
+        newState.podcasts = [{ ...castContent, domain: castContent.url }, ...podcasts]
+      }
       current.set(castContent);
       this.setState(newState, () => {
-        loadEpisodesToMemory.call(this, castContent.items.slice(0, 20));
-        accept({ ...castContent, ...cast });
+        loadEpisodesToInAppMemory.call(this, castContent.items.slice(0, 20));
+        accept({ ...castContent, ...cast});
       });
     });
   });
 };
 
+/*
+ Verifies if visible podcast is in library by checking.
+*/
 export const isPodcastInLibrary = function() {
   return this.state.podcasts.find(cast => cast.domain === this.state.domain);
 };
 
+/*
+ Start the application and loads the library.
+*/
 export const initializeLibrary = function() {
   PodcastLibrary.ready.then( () => {
     PodcastLibrary.getLibrary().then(podcastsArray => {
@@ -160,10 +177,13 @@ export const initializeLibrary = function() {
   });
 };
 
-export const addNewPodcast = function(newPodcast, callback) {
-  const cast = `${newPodcast.protocol}//${newPodcast.domain}`;
+/*
+Load a new podcast into the application
+!! IT DOES NOT SAVE IT IN MEMORY
+*/
+export const loadaNewPodcast = function(cast, callback) {
   retrievePodcast
-    .call(this, cast, true) // RetrievePodcast
+    .call(this, cast, false) // RetrievePodcast
     .then(() => {
       callback && callback();
     });
@@ -205,8 +225,7 @@ export const checkIfNewPodcastInURL = function() {
     };
   let urlPodcast = new window.URL(window.location.href);
   let podcast = urlPodcast.searchParams.get("podcast");
-
-  return convertURLToPodcast(podcast);
+  return podcast;
 };
 
 // export const getPopularPodcasts = function() {
