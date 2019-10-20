@@ -8,17 +8,17 @@
     "@material-ui/lab": "^1.0.0-alpha.12",
     "babel-core": "^6.26.3",
     "babel-polyfill": "^6.26.0",
-    "idb-keyval": "^3.1.0",
+    "idb-keyval": "^3.2.0",
     "podcastsuite": "^1.0.11",
-    "prop-types": "^15.6.2",
-    "randomcolor": "^0.5.3",
-    "react": "^16.8.4",
-    "react-dom": "^16.8.4",
+    "prop-types": "^15.7.2",
+    "randomcolor": "^0.5.4",
+    "react": "^16.10.2",
+    "react-dom": "^16.10.2",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "smallfetch": "^1.0.8",
-    "timeago.js": "^4.0.0-beta.1",
-    "xml2js": "^0.4.19"
+    "timeago.js": "^4.0.0",
+    "xml2js": "^0.4.22"
   },
   "version": "0.1.5",
   "private": true,
@@ -29,6 +29,6 @@
   },
   "devDependencies": {
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "parcel-bundler": "^1.10.3"
+    "parcel-bundler": "^1.12.4"
   }
 }

@@ -10,7 +10,7 @@ import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import PauseIcon from '@material-ui/icons/Pause';
 import Typography from '@material-ui/core/Typography';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import timeago from 'timeago.js';
+import {format} from 'timeago.js';
 import { Consumer } from "../App.js";
 
 // const toMinutes = time => {
@@ -40,8 +40,7 @@ export const styles = theme => ({
   }
 });
 
-const timeagoInstance = timeago();
-const episodeDate = (date) => timeagoInstance.format(date);
+const episodeDate = (date) => format(date);
 
 class EpisodeList extends React.Component{
   constructor(props){
