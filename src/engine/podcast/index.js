@@ -21,14 +21,16 @@ const PROXY = !DEBUG
       "http:": "https://cors-anywhere.herokuapp.com/"
     };
 
-const forceHttps = (originalUrl) => {
+const commonRules = (originalUrl) => {
   let url = originalUrl;
   url = ( url.indexOf('http:') > -1 ) ? url.replace('http:', 'https:'): url;
-  url = ( url.indexOf('feeds.feedburner') > -1 ) ? url + "?format=xml" : url;
+  url = ( url.search("http") < 0 ) ? "https://" + url : url;
+  url = ( ( url.indexOf('feeds.feedburner') > -1 ) && (url.indexOf('?format=xml') === -1 ) ) ?
+        url + "?format=xml" : url;
   return url
 }
 
-const initializeCast = defaultCasts.map(forceHttps);
+const initializeCast = defaultCasts.map(commonRules);
 
 const PodcastLibrary = new PodcastEngine({
   podcasts: initializeCast,
@@ -67,7 +69,7 @@ export const removePodcastFromLibrary = function(domain) {
 
 export const fetchPodcastToView = function(podcast) {
   return new Promise(acc => {
-    PodcastLibrary.getPodcast(forceHttps(podcast))
+    PodcastLibrary.getPodcast(commonRules(podcast))
       .then(cast => {
         if (cast) {
           let { title, image, description, url } = cast;
@@ -89,7 +91,6 @@ export const loadPodcastToView = function(ev) {
   const podcast = ev &&
                   ev.currentTarget &&
                   ev.currentTarget.getAttribute("domain");
-                  console.log(fetchPodcastToView);
   return fetchPodcastToView.call(this, podcast);
 };
 
@@ -113,7 +114,7 @@ export const saveToLibrary = function() {
 };
 
 export const retrievePodcast = function(castArg, save = false) {
-  const cast = forceHttps(castArg);
+  const cast = commonRules(castArg);
   current.clear();
   return new Promise(accept => {
     PodcastLibrary.getPodcast(cast, { save }).then(castContent => {

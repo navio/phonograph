@@ -78,19 +78,19 @@ class App extends Component {
 
     this.clearNotification = clearNotification.bind(this);
     this.addNotification = addNotification.bind(this);
+
+        // Mode
+    const newPodcast = checkIfNewPodcastInURL.call(this);
+    newPodcast && addNewPodcast.call( this, newPodcast, this.navigateTo(PODCASTVIEW) )
   }
 
   componentDidMount() {
     // Player
-    let player = this.refs.player;
+    const player = this.refs.player;
     attachEvents.call(this, player);
 
     // Podcasts
     initializeLibrary.call(this);
-
-    // Mode
-    let newPodcast = checkIfNewPodcastInURL.call(this);
-        newPodcast && addNewPodcast.call(this,newPodcast,this.navigateTo(PODCASTVIEW))
 
     // Debug
     window.player = player;
@@ -119,7 +119,7 @@ class App extends Component {
         <Route
           path={PODCASTVIEW}
           render={() => (
-            this.state.title ?<div>
+            ( this.state.title ) ? <div>
               <PodcastHeader
                 inLibrary={isPodcastInLibrary.bind(this)}
                 savePodcastToLibrary={saveToLibrary.bind(this)}
