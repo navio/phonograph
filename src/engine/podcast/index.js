@@ -1,5 +1,4 @@
 import { defaultCasts } from "../../podcast/podcast";
-import {toArray} from "./db/db";
 import PodcastSearcher from "./PodcastSearcher";
 import randomColor from "randomcolor";
 import PodcastEngine from "podcastsuite";
@@ -22,7 +21,12 @@ const PROXY = !DEBUG
       "http:": "https://cors-anywhere.herokuapp.com/"
     };
 
-const forceHttps = (url) => (url.indexOf('http:') > -1) ? url.replace('http:', 'https:'):url;
+const forceHttps = (originalUrl) => {
+  let url = originalUrl;
+  url = ( url.indexOf('http:') > -1 ) ? url.replace('http:', 'https:'): url;
+  url = ( url.indexOf('feeds.feedburner') > -1 ) ? url + "?format=xml" : url;
+  return url
+}
 
 const initializeCast = defaultCasts.map(forceHttps);
 
@@ -59,12 +63,11 @@ export const removePodcastFromLibrary = function(domain) {
   });
 };
 
-export const loadPodcastToView = function(ev) {
-  let podcast =
-    ev && ev.currentTarget && ev.currentTarget.getAttribute("domain");
+
+
+export const fetchPodcastToView = function(podcast) {
   return new Promise(acc => {
     PodcastLibrary.getPodcast(forceHttps(podcast))
-      // DB.get(podcast)
       .then(cast => {
         if (cast) {
           let { title, image, description, url } = cast;
@@ -80,6 +83,14 @@ export const loadPodcastToView = function(ev) {
         acc(cast);
       });
   });
+};
+
+export const loadPodcastToView = function(ev) {
+  const podcast = ev &&
+                  ev.currentTarget &&
+                  ev.currentTarget.getAttribute("domain");
+                  console.log(fetchPodcastToView);
+  return fetchPodcastToView.call(this, podcast);
 };
 
 export const saveToLibrary = function() {
@@ -197,13 +208,13 @@ export const checkIfNewPodcastInURL = function() {
   return convertURLToPodcast(podcast);
 };
 
-export const getPopularPodcasts = function() {
-  return new Promise(function(acc, rej) {
-    fetchJ(`${API}/popular`)
-      .then(data => acc(data.podcasts))
-      .catch(err => rej(err));
-  });
-};
+// export const getPopularPodcasts = function() {
+//   return new Promise(function(acc, rej) {
+//     fetchJ(`${API}/popular`)
+//       .then(data => acc(data.podcasts))
+//       .catch(err => rej(err));
+//   });
+// };
 
 export const getPodcastColor = cast => ({
   backgroundColor: randomColor({
