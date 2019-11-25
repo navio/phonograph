@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import CssBaseline from "@material-ui/core/CssBaseline";
+import audioqueue from "audioqueue";
 // import "babel-polyfill";
 
 import { LIBVIEW, PODCASTVIEW, DISCOVERVIEW, SETTINGSVIEW } from "./constants";
@@ -86,7 +87,8 @@ class App extends Component {
 
   componentDidMount() {
     // Player
-    const player = this.refs.player;
+    // const p = new audioqueue([], { audioObject: this.refs.player });
+    const player = new audioqueue([], { audioObject: this.refs.player });
     attachEvents.call(this, player);
 
     // Podcasts

@@ -6,85 +6,131 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import Divider from "@material-ui/core/Divider";
 import Card from "@material-ui/core/Card";
-import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import PauseIcon from '@material-ui/icons/Pause';
-import Typography from '@material-ui/core/Typography';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import {format} from 'timeago.js';
+import PlayArrowIcon from "@material-ui/icons/PlayArrow";
+import PauseIcon from "@material-ui/icons/Pause";
+import Typography from "@material-ui/core/Typography";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import { format } from "timeago.js";
 import { Consumer } from "../App.js";
 
 // const toMinutes = time => {
 //   return Math.floor(1 * time / 60) + ":" + (1 * time) % 60;
 // };
 
-
-export const clearText = (html) =>{
-  let tmp = document.createElement('div');
+export const clearText = html => {
+  let tmp = document.createElement("div");
   tmp.innerHTML = html;
   return tmp.textContent || tmp.innerText;
-}
+};
 
 export const styles = theme => ({
   root: {
     width: "100%"
   },
-  selected:{
-    backgroundColor:'aliceblue'
+  selected: {
+    backgroundColor: "aliceblue"
   },
   progress: {
-    margin: theme.spacing.unit * 2,
+    margin: theme.spacing.unit * 2
   },
-  progressContainer:{
+  progressContainer: {
     width: 0,
-    margin: 'auto'
+    margin: "auto"
   }
 });
 
-const episodeDate = (date) => format(date);
+const episodeDate = date => format(date);
 
-class EpisodeList extends React.Component{
+class EpisodeListDescription extends React.Component {
   constructor(props){
+    super()
+    this.state = {
+      open: true
+    };
+    this.toggle = this.toggle.bind(this);
+    this.episode = props.episode;
+  }
+  toggle(){
+    console.log("here");
+    this.setState({open: !this.state.open});
+  }
+  render(){
+    return <ListItemText onClick={this.toggle}
+    primary={
+      <Typography component="span" variant="subheading" noWrap>
+        {clearText(this.episode.title)}{" "}
+        <Typography component="span">
+          {episodeDate(this.episode.created)}
+        </Typography>
+      </Typography>
+    }
+    secondary={
+      <Typography component="span" color="textSecondary" noWrap={this.state.open}>
+        {clearText(JSON.stringify(this.episode.description))}
+      </Typography>
+    }
+  />
+  }
+}
+
+class EpisodeList extends React.Component {
+  constructor(props) {
     super();
-    window && window.scrollTo && window.scrollTo(0, 0)
+    window && window.scrollTo && window.scrollTo(0, 0);
   }
 
   render() {
     let props = this.props;
     let { classes } = this.props;
     return (
-    <Consumer>
-      { (state) =>
-      <div className={classes.root}>
-        <Card>
-          { props.episodes ? <List>
-            { props.episodes.map(episode => (
-                <div key={episode.guid}>
-                  <ListItem className={(state.playing === episode.guid ? classes.selected : null)}
-                    button
-                    onClick={props.handler}
-                    data-guid={episode.guid}
-                  >
-                  {( props.playing === episode.guid && props.status !== 'pause' ) ?
-                <PauseIcon className={classes.playIcon} /> :
-                <PlayArrowIcon className={classes.playIcon} />
-              }
-                    <ListItemText
-                      primary={(<Typography component="span" variant="subheading" noWrap>
-                                {clearText(episode.title)} <Typography component="span" >{episodeDate(episode.created)}</Typography>
-                              </Typography>)}
-                      secondary={<Typography component="span" color="textSecondary" noWrap >{clearText(JSON.stringify(episode.description))}</Typography>}
-                    />
-                  </ListItem>
-                  <Divider />
+      <Consumer>
+        {state => (
+          <div className={classes.root}>
+            <Card>
+              {props.episodes ? (
+                <List>
+                  {props.episodes.map(episode => (
+                    <div key={episode.guid}>
+                      <ListItem
+                        className={
+                          state.playing === episode.guid
+                            ? classes.selected
+                            : null
+                        }
+                        button
+                      >
+                        {props.playing === episode.guid &&
+                        props.status !== "pause" ? (
+                          <PauseIcon
+                            className={classes.playIcon}
+                            onClick={props.handler}
+                            data-guid={episode.guid}
+                          />
+                        ) : (
+                          <PlayArrowIcon
+                            className={classes.playIcon}
+                            onClick={props.handler}
+                            data-guid={episode.guid}
+                          />
+                        )}
+                        <EpisodeListDescription episode={episode} />
+                      </ListItem>
+                      <Divider />
+                    </div>
+                  ))}
+                </List>
+              ) : (
+                <div className={classes.progressContainer}>
+                  <CircularProgress className={classes.progress} />
                 </div>
-              ))}
-          </List>: <div className={classes.progressContainer}><CircularProgress className={classes.progress} /></div>}
-        </Card>
-      </div>}
-    </Consumer>
+              )}
+            </Card>
+          </div>
+        )}
+      </Consumer>
     );
   }
-};
+}
 
 EpisodeList.propTypes = {
   classes: PropTypes.object.isRequired

@@ -103,7 +103,9 @@ const toMinutes = (totalTime , currentTime) => {
 }
 
 const toMin = (theTime) =>
-typeof theTime === 'number'  ? convertMinsToHrsMins(Math.floor(theTime)) : `00:00` ;
+typeof theTime === 'number' ? 
+  convertMinsToHrsMins(Math.floor(theTime)) :
+  `00:00` ;
 
 //
 function MediaControlCard(props) {
