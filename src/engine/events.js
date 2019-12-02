@@ -19,7 +19,7 @@
   const playTick = function(ev){
     this.setState({status: 'playing'});
     this.tick = setInterval(()=>{ 
-      let player = this.refs.player;
+      let player = this.player;
       let loaded = (player.buffered.length) ? (100 * player.buffered.end(0) / player.duration) : 0;
       this.setState({ loaded,
                       played: (100 * player.currentTime / player.duration), 
@@ -29,7 +29,7 @@
   }
 
   // const updateStatus = function(){
-  //   let player = this.refs.player;
+  //   let player = this.player;
   //   let loaded = (player.buffered.length) ? (100 * player.buffered.end(0) / player.duration) : 0;
   //   this.setState({ loaded,
   //     played: (100 * player.currentTime / player.duration),
@@ -38,7 +38,7 @@
   // }
   
   const progress = function(ev){
-    let player = this.refs.player;
+    let player = this.player;
     let loaded = (player.buffered.length) ? (100 * player.buffered.end(0) / player.duration) : 100;
     this.setState({loaded});
   }

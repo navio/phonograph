@@ -65,6 +65,7 @@ class App extends Component {
       podcasts:[],
     };
 
+    this.audioObject = React.createRef();
 
     this.episodes = new Map();
     // this.podcasts = new Map();
@@ -76,7 +77,8 @@ class App extends Component {
     this.playButton = playButton.bind(this);
     this.loadPodcastToView = loadPodcastToView.bind(this);
     this.askForPodcast = askForPodcast.bind(this);
-
+    console.log(this.audioObject.current);
+    this.player = null
     this.clearNotification = clearNotification.bind(this);
     this.addNotification = addNotification.bind(this);
 
@@ -87,15 +89,18 @@ class App extends Component {
 
   componentDidMount() {
     // Player
+    
+    this.player = new audioqueue([], { audioObject: this.audioObject.current });
+    console.log(this.player, this.audioObject.current ); 
     // const p = new audioqueue([], { audioObject: this.refs.player });
-    const player = new audioqueue([], { audioObject: this.refs.player });
-    attachEvents.call(this, player);
+    // const player = new audioqueue([], { audioObject: this.refs.player });
+    attachEvents.call(this, this.player);
 
     // Podcasts
     initializeLibrary.call(this);
 
     // Debug
-    window.player = player;
+    window.player = this.player;
     window.notification = this.addNotification;
 
   }
@@ -171,7 +176,7 @@ class App extends Component {
 
         <audio
           autoPlay={true}
-          ref="player"
+          ref= { this.audioObject }
           preload="auto"
           title={ (episode && episode.title) || ""}
           poster={ (episode && episode.itunes && episode.itunes.image) || ""}

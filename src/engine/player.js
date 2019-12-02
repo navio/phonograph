@@ -47,16 +47,18 @@ export const playButton =
         if (this.state.playing === guid) {
             
             if (this.state.status === 'pause') {
-                this.refs.player.play();
+                this.player.play();
                 this.setState({ status: 'playing' });
             } else {
-                this.refs.player.pause();
+                this.player.pause();
                 this.setState({ status: 'pause' });
             }
 
         } else {
-            this.refs.player.setAttribute("src", driveThruDNS(episode.enclosures[0].url));
-            this.refs.player.play();
+            this.player.addNext(driveThruDNS(episode.enclosures[0].url));
+            console.log("there", this.player.list, driveThruDNS(episode.enclosures[0].url));
+            this.player.play();
+            console.log(this.player.list);
             this.setState({
                 episode: episode.guid,
                 author: episode.itunes_author,
