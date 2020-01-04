@@ -87,7 +87,6 @@ class App extends Component {
 
   componentDidMount() {
     // Player
-    // const p = new audioqueue([], { audioObject: this.refs.player });
     const player = new audioqueue([], { audioObject: this.refs.player });
     attachEvents.call(this, player);
 

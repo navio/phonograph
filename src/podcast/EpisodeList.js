@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
+import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from "@material-ui/core/ListItemText";
 import Divider from "@material-ui/core/Divider";
 import Card from "@material-ui/core/Card";
@@ -51,21 +52,20 @@ class EpisodeListDescription extends React.Component {
     this.episode = props.episode;
   }
   toggle(){
-    console.log("here");
     this.setState({open: !this.state.open});
   }
   render(){
     return <ListItemText onClick={this.toggle}
-    primary={
-      <Typography component="span" variant="subheading" noWrap>
+    primary = {
+      <Typography component="div" variant="subheading" noWrap>
         {clearText(this.episode.title)}{" "}
         <Typography component="span">
           {episodeDate(this.episode.created)}
         </Typography>
       </Typography>
     }
-    secondary={
-      <Typography component="span" color="textSecondary" noWrap={this.state.open}>
+    secondary = {
+      <Typography component="div" color="textSecondary" noWrap={this.state.open}>
         {clearText(JSON.stringify(this.episode.description))}
       </Typography>
     }
@@ -98,7 +98,7 @@ class EpisodeList extends React.Component {
                             : null
                         }
                         button
-                      >
+                      ><ListItemIcon>
                         {props.playing === episode.guid &&
                         props.status !== "pause" ? (
                           <PauseIcon
@@ -112,7 +112,7 @@ class EpisodeList extends React.Component {
                             onClick={props.handler}
                             data-guid={episode.guid}
                           />
-                        )}
+                        )}</ListItemIcon>
                         <EpisodeListDescription episode={episode} />
                       </ListItem>
                       <Divider />
