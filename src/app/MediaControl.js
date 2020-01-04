@@ -43,7 +43,7 @@ const styles = theme => ({
   },
   line:{
     position:"absolute",
-    bottom: "-1px",
+    bottom: "-10%",
     width:"100%"
   },
   trackAfter:{
