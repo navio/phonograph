@@ -62,7 +62,7 @@ function PodcastHeader(props) {
         />}
         <div className={classes.details}>
           <CardContent className={classes.content}>
-            <Typography className={classes.title} variant="headline" noWrap>{state.title}
+            <Typography className={classes.title} variant="h4" noWrap>{state.title}
               { isInLibrary ? 
                 <IconButton className={classes.addToLibrary} 
                   color="secondary" 

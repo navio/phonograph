@@ -59,7 +59,7 @@ class EpisodeListDescription extends React.Component {
     primary = {
       <Typography component="div" variant="subheading" noWrap>
         {clearText(this.episode.title)}{" "}
-        <Typography component="span">
+        <Typography component="div">
           {episodeDate(this.episode.created)}
         </Typography>
       </Typography>
