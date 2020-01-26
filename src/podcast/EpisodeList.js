@@ -48,14 +48,10 @@ class EpisodeListDescription extends React.Component {
     this.state = {
       open: true
     };
-    this.toggle = this.toggle.bind(this);
     this.episode = props.episode;
   }
-  toggle(){
-    this.setState({open: !this.state.open});
-  }
   render(){
-    return <ListItemText onClick={this.toggle}
+    return <ListItemText
     primary = {
       <Typography component="div" variant="subheading" noWrap>
         {clearText(this.episode.title)}{" "}
@@ -65,7 +61,7 @@ class EpisodeListDescription extends React.Component {
       </Typography>
     }
     secondary = {
-      <Typography component="div" color="textSecondary" noWrap={this.state.open}>
+      <Typography component="div" color="textSecondary" noWrap>
         {clearText(JSON.stringify(this.episode.description))}
       </Typography>
     }
