@@ -43,7 +43,7 @@
 #   status = 200
 
 [[redirects]]
-  from = "/ln/"
+  from = "/ln/*"
   to = "https://listen-api.listennotes.com/api/v2/:splat"
   status = 200
   headers = {X-From = "ebbd0481aa1b4acc8949a9ffeedf4d7b"}
