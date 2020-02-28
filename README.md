@@ -4,10 +4,12 @@ Phonograph is a PWA shell to house Audio Applications.
 By default (During development to 1.0) it includes a Podcast App, but it can be replaced or enhanced to work with other audio services.
 This project is powered by Remote and Local Cache to provide a PWA
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/1470601f-7cda-4bb0-a5c6-8e56cf171e40/deploy-status)](https://app.netlify.com/sites/player/deploys)
+
 https://phonograph.app
 
 # Architecture
-Todo
+* Todo
 
 # Goals
 Provide a First Class a PWA for Audio Execution. The first release focused on Podcasts.
