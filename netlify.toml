@@ -19,6 +19,12 @@
   status = 200
 
 [[redirects]]
+  from = "/ln/*"
+  to = "https://listen-api.listennotes.com/api/v2/:splat"
+  status = 200
+  headers = {"X-ListenAPI-Key" = "ebbd0481aa1b4acc8949a9ffeedf4d7b"}
+
+[[redirects]]
   from="/cacheds/*"
   to ="https://:splat"
   status = 200
@@ -42,8 +48,4 @@
 #   to = "https://popular-podcast.glitch.me/"
 #   status = 200
 
-[[redirects]]
-  from = "/ln/*"
-  to = "https://listen-api.listennotes.com/api/v2/:splat"
-  status = 200
-  headers = {X-From = "ebbd0481aa1b4acc8949a9ffeedf4d7b"}
+
