@@ -19,13 +19,6 @@
   status = 200
 
 [[redirects]]
-  from = "/ln/*"
-  to = "https://listen-api.listennotes.com/api/v2/:splat"
-  headers = {"X-ListenAPI-Key" = "ebbd0481aa1b4acc8949a9ffeedf4d7b"}
-  status = 200
-  force = true
-
-[[redirects]]
   from="/cacheds/*"
   to ="https://:splat"
   status = 200
