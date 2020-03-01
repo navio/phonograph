@@ -51,9 +51,19 @@ class Discover extends Component {
     if (search) {
       this.setState({ loading: true });
       this.searchForPodcasts(search)
-        .then(podcasts =>
-          this.setState({ podcasts, loading: false, init: false })
-        )
+        .then(podcasts => {
+          const cleanedCasts = podcasts.map((podcast) => {
+              const { title_original:title, 
+                      thumbnail:image_url , 
+                      website:domain,
+                      rss: feed_url
+                    } = podcast;
+                    return {
+                      title, image_url, domain, feed_url
+                    };
+          });
+          this.setState({ podcasts: cleanedCasts, loading: false, init: false });
+        })
         .catch(el => this.setState({ podcasts: [], error: el }));
     } else {
       this.setState({ podcasts: [], init: true });
