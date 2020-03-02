@@ -38,11 +38,20 @@ class Discover extends Component {
     //     .catch( el => this.setState({'podcasts':[],'error':el}) );
   }
 
+  async getFinalURL(url){
+    const URL = `/lhead?term=${url}`;
+    const data = await fetch(URL);
+    const result = await data.json();
+    return result.url;
+  }
+
   getClickHandler(domain) {
     let addPodcastHandler = this.props.addPodcastHandler;
     let actionAfterClick = this.props.actionAfterClick;
     return function() {
-      addPodcastHandler(domain, actionAfterClick)
+      this.getFinalURL(domain).then( finalDomain => {
+        addPodcastHandler(finalDomain, actionAfterClick)
+      })
     };
   }
 
