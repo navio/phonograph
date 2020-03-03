@@ -25,6 +25,11 @@
   status=200
 
 [[redirects]]
+  from="/lhead/*"
+  to="/.netlify/functions/findFinal?term=:splat"
+  status=200
+
+[[redirects]]
   from="/cacheds/*"
   to ="https://:splat"
   status = 200
