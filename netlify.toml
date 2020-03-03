@@ -20,8 +20,8 @@
   status = 200
   
 [[redirects]]
-  from="/ln"
-  to=".netlify/functions/findCast"
+  from="/ln/*"
+  to="/.netlify/functions/findCast?term=:splat"
   status=200
 
 [[redirects]]
