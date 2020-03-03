@@ -27,8 +27,9 @@
   "private": true,
   "scripts": {
     "start": "parcel public/index.html",
-    "build": "parcel build public/index.html",
-    "serve": "parcel serve public/index.html"
+    "build": "parcel build public/index.html; yarn lambda:build",
+    "serve": "parcel serve public/index.html",
+    "lambda:build": "npx netlify-lambda build ./lambda"
   },
   "devDependencies": {
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
