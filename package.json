@@ -30,7 +30,8 @@
     "start": "parcel public/index.html",
     "build": "parcel build public/index.html; yarn lambda:build",
     "serve": "parcel serve public/index.html",
-    "lambda:build": "npx netlify-lambda build ./lambda"
+    "lambda:build": "npx netlify-lambda build ./lambda",
+    "lambda:serve": "npx netlify-lambda serve ./lambda"
   },
   "devDependencies": {
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
