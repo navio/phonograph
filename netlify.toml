@@ -42,11 +42,6 @@
     must-revalidate'''
 
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
   from="/ln/*"
   to="/.netlify/functions/findCast/:splat"
   status=200
@@ -55,3 +50,8 @@
   from="/lhead/*"
   to="/.netlify/functions/findFinal/:splat"
   status=200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
