@@ -26,6 +26,9 @@
   },
   "version": "0.1.5",
   "private": true,
+  "browserslist": [
+    "last 1 Chrome versions"
+  ],
   "scripts": {
     "start": "parcel public/index.html",
     "build": "parcel build public/index.html; yarn lambda:build",
