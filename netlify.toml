@@ -24,14 +24,22 @@
   to ="https://:splat"
   status = 200
   [redirects.headers]
-    max-age="180000"
+    cache-control = '''
+    max-age=1800000,
+    no-cache,
+    no-store,
+    must-revalidate'''
     
 [[redirects]]
   from="/cached/*"
   to ="http://:splat"
   status = 200
   [redirects.headers]
-    max-age="180000"
+    cache-control = '''
+    max-age=1800000,
+    no-cache,
+    no-store,
+    must-revalidate'''
 
 [[redirects]]
   from = "/*"
@@ -40,15 +48,10 @@
 
 [[redirects]]
   from="/ln/*"
-  to="/.netlify/functions/findCast?term=:splat"
+  to="/.netlify/functions/findCast/:splat"
   status=200
 
 [[redirects]]
   from="/lhead/*"
-  to="/.netlify/functions/findFinal?term=:splat"
+  to="/.netlify/functions/findFinal/:splat"
   status=200
-
-# [[redirects]]
-#   from = "/podcasts/popular"
-#   to = "https://popular-podcast.glitch.me/"
-#   status = 200
