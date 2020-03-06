@@ -29,6 +29,7 @@ class Discover extends Component {
     };
     this.searchForPodcasts = searchForPodcasts.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.getFinalURL = this.getFinalURL.bind(this);
     // this.addPodcast = this.props.addPodcast;
   }
   componentDidMount() {
