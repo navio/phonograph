@@ -18,16 +18,7 @@
   from = "/podcasts/*"
   to = "https://feedwrangler.net/api/v2/podcasts/:splat"
   status = 200
-  
-[[redirects]]
-  from="/ln/*"
-  to="/.netlify/functions/findCast?term=:splat"
-  status=200
 
-[[redirects]]
-  from="/lhead/*"
-  to="/.netlify/functions/findFinal?term=:splat"
-  status=200
 
 [[redirects]]
   from="/cacheds/*"
