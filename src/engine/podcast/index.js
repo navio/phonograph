@@ -261,8 +261,8 @@ export const getPodcastColor = cast => ({
 const SFP = new PodcastSearcher(API);
 export const searchForPodcasts = function(search) {
   return new Promise(function(acc, rej) {
-    SFP.search(search)
-      .then(data => acc(data.podcasts))
+    SFP.listennotes(search)
+      .then(data => acc(data.results))
       .catch(console.error);
   });
 };

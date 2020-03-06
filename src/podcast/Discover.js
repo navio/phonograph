@@ -29,6 +29,7 @@ class Discover extends Component {
     };
     this.searchForPodcasts = searchForPodcasts.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.getFinalURL = this.getFinalURL.bind(this);
     // this.addPodcast = this.props.addPodcast;
   }
   componentDidMount() {
@@ -38,11 +39,21 @@ class Discover extends Component {
     //     .catch( el => this.setState({'podcasts':[],'error':el}) );
   }
 
+  async getFinalURL(url){
+    const URL = `/lhead?term=${url}`;
+    const data = await fetch(URL);
+    const result = await data.json();
+    return result.url;
+  }
+
   getClickHandler(domain) {
     let addPodcastHandler = this.props.addPodcastHandler;
     let actionAfterClick = this.props.actionAfterClick;
+    const request = this.getFinalURL;
     return function() {
-      addPodcastHandler(domain, actionAfterClick)
+      request(domain).then( finalDomain => {
+        addPodcastHandler(finalDomain, actionAfterClick)
+      })
     };
   }
 
@@ -51,9 +62,19 @@ class Discover extends Component {
     if (search) {
       this.setState({ loading: true });
       this.searchForPodcasts(search)
-        .then(podcasts =>
-          this.setState({ podcasts, loading: false, init: false })
-        )
+        .then(podcasts => {
+          const cleanedCasts = podcasts.map((podcast) => {
+              const { title_original:title, 
+                      thumbnail:image_url , 
+                      website:domain,
+                      rss: feed_url
+                    } = podcast;
+                    return {
+                      title, image_url, domain, feed_url
+                    };
+          });
+          this.setState({ podcasts: cleanedCasts, loading: false, init: false });
+        })
         .catch(el => this.setState({ podcasts: [], error: el }));
     } else {
       this.setState({ podcasts: [], init: true });
