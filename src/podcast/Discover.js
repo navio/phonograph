@@ -49,8 +49,9 @@ class Discover extends Component {
   getClickHandler(domain) {
     let addPodcastHandler = this.props.addPodcastHandler;
     let actionAfterClick = this.props.actionAfterClick;
+    const request = this.getFinalURL;
     return function() {
-      this.getFinalURL(domain).then( finalDomain => {
+      request(domain).then( finalDomain => {
         addPodcastHandler(finalDomain, actionAfterClick)
       })
     };
