@@ -17,13 +17,13 @@ export default class PodcastSearcher {
     this.currentRequest && this.currentRequest.abort();
     this.currentRequest = new AbortController();
     let { signal } = this.currentRequest;
-    const api = `/ln/search?q=${term}&sort_by_date=0&type=podcasts&offset=0&len_min=10&len_max=30&only_in=title&safe_mode=1`;
+    const api = `/ln/search?q=${term}&show_podcasts=1`;
     const headers = {
       'User-Agent': 'podcastsuite',
       'Accept': 'application/rss+xml'
     }
     const response = fetch(api, { headers, signal }).then(results => results.json());
-    return response;
+    return response.podcasts;
   };
 
   static getFinalURL(url) {

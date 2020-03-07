@@ -64,13 +64,14 @@ class Discover extends Component {
       this.searchForPodcasts(search)
         .then(podcasts => {
           const cleanedCasts = podcasts.map((podcast) => {
-              const { title_original:title, 
-                      thumbnail:image_url , 
+              const { title_original:title,  
                       website:domain,
-                      rss: feed_url
+                      thumbnail,
+                      id
                     } = podcast;
+                    const rss = `https://www.listennotes.com/c/r/${id}`;
                     return {
-                      title, image_url, domain, feed_url
+                      title, thumbnail, domain, rss
                     };
           });
           this.setState({ podcasts: cleanedCasts, loading: false, init: false });
@@ -115,11 +116,11 @@ class Discover extends Component {
                       {cast.title}
                     </CardContent>
                     <CardMedia
-                      onClick={this.getClickHandler.call(this, cast.feed_url)}
-                      domain={cast.feed_url}
+                      onClick={this.getClickHandler.call(this, cast.rss)}
+                      domain={cast.rss}
                       title={cast.title}
                       className={this.props.classes.podcastMedia}
-                      image={cast.image_url}
+                      image={cast.thumbnail}
                     />
                   </div>
                 </Card>
