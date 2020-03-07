@@ -17,7 +17,7 @@ export default class PodcastSearcher {
     this.currentRequest && this.currentRequest.abort();
     this.currentRequest = new AbortController();
     let { signal } = this.currentRequest;
-    const api = `/ln/search?q=${term}&show_podcasts=1`;
+    const api = `/ln/typeahead?q=${term}&show_podcasts=1`;
     const headers = {
       'User-Agent': 'podcastsuite',
       'Accept': 'application/rss+xml'
