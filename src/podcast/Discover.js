@@ -107,7 +107,7 @@ class Discover extends Component {
             direction={"row"}
           >
             {podcasts.map((cast, ins) => (
-              <Grid item xs={3} sm={2} md={1} key={ins}>
+              <Grid item xs={3} sm={2} md={2} key={ins}>
                 <Card
                   classes={{ root: this.props.classes.card }}
                   style={getPodcastColor(cast)}
