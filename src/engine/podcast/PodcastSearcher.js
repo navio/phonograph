@@ -23,7 +23,7 @@ export default class PodcastSearcher {
       'Accept': 'application/rss+xml'
     }
     const response = fetch(api, { headers, signal }).then(results => results.json());
-    return response.podcasts;
+    return response;
   };
 
   static getFinalURL(url) {
