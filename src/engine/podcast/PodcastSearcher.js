@@ -17,10 +17,11 @@ export default class PodcastSearcher {
     this.currentRequest && this.currentRequest.abort();
     this.currentRequest = new AbortController();
     let { signal } = this.currentRequest;
-    const api = `/ln/typeahead?q=${term}&show_podcasts=1`;
+    const api = `https://listen-api.listennotes.com/api/v2/typeahead?q=${term}&show_podcasts=1`;
     const headers = {
       'User-Agent': 'podcastsuite',
-      'Accept': 'application/rss+xml'
+      'Accept': 'application/json',
+      'X-ListenAPI-Key': 'ee2d6e094db943d4ab41cf2f3ad0f287'
     }
     const response = fetch(api, { headers, signal }).then(results => results.json());
     return response;

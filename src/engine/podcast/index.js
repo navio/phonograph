@@ -262,7 +262,7 @@ const SFP = new PodcastSearcher(API);
 export const searchForPodcasts = function(search) {
   return new Promise(function(acc, rej) {
     SFP.listennotes(search)
-      .then(data => acc(data.results))
+      .then(data => acc(data.podcasts))
       .catch(console.error);
   });
 };
