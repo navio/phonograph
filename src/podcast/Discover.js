@@ -62,9 +62,8 @@ class Discover extends Component {
     if (search) {
       this.setState({ loading: true });
       this.searchForPodcasts(search)
-        .then(podcasts => {
-          console.log(podcasts)
-          const cleanedCasts = podcasts.map((podcast) => {
+        .then(podcastsFound => {
+          const podcasts = podcastsFound.map((podcast) => {
               const { title_original:title,  
                       website:domain,
                       thumbnail,
@@ -75,7 +74,7 @@ class Discover extends Component {
                       title, thumbnail, domain, rss
                     };
           });
-          this.setState({ podcasts: cleanedCasts, loading: false, init: false });
+          this.setState({ podcasts , loading: false, init: false });
         })
         .catch(el => this.setState({ podcasts: [], error: el }));
     } else {
