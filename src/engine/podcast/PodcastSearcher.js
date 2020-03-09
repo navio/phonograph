@@ -21,7 +21,6 @@ export default class PodcastSearcher {
     const headers = {
       'User-Agent': 'podcastsuite',
       'Accept': 'application/json',
-      'X-ListenAPI-Key': 'ee2d6e094db943d4ab41cf2f3ad0f287'
     }
     const response = fetch(api, { headers, signal }).then(results => results.json());
     return response;
