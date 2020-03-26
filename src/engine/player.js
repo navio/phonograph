@@ -55,7 +55,7 @@ export const playButton =
             }
 
         } else {
-            this.refs.player.setAttribute("src", driveThruDNS(episode.enclosures[0].url));
+            this.refs.player.setAttribute("src",(episode.enclosures[0].url));
             this.refs.player.play();
             this.setState({
                 episode: episode.guid,
