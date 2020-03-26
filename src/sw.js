@@ -5,51 +5,51 @@
 // Other files: try the cache first, then the network.
 // Both: cache a fresh version if possible.
 // (beware: the cache will grow and grow; there's no cleanup)
-/*
-const cacheName = 'files';
-const rss = 'rss-pg';
-const rssless = 'rss-less-pg';
 
-self.addEventListener('fetch', fetchEvent => {
-  const request = fetchEvent.request;
+// const cacheName = 'files';
+// const rss = 'rss-pg';
+// const rssless = 'rss-less-pg';
 
-  if (request.method !== 'GET') return;
-  if ( (request.url.indexOf(rss) > -1 ) || 
-       (request.url.indexOf(rssless) > -1 ) ||
-       (request.url.indexOf("http:") > -1 ) ) return;
+// self.addEventListener('fetch', fetchEvent => {
+//   const request = fetchEvent.request;
 
-  fetchEvent.respondWith(async function() {
-    const fetchPromise = fetch(request);
-    fetchEvent.waitUntil(async function() {
-      const responseFromFetch = await fetchPromise;
-      const responseCopy = responseFromFetch.clone();
-      const myCache = await caches.open(cacheName);
-      try{
-        return myCache.put(request, responseCopy);
-      }catch(error){
-        return;
-      }
+//   if (request.method !== 'GET') return;
+//   if ( (request.url.indexOf(rss) > -1 ) || 
+//        (request.url.indexOf(rssless) > -1 ) ||
+//        (request.url.indexOf("http:") > -1 ) ) return;
+
+//   fetchEvent.respondWith(async function() {
+//     const fetchPromise = fetch(request);
+//     fetchEvent.waitUntil(async function() {
+//       const responseFromFetch = await fetchPromise;
+//       const responseCopy = responseFromFetch.clone();
+//       const myCache = await caches.open(cacheName);
+//       try{
+//         return myCache.put(request, responseCopy);
+//       }catch(error){
+//         return;
+//       }
       
-    }());
-    if (request.headers.get('Accept').includes('text/html')) {
-      try {
-        return fetchPromise;
-      }
-      catch(error) {
-        return caches.match(request);
-      }
-    } else {
-      const responseFromCache = await caches.match(request);
-      return responseFromCache || fetchPromise;
-    }
-  }());
-});
-*/
-if(window.navigator && navigator.serviceWorker) {
-  navigator.serviceWorker.getRegistrations()
-  .then(function(registrations) {
-    for(let registration of registrations) {
-      registration.unregister();
-    }
-  });
-}
+//     }());
+//     if (request.headers.get('Accept').includes('text/html')) {
+//       try {
+//         return fetchPromise;
+//       }
+//       catch(error) {
+//         return caches.match(request);
+//       }
+//     } else {
+//       const responseFromCache = await caches.match(request);
+//       return responseFromCache || fetchPromise;
+//     }
+//   }());
+// });
+
+// if(window.navigator && navigator.serviceWorker) {
+//   navigator.serviceWorker.getRegistrations()
+//   .then(function(registrations) {
+//     for(let registration of registrations) {
+//       registration.unregister();
+//     }
+//   });
+// }
