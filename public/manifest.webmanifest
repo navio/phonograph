@@ -2,7 +2,7 @@
     "name": "Phonograph",
     "short_name": "Phonograph",
     "default_locale": "en",
-    "description": "An PWA for audio.",
+    "description": "An Podcast Application",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
@@ -15,8 +15,9 @@
             "type": "image/png"
         }
     ],
-    "start_url": "/index.html",
+    "start_url": "/",
     "theme_color": "#ffffff",
     "background_color": "#ffffff",
-    "display": "standalone"
+    "display": "standalone",
+    "scope": "/"
 }
