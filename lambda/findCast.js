@@ -9,7 +9,8 @@ export const handler = async (event, context, callback) => {
       'User-Agent': 'podcastsuite',
       'Accept': 'application/rss+xml'
     }
-    const response = await fetch(term, {headers})
+    const final = !term.includes("http") ? 'https://' + term : term;
+    const response = await fetch(final, {headers})
     const xml = await response.text()
     return  {
       statusCode: 200,

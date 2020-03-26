@@ -10,10 +10,10 @@ const API = !DEBUG
   ? "/podcasts/"
   : "https://cors-anywhere.herokuapp.com/https://feedwrangler.net/api/v2/podcasts/";
 
-const PROXY = !DEBUG
+const PROXY = !DEBU
   ? {
-      "https:": "/rss-pg/",
-      "http:": "/rss-less-pg/"
+      "https:": "/raw?term=",
+      "http:": "/raw?term="
     }
   : {
       "https:": "https://cors-anywhere.herokuapp.com/",
