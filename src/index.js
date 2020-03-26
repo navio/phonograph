@@ -7,4 +7,4 @@ import * as serviceWorker from './serviceWorker';
 
 render(<Router><App /></Router>, document.getElementById('root'));
 
-serviceWorker.unregister();
+serviceWorker.register();
