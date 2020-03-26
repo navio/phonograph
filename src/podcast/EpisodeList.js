@@ -11,6 +11,7 @@ import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import PauseIcon from "@material-ui/icons/Pause";
 import Typography from "@material-ui/core/Typography";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import EpisodeView from './EpisodeView';
 import { format } from "timeago.js";
 import { Consumer } from "../App.js";
 
@@ -94,7 +95,8 @@ class EpisodeList extends React.Component {
                             : null
                         }
                         button
-                      ><ListItemIcon>
+                      >
+                        <ListItemIcon>
                         {props.playing === episode.guid &&
                         props.status !== "pause" ? (
                           <PauseIcon
@@ -110,6 +112,7 @@ class EpisodeList extends React.Component {
                           />
                         )}</ListItemIcon>
                         <EpisodeListDescription episode={episode} />
+
                       </ListItem>
                       <Divider />
                     </div>

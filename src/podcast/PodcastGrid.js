@@ -25,11 +25,11 @@ export const styles = theme => ({
     width:'100%'
   },
   cardContent: {
-      position:'absolute'
-      ,width:0
+      position:'absolute',
+      width:0
   },
   relativeContainer:{
-    position:"relative"
+    position:"relative",
   },
   addIcon:{
     width:'3em',
@@ -74,7 +74,7 @@ function PodCastGrid(props) {
       return (
       <Grid container spacing={0} direction={'row'}>
         { casts && casts.map(cast =>
-          <Grid item xs={3} sm={2} md={1} key={cast.domain} >
+          <Grid item xs={4} md={2} lg={1} key={cast.domain} >
             <Card classes={{root:classes.card}} style={getMyColor(cast)}>
               { cast.domain === addMore
               ? <IconButton onClick={cast.onClick} classes={{root:classes.card}}>

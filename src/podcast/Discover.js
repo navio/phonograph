@@ -61,9 +61,10 @@ class Discover extends Component {
     let search = ev.target.value;
     if (search) {
       this.setState({ loading: true });
+      console.log("handler");
       this.searchForPodcasts(search)
-        .then(podcasts => {
-          const cleanedCasts = podcasts.map((podcast) => {
+        .then(podcastsFound => {
+          const podcasts = podcastsFound.map((podcast) => {
               const { title_original:title,  
                       website:domain,
                       thumbnail,
@@ -74,7 +75,7 @@ class Discover extends Component {
                       title, thumbnail, domain, rss
                     };
           });
-          this.setState({ podcasts: cleanedCasts, loading: false, init: false });
+          this.setState({ podcasts , loading: false, init: false });
         })
         .catch(el => this.setState({ podcasts: [], error: el }));
     } else {
@@ -106,7 +107,7 @@ class Discover extends Component {
             direction={"row"}
           >
             {podcasts.map((cast, ins) => (
-              <Grid item xs={3} sm={2} md={1} key={ins}>
+              <Grid item xs={3} sm={2} md={2} key={ins}>
                 <Card
                   classes={{ root: this.props.classes.card }}
                   style={getPodcastColor(cast)}
