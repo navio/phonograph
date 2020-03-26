@@ -61,6 +61,7 @@ class Discover extends Component {
     let search = ev.target.value;
     if (search) {
       this.setState({ loading: true });
+      console.log("handler");
       this.searchForPodcasts(search)
         .then(podcastsFound => {
           const podcasts = podcastsFound.map((podcast) => {

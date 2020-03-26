@@ -13,15 +13,14 @@ export default class PodcastSearcher {
         .catch(reject))
   };
 
-  listennotes(term , {api_external, extra ={}}) {
+  listennotes(term) {
     this.currentRequest && this.currentRequest.abort();
     this.currentRequest = new AbortController();
     let { signal } = this.currentRequest;
-    const api = api_external || `/ln/typeahead?q=${term}&show_podcasts=1`;
+    const api = `/ln/typeahead?q=${term}&show_podcasts=1`;
     const headers = {
       'User-Agent': 'podcastsuite',
       'Accept': 'application/json',
-      ...extra
     }
     const response = fetch(api, { headers, signal }).then(results => results.json());
     return response;
