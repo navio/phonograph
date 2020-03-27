@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import Divider from "@material-ui/core/Divider";
 import Card from "@material-ui/core/Card";
@@ -11,7 +11,7 @@ import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import PauseIcon from "@material-ui/icons/Pause";
 import Typography from "@material-ui/core/Typography";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import EpisodeView from './EpisodeView';
+import EpisodeView from "./EpisodeView";
 import { format } from "timeago.js";
 import { Consumer } from "../App.js";
 
@@ -19,54 +19,56 @@ import { Consumer } from "../App.js";
 //   return Math.floor(1 * time / 60) + ":" + (1 * time) % 60;
 // };
 
-export const clearText = html => {
+export const clearText = (html) => {
   let tmp = document.createElement("div");
   tmp.innerHTML = html;
   return tmp.textContent || tmp.innerText;
 };
 
-export const styles = theme => ({
+export const styles = (theme) => ({
   root: {
-    width: "100%"
+    width: "100%",
   },
   selected: {
-    backgroundColor: "aliceblue"
+    backgroundColor: "aliceblue",
   },
   progress: {
-    margin: theme.spacing.unit * 2
+    margin: theme.spacing.unit * 2,
   },
   progressContainer: {
     width: 0,
-    margin: "auto"
-  }
+    margin: "auto",
+  },
 });
 
-const episodeDate = date => format(date);
+const episodeDate = (date) => format(date);
 
 class EpisodeListDescription extends React.Component {
-  constructor(props){
-    super()
+  constructor(props) {
+    super();
     this.state = {
-      open: true
+      open: true,
     };
     this.episode = props.episode;
   }
-  render(){
-    return <ListItemText
-    primary = {
-      <Typography component="div" variant="subheading" noWrap>
-        {clearText(this.episode.title)}{" "}
-        <Typography component="div">
-          {episodeDate(this.episode.created)}
-        </Typography>
-      </Typography>
-    }
-    secondary = {
-      <Typography component="div" color="textSecondary" noWrap>
-        {clearText(JSON.stringify(this.episode.description))}
-      </Typography>
-    }
-  />
+  render() {
+    return (
+      <ListItemText
+        primary={
+          <Typography component="div" variant="subheading" noWrap>
+            {clearText(this.episode.title)}{" "}
+            <Typography component="div">
+              {episodeDate(this.episode.created)}
+            </Typography>
+          </Typography>
+        }
+        secondary={
+          <Typography component="div" color="textSecondary" noWrap>
+            {clearText(JSON.stringify(this.episode.description))}
+          </Typography>
+        }
+      />
+    );
   }
 }
 
@@ -81,12 +83,12 @@ class EpisodeList extends React.Component {
     let { classes } = this.props;
     return (
       <Consumer>
-        {state => (
+        {(state) => (
           <div className={classes.root}>
             <Card>
               {props.episodes ? (
                 <List>
-                  {props.episodes.map(episode => (
+                  {props.episodes.map((episode) => (
                     <div key={episode.guid}>
                       <ListItem
                         className={
@@ -97,22 +99,22 @@ class EpisodeList extends React.Component {
                         button
                       >
                         <ListItemIcon>
-                        {props.playing === episode.guid &&
-                        props.status !== "pause" ? (
-                          <PauseIcon
-                            className={classes.playIcon}
-                            onClick={props.handler}
-                            data-guid={episode.guid}
-                          />
-                        ) : (
-                          <PlayArrowIcon
-                            className={classes.playIcon}
-                            onClick={props.handler}
-                            data-guid={episode.guid}
-                          />
-                        )}</ListItemIcon>
+                          {props.playing === episode.guid &&
+                          props.status !== "pause" ? (
+                            <PauseIcon
+                              className={classes.playIcon}
+                              onClick={props.handler}
+                              data-guid={episode.guid}
+                            />
+                          ) : (
+                            <PlayArrowIcon
+                              className={classes.playIcon}
+                              onClick={props.handler}
+                              data-guid={episode.guid}
+                            />
+                          )}
+                        </ListItemIcon>
                         <EpisodeListDescription episode={episode} />
-
                       </ListItem>
                       <Divider />
                     </div>
@@ -132,7 +134,7 @@ class EpisodeList extends React.Component {
 }
 
 EpisodeList.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles)(EpisodeList);

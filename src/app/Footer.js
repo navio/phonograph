@@ -13,12 +13,12 @@ const styles = {
     position: "fixed",
     bottom: 0,
     width: "100%",
-    borderTop: "1px solid rgba(0, 0, 0, 0.12)"
+    borderTop: "1px solid rgba(0, 0, 0, 0.12)",
   },
   underground: {
     height: 48,
-    width: "100%"
-  }
+    width: "100%",
+  },
 };
 
 class SimpleBottomNavigation extends React.Component {
@@ -26,8 +26,8 @@ class SimpleBottomNavigation extends React.Component {
     return () => this.props.history.push(url);
   }
   render() {
-    const classes  = this.props.classes;
-    const selected = this.props.path.substring(1) || 'library';
+    const classes = this.props.classes;
+    const selected = this.props.path.substring(1) || "library";
     return (
       <div>
         <Paper className={classes.root} elevation={4}>
@@ -40,19 +40,19 @@ class SimpleBottomNavigation extends React.Component {
             <BottomNavigationAction
               label="Library"
               value="library"
-              onClick={this.handleRedirect('/')}
+              onClick={this.handleRedirect("/")}
               icon={<Favorite />}
             />
             <BottomNavigationAction
               label="Search"
               value="discover"
-              onClick={this.handleRedirect('/discover')}
+              onClick={this.handleRedirect("/discover")}
               icon={<FavoriteIcon />}
             />
             <BottomNavigationAction
               label="Settings"
               value="settings"
-              onClick={this.handleRedirect('/settings')}
+              onClick={this.handleRedirect("/settings")}
               icon={<Settings />}
             />
           </BottomNavigation>
@@ -64,7 +64,7 @@ class SimpleBottomNavigation extends React.Component {
 }
 
 SimpleBottomNavigation.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles)(withRouter(SimpleBottomNavigation));
