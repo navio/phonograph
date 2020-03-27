@@ -16,8 +16,8 @@ const PROXY = !DEBUG
       "http:": "/raw?term="
     }
   : {
-      "https:": "https://cors-anywhere.herokuapp.com/",
-      "http:": "https://cors-anywhere.herokuapp.com/"
+      "https:": `https://${(window.location.host).replace("1234","8080")}/findCast/?term=`,
+      "http:": `https://${(window.location.host).replace("1234","8080")}/findCast/?term=`
     };
 
 // Rules for URLS
@@ -40,18 +40,19 @@ const current = new Podcast();
 
 
 
-
-// export const removePodcastFromState = function() {
-//   this.setState({
-//     items: null,
-//     title: "",
-//     image: null,
-//     link: null,
-//     description: "",
-//     podcast: null
-//   });
-//   this.episodes.clear();
-// };
+/*
+export const removePodcastFromState = function() {
+  this.setState({
+    items: null,
+    title: "",
+    image: null,
+    link: null,
+    description: "",
+    podcast: null
+  });
+  this.episodes.clear();
+};
+*/
 
 /*
 Removes a podcast from library and from the application state.
