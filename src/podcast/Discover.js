@@ -9,14 +9,13 @@ import CardContent from "@material-ui/core/CardContent";
 import {
   getPopularPodcasts,
   searchForPodcasts,
-  getPodcastColor
+  getPodcastColor,
 } from "../engine/podcast";
 import { styles } from "./PodcastGrid";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
-import InputAdornment from '@material-ui/core/InputAdornment';
-
+import InputAdornment from "@material-ui/core/InputAdornment";
 
 class Discover extends Component {
   constructor(props) {
@@ -25,7 +24,7 @@ class Discover extends Component {
       init: true,
       loading: false,
       podcasts: [],
-      error: null
+      error: null,
     };
     this.searchForPodcasts = searchForPodcasts.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -39,7 +38,7 @@ class Discover extends Component {
     //     .catch( el => this.setState({'podcasts':[],'error':el}) );
   }
 
-  async getFinalURL(url){
+  async getFinalURL(url) {
     const URL = `/lhead?term=${url}`;
     const data = await fetch(URL);
     const result = await data.json();
@@ -50,10 +49,10 @@ class Discover extends Component {
     let addPodcastHandler = this.props.addPodcastHandler;
     let actionAfterClick = this.props.actionAfterClick;
     const request = this.getFinalURL;
-    return function() {
-      request(domain).then( finalDomain => {
-        addPodcastHandler(finalDomain, actionAfterClick)
-      })
+    return function () {
+      request(domain).then((finalDomain) => {
+        addPodcastHandler(finalDomain, actionAfterClick);
+      });
     };
   }
 
@@ -62,21 +61,25 @@ class Discover extends Component {
     if (search) {
       this.setState({ loading: true });
       this.searchForPodcasts(search)
-        .then(podcastsFound => {
+        .then((podcastsFound) => {
           const podcasts = podcastsFound.map((podcast) => {
-              const { title_original:title,  
-                      website:domain,
-                      thumbnail,
-                      id
-                    } = podcast;
-                    const rss = `https://www.listennotes.com/c/r/${id}`;
-                    return {
-                      title, thumbnail, domain, rss
-                    };
+            const {
+              title_original: title,
+              website: domain,
+              thumbnail,
+              id,
+            } = podcast;
+            const rss = `https://www.listennotes.com/c/r/${id}`;
+            return {
+              title,
+              thumbnail,
+              domain,
+              rss,
+            };
           });
-          this.setState({ podcasts , loading: false, init: false });
+          this.setState({ podcasts, loading: false, init: false });
         })
-        .catch(el => this.setState({ podcasts: [], error: el }));
+        .catch((el) => this.setState({ podcasts: [], error: el }));
     } else {
       this.setState({ podcasts: [], init: true });
     }
@@ -84,9 +87,9 @@ class Discover extends Component {
 
   render() {
     let podcasts = this.state.podcasts;
-    let {classes} = this.props;
+    let { classes } = this.props;
     return (
-      <Card >
+      <Card>
         <CardContent>
           <Typography variant="headline" component="h2">
             Search
@@ -98,7 +101,7 @@ class Discover extends Component {
             onChange={this.handleChange}
           />
         </CardContent>
-        { podcasts && podcasts.length > 0 ? (
+        {podcasts && podcasts.length > 0 ? (
           <Grid
             style={{ paddingTop: "2em" }}
             container
@@ -127,24 +130,24 @@ class Discover extends Component {
               </Grid>
             ))}
           </Grid>
-        ) : this.state.loading ? 
+        ) : this.state.loading ? (
           <div className={classes.progressContainer}>
             <CircularProgress className={classes.progress} />
           </div>
-         : 
+        ) : (
           <Grid container style={{ padding: "2em" }}>
             <Typography variant="title">
               {this.state.init ? "" : "Nothing Found"}
             </Typography>
           </Grid>
-        }
+        )}
       </Card>
     );
   }
 }
 
 Discover.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles)(Discover);

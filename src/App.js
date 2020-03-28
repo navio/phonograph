@@ -10,7 +10,7 @@ import { LIBVIEW, PODCASTVIEW, DISCOVERVIEW, SETTINGSVIEW } from "./constants";
 import Footer from "./app/Footer";
 import Notifications from "./app/Notifications";
 import MediaControl from "./app/MediaControl";
-import {clearNotification,addNotification} from './engine/notifications';
+import { clearNotification, addNotification } from "./engine/notifications";
 
 // Podcast Views
 import EpisodeList from "./podcast/EpisodeList";
@@ -25,7 +25,7 @@ import {
   rewind10Seconds,
   playButton,
   seek,
-  navigateTo
+  navigateTo,
 } from "./engine/player";
 
 // Podcast Engine
@@ -37,7 +37,7 @@ import {
   askForPodcast,
   isPodcastInLibrary,
   removePodcastFromLibrary,
-  saveToLibrary
+  saveToLibrary,
 } from "./engine/podcast";
 
 import attachEvents from "./engine/events";
@@ -62,9 +62,8 @@ class App extends Component {
       image: null,
       link: null,
       loading: false,
-      podcasts:[],
+      podcasts: [],
     };
-
 
     this.episodes = new Map();
     // this.podcasts = new Map();
@@ -80,9 +79,10 @@ class App extends Component {
     this.clearNotification = clearNotification.bind(this);
     this.addNotification = addNotification.bind(this);
 
-        // Mode
+    // Mode
     const newPodcast = checkIfNewPodcastInURL.call(this);
-    newPodcast && loadaNewPodcast.call( this, newPodcast, this.navigateTo(PODCASTVIEW) )
+    newPodcast &&
+      loadaNewPodcast.call(this, newPodcast, this.navigateTo(PODCASTVIEW));
   }
 
   componentDidMount() {
@@ -96,16 +96,21 @@ class App extends Component {
     // Debug
     window.player = player;
     window.notification = this.addNotification;
-
   }
 
   render() {
     const episode = this.episodes.get(this.state.episode);
     return (
-      <AppContext.Provider value={{ state: this.state, global: this, episode: episode }}>
+      <AppContext.Provider
+        value={{ state: this.state, global: this, episode: episode }}
+      >
         <CssBaseline />
-        <Notifications show={!!this.state.showNotification} callback={this.clearNotification} {...this.state.notification} />
-        
+        <Notifications
+          show={!!this.state.showNotification}
+          callback={this.clearNotification}
+          {...this.state.notification}
+        />
+
         <Route
           exact
           path={LIBVIEW}
@@ -119,21 +124,25 @@ class App extends Component {
 
         <Route
           path={PODCASTVIEW}
-          render={() => (
-            ( this.state.title ) ? <div>
-              <PodcastHeader
-                inLibrary={isPodcastInLibrary.bind(this)}
-                savePodcastToLibrary={saveToLibrary.bind(this)}
-                removePodcast={removePodcastFromLibrary.bind(this)}
-              />
-              <EpisodeList
-                episodes={this.state.items}
-                handler={this.playButton.bind(this)}
-                status={this.state.status}
-                playing={this.state.playing}
-              />
-            </div>:<Redirect to={LIBVIEW} />
-          )}
+          render={() =>
+            this.state.title ? (
+              <div>
+                <PodcastHeader
+                  inLibrary={isPodcastInLibrary.bind(this)}
+                  savePodcastToLibrary={saveToLibrary.bind(this)}
+                  removePodcast={removePodcastFromLibrary.bind(this)}
+                />
+                <EpisodeList
+                  episodes={this.state.items}
+                  handler={this.playButton.bind(this)}
+                  status={this.state.status}
+                  playing={this.state.playing}
+                />
+              </div>
+            ) : (
+              <Redirect to={LIBVIEW} />
+            )
+          }
         />
 
         <Route
@@ -172,8 +181,8 @@ class App extends Component {
           autoPlay={true}
           ref="player"
           preload="auto"
-          title={ (episode && episode.title) || ""}
-          poster={ (episode && episode.itunes && episode.itunes.image) || ""}
+          title={(episode && episode.title) || ""}
+          poster={(episode && episode.itunes && episode.itunes.image) || ""}
         />
       </AppContext.Provider>
     );
@@ -181,4 +190,4 @@ class App extends Component {
 }
 
 export default withRouter(App);
-export const Consumer =  AppContext.Consumer;
+export const Consumer = AppContext.Consumer;
