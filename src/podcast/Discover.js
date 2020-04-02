@@ -120,7 +120,6 @@ class Discover extends Component {
             direction={"row"}
           >
             {podcasts.map((cast, ins) => {
-              console.log("aa", cast);
               return (
                 <Grid item xs={3} sm={2} md={2} key={ins}>
                   <Card
