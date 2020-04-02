@@ -40,7 +40,7 @@ function NavigationApp(props) {
               <MenuIcon />
             </IconButton>
             <Typography
-              variant="title"
+              variant="h2"
               color="inherit"
               className={classes.flex}
             >

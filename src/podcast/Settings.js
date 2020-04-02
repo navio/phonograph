@@ -29,7 +29,7 @@ const GeneraList = (props) => {
   return (
     <Card>
       <CardContent>
-        <Typography variant="headline" component="h2">
+        <Typography variant="h4" component="h2">
           Settings
         </Typography>
       </CardContent>
@@ -42,8 +42,8 @@ const GeneraList = (props) => {
               <ListItem>
                 <ListItemText
                   secondary={
-                    <Typography component="span" variant="subheading">
-                      {podcast.title}
+                    <Typography component="span" variant="subtitle1">
+                      {podcast.title} <br />
                       <Typography component="span" variant="caption">
                         {new Date(podcast.created).toLocaleString()}
                       </Typography>
@@ -51,13 +51,13 @@ const GeneraList = (props) => {
                   }
                 />
                 <ListItemSecondaryAction>
-                  <IconButton aria-label="Delete">
-                    <DeleteIcon
-                      onClick={eraseThisPodcast(
-                        podcast.domain,
-                        props.removePodcast
-                      )}
-                    />
+                  <IconButton aria-label="Delete"
+                    onClick={eraseThisPodcast(
+                      podcast.domain,
+                      props.removePodcast
+                    )}
+                  >
+                    <DeleteIcon />
                   </IconButton>
                 </ListItemSecondaryAction>
               </ListItem>
