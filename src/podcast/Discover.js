@@ -61,21 +61,17 @@ class Discover extends Component {
     if (search) {
       this.setState({ loading: true });
       this.searchForPodcasts(search)
-        .then((podcastsFound) => {
-          const podcasts = podcastsFound.map((podcast) => {
-            const {
-              title_original: title,
-              website: domain,
-              thumbnail,
-              id,
-            } = podcast;
-            const rss = `https://www.listennotes.com/c/r/${id}`;
-            return {
-              title,
-              thumbnail,
-              domain,
-              rss,
-            };
+        .then(podcasts => { console.log(podcasts)
+          const cleanedCasts = podcasts.map((podcast) => {
+              const { title_original:title,  
+                      website:domain,
+                      thumbnail,
+                      id
+                    } = podcast;
+                    const rss = `https://www.listennotes.com/c/r/${id}`;
+                    return {
+                      title, thumbnail, domain, rss
+                    };
           });
           this.setState({ podcasts, loading: false, init: false });
         })

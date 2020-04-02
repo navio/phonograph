@@ -6,9 +6,7 @@ import Podcast from "./Podcast";
 
 const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 
-const API = !DEBUG
-  ? "/podcasts/"
-  : "https://cors-anywhere.herokuapp.com/https://feedwrangler.net/api/v2/podcasts/";
+const API = !DEBUG ? "https://listen-api.listennotes.com/api/v2/" : "/ln/";
 
 const PROXY = !DEBUG
   ? {
@@ -16,14 +14,8 @@ const PROXY = !DEBUG
       "http:": "/raw?term=",
     }
   : {
-      "https:": `https://${window.location.host.replace(
-        "1234",
-        "8080"
-      )}/findCast/?term=`,
-      "http:": `https://${window.location.host.replace(
-        "1234",
-        "8080"
-      )}/findCast/?term=`,
+      "https:": `//${window.location.host}/api/findCast/?term=`,
+      "http:": `//${window.location.host}/api/findCast/?term=`,
     };
 
 // Rules for URLS
@@ -94,7 +86,8 @@ export const fetchPodcastToView = function (podcast) {
       }
       retrievePodcast.call(this, podcast);
       acc(cast);
-    });
+    })
+    .catch(error => console.error)
   });
 };
 
