@@ -10,7 +10,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import {
   getPopularPodcasts,
   searchForPodcasts,
-  getPodcastColor,
+  getPodcastColor
 } from "../engine/podcast";
 // import { styles } from "./PodcastGrid";
 import CircularProgress from "@material-ui/core/CircularProgress";
@@ -103,8 +103,7 @@ class Discover extends Component {
       init: true,
       loading: false,
       podcasts: [],
-      error: null,
-      term: "",
+      error: null
     };
     this.searchForPodcasts = searchForPodcasts.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -174,9 +173,9 @@ class Discover extends Component {
     let addPodcastHandler = this.props.addPodcastHandler;
     let actionAfterClick = this.props.actionAfterClick;
     const request = this.getFinalURL;
-    return function () {
+    return function() {
       request(domain)
-        .then((finalDomain) => {
+        .then(finalDomain => {
           addPodcastHandler(finalDomain, actionAfterClick);
         })
         .catch(console.error);
@@ -188,30 +187,29 @@ class Discover extends Component {
     if (search) {
       this.setState({ loading: true });
       this.searchForPodcasts(search)
-        .then((podcasts) => {
-          const cleanedCasts = podcasts.map((podcast) => {
+        .then(podcasts => {
+          const cleanedCasts = podcasts.map(podcast => {
             const {
               title_original: title,
               website: domain,
               thumbnail,
-              id,
+              id
             } = podcast;
             const rss = `https://www.listennotes.com/c/r/${id}`;
             return {
               title,
               thumbnail,
               domain,
-              rss,
+              rss
             };
           });
           this.setState({
             podcasts: cleanedCasts,
             loading: false,
-            init: false,
-            term: search,
+            init: false
           });
         })
-        .catch((el) => this.setState({ podcasts: [], error: el, term: null }));
+        .catch(el => this.setState({ podcasts: [], error: el }));
     } else {
       this.setState({ podcasts: [], init: true, term: null });
       this.showTopPodcasts.call(this);
@@ -223,29 +221,47 @@ class Discover extends Component {
     const { classes } = this.props;
     return (
       <Card>
-        <AppBar position="static">
-          <Grid>
-            <Toolbar variant="dense">
-              <Grid item xs={8}>
-                <Typography variant="h6">Discover</Typography>
-              </Grid>
-              <Grid item md={4} xs={12}>
-                <div className={classes.search}>
-                  <div className={classes.searchIcon}>
-                    <SearchIcon />
-                  </div>
-                  <InputBase
-                    placeholder="Search…"
-                    classes={{
-                      root: classes.inputRoot,
-                      input: classes.inputInput,
-                    }}
-                    inputProps={{ "aria-label": "search" }}
-                    onChange={this.handleChange}
-                  />
-                </div>
-              </Grid>
-            </Toolbar>
+        <CardContent>
+          <Typography variant="h4" component="h1">
+            Search
+          </Typography>
+          <TextField
+            id="podcast"
+            style={{ width: "100%", paddingTop: "5px" }}
+            label="Type Podcast Name"
+            onChange={this.handleChange}
+          />
+        </CardContent>
+        {podcasts && podcasts.length > 0 ? (
+          <Grid
+            style={{ paddingTop: "2em" }}
+            container
+            spacing={0}
+            direction={"row"}
+          >
+            {podcasts.map((cast, ins) => {
+              return (
+                <Grid item xs={3} sm={2} md={2} key={ins}>
+                  <Card
+                    classes={{ root: this.props.classes.card }}
+                    style={getPodcastColor(cast)}
+                  >
+                    <div className={classes.relativeContainer}>
+                      <CardContent className={classes.cardContent}>
+                        {cast.title}
+                      </CardContent>
+                      <CardMedia
+                        onClick={this.getClickHandler.call(this, cast.rss)}
+                        domain={cast.rss}
+                        title={cast.title}
+                        className={this.props.classes.podcastMedia}
+                        image={cast.thumbnail}
+                      />
+                    </div>
+                  </Card>
+                </Grid>
+              );
+            })}
           </Grid>
         </AppBar>
 
@@ -298,7 +314,7 @@ class Discover extends Component {
         ) : (
           <Grid container style={{ padding: "2em" }}>
             <Typography variant="subtitle1">
-              {this.state.term && `Nothing Found for "${this.state.term}"`}
+              {this.state.init ? "" : "Nothing Found"}
             </Typography>
           </Grid>
         )}
@@ -308,7 +324,7 @@ class Discover extends Component {
 }
 
 Discover.propTypes = {
-  classes: PropTypes.object.isRequired,
+  classes: PropTypes.object.isRequired
 };
 
 export default withStyles(styles)(Discover);

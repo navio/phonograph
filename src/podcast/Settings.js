@@ -29,48 +29,45 @@ const eraseThisPodcast = function (domain, fn) {
 
 const GeneraList = (props) => {
   return (
-    <>
-      <AppBar position="static">
-        <Toolbar variant="dense">
-          <Typography variant="h6">Settings</Typography>
-        </Toolbar>
-      </AppBar>
-      <Card>
-        <List>
-          <Divider />
-          {props.podcasts &&
-            props.removePodcast &&
-            props.podcasts.map((podcast) => (
-              <div key={podcast.domain}>
-                <ListItem>
-                  <ListItemText
-                    secondary={
-                      <Typography component="span" variant="subtitle1">
-                        {podcast.title} <br />
-                        <Typography component="span" variant="caption">
-                          {new Date(podcast.created).toLocaleString()}
-                        </Typography>
+    <Card>
+      <CardContent>
+        <Typography variant="h4" component="h2">
+          Settings
+        </Typography>
+      </CardContent>
+      <List>
+        <Divider />
+        {props.podcasts &&
+          props.removePodcast &&
+          props.podcasts.map((podcast) => (
+            <div key={podcast.domain}>
+              <ListItem>
+                <ListItemText
+                  secondary={
+                    <Typography component="span" variant="subtitle1">
+                      {podcast.title} <br />
+                      <Typography component="span" variant="caption">
+                        {new Date(podcast.created).toLocaleString()}
                       </Typography>
-                    }
-                  />
-                  <ListItemSecondaryAction>
-                    <IconButton
-                      aria-label="Delete"
-                      onClick={eraseThisPodcast(
-                        podcast.domain,
-                        props.removePodcast
-                      )}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </ListItemSecondaryAction>
-                </ListItem>
-                <Divider />
-              </div>
-            ))}
-        </List>
-      </Card>
-    </>
+                    </Typography>
+                  }
+                />
+                <ListItemSecondaryAction>
+                  <IconButton aria-label="Delete"
+                    onClick={eraseThisPodcast(
+                      podcast.domain,
+                      props.removePodcast
+                    )}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
+              <Divider />
+            </div>
+          ))}
+      </List>
+    </Card>
   );
 };
 
