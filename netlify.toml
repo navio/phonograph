@@ -42,6 +42,11 @@
     must-revalidate'''
 
 [[redirects]]
+  from="/api/*"
+  to="/.netlify/functions/:splat"
+  status=200
+
+[[redirects]]
   from="/raw/*"
   to="/.netlify/functions/findCast/:splat"
   status=200

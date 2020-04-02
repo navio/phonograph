@@ -8,12 +8,7 @@ const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 
 const API = !DEBUG ? "https://listen-api.listennotes.com/api/v2/" : "/ln/";
 
-const PROXY = !DEBUG
-  ? {
-      "https:": "/raw?term=",
-      "http:": "/raw?term=",
-    }
-  : {
+const PROXY = {
       "https:": `//${window.location.host}/api/findCast/?term=`,
       "http:": `//${window.location.host}/api/findCast/?term=`,
     };
