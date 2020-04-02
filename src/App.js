@@ -43,7 +43,8 @@ import {
 import attachEvents from "./engine/events";
 
 // Router
-import { Route, withRouter, Redirect } from "react-router-dom";
+import { withRouter } from "react-router";
+import { Route, Redirect } from "react-router-dom";
 
 const AppContext = React.createContext();
 

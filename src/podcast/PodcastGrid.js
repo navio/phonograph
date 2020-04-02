@@ -40,7 +40,7 @@ export const styles = (theme) => ({
     width: "100%",
   },
   progress: {
-    margin: theme.spacing.unit * 2,
+    margin: theme.spacing(2),
   },
   progressContainer: {
     width: 0,
