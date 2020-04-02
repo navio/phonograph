@@ -12,7 +12,8 @@ import PauseIcon from "@material-ui/icons/Pause";
 import Typography from "@material-ui/core/Typography";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import EpisodeView from "./EpisodeView";
-import { format } from "timeago.js";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 import { Consumer } from "../App.js";
 
 // const toMinutes = time => {
@@ -33,15 +34,16 @@ export const styles = (theme) => ({
     backgroundColor: "aliceblue",
   },
   progress: {
-    margin: theme.spacing.unit * 2,
+    margin: theme.spacing(2),
   },
   progressContainer: {
     width: 0,
     margin: "auto",
   },
 });
-
-const episodeDate = (date) => format(date);
+dayjs.extend(relativeTime);
+const today = dayjs();
+const episodeDate = (date) => today.from(date, true);
 
 class EpisodeListDescription extends React.Component {
   constructor(props) {
@@ -55,7 +57,7 @@ class EpisodeListDescription extends React.Component {
     return (
       <ListItemText
         primary={
-          <Typography component="div" variant="subheading" noWrap>
+          <Typography component="div" variant="subtitle1" noWrap>
             {clearText(this.episode.title)}{" "}
             <Typography component="div">
               {episodeDate(this.episode.created)}
@@ -88,7 +90,7 @@ class EpisodeList extends React.Component {
             <Card>
               {props.episodes ? (
                 <List>
-                  {props.episodes.map((episode) => (
+                  {props.episodes.map((episode, id) => (
                     <div key={episode.guid}>
                       <ListItem
                         className={

@@ -34,8 +34,8 @@ const styles = (theme) => ({
     margin: "30px",
   },
   controls: {
-    paddingLeft: theme.spacing.unit,
-    paddingBottom: theme.spacing.unit,
+    paddingLeft: theme.spacing(1),
+    paddingBottom: theme.spacing(1),
   },
   left: {
     textAlign: "left",
