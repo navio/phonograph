@@ -39,6 +39,8 @@
   },
   "devDependencies": {
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "parcel-bundler": "^1.12.4"
+    "express": "^4.17.1",
+    "parcel-bundler": "^1.12.4",
+    "http-proxy-middleware": "^1.0.3"
   }
 }

@@ -76,7 +76,7 @@ function PodCastGrid(props) {
         return (
           <Grid container spacing={0} direction={"row"}>
             {casts &&
-              casts.map((cast) => (
+              casts.map((cast) => cast && cast.domain && (
                 <Grid item xs={4} md={2} lg={1} key={cast.domain}>
                   <Card
                     classes={{ root: classes.card }}

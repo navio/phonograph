@@ -22,14 +22,13 @@ export default class PodcastSearcher {
     this.currentRequest && this.currentRequest.abort();
     this.currentRequest = new AbortController();
     let { signal } = this.currentRequest;
-    const api = `/ln/typeahead?q=${term}&show_podcasts=1`;
+    const api = `${this.API}typeahead?q=${term}&show_podcasts=1`;
     const headers = {
-      "User-Agent": "podcastsuite",
-      Accept: "application/json",
-    };
-    const response = fetch(api, { headers, signal }).then((results) =>
-      results.json()
-    );
+      'User-Agent': 'podcastsuite',
+      'Accept': 'application/json',
+      'X-ListenAPI-Key': "ebbd0481aa1b4acc8949a9ffeedf4d7b"
+    }
+    const response = fetch(api, { headers, signal }).then(results => results.json());
     return response;
   }
 
