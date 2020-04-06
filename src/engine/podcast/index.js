@@ -30,6 +30,7 @@ const initializeCast = defaultCasts.map(commonRules);
 const PodcastLibrary = new PodcastEngine({
   podcasts: initializeCast,
   proxy: PROXY,
+  fresh: 1800000,
 });
 const current = new Podcast();
 
@@ -161,6 +162,13 @@ export const isPodcastInLibrary = function () {
 */
 export const initializeLibrary = function () {
   PodcastLibrary.ready.then(() => {
+    PodcastLibrary.mapLibrary((cast) => {
+      return PodcastLibrary.getContent((new URL(cast)));
+    }).then((podcasts) => {
+      this.setState({
+        podcasts
+      });
+    });
     PodcastLibrary.getLibrary().then((podcastsArray) => {
       Promise.all(
         podcastsArray.map((podcastRaw) => PodcastLibrary.getPodcast(podcastRaw))

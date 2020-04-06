@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { render } from "react-dom";
 import App from "./App";
 import { BrowserRouter as Router } from "react-router-dom";
-import * as serviceWorker from "./serviceWorker";
+import serviceWorker from "./serviceWorker";
 
 render(
   <Router>
@@ -11,4 +11,5 @@ render(
   document.getElementById("root")
 );
 
-//serviceWorker.register();
+// serviceWorker();
+serviceWorker();
