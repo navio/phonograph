@@ -1,23 +1,7 @@
-// self.addEventListener('fetch', function(event) {
-//     event.respondWith(
-//       caches.match(event.request)
-//         .then(function(response) {
-//           // Cache hit - return response
-//           if (response) {
-//             return response;
-//           }
-//           return fetch(event.request);
-//         }
-//       )
-//     );
-//   });
+
 const version = 1;
 self.addEventListener("install", function(event) {
-    console.log('WORKER: install event in progress.');
     event.waitUntil(
-      /* The caches built-in is a promise-based API that helps you cache responses,
-         as well as finding and deleting them.
-      */
       caches
         .open('phonograph-core-'+version)
         .then(function(cache) {
@@ -44,6 +28,10 @@ self.addEventListener("fetch", function(event) {
       return;
     }
 
+    if(event.request.url.indexOf('/ln/') > -1 ){
+      return;
+    }
+
     /* Similar to event.waitUntil in that it blocks the fetch event on a promise.
        Fulfillment result will be used as the response, and rejection will end in a
        HTTP response indicating failure.
@@ -57,9 +45,6 @@ self.addEventListener("fetch", function(event) {
         .match(event.request)
         .then(function(cached) {
 
-          console.log('WORKER: fetch event', cached ? '(cached)' : '(network)', event.request.url);
-          console.log('lala', cached);
-
           return cached || fetch(event.request)
           .then(fetchedFromNetwork, unableToResolve)
           .catch(unableToResolve);
@@ -67,7 +52,7 @@ self.addEventListener("fetch", function(event) {
           function fetchedFromNetwork(response) {
             var cacheCopy = response.clone();
   
-            console.log('WORKER: fetch response from network.', event.request.url);
+            // console.log('WORKER: fetch response from network.', event.request.url);
   
             caches
               .open('phonograph-'+version)
@@ -91,7 +76,7 @@ self.addEventListener("fetch", function(event) {
                - Generate a Response programmaticaly, as shown below, and return that
             */
   
-            console.log('WORKER: fetch request failed in both cache and network.');
+            // console.log('WORKER: fetch request failed in both cache and network.');
   
             /* Here we're creating a response programmatically. The first parameter is the
                response body, and the second one defines the options for the response.
