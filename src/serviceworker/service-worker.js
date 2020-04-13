@@ -6,6 +6,7 @@ self.addEventListener("install", function(event) {
         .open('phonograph-core-'+version)
         .then(function(cache) {
           return cache.addAll([
+            '/',
             '/index.html',
             '/favicon-16x16.png',
             '/favicon-32x32.png"'
