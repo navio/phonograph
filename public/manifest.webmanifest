@@ -1,6 +1,7 @@
 {
     "name": "Phonograph",
     "short_name": "Phonograph",
+    "Scope":"/",
     "default_locale": "en",
     "description": "An Podcast Application",
     "icons": [
@@ -15,7 +16,7 @@
             "type": "image/png"
         }
     ],
-    "start_url": ".",
+    "start_url":"/",
     "theme_color": "#ffffff",
     "background_color": "#ffffff",
     "display": "standalone"
