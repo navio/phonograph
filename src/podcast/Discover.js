@@ -43,7 +43,6 @@ class Discover extends Component {
       .then((data) => data.json())
       .then(response => {
         const { podcasts } = response;
-        console.log(response);
         return podcasts;
       })
       .then(podcasts => {
