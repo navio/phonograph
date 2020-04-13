@@ -32,10 +32,42 @@ class Discover extends Component {
     // this.addPodcast = this.props.addPodcast;
   }
   componentDidMount() {
-    // this.setState({loading:true});
-    // getPopularPodcasts()
-    //     .then( podcasts => this.setState({podcasts,loading:false}) )
-    //     .catch( el => this.setState({'podcasts':[],'error':el}) );
+    const headers = {
+      'User-Agent': 'podcastsuite',
+      'Accept': 'application/json',
+      'X-ListenAPI-Key': "ebbd0481aa1b4acc8949a9ffeedf4d7b"
+    };
+    fetch('https://listen-api.listennotes.com/api/v2/best_podcasts?page=1', {
+      headers
+    })
+      .then((data) => data.json())
+      .then(response => {
+        const { podcasts } = response;
+        console.log(response);
+        return podcasts;
+      })
+      .then(podcasts => {
+        const cleanedCasts = podcasts.map(podcast => {
+          const {
+            title_original: title,
+            website: domain,
+            thumbnail,
+            id
+          } = podcast;
+          const rss = `https://www.listennotes.com/c/r/${id}`;
+          return {
+            title,
+            thumbnail,
+            domain,
+            rss
+          };
+        });
+        this.setState({
+          podcasts: cleanedCasts,
+          loading: false,
+          init: false
+        });
+      })
   }
 
   async getFinalURL(url) {
@@ -54,7 +86,7 @@ class Discover extends Component {
     let addPodcastHandler = this.props.addPodcastHandler;
     let actionAfterClick = this.props.actionAfterClick;
     const request = this.getFinalURL;
-    return function() {
+    return function () {
       request(domain)
         .then(finalDomain => {
           addPodcastHandler(finalDomain, actionAfterClick);
@@ -148,12 +180,12 @@ class Discover extends Component {
             <CircularProgress className={classes.progress} />
           </div>
         ) : (
-          <Grid container style={{ padding: "2em" }}>
-            <Typography variant="subtitle1">
-              {this.state.init ? "" : "Nothing Found"}
-            </Typography>
-          </Grid>
-        )}
+              <Grid container style={{ padding: "2em" }}>
+                <Typography variant="subtitle1">
+                  {this.state.init ? "" : "Nothing Found"}
+                </Typography>
+              </Grid>
+            )}
       </Card>
     );
   }
