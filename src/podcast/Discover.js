@@ -24,7 +24,8 @@ class Discover extends Component {
       init: true,
       loading: false,
       podcasts: [],
-      error: null
+      error: null,
+      term: ''
     };
     this.searchForPodcasts = searchForPodcasts.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -32,6 +33,10 @@ class Discover extends Component {
     // this.addPodcast = this.props.addPodcast;
   }
   componentDidMount() {
+    this.showTopPodcasts();
+  }
+
+  showTopPodcasts(){
     const headers = {
       'User-Agent': 'podcastsuite',
       'Accept': 'application/json',
@@ -118,12 +123,14 @@ class Discover extends Component {
           this.setState({
             podcasts: cleanedCasts,
             loading: false,
-            init: false
+            init: false,
+            term: search
           });
         })
-        .catch(el => this.setState({ podcasts: [], error: el }));
+        .catch(el => this.setState({ podcasts: [], error: el, term: null }));
     } else {
-      this.setState({ podcasts: [], init: true });
+      this.setState({ podcasts: [], init: true, term: null });
+      this.showTopPodcasts.call(this);
     }
   }
 
@@ -133,17 +140,32 @@ class Discover extends Component {
     return (
       <Card>
         <CardContent>
-          <Typography variant="h4" component="h1">
-            Search
-          </Typography>
-          <TextField
-            id="podcast"
-            style={{ width: "100%", paddingTop: "5px" }}
-            label="Type Podcast Name"
-            onChange={this.handleChange}
-          />
+          <Grid container>
+            <Grid item xs={12} md={9}>
+              <Typography variant="h4" component="h1">
+                Podcasts
+              </Typography>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <TextField
+              id="podcast"
+              style={{ width: "100%", paddingTop: "5px" }}
+              label="Search by Name"
+              onChange={this.handleChange}
+              />
+            </Grid>
+          </Grid>
         </CardContent>
+
         {podcasts && podcasts.length > 0 ? (
+          <>
+            <Card>
+              <CardContent>
+                <Typography variant="h5" component="h2">
+                  { !this.state.term ? "Top Podcasts" : `Results for "${this.state.term}"` }
+                </Typography>
+              </CardContent>
+            </Card>
           <Grid
             style={{ paddingTop: "2em" }}
             container
@@ -174,6 +196,7 @@ class Discover extends Component {
               );
             })}
           </Grid>
+        </>
         ) : this.state.loading ? (
           <div className={classes.progressContainer}>
             <CircularProgress className={classes.progress} />
@@ -181,7 +204,7 @@ class Discover extends Component {
         ) : (
               <Grid container style={{ padding: "2em" }}>
                 <Typography variant="subtitle1">
-                  {this.state.init ? "" : "Nothing Found"}
+                  { this.state.term && `Nothing Found for "${this.state.term}"`}
                 </Typography>
               </Grid>
             )}
