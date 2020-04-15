@@ -52,7 +52,7 @@ export const styles = (theme) => ({
     margin: "auto",
   },
   addMorebutton: {
-    position: "absolute",
+    position: "fixed",
     zIndex: 1,
     bottom: 0,
     right: "1em",
