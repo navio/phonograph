@@ -112,7 +112,11 @@ class Discover extends Component {
     // this.addPodcast = this.props.addPodcast;
   }
   componentDidMount() {
-    this.showTopPodcasts();
+    if (this.state.top) {
+      this.setState({ podcasts: this.state.top });
+    } else {
+      this.showTopPodcasts();
+    }
   }
 
   showTopPodcasts() {
@@ -146,6 +150,7 @@ class Discover extends Component {
           };
         });
         this.setState({
+          top: cleanedCasts,
           podcasts: cleanedCasts,
           loading: false,
           init: false,
