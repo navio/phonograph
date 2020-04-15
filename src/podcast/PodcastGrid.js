@@ -8,6 +8,11 @@ import Card from "@material-ui/core/Card";
 import CardMedia from "@material-ui/core/CardMedia";
 import CardContent from "@material-ui/core/CardContent";
 import Add from "@material-ui/icons/Add";
+import Typography from "@material-ui/core/Typography";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import AddIcon from "@material-ui/icons/Add";
+import Fab from "@material-ui/core/Fab";
 import { getPodcastColor, cachedContent } from "../engine/podcast";
 import { Consumer } from "../App.js";
 
@@ -46,7 +51,16 @@ export const styles = (theme) => ({
     width: 0,
     margin: "auto",
   },
+  addMorebutton: {
+    position: "absolute",
+    zIndex: 1,
+    bottom: 0,
+    right: "1em",
+    bottom: "5em",
+    margin: "0 auto",
+  },
 });
+
 const addMore = "addmore";
 
 const getMyColor = (cast) =>
@@ -64,49 +78,52 @@ function PodCastGrid(props) {
           global.loadPodcastToView(ev).then(props.actionAfterSelectPodcast);
         };
 
-        let casts = (state.podcasts && [...state.podcasts]) || [];
-        casts.push({
-          domain: addMore,
-          title: "Add more",
-          onClick: () => {
-            props.addPodcastHandler();
-          },
-        });
+        const casts = (state.podcasts && [...state.podcasts]) || [];
 
         return (
-          <Grid container spacing={0} direction={"row"}>
-            {casts &&
-              casts.map((cast) => cast && cast.domain && (
-                <Grid item xs={4} md={2} lg={1} key={cast.domain}>
-                  <Card
-                    classes={{ root: classes.card }}
-                    style={getMyColor(cast)}
-                  >
-                    {cast.domain === addMore ? (
-                      <IconButton
-                        onClick={cast.onClick}
-                        classes={{ root: classes.card }}
-                      >
-                        <Add classes={{ root: classes.addIcon }} />
-                      </IconButton>
-                    ) : (
-                      <div className={classes.relativeContainer}>
-                        <CardContent className={classes.cardContent}>
-                          {cast.title}
-                        </CardContent>
-                        <CardMedia
-                          onClick={processClick}
-                          domain={cast.domain}
-                          title={cast.title}
-                          className={classes.podcastMedia}
-                          image={cast.image}
-                        />
-                      </div>
-                    )}
-                  </Card>
-                </Grid>
-              ))}
-          </Grid>
+          <>
+            <AppBar position="static">
+              <Toolbar variant="dense">
+                <Typography variant="h6">Library</Typography>
+              </Toolbar>
+            </AppBar>
+            <Fab
+              color="secondary"
+              aria-label="add"
+              className={classes.addMorebutton}
+              onClick={() => props.addPodcastHandler()}
+            >
+              <AddIcon />
+            </Fab>
+            <Grid container spacing={0} direction={"row"}>
+              {casts &&
+                casts.map(
+                  (cast) =>
+                    cast &&
+                    cast.domain && (
+                      <Grid item xs={4} md={2} lg={1} key={cast.domain}>
+                        <Card
+                          classes={{ root: classes.card }}
+                          style={getMyColor(cast)}
+                        >
+                          <div className={classes.relativeContainer}>
+                            <CardContent className={classes.cardContent}>
+                              {cast.title}
+                            </CardContent>
+                            <CardMedia
+                              onClick={processClick}
+                              domain={cast.domain}
+                              title={cast.title}
+                              className={classes.podcastMedia}
+                              image={cast.image}
+                            />
+                          </div>
+                        </Card>
+                      </Grid>
+                    )
+                )}
+            </Grid>
+          </>
         );
       }}
     </Consumer>

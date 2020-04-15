@@ -3,8 +3,8 @@ import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import BottomNavigation from "@material-ui/core/BottomNavigation";
 import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
-import Favorite from "@material-ui/icons/Favorite"; //Headsert
-import FavoriteIcon from "@material-ui/icons/Search";
+import Favorite from "@material-ui/icons/Bookmark"; //Headsert
+import DiscoverIcon from "@material-ui/icons/FilterDrama";
 import Settings from "@material-ui/icons/Settings";
 import Paper from "@material-ui/core/Paper";
 import { withRouter } from "react-router-dom";
@@ -44,10 +44,10 @@ class SimpleBottomNavigation extends React.Component {
               icon={<Favorite />}
             />
             <BottomNavigationAction
-              label="Search"
+              label="Discover"
               value="discover"
               onClick={this.handleRedirect("/discover")}
-              icon={<FavoriteIcon />}
+              icon={<DiscoverIcon />}
             />
             <BottomNavigationAction
               label="Settings"

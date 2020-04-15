@@ -10,6 +10,8 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
 
 const styles = (theme) => ({
   root: {
@@ -26,13 +28,14 @@ const eraseThisPodcast = function (domain, fn) {
 };
 
 const GeneraList = (props) => {
+  let { classes } = this.props;
   return (
-    <Card>
-      <CardContent>
-        <Typography variant="h4" component="h2">
-          Settings
-        </Typography>
-      </CardContent>
+    <>
+      <AppBar position="static">
+        <Toolbar variant="dense">
+          <Typography variant="h6">Settings</Typography>
+        </Toolbar>
+      </AppBar>
       <List>
         <Divider />
         {props.podcasts &&
@@ -51,7 +54,8 @@ const GeneraList = (props) => {
                   }
                 />
                 <ListItemSecondaryAction>
-                  <IconButton aria-label="Delete"
+                  <IconButton
+                    aria-label="Delete"
                     onClick={eraseThisPodcast(
                       podcast.domain,
                       props.removePodcast
@@ -65,7 +69,7 @@ const GeneraList = (props) => {
             </div>
           ))}
       </List>
-    </Card>
+    </>
   );
 };
 
