@@ -9,9 +9,10 @@ import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import Button from "@material-ui/core/Button";
 
-import Favorite from "@material-ui/icons/Favorite";
+import Favorite from "@material-ui/icons/Bookmark";
 import AddIcon from "@material-ui/icons/Add";
-
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
 import { clearText } from "./EpisodeList";
 import { Consumer } from "../App.js";
 
@@ -54,45 +55,52 @@ function PodcastHeader(props) {
   return (
     <Consumer>
       {({ state }) => (
-        <Card className={classes.card}>
-          {state.image && (
-            <CardMedia
-              className={classes.cover}
-              image={state.image}
-              title={`${state.title} cover`}
-            />
-          )}
-          <div className={classes.details}>
-            <CardContent className={classes.content}>
-              <Typography className={classes.title} variant="h4" noWrap>
-                {state.title}
-                {isInLibrary ? (
-                  <IconButton
-                    className={classes.addToLibrary}
-                    color="secondary"
-                    onClick={removePodcast}
-                    aria-label="Add"
-                  >
-                    <Favorite />
-                  </IconButton>
-                ) : (
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    color="primary"
-                    onClick={savePodcastToLibrary}
-                    className={classes.addToLibrary}
-                  >
-                    <AddIcon />
-                  </Button>
-                )}
-              </Typography>
-              <Typography className={classes.desc} color="textSecondary">
-                {clearText(state.description)}
-              </Typography>
-            </CardContent>
-          </div>
-        </Card>
+        <>
+          <AppBar position="static">
+            <Toolbar variant="dense">
+              <Typography variant="h6">Podcast</Typography>
+            </Toolbar>
+          </AppBar>
+          <Card className={classes.card}>
+            {state.image && (
+              <CardMedia
+                className={classes.cover}
+                image={state.image}
+                title={`${state.title} cover`}
+              />
+            )}
+            <div className={classes.details}>
+              <CardContent className={classes.content}>
+                <Typography className={classes.title} variant="h4" noWrap>
+                  {state.title}
+                  {isInLibrary ? (
+                    <IconButton
+                      className={classes.addToLibrary}
+                      color="secondary"
+                      onClick={removePodcast}
+                      aria-label="Add"
+                    >
+                      <Favorite />
+                    </IconButton>
+                  ) : (
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      color="primary"
+                      onClick={savePodcastToLibrary}
+                      className={classes.addToLibrary}
+                    >
+                      <AddIcon />
+                    </Button>
+                  )}
+                </Typography>
+                <Typography className={classes.desc} color="textSecondary">
+                  {clearText(state.description)}
+                </Typography>
+              </CardContent>
+            </div>
+          </Card>
+        </>
       )}
     </Consumer>
   );
