@@ -1,7 +1,6 @@
 {
     "name": "Phonograph",
     "short_name": "Phonograph",
-    "scope":"/",
     "default_locale": "en",
     "description": "A Podcast Web App ",
     "icons": [
