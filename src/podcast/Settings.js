@@ -1,3 +1,5 @@
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
 import React from "react";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -10,8 +12,6 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
 
 const styles = (theme) => ({
   root: {
@@ -28,7 +28,6 @@ const eraseThisPodcast = function (domain, fn) {
 };
 
 const GeneraList = (props) => {
-  let { classes } = this.props;
   return (
     <>
       <AppBar position="static">
@@ -36,39 +35,41 @@ const GeneraList = (props) => {
           <Typography variant="h6">Settings</Typography>
         </Toolbar>
       </AppBar>
-      <List>
-        <Divider />
-        {props.podcasts &&
-          props.removePodcast &&
-          props.podcasts.map((podcast) => (
-            <div key={podcast.domain}>
-              <ListItem>
-                <ListItemText
-                  secondary={
-                    <Typography component="span" variant="subtitle1">
-                      {podcast.title} <br />
-                      <Typography component="span" variant="caption">
-                        {new Date(podcast.created).toLocaleString()}
+      <Card>
+        <List>
+          <Divider />
+          {props.podcasts &&
+            props.removePodcast &&
+            props.podcasts.map((podcast) => (
+              <div key={podcast.domain}>
+                <ListItem>
+                  <ListItemText
+                    secondary={
+                      <Typography component="span" variant="subtitle1">
+                        {podcast.title} <br />
+                        <Typography component="span" variant="caption">
+                          {new Date(podcast.created).toLocaleString()}
+                        </Typography>
                       </Typography>
-                    </Typography>
-                  }
-                />
-                <ListItemSecondaryAction>
-                  <IconButton
-                    aria-label="Delete"
-                    onClick={eraseThisPodcast(
-                      podcast.domain,
-                      props.removePodcast
-                    )}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </ListItemSecondaryAction>
-              </ListItem>
-              <Divider />
-            </div>
-          ))}
-      </List>
+                    }
+                  />
+                  <ListItemSecondaryAction>
+                    <IconButton
+                      aria-label="Delete"
+                      onClick={eraseThisPodcast(
+                        podcast.domain,
+                        props.removePodcast
+                      )}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </ListItemSecondaryAction>
+                </ListItem>
+                <Divider />
+              </div>
+            ))}
+        </List>
+      </Card>
     </>
   );
 };
