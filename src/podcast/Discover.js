@@ -32,7 +32,7 @@ const styles = (theme) => ({
   cardPointerValue: {
     // position: "absolute",
     // width: 0,
-    cursor: "pointer"
+    cursor: "pointer",
   },
   relativeContainer: {
     position: "relative",
@@ -108,55 +108,8 @@ class Discover extends Component {
     if (this.state.top) {
       this.setState({ podcasts: this.state.top });
     } else {
-      this.showTopPodcasts();
+      getPopularPodcasts.call(this);
     }
-  }
-
-  showTopPodcasts() {
-    const headers = {
-      "User-Agent": "podcastsuite",
-      Accept: "application/json",
-      "X-ListenAPI-Key": "ebbd0481aa1b4acc8949a9ffeedf4d7b",
-    };
-    fetch("https://listen-api.listennotes.com/api/v2/best_podcasts?page=1", {
-      headers,
-    })
-      .then((data) => data.json())
-      .then((response) => {
-        const { podcasts } = response;
-        return podcasts;
-      })
-      .then((podcasts) => {
-        const cleanedCasts = podcasts.map((podcast, num ) => {
-          const {
-            title,
-            domain,
-            thumbnail,
-            description,
-            id,
-            total_episodes: episodes,
-            earliest_pub_date_ms: startDate,
-            publisher,
-          } = podcast;
-          const rss = `https://www.listennotes.com/c/r/${id}`;
-          return {
-            title: (`${num+1}. ${title}`),
-            thumbnail,
-            domain,
-            description,
-            rss,
-            episodes,
-            startDate,
-            publisher,
-          };
-        });
-        this.setState({
-          top: cleanedCasts,
-          podcasts: cleanedCasts,
-          loading: false,
-          init: false,
-        });
-      });
   }
 
   async getFinalURL(url) {
@@ -196,6 +149,7 @@ class Discover extends Component {
               website: domain,
               thumbnail,
               id,
+              publisher_original: publisher
             } = podcast;
             const rss = `https://www.listennotes.com/c/r/${id}`;
             return {
@@ -203,6 +157,7 @@ class Discover extends Component {
               thumbnail,
               domain,
               rss,
+              publisher
             };
           });
           this.setState({
@@ -285,12 +240,14 @@ class Discover extends Component {
                         <Typography component="p" variant="h6" noWrap>
                           {cast.title}
                         </Typography>
-                        <Typography component="p" variant="subtitle2" noWrap>
+                        { cast.publisher && <Typography component="p" variant="subtitle2" noWrap>
                           By {cast.publisher}
-                        </Typography>
-                        <Typography component="p" variant="overline">
-                          Episodes: {cast.episodes}
-                        </Typography>
+                        </Typography>}
+                        {cast.episodes && (
+                          <Typography component="p" variant="overline">
+                            Episodes: {cast.episodes}
+                          </Typography>
+                        )}
                       </CardContent>
                     </Card>
                   </Grid>
