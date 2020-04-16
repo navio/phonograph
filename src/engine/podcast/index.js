@@ -158,6 +158,13 @@ export const isPodcastInLibrary = function () {
   return this.state.podcasts.find((cast) => cast.domain === this.state.domain);
 };
 
+const podcastCleaner = (podcasts) => {
+  return podcasts.map((podcast) => ({
+    ...podcast,
+    domain: podcast.url,
+  }));
+};
+
 /*
  Start the application and loads the library.
 */
@@ -166,21 +173,19 @@ export const initializeLibrary = function () {
     PodcastLibrary.mapLibrary((cast) => {
       return PodcastLibrary.getContent(new URL(cast));
     }).then((podcasts) => {
-      this.setState({
-        podcasts,
-      });
+      if (podcasts) {
+        this.setState({
+          podcasts: podcastCleaner(podcasts),
+        });
+      }
     });
     PodcastLibrary.getLibrary().then((podcastsArray) => {
       Promise.all(
         podcastsArray.map((podcastRaw) => PodcastLibrary.getPodcast(podcastRaw))
       ).then((podcasts) => {
         if (podcasts) {
-          const updatePodcasts = podcasts.map((podcast) => ({
-            ...podcast,
-            domain: podcast.url,
-          }));
           this.setState({
-            podcasts: updatePodcasts,
+            podcasts: podcastCleaner(podcasts),
           });
         }
       });
