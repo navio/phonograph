@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import CssBaseline from "@material-ui/core/CssBaseline";
+import { ThemeProvider } from "@material-ui/core/styles";
+import theme from "./Theme";
 import audioqueue from "audioqueue";
 // import "babel-polyfill";
 
@@ -102,90 +104,92 @@ class App extends Component {
   render() {
     const episode = this.episodes.get(this.state.episode);
     return (
-      <AppContext.Provider
-        value={{ state: this.state, global: this, episode: episode }}
-      >
-        <CssBaseline />
-        <Notifications
-          show={!!this.state.showNotification}
-          callback={this.clearNotification}
-          {...this.state.notification}
-        />
+      <ThemeProvider theme={theme}>
+        <AppContext.Provider
+          value={{ state: this.state, global: this, episode: episode }}
+        >
+          <CssBaseline />
+          <Notifications
+            show={!!this.state.showNotification}
+            callback={this.clearNotification}
+            {...this.state.notification}
+          />
 
-        <Route
-          exact
-          path={LIBVIEW}
-          render={({ history }) => (
-            <PodcastGrid
-              addPodcastHandler={this.navigateTo(DISCOVERVIEW)} //{this.askForPodcast}
-              actionAfterSelectPodcast={this.navigateTo(PODCASTVIEW)}
-            />
-          )}
-        />
+          <Route
+            exact
+            path={LIBVIEW}
+            render={({ history }) => (
+              <PodcastGrid
+                addPodcastHandler={this.navigateTo(DISCOVERVIEW)} //{this.askForPodcast}
+                actionAfterSelectPodcast={this.navigateTo(PODCASTVIEW)}
+              />
+            )}
+          />
 
-        <Route
-          path={PODCASTVIEW}
-          render={() =>
-            this.state.title ? (
-              <div>
-                <PodcastHeader
-                  inLibrary={isPodcastInLibrary.bind(this)}
-                  savePodcastToLibrary={saveToLibrary.bind(this)}
-                  removePodcast={removePodcastFromLibrary.bind(this)}
-                />
-                <EpisodeList
-                  episodes={this.state.items}
-                  handler={this.playButton.bind(this)}
-                  status={this.state.status}
-                  playing={this.state.playing}
-                />
-              </div>
-            ) : (
-              <Redirect to={LIBVIEW} />
-            )
-          }
-        />
+          <Route
+            path={PODCASTVIEW}
+            render={() =>
+              this.state.title ? (
+                <div>
+                  <PodcastHeader
+                    inLibrary={isPodcastInLibrary.bind(this)}
+                    savePodcastToLibrary={saveToLibrary.bind(this)}
+                    removePodcast={removePodcastFromLibrary.bind(this)}
+                  />
+                  <EpisodeList
+                    episodes={this.state.items}
+                    handler={this.playButton.bind(this)}
+                    status={this.state.status}
+                    playing={this.state.playing}
+                  />
+                </div>
+              ) : (
+                <Redirect to={LIBVIEW} />
+              )
+            }
+          />
 
-        <Route
-          path={DISCOVERVIEW}
-          render={({ history }) => (
-            <Discover
-              addPodcastHandler={loadaNewPodcast.bind(this)}
-              actionAfterClick={this.navigateTo(PODCASTVIEW)}
-              notificaions={this.addNotification}
-            />
-          )}
-        />
+          <Route
+            path={DISCOVERVIEW}
+            render={({ history }) => (
+              <Discover
+                addPodcastHandler={loadaNewPodcast.bind(this)}
+                actionAfterClick={this.navigateTo(PODCASTVIEW)}
+                notificaions={this.addNotification}
+              />
+            )}
+          />
 
-        <Route
-          path={SETTINGSVIEW}
-          render={() => (
-            <Settings
-              removePodcast={removePodcastFromLibrary.bind(this)}
-              podcasts={this.state.podcasts}
-            />
-          )}
-        />
+          <Route
+            path={SETTINGSVIEW}
+            render={() => (
+              <Settings
+                removePodcast={removePodcastFromLibrary.bind(this)}
+                podcasts={this.state.podcasts}
+              />
+            )}
+          />
 
-        <MediaControl
-          toCurrentPodcast={this.navigateTo(PODCASTVIEW)}
-          player={this.refs.player}
-          handler={this.playButton}
-          forward={this.forward30Seconds}
-          rewind={this.rewind10Seconds}
-          seek={this.seek}
-        />
+          <MediaControl
+            toCurrentPodcast={this.navigateTo(PODCASTVIEW)}
+            player={this.refs.player}
+            handler={this.playButton}
+            forward={this.forward30Seconds}
+            rewind={this.rewind10Seconds}
+            seek={this.seek}
+          />
 
-        <Footer path={this.props.location.pathname} />
+          <Footer path={this.props.location.pathname} />
 
-        <audio
-          autoPlay={true}
-          ref="player"
-          preload="auto"
-          title={(episode && episode.title) || ""}
-          poster={(episode && episode.itunes && episode.itunes.image) || ""}
-        />
-      </AppContext.Provider>
+          <audio
+            autoPlay={true}
+            ref="player"
+            preload="auto"
+            title={(episode && episode.title) || ""}
+            poster={(episode && episode.itunes && episode.itunes.image) || ""}
+          />
+        </AppContext.Provider>
+      </ThemeProvider>
     );
   }
 }
