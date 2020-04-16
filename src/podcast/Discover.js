@@ -103,12 +103,8 @@ class Discover extends Component {
       init: true,
       loading: false,
       podcasts: [],
-<<<<<<< HEAD
-      error: null
-=======
       error: null,
       term: "",
->>>>>>> preprod
     };
     this.searchForPodcasts = searchForPodcasts.bind(this);
     this.handleChange = this.handleChange.bind(this);
