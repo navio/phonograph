@@ -5,12 +5,11 @@ import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import CardMedia from "@material-ui/core/CardMedia";
 import Typography from "@material-ui/core/Typography";
-
+import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from "@material-ui/core/IconButton";
-import Button from "@material-ui/core/Button";
-
+import Grid from "@material-ui/core/Grid";
 import Favorite from "@material-ui/icons/Bookmark";
-import AddIcon from "@material-ui/icons/Add";
+import BookmarkBorderIcon from "@material-ui/icons/BookmarkBorder";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import { clearText } from "./EpisodeList";
@@ -58,7 +57,35 @@ function PodcastHeader(props) {
         <>
           <AppBar position="static">
             <Toolbar variant="dense">
-              <Typography variant="h6">Podcast</Typography>
+              <Grid container>
+                <Grid item xs={6}>
+                  <Typography variant="h6">Podcast</Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  {isInLibrary ? (
+                    <IconButton
+                      className={classes.addToLibrary}
+                      color="secondary"
+                      size="medium"
+                      onClick={removePodcast}
+                      aria-label="Remove from Library"
+                    >
+                      <Favorite />
+                    </IconButton>
+                  ) : (
+                    <Tooltip title="Add to Library" placement="bottom">
+                      <IconButton
+                        size="medium"
+                        color="secondary"
+                        onClick={savePodcastToLibrary}
+                        className={classes.addToLibrary}
+                      >
+                        <BookmarkBorderIcon />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </Grid>
+              </Grid>
             </Toolbar>
           </AppBar>
           <Card className={classes.card}>
@@ -73,26 +100,6 @@ function PodcastHeader(props) {
               <CardContent className={classes.content}>
                 <Typography className={classes.title} variant="h4" noWrap>
                   {state.title}
-                  {isInLibrary ? (
-                    <IconButton
-                      className={classes.addToLibrary}
-                      color="secondary"
-                      onClick={removePodcast}
-                      aria-label="Add"
-                    >
-                      <Favorite />
-                    </IconButton>
-                  ) : (
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      color="primary"
-                      onClick={savePodcastToLibrary}
-                      className={classes.addToLibrary}
-                    >
-                      <AddIcon />
-                    </Button>
-                  )}
                 </Typography>
                 <Typography className={classes.desc} color="textSecondary">
                   {clearText(state.description)}

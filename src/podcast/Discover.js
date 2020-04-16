@@ -19,12 +19,12 @@ import Typography from "@material-ui/core/Typography";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import SearchIcon from "@material-ui/icons/Search";
 import InputBase from "@material-ui/core/InputBase";
+import Backdrop from "@material-ui/core/Backdrop";
 
 const styles = (theme) => ({
-  podcastMedia: {
-    // paddingTop: "100%",
-    // position: "relative",
-    // cursor: "pointer",
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: "#fff",
   },
   cover: {
     height: 151,
@@ -98,6 +98,7 @@ class Discover extends Component {
       podcasts: [],
       error: null,
       term: "",
+      loadContent: false,
     };
     this.searchForPodcasts = searchForPodcasts.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -128,10 +129,12 @@ class Discover extends Component {
     let addPodcastHandler = this.props.addPodcastHandler;
     let actionAfterClick = this.props.actionAfterClick;
     const request = this.getFinalURL;
-    return function () {
+    return () => {
+      this.setState({ loadContent: true });
       request(domain)
         .then((finalDomain) => {
           addPodcastHandler(finalDomain, actionAfterClick);
+          this.setState({loadContent: false});
         })
         .catch(console.error);
     };
@@ -149,7 +152,7 @@ class Discover extends Component {
               website: domain,
               thumbnail,
               id,
-              publisher_original: publisher
+              publisher_original: publisher,
             } = podcast;
             const rss = `https://www.listennotes.com/c/r/${id}`;
             return {
@@ -157,7 +160,7 @@ class Discover extends Component {
               thumbnail,
               domain,
               rss,
-              publisher
+              publisher,
             };
           });
           this.setState({
@@ -178,95 +181,105 @@ class Discover extends Component {
     const podcasts = this.state.podcasts;
     const { classes } = this.props;
     return (
-      <Card>
-        <AppBar position="static">
-          <Grid>
-            <Toolbar variant="dense">
-              <Grid item xs={8}>
-                <Typography variant="h6">Discover</Typography>
-              </Grid>
-              <Grid item md={4} xs={12}>
-                <div className={classes.search}>
-                  <div className={classes.searchIcon}>
-                    <SearchIcon />
+      <>
+        <Backdrop className={classes.backdrop} open={this.state.loadContent || false}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
+        <Card>
+          <AppBar position="static">
+            <Grid>
+              <Toolbar variant="dense">
+                <Grid item xs={8}>
+                  <Typography variant="h6">Discover</Typography>
+                </Grid>
+                <Grid item md={4} xs={12}>
+                  <div className={classes.search}>
+                    <div className={classes.searchIcon}>
+                      <SearchIcon />
+                    </div>
+                    <InputBase
+                      placeholder="Search…"
+                      classes={{
+                        root: classes.inputRoot,
+                        input: classes.inputInput,
+                      }}
+                      inputProps={{ "aria-label": "search" }}
+                      onChange={this.handleChange}
+                    />
                   </div>
-                  <InputBase
-                    placeholder="Search…"
-                    classes={{
-                      root: classes.inputRoot,
-                      input: classes.inputInput,
-                    }}
-                    inputProps={{ "aria-label": "search" }}
-                    onChange={this.handleChange}
-                  />
-                </div>
-              </Grid>
-            </Toolbar>
-          </Grid>
-        </AppBar>
-
-        {podcasts && podcasts.length > 0 ? (
-          <>
-            <Card>
-              <CardContent>
-                <Typography variant="h5" component="h2">
-                  {!this.state.term
-                    ? "Trending"
-                    : `Results for "${this.state.term}"`}
-                </Typography>
-              </CardContent>
-            </Card>
-            <Grid
-              // style={{ paddingTop: "2em" }}
-              container
-              spacing={0}
-              direction={"row"}
-            >
-              {podcasts.map((cast, ins) => {
-                console.log(cast);
-                return (
-                  <Grid item xs={12} sm={6} lg={3} key={ins}>
-                    <Card
-                      className={classes.cardPointerValue}
-                      onClick={this.getClickHandler.call(this, cast.rss)}
-                      domain={cast.rss}
-                    >
-                      <CardMedia
-                        className={classes.cover}
-                        image={cast.thumbnail}
-                        title={cast.title}
-                      />
-                      <CardContent>
-                        <Typography component="p" variant="h6" noWrap>
-                          {cast.title}
-                        </Typography>
-                        { cast.publisher && <Typography component="p" variant="subtitle2" noWrap>
-                          By {cast.publisher}
-                        </Typography>}
-                        {cast.episodes && (
-                          <Typography component="p" variant="overline">
-                            Episodes: {cast.episodes}
-                          </Typography>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                );
-              })}
+                </Grid>
+              </Toolbar>
             </Grid>
-          </>
-        ) : this.state.loading ? (
-          <div className={classes.progressContainer}>
-            <CircularProgress className={classes.progress} />
-          </div>
-        ) : (
-          <Grid container style={{ padding: "2em" }}>
-            <Typography variant="subtitle1">
-              {this.state.term && `Nothing Found for "${this.state.term}"`}
-            </Typography>
-          </Grid>
-        )}
-      </Card>
+          </AppBar>
+
+          {podcasts && podcasts.length > 0 ? (
+            <>
+              <Card>
+                <CardContent>
+                  <Typography variant="h5" component="h2">
+                    {!this.state.term
+                      ? "Trending"
+                      : `Results for "${this.state.term}"`}
+                  </Typography>
+                </CardContent>
+              </Card>
+              <Grid
+                // style={{ paddingTop: "2em" }}
+                container
+                spacing={0}
+                direction={"row"}
+              >
+                {podcasts.map((cast, ins) => {
+                  return (
+                    <Grid item xs={12} sm={6} lg={3} key={ins}>
+                      <Card
+                        className={classes.cardPointerValue}
+                        onClick={this.getClickHandler.call(this, cast.rss)}
+                        domain={cast.rss}
+                      >
+                        <CardMedia
+                          className={classes.cover}
+                          image={cast.thumbnail}
+                          title={cast.title}
+                        />
+                        <CardContent>
+                          <Typography component="p" variant="h6" noWrap>
+                            {cast.title}
+                          </Typography>
+                          {cast.publisher && (
+                            <Typography
+                              component="p"
+                              variant="subtitle2"
+                              noWrap
+                            >
+                              By {cast.publisher}
+                            </Typography>
+                          )}
+                          {cast.episodes && (
+                            <Typography component="p" variant="overline">
+                              Episodes: {cast.episodes}
+                            </Typography>
+                          )}
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  );
+                })}
+              </Grid>
+            </>
+          ) : this.state.loading ? (
+            <div className={classes.progressContainer}>
+              <CircularProgress className={classes.progress} />
+            </div>
+          ) : (
+            <Grid container style={{ padding: "2em" }}>
+              <Typography variant="subtitle1">
+                {this.state.term && `Nothing Found for "${this.state.term}"`}
+              </Typography>
+            </Grid>
+          )}
+        </Card>
+      </>
     );
   }
 }
