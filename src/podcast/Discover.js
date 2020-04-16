@@ -10,7 +10,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import {
   getPopularPodcasts,
   searchForPodcasts,
-  getPodcastColor
+  getPodcastColor,
 } from "../engine/podcast";
 // import { styles } from "./PodcastGrid";
 import CircularProgress from "@material-ui/core/CircularProgress";
@@ -22,30 +22,23 @@ import InputBase from "@material-ui/core/InputBase";
 
 const styles = (theme) => ({
   podcastMedia: {
-    paddingTop: "100%",
-    position: "relative",
-    cursor: "pointer",
+    // paddingTop: "100%",
+    // position: "relative",
+    // cursor: "pointer",
   },
-  podcastData: {
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
-    color: "000",
-    position: "absolute",
-    bottom: 0,
-    width: "100%",
+  cover: {
+    height: 151,
   },
-  cardContent: {
-    position: "absolute",
-    width: 0,
+  cardPointerValue: {
+    // position: "absolute",
+    // width: 0,
+    cursor: "pointer"
   },
   relativeContainer: {
     position: "relative",
   },
-  addIcon: {
-    width: "3em",
-    height: "3em",
-  },
   card: {
-    height: "100%",
+    height: "90px",
     width: "100%",
   },
   progress: {
@@ -134,19 +127,27 @@ class Discover extends Component {
         return podcasts;
       })
       .then((podcasts) => {
-        const cleanedCasts = podcasts.map((podcast) => {
+        const cleanedCasts = podcasts.map((podcast, num ) => {
           const {
-            title_original: title,
-            website: domain,
+            title,
+            domain,
             thumbnail,
+            description,
             id,
+            total_episodes: episodes,
+            earliest_pub_date_ms: startDate,
+            publisher,
           } = podcast;
           const rss = `https://www.listennotes.com/c/r/${id}`;
           return {
-            title,
+            title: (`${num+1}. ${title}`),
             thumbnail,
             domain,
+            description,
             rss,
+            episodes,
+            startDate,
+            publisher,
           };
         });
         this.setState({
@@ -194,14 +195,14 @@ class Discover extends Component {
               title_original: title,
               website: domain,
               thumbnail,
-              id
+              id,
             } = podcast;
             const rss = `https://www.listennotes.com/c/r/${id}`;
             return {
               title,
               thumbnail,
               domain,
-              rss
+              rss,
             };
           });
           this.setState({
@@ -255,36 +256,42 @@ class Discover extends Component {
               <CardContent>
                 <Typography variant="h5" component="h2">
                   {!this.state.term
-                    ? "Top Podcasts"
+                    ? "Trending"
                     : `Results for "${this.state.term}"`}
                 </Typography>
               </CardContent>
             </Card>
             <Grid
-              style={{ paddingTop: "2em" }}
+              // style={{ paddingTop: "2em" }}
               container
               spacing={0}
               direction={"row"}
             >
               {podcasts.map((cast, ins) => {
+                console.log(cast);
                 return (
-                  <Grid item xs={3} sm={2} md={2} key={ins}>
+                  <Grid item xs={12} sm={6} lg={3} key={ins}>
                     <Card
-                      classes={{ root: this.props.classes.card }}
-                      style={getPodcastColor(cast)}
+                      className={classes.cardPointerValue}
+                      onClick={this.getClickHandler.call(this, cast.rss)}
+                      domain={cast.rss}
                     >
-                      <div className={classes.relativeContainer}>
-                        <CardContent className={classes.cardContent}>
+                      <CardMedia
+                        className={classes.cover}
+                        image={cast.thumbnail}
+                        title={cast.title}
+                      />
+                      <CardContent>
+                        <Typography component="p" variant="h6" noWrap>
                           {cast.title}
-                        </CardContent>
-                        <CardMedia
-                          onClick={this.getClickHandler.call(this, cast.rss)}
-                          domain={cast.rss}
-                          title={cast.title}
-                          className={this.props.classes.podcastMedia}
-                          image={cast.thumbnail}
-                        />
-                      </div>
+                        </Typography>
+                        <Typography component="p" variant="subtitle2" noWrap>
+                          By {cast.publisher}
+                        </Typography>
+                        <Typography component="p" variant="overline">
+                          Episodes: {cast.episodes}
+                        </Typography>
+                      </CardContent>
                     </Card>
                   </Grid>
                 );
@@ -308,7 +315,7 @@ class Discover extends Component {
 }
 
 Discover.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles)(Discover);
