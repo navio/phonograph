@@ -103,7 +103,12 @@ class Discover extends Component {
       init: true,
       loading: false,
       podcasts: [],
+<<<<<<< HEAD
       error: null
+=======
+      error: null,
+      term: "",
+>>>>>>> preprod
     };
     this.searchForPodcasts = searchForPodcasts.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -173,9 +178,9 @@ class Discover extends Component {
     let addPodcastHandler = this.props.addPodcastHandler;
     let actionAfterClick = this.props.actionAfterClick;
     const request = this.getFinalURL;
-    return function() {
+    return function () {
       request(domain)
-        .then(finalDomain => {
+        .then((finalDomain) => {
           addPodcastHandler(finalDomain, actionAfterClick);
         })
         .catch(console.error);
@@ -187,8 +192,8 @@ class Discover extends Component {
     if (search) {
       this.setState({ loading: true });
       this.searchForPodcasts(search)
-        .then(podcasts => {
-          const cleanedCasts = podcasts.map(podcast => {
+        .then((podcasts) => {
+          const cleanedCasts = podcasts.map((podcast) => {
             const {
               title_original: title,
               website: domain,
@@ -206,10 +211,11 @@ class Discover extends Component {
           this.setState({
             podcasts: cleanedCasts,
             loading: false,
-            init: false
+            init: false,
+            term: search,
           });
         })
-        .catch(el => this.setState({ podcasts: [], error: el }));
+        .catch((el) => this.setState({ podcasts: [], error: el, term: null }));
     } else {
       this.setState({ podcasts: [], init: true, term: null });
       this.showTopPodcasts.call(this);
@@ -221,47 +227,29 @@ class Discover extends Component {
     const { classes } = this.props;
     return (
       <Card>
-        <CardContent>
-          <Typography variant="h4" component="h1">
-            Search
-          </Typography>
-          <TextField
-            id="podcast"
-            style={{ width: "100%", paddingTop: "5px" }}
-            label="Type Podcast Name"
-            onChange={this.handleChange}
-          />
-        </CardContent>
-        {podcasts && podcasts.length > 0 ? (
-          <Grid
-            style={{ paddingTop: "2em" }}
-            container
-            spacing={0}
-            direction={"row"}
-          >
-            {podcasts.map((cast, ins) => {
-              return (
-                <Grid item xs={3} sm={2} md={2} key={ins}>
-                  <Card
-                    classes={{ root: this.props.classes.card }}
-                    style={getPodcastColor(cast)}
-                  >
-                    <div className={classes.relativeContainer}>
-                      <CardContent className={classes.cardContent}>
-                        {cast.title}
-                      </CardContent>
-                      <CardMedia
-                        onClick={this.getClickHandler.call(this, cast.rss)}
-                        domain={cast.rss}
-                        title={cast.title}
-                        className={this.props.classes.podcastMedia}
-                        image={cast.thumbnail}
-                      />
-                    </div>
-                  </Card>
-                </Grid>
-              );
-            })}
+        <AppBar position="static">
+          <Grid>
+            <Toolbar variant="dense">
+              <Grid item xs={8}>
+                <Typography variant="h6">Discover</Typography>
+              </Grid>
+              <Grid item md={4} xs={12}>
+                <div className={classes.search}>
+                  <div className={classes.searchIcon}>
+                    <SearchIcon />
+                  </div>
+                  <InputBase
+                    placeholder="Search…"
+                    classes={{
+                      root: classes.inputRoot,
+                      input: classes.inputInput,
+                    }}
+                    inputProps={{ "aria-label": "search" }}
+                    onChange={this.handleChange}
+                  />
+                </div>
+              </Grid>
+            </Toolbar>
           </Grid>
         </AppBar>
 
@@ -314,7 +302,7 @@ class Discover extends Component {
         ) : (
           <Grid container style={{ padding: "2em" }}>
             <Typography variant="subtitle1">
-              {this.state.init ? "" : "Nothing Found"}
+              {this.state.term && `Nothing Found for "${this.state.term}"`}
             </Typography>
           </Grid>
         )}
