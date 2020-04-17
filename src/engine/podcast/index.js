@@ -6,7 +6,7 @@ import Podcast from "./Podcast";
 
 const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 
-const API = !DEBUG ? "https://listen-api.listennotes.com/api/v2/" : "/ln/";
+const API = "/ln/";
 
 const PROXY = {
   "https:": `//${window.location.host}/api/findCast/?term=`,
@@ -170,10 +170,11 @@ const podcastCleaner = (podcasts) => {
 */
 export const initializeLibrary = function () {
   PodcastLibrary.ready.then(() => {
+
     PodcastLibrary.mapLibrary((cast) => {
       return PodcastLibrary.getContent(new URL(cast));
     }).then((podcasts) => {
-      if (podcasts) {
+      if (podcasts) {   
         this.setState({
           podcasts: podcastCleaner(podcasts),
         });
