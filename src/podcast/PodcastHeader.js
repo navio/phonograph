@@ -5,13 +5,15 @@ import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import CardMedia from "@material-ui/core/CardMedia";
 import Typography from "@material-ui/core/Typography";
-import Tooltip from '@material-ui/core/Tooltip';
+import Tooltip from "@material-ui/core/Tooltip";
 import IconButton from "@material-ui/core/IconButton";
 import Grid from "@material-ui/core/Grid";
 import Favorite from "@material-ui/icons/Bookmark";
 import BookmarkBorderIcon from "@material-ui/icons/BookmarkBorder";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
 import { clearText } from "./EpisodeList";
 import { Consumer } from "../App.js";
 
@@ -48,13 +50,37 @@ const styles = (theme) => ({
   },
 });
 
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
 function PodcastHeader(props) {
   const { classes, inLibrary, savePodcastToLibrary, removePodcast } = props;
   const isInLibrary = inLibrary();
+  const [open, setOpen] = React.useState(false);
+
+  const saveThisPodcastToLibrary = (ev) =>{
+    savePodcastToLibrary(ev);
+    setOpen(true);
+  }
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
+
   return (
     <Consumer>
       {({ state }) => (
         <>
+          <Snackbar open={open} onClose={handleClose} autoHideDuration={4000}>
+            <Alert severity="success">
+              Podcast Added to Library !
+            </Alert>
+          </Snackbar>
           <AppBar position="static">
             <Toolbar variant="dense">
               <Grid container>
@@ -66,7 +92,7 @@ function PodcastHeader(props) {
                     <IconButton
                       className={classes.addToLibrary}
                       color="secondary"
-                      size="medium"
+                      size="small"
                       onClick={removePodcast}
                       aria-label="Remove from Library"
                     >
@@ -75,9 +101,9 @@ function PodcastHeader(props) {
                   ) : (
                     <Tooltip title="Add to Library" placement="bottom">
                       <IconButton
-                        size="medium"
+                        size="small"
                         color="secondary"
-                        onClick={savePodcastToLibrary}
+                        onClick={saveThisPodcastToLibrary}
                         className={classes.addToLibrary}
                       >
                         <BookmarkBorderIcon />
