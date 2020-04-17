@@ -246,52 +246,59 @@ export const checkIfNewPodcastInURL = function () {
   return podcast;
 };
 
-export const getPopularPodcasts = function () {
-  const headers = {
-    "User-Agent": "podcastsuite",
-    Accept: "application/json",
-    "X-ListenAPI-Key": "ebbd0481aa1b4acc8949a9ffeedf4d7b",
+export const getPopularPodcasts = (function () {
+  let response = null;
+  return function query() {
+    if (response) {
+      this.setState(response);
+    } else {
+      const headers = {
+        "User-Agent": "podcastsuite",
+        Accept: "application/json",
+      };
+      fetch("/ln/best_podcasts?page=1", {
+        headers,
+      })
+        .then((data) => data.json())
+        .then((response) => {
+          const { podcasts } = response;
+          return podcasts;
+        })
+        .then((podcasts) => {
+          const cleanedCasts = podcasts.map((podcast, num) => {
+            const {
+              title,
+              domain,
+              thumbnail,
+              description,
+              id,
+              total_episodes: episodes,
+              earliest_pub_date_ms: startDate,
+              publisher,
+            } = podcast;
+            const rss = `https://www.listennotes.com/c/r/${id}`;
+            return {
+              title: `${num + 1}. ${title}`,
+              thumbnail,
+              domain,
+              description,
+              rss,
+              episodes,
+              startDate,
+              publisher,
+            };
+          });
+          response = {
+            top: cleanedCasts,
+            podcasts: cleanedCasts,
+            loading: false,
+            init: false,
+          };
+          this.setState(response);
+        });
+    }
   };
-  fetch("https://listen-api.listennotes.com/api/v2/best_podcasts?page=1", {
-    headers,
-  })
-    .then((data) => data.json())
-    .then((response) => {
-      const { podcasts } = response;
-      return podcasts;
-    })
-    .then((podcasts) => {
-      const cleanedCasts = podcasts.map((podcast, num) => {
-        const {
-          title,
-          domain,
-          thumbnail,
-          description,
-          id,
-          total_episodes: episodes,
-          earliest_pub_date_ms: startDate,
-          publisher,
-        } = podcast;
-        const rss = `https://www.listennotes.com/c/r/${id}`;
-        return {
-          title: `${num + 1}. ${title}`,
-          thumbnail,
-          domain,
-          description,
-          rss,
-          episodes,
-          startDate,
-          publisher,
-        };
-      });
-      this.setState({
-        top: cleanedCasts,
-        podcasts: cleanedCasts,
-        loading: false,
-        init: false,
-      });
-    });
-};
+})();
 
 export const getPodcastColor = (cast) => ({
   backgroundColor: randomColor({

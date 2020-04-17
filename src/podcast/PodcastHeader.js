@@ -12,8 +12,8 @@ import Favorite from "@material-ui/icons/Bookmark";
 import BookmarkBorderIcon from "@material-ui/icons/BookmarkBorder";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
-import Snackbar from '@material-ui/core/Snackbar';
-import MuiAlert from '@material-ui/lab/Alert';
+import Snackbar from "@material-ui/core/Snackbar";
+import MuiAlert from "@material-ui/lab/Alert";
 import { clearText } from "./EpisodeList";
 import { Consumer } from "../App.js";
 
@@ -58,14 +58,14 @@ function PodcastHeader(props) {
   const { classes, inLibrary, savePodcastToLibrary, removePodcast } = props;
   const isInLibrary = inLibrary();
   const [open, setOpen] = React.useState(false);
-
-  const saveThisPodcastToLibrary = (ev) =>{
+ 
+  const saveThisPodcastToLibrary = (ev) => {
     savePodcastToLibrary(ev);
     setOpen(true);
-  }
+  };
 
   const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
 
@@ -76,10 +76,13 @@ function PodcastHeader(props) {
     <Consumer>
       {({ state }) => (
         <>
-          <Snackbar open={open} onClose={handleClose} autoHideDuration={4000}>
-            <Alert severity="success">
-              Podcast Added to Library !
-            </Alert>
+          <Snackbar
+            open={open}
+            onClose={handleClose}
+            anchorOrigin={{ vertical: "top", horizontal: "center" }}
+            autoHideDuration={4000}
+          >
+            <Alert severity="success">Podcast Added to Library!</Alert>
           </Snackbar>
           <AppBar position="static">
             <Toolbar variant="dense">

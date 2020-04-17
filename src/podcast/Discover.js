@@ -173,7 +173,7 @@ class Discover extends Component {
         .catch((el) => this.setState({ podcasts: [], error: el, term: null }));
     } else {
       this.setState({ podcasts: [], init: true, term: null });
-      this.showTopPodcasts.call(this);
+      getPopularPodcasts.call(this);
     }
   }
 

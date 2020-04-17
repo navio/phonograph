@@ -19,6 +19,11 @@ app.use('/ln', proxy({
     pathRewrite: {'/ln' : '/api/v2/'},
     target: 'https://listen-api.listennotes.com',
     changeOrigin: true,
+    onProxyReq(proxyReq, req, res){
+      proxyReq.setHeader('X-ListenAPI-Key','ebbd0481aa1b4acc8949a9ffeedf4d7b');
+      proxyReq.setHeader('X-From', 'Gramophone-DEV');
+      proxyReq.end();
+    }
   }));
 
 const bundler = new Bundler('public/index.html');
