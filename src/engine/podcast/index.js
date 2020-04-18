@@ -179,6 +179,7 @@ const podcastCleaner = (podcasts) => {
 */
 export const initializeLibrary = function () {
   PodcastLibrary.ready.then(() => {
+
     PodcastLibrary.mapLibrary((cast) => {
       return PodcastLibrary.getContent(new URL(cast));
     }).then((podcasts) => {
@@ -189,9 +190,11 @@ export const initializeLibrary = function () {
       }
     });
     PodcastLibrary.getLibrary().then((podcastsArray) => {
-      Promise.all(
+      Promise.allSettled(
         podcastsArray.map((podcastRaw) => PodcastLibrary.getPodcast(podcastRaw))
-      ).then((podcasts) => {
+      )
+      .then((results) => results.filter((result) => result.status === 'fulfilled')) // not failing.
+      .then((podcasts) => {
         if (podcasts) {
           this.setState({
             podcasts: podcastCleaner(podcasts),
