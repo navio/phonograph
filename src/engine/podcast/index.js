@@ -159,10 +159,15 @@ export const isPodcastInLibrary = function () {
 };
 
 const podcastCleaner = (podcasts) => {
-  return podcasts.map((podcast) => ({
-    ...podcast,
-    domain: podcast.url,
-  }));
+  return podcasts.map((podcast) => {
+    delete podcast['items'];
+    delete podcast['description'];
+    delete podcast['length'];
+    return {
+      ...podcast, 
+      domain: podcast.url,
+    }
+  });
 };
 
 /*
