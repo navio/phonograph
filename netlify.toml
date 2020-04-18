@@ -11,7 +11,7 @@
   force = true
 
 [[redirects]]
-  from = "/rss-full/?term=*"
+  from = "/rss-full/*"
   to = ":splat"
   status = 200
   force = true

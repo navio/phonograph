@@ -9,10 +9,13 @@ const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 const API = "/ln/";
 
 // This is insane.. but for now seems necessary.
-const PROXY = {
+const PROXY = DEBUG ?  {
   "https:": `//${window.location.host}/rss-full/?term=https://`,
   "http:": `//${window.location.host}/rss-full/?term=http://`,
-};
+} : {
+  "https:": `//${window.location.host}/rss-full/https://`,
+  "http:": `//${window.location.host}/rss-full/http://`,
+}
 
 // Rules for URLS
 export const commonRules = (originalUrl) => {
