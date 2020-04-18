@@ -15,6 +15,12 @@ app.use('/api', proxy({
   changeOrigin: true,
 }));
 
+app.use('/rss-full', proxy({
+  pathRewrite: {'/rss-full' : '/.netlify/functions/findCast/'},
+  target: 'http://localhost:9000',
+  changeOrigin: true,
+}));
+
 app.use('/ln', proxy({
     pathRewrite: {'/ln' : '/api/v2/'},
     target: 'https://listen-api.listennotes.com',

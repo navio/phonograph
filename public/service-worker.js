@@ -29,6 +29,10 @@ self.addEventListener("fetch", function(event) {
       return;
     }
 
+    if(event.request.url.indexOf('/rss-full/') > -1 ){
+      return;
+    }
+
     if(event.request.url.indexOf('/ln/') > -1 ){
       return;
     }
