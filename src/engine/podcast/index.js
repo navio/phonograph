@@ -198,7 +198,7 @@ export const initializeLibrary = function () {
       Promise.allSettled(
         podcastsArray.map((podcastRaw) => PodcastLibrary.getPodcast(podcastRaw))
       )
-      .then((results) => results.filter((result) => result.status === 'fulfilled')) // not failing.
+      // .then((results) => results.filter((result) => result.status === 'fulfilled')) // not failing.
       .then((podcasts) => {
         if (podcasts) {
           this.setState({
