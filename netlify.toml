@@ -11,6 +11,12 @@
   force = true
 
 [[redirects]]
+  from = "/rss-test/*"
+  to = ":splat"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/rss-less-pg/*"
   to = "http://:splat"
   status = 200
