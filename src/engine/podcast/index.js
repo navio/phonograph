@@ -179,7 +179,6 @@ const podcastCleaner = (podcasts) => {
 */
 export const initializeLibrary = function () {
   PodcastLibrary.ready.then(() => {
-
     PodcastLibrary.mapLibrary((cast) => {
       return PodcastLibrary.getContent(new URL(cast));
     }).then((podcasts) => {
