@@ -2,7 +2,7 @@
     "name": "Phonograph",
     "short_name": "Phonograph",
     "default_locale": "en",
-    "description": "A Podcast Web App ",
+    "description": "A Podcast App ",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
