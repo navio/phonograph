@@ -9,18 +9,18 @@ const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 const API = "/ln/";
 
 // This is insane.. but for now seems necessary.
-// const PROXY = DEBUG ?  {
-//   "https:": `//${window.location.host}/rss-full/?term=https://`,
-//   "http:": `//${window.location.host}/rss-full/?term=http://`,
-// } : {
-//   "https:": `//${window.location.host}/rss-full/https://`,
-//   "http:": `//${window.location.host}/rss-full/http://`,
-// }
+const PROXY = DEBUG ?  {
+  "https:": `//${window.location.host}/rss-full/?term=https://`,
+  "http:": `//${window.location.host}/rss-full/?term=http://`,
+} : {
+  "https:": `//${window.location.host}/rss-full/https://`,
+  "http:": `//${window.location.host}/rss-full/http://`,
+}
 
-const PROXY = {	// This is insane.. but for now seems necessary.
-  "https:": `//${window.location.host}/api/findCast/?term=`,	
-  "http:": `//${window.location.host}/api/findCast/?term=`,	  
-};
+// const PROXY = {	// This is insane.. but for now seems necessary.
+//   "https:": `//${window.location.host}/api/findCast/?term=`,	
+//   "http:": `//${window.location.host}/api/findCast/?term=`,	  
+// };
 
 // Rules for URLS
 export const commonRules = (originalUrl) => {
@@ -194,19 +194,19 @@ export const initializeLibrary = function () {
         });
       }
     });
-    PodcastLibrary.getLibrary().then((podcastsArray) => {
-      Promise.allSettled(
-        podcastsArray.map((podcastRaw) => PodcastLibrary.getPodcast(podcastRaw))
-      )
-      // .then((results) => results.filter((result) => result.status === 'fulfilled')) // not failing.
-      .then((podcasts) => {
-        if (podcasts) {
-          this.setState({
-            podcasts: podcastCleaner(podcasts),
-          });
-        }
-      });
-    });
+    // PodcastLibrary.getLibrary().then((podcastsArray) => {
+    //   Promise.all(
+    //     podcastsArray.map((podcastRaw) => PodcastLibrary.getPodcast(podcastRaw))
+    //   )
+    //   // .then((results) => results.filter((result) => result.status === 'fulfilled')) // not failing.
+    //   .then((podcasts) => {
+    //     if (podcasts) {
+    //       this.setState({
+    //         podcasts: podcastCleaner(podcasts),
+    //       });
+    //     }
+    //   });
+    // });
   });
 };
 
