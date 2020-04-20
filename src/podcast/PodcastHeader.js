@@ -53,24 +53,7 @@ const styles = (theme) => ({
   },
 });
 
-const share = (title, text, url) => {
-  console.log(title,url)
-  if (navigator.share) {
-    return () =>
-      navigator
-        .share({
-          title,
-          text,
-          url,
-        })
-  } else if (navigator.clipboard) {
-    return () => {
-      navigator.clipboard.writeText(`${title} ${url.toString()}`);
-    };
-  } else {
-    return false;
-  }
-};
+
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -80,10 +63,12 @@ function PodcastHeader(props) {
   const { classes, inLibrary, savePodcastToLibrary, removePodcast } = props;
   const isInLibrary = inLibrary();
   const [open, setOpen] = React.useState(false);
+  const [message, setMessage] = React.useState('');
   let history = useHistory();
 
   const saveThisPodcastToLibrary = (ev) => {
     savePodcastToLibrary(ev);
+    setMessage("Podcast Added to Library")
     setOpen(true);
   };
 
@@ -93,8 +78,26 @@ function PodcastHeader(props) {
     if (reason === "clickaway") {
       return;
     }
-
     setOpen(false);
+  };
+  const shareLink = !!(navigator.share || navigator.clipboard)
+  const share = (title, text, url) => {
+    if (navigator.share) {
+      return () =>
+        navigator.share({
+          title,
+          text,
+          url,
+        });
+    } else if (navigator.clipboard) {
+      return () => {
+        navigator.clipboard.writeText(`${title} ${url.toString()}`);
+        setMessage("Link csopied to clipboard")
+        setOpen(true);
+      };
+    } else {
+      return false;
+    }
   };
 
   return (
@@ -107,7 +110,7 @@ function PodcastHeader(props) {
             anchorOrigin={{ vertical: "top", horizontal: "center" }}
             autoHideDuration={4000}
           >
-            <Alert severity="success">Podcast Added to Library!</Alert>
+            <Alert severity="success">{message}</Alert>
           </Snackbar>
           <AppBar position="static">
             <Toolbar variant="dense">
@@ -127,6 +130,7 @@ function PodcastHeader(props) {
                 </Grid>
                 <Grid item xs={6}>
                   {isInLibrary ? (
+                    <Tooltip title="Remove from library" placement="bottom">
                     <IconButton
                       className={classes.addToLibrary}
                       color="secondary"
@@ -135,7 +139,7 @@ function PodcastHeader(props) {
                       aria-label="Remove from Library"
                     >
                       <Favorite />
-                    </IconButton>
+                    </IconButton></Tooltip>
                   ) : (
                     <Tooltip title="Add to Library" placement="bottom">
                       <IconButton
@@ -148,18 +152,18 @@ function PodcastHeader(props) {
                       </IconButton>
                     </Tooltip>
                   )}
-                  <IconButton
+                  {shareLink && <Tooltip title="Share Podcast" placement="bottom"><IconButton
                     color="secondary"
                     size="small"
                     className={classes.addToLibrary}
                     onClick={share(
-                      'Phonograph',
+                      "Phonograph",
                       state.title,
                       `${document.location.origin}?podcast=${state.domain}`
                     )}
                   >
                     <ShareIcon />
-                  </IconButton>
+                  </IconButton></Tooltip>}
                 </Grid>
               </Grid>
             </Toolbar>
