@@ -12,7 +12,6 @@ import {
   searchForPodcasts,
   getPodcastColor,
 } from "../engine/podcast";
-// import { styles } from "./PodcastGrid";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
@@ -20,6 +19,14 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import SearchIcon from "@material-ui/icons/Search";
 import InputBase from "@material-ui/core/InputBase";
 import Backdrop from "@material-ui/core/Backdrop";
+
+// --
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
+import Divider from "@material-ui/core/Divider";
+import ListItemAvatar from "@material-ui/core/ListItemAvatar";
+import Avatar from "@material-ui/core/Avatar";
 
 const styles = (theme) => ({
   backdrop: {
@@ -71,6 +78,9 @@ const styles = (theme) => ({
     alignItems: "center",
     justifyContent: "center",
   },
+  listItem: {
+    display: "inline-grid",
+  },
   inputRoot: {
     color: "inherit",
   },
@@ -97,7 +107,7 @@ class Discover extends Component {
       loading: false,
       podcasts: [],
       error: null,
-      term: "",
+      term: null,
       loadContent: false,
     };
     this.searchForPodcasts = searchForPodcasts.bind(this);
@@ -106,11 +116,7 @@ class Discover extends Component {
     // this.addPodcast = this.props.addPodcast;
   }
   componentDidMount() {
-    if (this.state.top) {
-      this.setState({ podcasts: this.state.top });
-    } else {
-      getPopularPodcasts.call(this);
-    }
+    getPopularPodcasts.call(this);
   }
 
   async getFinalURL(url) {
@@ -134,7 +140,7 @@ class Discover extends Component {
       request(domain)
         .then((finalDomain) => {
           addPodcastHandler(finalDomain, actionAfterClick);
-          this.setState({loadContent: false});
+          this.setState({ loadContent: false });
         })
         .catch(console.error);
     };
@@ -164,7 +170,7 @@ class Discover extends Component {
             };
           });
           this.setState({
-            podcasts: cleanedCasts,
+            podcasts: cleanedCasts.slice(0, 4),
             loading: false,
             init: false,
             term: search,
@@ -173,16 +179,20 @@ class Discover extends Component {
         .catch((el) => this.setState({ podcasts: [], error: el, term: null }));
     } else {
       this.setState({ podcasts: [], init: true, term: null });
-      getPopularPodcasts.call(this);
+      //getPopularPodcasts.call(this);
     }
   }
 
   render() {
     const podcasts = this.state.podcasts;
+    const topPodcasts = this.state.top;
     const { classes } = this.props;
     return (
       <>
-        <Backdrop className={classes.backdrop} open={this.state.loadContent || false}>
+        <Backdrop
+          className={classes.backdrop}
+          open={this.state.loadContent || false}
+        >
           <CircularProgress color="inherit" />
         </Backdrop>
         <Card>
@@ -211,7 +221,6 @@ class Discover extends Component {
               </Toolbar>
             </Grid>
           </AppBar>
-
           {podcasts && podcasts.length > 0 ? (
             <>
               <Card>
@@ -231,7 +240,7 @@ class Discover extends Component {
               >
                 {podcasts.map((cast, ins) => {
                   return (
-                    <Grid item xs={12} sm={6} lg={3} key={ins}>
+                    <Grid item xs={6} sm={3} key={ins}>
                       <Card
                         className={classes.cardPointerValue}
                         onClick={this.getClickHandler.call(this, cast.rss)}
@@ -272,12 +281,68 @@ class Discover extends Component {
               <CircularProgress className={classes.progress} />
             </div>
           ) : (
-            <Grid container style={{ padding: "2em" }}>
-              <Typography variant="subtitle1">
-                {this.state.term && `Nothing Found for "${this.state.term}"`}
-              </Typography>
-            </Grid>
+            this.state.term && (
+              <Card>
+                <CardContent>
+                  <Grid container>
+                    <Typography variant={"h5"}>
+                      {this.state.term &&
+                        `Nothing Found for "${this.state.term}"`}
+                    </Typography>
+                  </Grid>
+                </CardContent>
+              </Card>
+            )
           )}
+          <Card>
+            <CardContent>
+              <Typography variant={"h5"} component={"h2"}>
+                Today Top Podcasts
+              </Typography>
+            </CardContent>
+            <CardContent>
+              <Grid container>
+                {topPodcasts &&
+                  topPodcasts.map((podcast) => (
+                    <Grid item xs={6} sm={4} md={3}>
+                      <List
+                        dense
+                        component="nav"
+                        aria-label="top podcast"
+                        key={podcast.title}
+                      >
+                        <ListItem
+                          button
+                          onClick={this.getClickHandler.call(this, podcast.rss)}
+                        >
+                          <ListItemAvatar>
+                            <Avatar
+                              alt={podcast.title}
+                              src={podcast.thumbnail}
+                            />
+                          </ListItemAvatar>
+                          <ListItemText
+                            classes={{
+                              root: classes.listItem,
+                            }}
+                            primaryTypographyProps={{
+                              noWrap: true,
+                              elementtype: "span",
+                            }}
+                            primary={podcast.title}
+                            secondaryTypographyProps={{
+                              noWrap: true,
+                              elementtype: "span",
+                            }}
+                            secondary={podcast.publisher}
+                          />
+                        </ListItem>
+                      </List>
+                    </Grid>
+                  ))}
+              </Grid>
+            </CardContent>
+          </Card>
         </Card>
       </>
     );

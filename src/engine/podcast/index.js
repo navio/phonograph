@@ -308,7 +308,6 @@ export const getPopularPodcasts = (function () {
           });
           response = {
             top: cleanedCasts,
-            podcasts: cleanedCasts,
             loading: false,
             init: false,
           };
