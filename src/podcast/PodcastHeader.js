@@ -15,7 +15,10 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 import { clearText } from "./EpisodeList";
+import ShareIcon from "@material-ui/icons/ShareOutlined";
+import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import { Consumer } from "../App.js";
+import { useHistory } from "react-router-dom";
 
 const styles = (theme) => ({
   card: {
@@ -50,6 +53,25 @@ const styles = (theme) => ({
   },
 });
 
+const share = (title, text, url) => {
+  console.log(title,url)
+  if (navigator.share) {
+    return () =>
+      navigator
+        .share({
+          title,
+          text,
+          url,
+        })
+  } else if (navigator.clipboard) {
+    return () => {
+      navigator.clipboard.writeText(`${title} ${url.toString()}`);
+    };
+  } else {
+    return false;
+  }
+};
+
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
@@ -58,11 +80,14 @@ function PodcastHeader(props) {
   const { classes, inLibrary, savePodcastToLibrary, removePodcast } = props;
   const isInLibrary = inLibrary();
   const [open, setOpen] = React.useState(false);
- 
+  let history = useHistory();
+
   const saveThisPodcastToLibrary = (ev) => {
     savePodcastToLibrary(ev);
     setOpen(true);
   };
+
+  const backHandler = () => history.goBack();
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -88,7 +113,17 @@ function PodcastHeader(props) {
             <Toolbar variant="dense">
               <Grid container>
                 <Grid item xs={6}>
-                  <Typography variant="h6">Podcast</Typography>
+                  <Typography variant="h6">
+                    <IconButton
+                      size="small"
+                      aria-label="back"
+                      onClick={backHandler}
+                    >
+                      {" "}
+                      <ArrowBackIcon />
+                    </IconButton>
+                    Podcast
+                  </Typography>
                 </Grid>
                 <Grid item xs={6}>
                   {isInLibrary ? (
@@ -113,6 +148,18 @@ function PodcastHeader(props) {
                       </IconButton>
                     </Tooltip>
                   )}
+                  <IconButton
+                    color="secondary"
+                    size="small"
+                    className={classes.addToLibrary}
+                    onClick={share(
+                      'Phonograph',
+                      state.title,
+                      `${document.location.origin}?podcast=${state.domain}`
+                    )}
+                  >
+                    <ShareIcon />
+                  </IconButton>
                 </Grid>
               </Grid>
             </Toolbar>

@@ -34,7 +34,8 @@ export const commonRules = (originalUrl) => {
   return url;
 };
 
-const initializeCast = defaultCasts.map(commonRules);
+const initializeCast = []
+//defaultCasts.map(commonRules);
 
 const PodcastLibrary = new PodcastEngine({
   podcasts: initializeCast,
