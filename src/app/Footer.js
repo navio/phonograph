@@ -8,6 +8,7 @@ import DiscoverIcon from "@material-ui/icons/FilterDrama";
 import Settings from "@material-ui/icons/Settings";
 import Paper from "@material-ui/core/Paper";
 import { withRouter } from "react-router-dom";
+import { ROOT, LIBVIEW, PODCASTVIEW, DISCOVERVIEW, SETTINGSVIEW } from "../constants";
 const styles = {
   root: {
     position: "fixed",
@@ -40,19 +41,19 @@ class SimpleBottomNavigation extends React.Component {
             <BottomNavigationAction
               label="Library"
               value="library"
-              onClick={this.handleRedirect("/")}
+              onClick={this.handleRedirect(LIBVIEW)}
               icon={<Favorite />}
             />
             <BottomNavigationAction
               label="Discover"
               value="discover"
-              onClick={this.handleRedirect("/discover")}
+              onClick={this.handleRedirect(DISCOVERVIEW)}
               icon={<DiscoverIcon />}
             />
             <BottomNavigationAction
               label="Settings"
               value="settings"
-              onClick={this.handleRedirect("/settings")}
+              onClick={this.handleRedirect(SETTINGSVIEW)}
               icon={<Settings />}
             />
           </BottomNavigation>

@@ -297,14 +297,14 @@ class Discover extends Component {
           <Card>
             <CardContent>
               <Typography variant={"h5"} component={"h2"}>
-                Today Top Podcasts
+                Today's Top Podcasts
               </Typography>
             </CardContent>
             <CardContent>
               <Grid container>
                 {topPodcasts &&
                   topPodcasts.map((podcast) => (
-                    <Grid item xs={6} sm={4} md={3}>
+                    <Grid item xs={12} sm={6} md={3}>
                       <List
                         dense
                         component="nav"

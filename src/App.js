@@ -5,7 +5,7 @@ import theme from "./Theme";
 import audioqueue from "audioqueue";
 // import "babel-polyfill";
 
-import { LIBVIEW, PODCASTVIEW, DISCOVERVIEW, SETTINGSVIEW } from "./constants";
+import { ROOT, LIBVIEW, PODCASTVIEW, DISCOVERVIEW, SETTINGSVIEW } from "./constants";
 
 // App Components
 // import Header from './app/Header';
@@ -114,7 +114,7 @@ class App extends Component {
             callback={this.clearNotification}
             {...this.state.notification}
           />
-
+          <Redirect from={ROOT} to={DISCOVERVIEW} />
           <Route
             exact
             path={LIBVIEW}
