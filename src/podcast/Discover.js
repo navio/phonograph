@@ -28,7 +28,7 @@ import Divider from "@material-ui/core/Divider";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
 
-  import Search from "./Search";
+import Search from "./Search";
 
 const styles = (theme) => ({
   backdrop: {
@@ -101,8 +101,34 @@ const styles = (theme) => ({
   },
 });
 
-class Discover extends Component {
+const Header = ({ searchHandler }) => (
+  <AppBar position="static">
+    <Grid>
+      <Toolbar variant="dense">
+        <Grid item xs={8}>
+          <Typography variant="h6">Discover</Typography>
+        </Grid>
+        <Grid item md={4} xs={12}>
+          <Search onChange={searchHandler} />
+        </Grid>
+      </Toolbar>
+    </Grid>
+  </AppBar>
+);
 
+const getFinalURL = async (url) => {
+  const URL = `/api/findFinal/?term=${url}`;
+  try {
+    const data = await fetch(URL);
+    const result = await data.json();
+    return result.url;
+  } catch (error) {
+    new Error(error);
+    return URL;
+  }
+};
+
+class Discover extends Component {
   constructor(props) {
     super();
     this.state = {
@@ -114,25 +140,12 @@ class Discover extends Component {
       loadContent: false,
     };
     this.searchForPodcasts = searchForPodcasts.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    this.getFinalURL = this.getFinalURL.bind(this);
+    this.getFinalURL = getFinalURL.bind(this);
     this.searchHandler = this.searchHandler.bind(this);
-    // this.addPodcast = this.props.addPodcast;
-  }
-  componentDidMount() {
-    getPopularPodcasts.call(this);
   }
 
-  async getFinalURL(url) {
-    const URL = `/api/findFinal/?term=${url}`;
-    try {
-      const data = await fetch(URL);
-      const result = await data.json();
-      return result.url;
-    } catch (error) {
-      new Error(error);
-      return URL;
-    }
+  componentDidMount() {
+    getPopularPodcasts.call(this);
   }
 
   getClickHandler(domain) {
@@ -150,56 +163,19 @@ class Discover extends Component {
     };
   }
 
-  handleChange(ev) {
-    let search = ev.target.value;
-    if (search) {
-      this.setState({ loading: true });
-      this.searchForPodcasts(search)
-        .then((podcasts) => {
-          const cleanedCasts = podcasts.map((podcast) => {
-            const {
-              title_original: title,
-              website: domain,
-              thumbnail,
-              id,
-              publisher_original: publisher,
-            } = podcast;
-            const rss = `https://www.listennotes.com/c/r/${id}`;
-            return {
-              title,
-              thumbnail,
-              domain,
-              rss,
-              publisher,
-            };
-          });
-          this.setState({
-            podcasts: cleanedCasts.slice(0, 4),
-            loading: false,
-            init: false,
-            term: search,
-          });
-        })
-        .catch((el) => this.setState({ podcasts: [], error: el, term: null }));
-    } else {
-      this.setState({ podcasts: [], init: true, term: null });
-      //getPopularPodcasts.call(this);
-    }
-  }
-
-  searchHandler(a,b){
-      const {id} = b;
-      const domain = `https://www.listennotes.com/c/r/${id}`;
-      this.setState({ loadContent: true });
-      const request = this.getFinalURL;
-      const addPodcastHandler = this.props.addPodcastHandler;
-      const actionAfterClick = this.props.actionAfterClick;
-      request(domain)
-        .then((finalDomain) => {
-          addPodcastHandler(finalDomain, actionAfterClick);
-          this.setState({ loadContent: false });
-        })
-        .catch(console.error);
+  searchHandler(a, b) {
+    const { id } = b;
+    const domain = `https://www.listennotes.com/c/r/${id}`;
+    this.setState({ loadContent: true });
+    const request = this.getFinalURL;
+    const addPodcastHandler = this.props.addPodcastHandler;
+    const actionAfterClick = this.props.actionAfterClick;
+    request(domain)
+      .then((finalDomain) => {
+        addPodcastHandler(finalDomain, actionAfterClick);
+        this.setState({ loadContent: false });
+      })
+      .catch(console.error);
   }
 
   render() {
@@ -215,102 +191,18 @@ class Discover extends Component {
           <CircularProgress color="inherit" />
         </Backdrop>
         <Card>
-          <AppBar position="static">
-            <Grid>
-              <Toolbar variant="dense">
-                <Grid item xs={8}>
-                  <Typography variant="h6">Discover</Typography>
-                </Grid>
-                <Grid item md={4} xs={12}>
-                  <Search onChange={this.searchHandler}/>
-                </Grid>
-              </Toolbar>
-            </Grid>
-          </AppBar>
-          {podcasts && podcasts.length > 0 ? (
-            <>
-              <Card>
-                <CardContent>
-                  <Typography variant="h5" component="h2">
-                    {!this.state.term
-                      ? "Trending"
-                      : `Results for "${this.state.term}"`}
-                  </Typography>
-                </CardContent>
-              </Card>
-              <Grid
-                // style={{ paddingTop: "2em" }}
-                container
-                spacing={0}
-                direction={"row"}
-              >
-                {podcasts.map((cast, ins) => {
-                  return (
-                    <Grid item xs={6} sm={3} key={ins}>
-                      <Card
-                        className={classes.cardPointerValue}
-                        onClick={this.getClickHandler.call(this, cast.rss)}
-                        domain={cast.rss}
-                      >
-                        <CardMedia
-                          className={classes.cover}
-                          image={cast.thumbnail}
-                          title={cast.title}
-                        />
-                        <CardContent>
-                          <Typography component="p" variant="h6" noWrap>
-                            {cast.title}
-                          </Typography>
-                          {cast.publisher && (
-                            <Typography
-                              component="p"
-                              variant="subtitle2"
-                              noWrap
-                            >
-                              By {cast.publisher}
-                            </Typography>
-                          )}
-                          {cast.episodes && (
-                            <Typography component="p" variant="overline">
-                              Episodes: {cast.episodes}
-                            </Typography>
-                          )}
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  );
-                })}
-              </Grid>
-            </>
-          ) : this.state.loading ? (
-            <div className={classes.progressContainer}>
-              <CircularProgress className={classes.progress} />
-            </div>
-          ) : (
-            this.state.term && (
-              <Card>
-                <CardContent>
-                  <Grid container>
-                    <Typography variant={"h5"}>
-                      {this.state.term &&
-                        `Nothing Found for "${this.state.term}"`}
-                    </Typography>
-                  </Grid>
-                </CardContent>
-              </Card>
-            )
-          )}
+          <Header searchHandler={this.searchHandler} />
           <Card>
             <CardContent>
-              <Typography variant={"h5"} component={"h2"}>
-                Today's Top Podcasts
+              <Typography variant={"h5"} pb={0} component={"h2"}>
+                Today's Top 20 Podcasts
               </Typography>
             </CardContent>
             <CardContent>
               <Grid container>
                 {topPodcasts &&
                   topPodcasts.map((podcast) => (
-                    <Grid key={podcast.title} item xs={12} sm={6} md={3}>
+                    <Grid key={podcast.title} item xs={12} sm={6} md={4} lg={3}>
                       <List
                         dense
                         component="nav"
@@ -321,12 +213,12 @@ class Discover extends Component {
                           button
                           onClick={this.getClickHandler.call(this, podcast.rss)}
                         >
-                          <ListItemAvatar>
-                            <Avatar
-                              alt={podcast.title}
-                              src={podcast.thumbnail}
-                            />
-                          </ListItemAvatar>
+                          <img
+                            style={{ width: "8em" }}
+                            alt={podcast.title}
+                            src={podcast.thumbnail}
+                          />
+
                           <ListItemText
                             classes={{
                               root: classes.listItem,
@@ -334,6 +226,7 @@ class Discover extends Component {
                             primaryTypographyProps={{
                               noWrap: true,
                               elementtype: "span",
+                              variant:'subtitle1'
                             }}
                             primary={podcast.title}
                             secondaryTypographyProps={{

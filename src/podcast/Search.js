@@ -44,6 +44,11 @@ export default ({ onChange }) => {
       getOptionLabel={(option) => option.title_original}
       renderOption={(option, key) => (
         <div width={"100%"} value={option.id} key={key}>
+           <img
+                            style={{ width: "2em", paddingRight:".2em" }}
+                            alt={option.title_original}
+                            src={option.thumbnail}
+                          />
           {option.title_original}
         </div>
       )}
