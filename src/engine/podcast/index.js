@@ -78,13 +78,15 @@ export const fetchPodcastToView = function (podcast) {
     PodcastLibrary.getPodcast(commonRules(podcast))
       .then((cast) => {
         if (cast) {
-          let { title, image, description, url } = cast;
+          let { title, image, description, url, created, link } = cast;
           this.setState({
             title,
             image,
             description,
             domain: url,
             podcast,
+            created,
+            link
           });
         }
         retrievePodcast.call(this, podcast);

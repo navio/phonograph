@@ -64,6 +64,7 @@ class App extends Component {
       description: "",
       image: null,
       link: null,
+      created: null,
       loading: false,
       podcasts: [],
     };
