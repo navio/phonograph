@@ -214,7 +214,7 @@ class Discover extends Component {
                           onClick={this.getClickHandler.call(this, podcast.rss)}
                         >
                           <img
-                            style={{ width: "8em" }}
+                            style={{ width: "8em", marginRight:".5em" }}
                             alt={podcast.title}
                             src={podcast.thumbnail}
                           />
