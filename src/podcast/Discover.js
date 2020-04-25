@@ -28,6 +28,8 @@ import Divider from "@material-ui/core/Divider";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
 
+  import Search from "./Search";
+
 const styles = (theme) => ({
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
@@ -100,6 +102,7 @@ const styles = (theme) => ({
 });
 
 class Discover extends Component {
+
   constructor(props) {
     super();
     this.state = {
@@ -113,6 +116,7 @@ class Discover extends Component {
     this.searchForPodcasts = searchForPodcasts.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.getFinalURL = this.getFinalURL.bind(this);
+    this.searchHandler = this.searchHandler.bind(this);
     // this.addPodcast = this.props.addPodcast;
   }
   componentDidMount() {
@@ -132,8 +136,8 @@ class Discover extends Component {
   }
 
   getClickHandler(domain) {
-    let addPodcastHandler = this.props.addPodcastHandler;
-    let actionAfterClick = this.props.actionAfterClick;
+    const addPodcastHandler = this.props.addPodcastHandler;
+    const actionAfterClick = this.props.actionAfterClick;
     const request = this.getFinalURL;
     return () => {
       this.setState({ loadContent: true });
@@ -183,6 +187,21 @@ class Discover extends Component {
     }
   }
 
+  searchHandler(a,b){
+      const {id} = b;
+      const domain = `https://www.listennotes.com/c/r/${id}`;
+      this.setState({ loadContent: true });
+      const request = this.getFinalURL;
+      const addPodcastHandler = this.props.addPodcastHandler;
+      const actionAfterClick = this.props.actionAfterClick;
+      request(domain)
+        .then((finalDomain) => {
+          addPodcastHandler(finalDomain, actionAfterClick);
+          this.setState({ loadContent: false });
+        })
+        .catch(console.error);
+  }
+
   render() {
     const podcasts = this.state.podcasts;
     const topPodcasts = this.state.top;
@@ -203,20 +222,7 @@ class Discover extends Component {
                   <Typography variant="h6">Discover</Typography>
                 </Grid>
                 <Grid item md={4} xs={12}>
-                  <div className={classes.search}>
-                    <div className={classes.searchIcon}>
-                      <SearchIcon />
-                    </div>
-                    <InputBase
-                      placeholder="Search…"
-                      classes={{
-                        root: classes.inputRoot,
-                        input: classes.inputInput,
-                      }}
-                      inputProps={{ "aria-label": "search" }}
-                      onChange={this.handleChange}
-                    />
-                  </div>
+                  <Search onChange={this.searchHandler}/>
                 </Grid>
               </Toolbar>
             </Grid>
@@ -304,7 +310,7 @@ class Discover extends Component {
               <Grid container>
                 {topPodcasts &&
                   topPodcasts.map((podcast) => (
-                    <Grid item xs={12} sm={6} md={3}>
+                    <Grid key={podcast.title} item xs={12} sm={6} md={3}>
                       <List
                         dense
                         component="nav"

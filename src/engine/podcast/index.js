@@ -17,10 +17,6 @@ const PROXY = DEBUG ?  {
   "http:": `//${window.location.host}/rss-full/http://`,
 }
 
-// const PROXY = {	// This is insane.. but for now seems necessary.
-//   "https:": `//${window.location.host}/api/findCast/?term=`,	
-//   "http:": `//${window.location.host}/api/findCast/?term=`,	  
-// };
 
 // Rules for URLS
 export const commonRules = (originalUrl) => {

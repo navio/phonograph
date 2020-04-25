@@ -122,10 +122,8 @@ function PodcastHeader(props) {
                       aria-label="back"
                       onClick={backHandler}
                     >
-                      {" "}
-                      <ArrowBackIcon />
+                      <ArrowBackIcon style={{ color: '#fff' }} />
                     </IconButton>
-                    Podcast
                   </Typography>
                 </Grid>
                 <Grid item xs={6}>
