@@ -186,7 +186,7 @@ function PodcastHeader(props) {
             <Grid item sm={12} md={6}>
                 <Typography
                 className={classes.title} 
-                variant="h3" noWrap>
+                variant="h4" noWrap>
                   {state.title}
                 </Typography>
                 <Typography 
