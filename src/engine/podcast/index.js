@@ -263,10 +263,18 @@ export const checkIfNewPodcastInURL = function () {
 };
 
 export const getPopularPodcasts = (function () {
-  let response = null;
+  const lsName = 'topCasts';
+  const seconsToRefresh = 6 * 60 * 1000;
+  
+
   return function query() {
-    if (response) {
+    
+    let responseSaved = JSON.parse(localStorage.getItem(lsName)) || {};
+    const fresh = responseSaved.created + seconsToRefresh >  Date.now()
+    if (responseSaved.created && fresh ) {
+      const {response } = responseSaved;
       this.setState(response);
+      return;
     } else {
       const headers = {
         "User-Agent": "podcastsuite",
@@ -304,12 +312,16 @@ export const getPopularPodcasts = (function () {
               publisher,
             };
           });
-          response = {
+          const response = {
             top: cleanedCasts,
             loading: false,
             init: false,
           };
           this.setState(response);
+          responseSaved = { response, created: Date.now() }
+          console.log('response fetched and Saved', responseSaved)
+          localStorage.setItem(lsName,JSON.stringify(responseSaved));
+          
         });
     }
   };
