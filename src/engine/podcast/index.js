@@ -36,7 +36,7 @@ const initializeCast = []
 const PodcastLibrary = new PodcastEngine({
   podcasts: initializeCast,
   proxy: PROXY,
-  fresh: 1800000,
+  fresh: 1000*60*60,
 });
 const current = new Podcast();
 
