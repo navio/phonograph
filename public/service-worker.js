@@ -1,5 +1,5 @@
 
-const version = 1.3;
+const version = 1.4;
 self.addEventListener("install", function(event) {
     event.waitUntil(
       caches
@@ -16,7 +16,11 @@ self.addEventListener("install", function(event) {
           console.log('WORKER: install completed');
         })
     );
-  });
+});
+
+self.addEventListener('activate', event => {
+  console.log('Service Worker Active');
+});
 
 self.addEventListener("fetch", function(event) {
     console.log('WORKER: fetch event in progress.');
