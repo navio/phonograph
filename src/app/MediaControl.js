@@ -17,7 +17,7 @@ import LinearProgress from "@material-ui/core/LinearProgress";
 import Grid from "@material-ui/core/Grid";
 import { Link } from "react-router-dom";
 import { Consumer } from "../App.js";
-import blueGrey from '@material-ui/core/colors/blueGrey';
+import blueGrey from "@material-ui/core/colors/blueGrey";
 
 const styles = (theme) => ({
   card: {
@@ -40,15 +40,16 @@ const styles = (theme) => ({
   },
   left: {
     textAlign: "left",
+    padding: 0,
   },
   line: {
     position: "absolute",
-    top: '8px',
+    top: "8px",
     width: "100%",
   },
   progress: {
     position: "absolute",
-    top: '7px',
+    top: "7px",
     width: "100%",
   },
   trackAfter: {
@@ -56,9 +57,11 @@ const styles = (theme) => ({
   },
   right: {
     textAlign: "right",
+    padding: 0,
   },
   center: {
     textAlign: "center",
+    padding: 0,
   },
   playIcon: {
     height: 45,
@@ -67,6 +70,7 @@ const styles = (theme) => ({
   controlIcon: {
     height: 30,
     width: 30,
+    color: theme.palette.secondary.main
   },
   player: {
     paddingLeft: 20,
@@ -80,14 +84,16 @@ const styles = (theme) => ({
     position: "absolute",
   },
   container: {
-    position: "relative"
+    position: "relative",
   },
+  title: { paddingTop: "10px", paddingBottom: "10px", color: theme.palette.text.primary },
   root: {
-    borderTop: "1px solid rgba(0, 0, 0, 0.12)",
+    borderTop: "2px solid",
+    borderColor: theme.palette.primary.main,
     position: "fixed",
     bottom: 56,
     width: "100%",
-    backgroundColor: blueGrey[200],
+    backgroundColor: theme.palette.background.paper,
     zIndex: 50,
   },
 });
@@ -123,10 +129,14 @@ function MediaControlCard(props) {
             {episode && (
               <div className={classes.card}>
                 <div className={classes.details}>
-                  <Link to="/podcast" style={{color:'#000'}}>
-                    <CardContent>
-                      <Typography variant="body1">{episode.title}</Typography>
-                    </CardContent>
+                  <Link to="/podcast" style={{ textDecoration: "none" }}>
+                    <Typography
+                      align={"center"}
+                      className={classes.title}
+                      variant="h6"
+                    >
+                      {episode.title}
+                    </Typography>
                   </Link>
 
                   <Grid container className={classes.player}>
@@ -140,13 +150,13 @@ function MediaControlCard(props) {
                         value={state.played}
                         valueBuffer={state.loaded}
                       />
-                        <Slider
-                          style={{padding:'0px'}}
-                          className={classes.line}
-                          value={state.played}
-                          aria-labelledby="audio"
-                          onChange={props.seek}
-                        />
+                      <Slider
+                        style={{ padding: "0px" }}
+                        className={classes.line}
+                        value={state.played}
+                        aria-labelledby="audio"
+                        onChange={props.seek}
+                      />
                     </Grid>
                     <Grid item xs={2} className={classes.right}>
                       <span>
@@ -157,7 +167,11 @@ function MediaControlCard(props) {
 
                   <Grid container className={classes.controls}>
                     <Grid className={classes.right} item xs={4}>
-                      <IconButton aria-label="Previous" onClick={props.rewind}>
+                      <IconButton
+                        style={{ padding: "0" }}
+                        aria-label="Previous"
+                        onClick={props.rewind}
+                      >
                         {theme.direction === "rtl" ? (
                           <SkipNextIcon className={classes.controlIcon} />
                         ) : (
@@ -167,6 +181,7 @@ function MediaControlCard(props) {
                     </Grid>
                     <Grid item xs={4} className={classes.center}>
                       <IconButton
+                        style={{ padding: "0" }}
                         aria-label="Play/pause"
                         onClick={props.handler}
                         data-guid={state.playing}
@@ -180,7 +195,11 @@ function MediaControlCard(props) {
                       </IconButton>
                     </Grid>
                     <Grid item xs={4} className={classes.left}>
-                      <IconButton aria-label="Next" onClick={props.forward}>
+                      <IconButton
+                        style={{ padding: "0" }}
+                        aria-label="Next"
+                        onClick={props.forward}
+                      >
                         {theme.direction === "rtl" ? (
                           <SkipPreviousIcon className={classes.controlIcon} />
                         ) : (
