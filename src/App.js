@@ -115,7 +115,7 @@ class App extends Component {
             callback={this.clearNotification}
             {...this.state.notification}
           />
-          <Redirect from={ROOT} to={DISCOVERVIEW} />
+          
           <Route
             exact
             path={LIBVIEW}
@@ -170,6 +170,7 @@ class App extends Component {
               />
             )}
           />
+          <Redirect from={ROOT} to={LIBVIEW} />
 
           <MediaControl
             toCurrentPodcast={this.navigateTo(PODCASTVIEW)}

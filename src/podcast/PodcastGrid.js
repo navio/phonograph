@@ -15,6 +15,7 @@ import AddIcon from "@material-ui/icons/Add";
 import Fab from "@material-ui/core/Fab";
 import { getPodcastColor, cachedContent } from "../engine/podcast";
 import { Consumer } from "../App.js";
+import ButtonBase from '@material-ui/core/ButtonBase';
 
 export const styles = (theme) => ({
   podcastMedia: {
@@ -103,8 +104,8 @@ function PodCastGrid(props) {
                     cast.domain && (
                       <Grid item xs={4} sm={3} md={2} key={cast.domain}>
                         <Card
-                          classes={{ root: classes.card }}
-                          style={getMyColor(cast)}
+                          raised={true}
+                          classes={{ root: classes.card }}                
                         >
                           <div className={classes.relativeContainer}>
                             <CardContent className={classes.cardContent}>
