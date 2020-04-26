@@ -89,7 +89,7 @@ const styles = (theme) => ({
   title: { paddingTop: "10px", paddingBottom: "10px", color: theme.palette.text.primary },
   root: {
     borderTop: "2px solid",
-    borderColor: theme.palette.primary.main,
+    borderColor: theme.palette.secondary.main,
     position: "fixed",
     bottom: 56,
     width: "100%",

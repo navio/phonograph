@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { ThemeProvider } from "@material-ui/core/styles";
-import theme from "./Theme";
+import theme, {switchHanlder} from "./Theme";
 import audioqueue from "audioqueue";
 // import "babel-polyfill";
 
@@ -17,7 +17,7 @@ import { clearNotification, addNotification } from "./engine/notifications";
 // Podcast Views
 import EpisodeList from "./podcast/EpisodeList";
 import PodcastHeader from "./podcast/PodcastHeader";
-import PodcastGrid from "./podcast/PodcastGrid";
+import Library from "./podcast/Library";
 import Discover from "./podcast/Discover";
 import Settings from "./podcast/Settings";
 
@@ -67,6 +67,7 @@ class App extends Component {
       created: null,
       loading: false,
       podcasts: [],
+      theme: true
     };
 
     this.episodes = new Map();
@@ -82,6 +83,8 @@ class App extends Component {
 
     this.clearNotification = clearNotification.bind(this);
     this.addNotification = addNotification.bind(this);
+
+    this.switchHanlder = switchHanlder.bind(this);
 
     // Mode
     const newPodcast = checkIfNewPodcastInURL.call(this);
@@ -102,10 +105,12 @@ class App extends Component {
     window.notification = this.addNotification;
   }
 
+
   render() {
+    const finalTheme = ( this.state.theme === theme.os) ? theme.dark : theme.light
     const episode = this.episodes.get(this.state.episode);
     return (
-      <ThemeProvider theme={theme}>
+      <ThemeProvider theme={(finalTheme)}>
         <AppContext.Provider
           value={{ state: this.state, global: this, episode: episode }}
         >
@@ -118,9 +123,9 @@ class App extends Component {
           
           <Route
             exact
-            path={LIBVIEW}
+            path={[LIBVIEW, ROOT]}
             render={({ history }) => (
-              <PodcastGrid
+              <Library
                 addPodcastHandler={this.navigateTo(DISCOVERVIEW)} //{this.askForPodcast}
                 actionAfterSelectPodcast={this.navigateTo(PODCASTVIEW)}
               />
@@ -151,6 +156,7 @@ class App extends Component {
           />
 
           <Route
+            exact
             path={DISCOVERVIEW}
             render={({ history }) => (
               <Discover
@@ -165,12 +171,12 @@ class App extends Component {
             path={SETTINGSVIEW}
             render={() => (
               <Settings
+                themeSwitcher={this.switchHanlder}
                 removePodcast={removePodcastFromLibrary.bind(this)}
                 podcasts={this.state.podcasts}
               />
             )}
           />
-          <Redirect from={ROOT} to={LIBVIEW} />
 
           <MediaControl
             toCurrentPodcast={this.navigateTo(PODCASTVIEW)}

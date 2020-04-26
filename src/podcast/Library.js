@@ -60,6 +60,12 @@ export const styles = (theme) => ({
     bottom: "5em",
     margin: "0 auto",
   },
+  empty: {
+    display:"block",
+    width:"100%",
+    marginTop:"18%",
+    color: theme.palette.text.secondary
+  }
 });
 
 const addMore = "addmore";
@@ -97,7 +103,7 @@ function PodCastGrid(props) {
               <AddIcon />
             </Fab>
             <Grid container spacing={0} direction={"row"}>
-              {casts &&
+              {casts.length > 0 ?
                 casts.map(
                   (cast) =>
                     cast &&
@@ -122,7 +128,7 @@ function PodCastGrid(props) {
                         </Card>
                       </Grid>
                     )
-                )}
+                ): <Typography className={classes.empty} align="center" variant="h3">No podcasts bookmarked. </Typography>}
             </Grid>
           </>
         );

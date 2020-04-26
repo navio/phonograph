@@ -10,11 +10,14 @@ import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
 import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent"
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Typography from "@material-ui/core/Typography";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
 
 const styles = (theme) => ({
   root: {
@@ -31,6 +34,7 @@ const eraseThisPodcast = function (domain, fn) {
 };
 
 const GeneraList = (props) => {
+  const {themeSwitcher} = props;
   return (
     <>
       <AppBar position="static">
@@ -38,13 +42,19 @@ const GeneraList = (props) => {
           <Typography variant="h6">Settings</Typography>
         </Toolbar>
       </AppBar>
+      <Card variant="outlined">
+      <CardContent>
+        <Typography variant="h5">Configurations</Typography>
+        <FormControlLabel control={<Switch color="primary" onChange={themeSwitcher} />} label="Toggle Theme" />
+      </CardContent>
+      </Card>
       <ExpansionPanel defaultExpanded>
         <ExpansionPanelSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1a-content"
           id="panel1a-header"
         >
-          <Typography variant="h6"> Podcasts Data</Typography>
+          <Typography variant="h5"> Podcasts Data</Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
             <List style={{width:'100%'}}>
@@ -82,6 +92,12 @@ const GeneraList = (props) => {
             </List>
         </ExpansionPanelDetails>
       </ExpansionPanel>
+      <Card variant="outlined">
+      <CardContent align="center">
+         <Typography variant="h5">Phonograph</Typography>
+        <Typography>is developed with ❤️ in Hoboken, NJ</Typography>
+      </CardContent>
+      </Card>
     </>
   );
 };
