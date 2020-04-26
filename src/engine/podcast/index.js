@@ -183,29 +183,19 @@ const podcastCleaner = (podcasts) => {
 */
 export const initializeLibrary = function () {
   PodcastLibrary.ready.then(() => {
-
-    PodcastLibrary.mapLibrary((cast) => {
-      return PodcastLibrary.getContent(new URL(cast));
-    }).then((podcasts) => {
-      if (podcasts) {   
-        this.setState({
-          podcasts: podcastCleaner(podcasts),
-        });
-      }
+    PodcastLibrary.getLibrary().then((podcastsArray) => {
+      Promise.allSettled(
+        podcastsArray.map((podcastRaw) => PodcastLibrary.getPodcast(podcastRaw))
+      )
+      .then((results) => results.filter((result) => result.status === 'fulfilled')) // not failing.
+      .then((podcasts) => {
+        if (podcasts) {
+          this.setState({
+            podcasts: podcastCleaner(podcasts),
+          });
+        }
+      });
     });
-    // PodcastLibrary.getLibrary().then((podcastsArray) => {
-    //   Promise.all(
-    //     podcastsArray.map((podcastRaw) => PodcastLibrary.getPodcast(podcastRaw))
-    //   )
-    //   // .then((results) => results.filter((result) => result.status === 'fulfilled')) // not failing.
-    //   .then((podcasts) => {
-    //     if (podcasts) {
-    //       this.setState({
-    //         podcasts: podcastCleaner(podcasts),
-    //       });
-    //     }
-    //   });
-    // });
   });
 };
 
