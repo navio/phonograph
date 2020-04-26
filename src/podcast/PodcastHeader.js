@@ -85,7 +85,7 @@ function PodcastHeader(props) {
     setOpen(false);
   };
 
-  const colorThief = new ColorThief();
+  // const colorThief = new ColorThief();
   const shareLink = !!(navigator.share || navigator.clipboard);
   const share = (title, text, url) => {
     if (navigator.share) {
@@ -179,7 +179,7 @@ function PodcastHeader(props) {
                 </Grid>
               </Toolbar>
             </AppBar>
-            <Grid container spacing={1}>
+            <Grid style={{ paddingBottom: "1em" }} container spacing={1}>
               <Grid item xs={12} md={4}>
                 {state.image && (
                   <CardMedia
@@ -190,7 +190,7 @@ function PodcastHeader(props) {
                 )}
               </Grid>
 
-              <Grid item sm={12} pb={2} md={6}>
+              <Grid item sm={12} md={6}>
                 <Typography className={classes.title} variant="h4" noWrap>
                   {state.title}
                 </Typography>
