@@ -17,6 +17,7 @@ import LinearProgress from "@material-ui/core/LinearProgress";
 import Grid from "@material-ui/core/Grid";
 import { Link } from "react-router-dom";
 import { Consumer } from "../App.js";
+import blueGrey from '@material-ui/core/colors/blueGrey';
 
 const styles = (theme) => ({
   card: {
@@ -42,7 +43,12 @@ const styles = (theme) => ({
   },
   line: {
     position: "absolute",
-    bottom: "-10%",
+    top: '8px',
+    width: "100%",
+  },
+  progress: {
+    position: "absolute",
+    top: '7px',
     width: "100%",
   },
   trackAfter: {
@@ -74,14 +80,14 @@ const styles = (theme) => ({
     position: "absolute",
   },
   container: {
-    position: "relative",
+    position: "relative"
   },
   root: {
     borderTop: "1px solid rgba(0, 0, 0, 0.12)",
     position: "fixed",
     bottom: 56,
     width: "100%",
-    backgroundColor: "aliceblue",
+    backgroundColor: blueGrey[200],
     zIndex: 50,
   },
 });
@@ -117,8 +123,8 @@ function MediaControlCard(props) {
             {episode && (
               <div className={classes.card}>
                 <div className={classes.details}>
-                  <Link to="/podcast">
-                    <CardContent className={classes.content}>
+                  <Link to="/podcast" style={{color:'#000'}}>
+                    <CardContent>
                       <Typography variant="body1">{episode.title}</Typography>
                     </CardContent>
                   </Link>
@@ -129,17 +135,18 @@ function MediaControlCard(props) {
                     </Grid>
                     <Grid className={classes.container} item xs={8}>
                       <LinearProgress
+                        className={classes.progress}
                         variant="buffer"
                         value={state.played}
                         valueBuffer={state.loaded}
                       />
-                      <div className={classes.line}>
                         <Slider
+                          style={{padding:'0px'}}
+                          className={classes.line}
                           value={state.played}
                           aria-labelledby="audio"
                           onChange={props.seek}
                         />
-                      </div>
                     </Grid>
                     <Grid item xs={2} className={classes.right}>
                       <span>
