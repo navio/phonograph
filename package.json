@@ -10,6 +10,7 @@
     "babel-core": "^6.26.3",
     "babel-polyfill": "^6.26.0",
     "dayjs": "^1.8.23",
+    "dompurify": "^2.0.10",
     "encoding": "^0.1.12",
     "idb-keyval": "^3.2.0",
     "netlify-lambda": "^1.6.3",

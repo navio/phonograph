@@ -50,12 +50,13 @@ const styles = (theme) => ({
     marginTop: "1em",
     overflow: "hidden",
     marginLeft: ".5em",
+    paddingRight:"1em"
   },
   title: {
     marginTop: 3,
     whiteSpace: "pre-wrap",
     marginLeft: 10,
-    // marginLeft: '.5em'
+    paddingRight:"1em"
   },
 });
 
@@ -179,7 +180,7 @@ function PodcastHeader(props) {
                 </Grid>
               </Toolbar>
             </AppBar>
-            <Grid style={{ paddingBottom: "1em" }} container spacing={1}>
+            <Grid style={{ paddingBottom: "1em" }} elevation={3} container >
               <Grid item xs={12} md={4}>
                 {state.image && (
                   <CardMedia
@@ -190,7 +191,7 @@ function PodcastHeader(props) {
                 )}
               </Grid>
 
-              <Grid item sm={12} md={6}>
+              <Grid item sm={12} md={8}>
                 <Typography className={classes.title} variant="h4" noWrap>
                   {state.title}
                 </Typography>

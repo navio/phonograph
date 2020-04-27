@@ -77,7 +77,8 @@ const styles = (theme) => ({
     paddingRight: 20,
   },
   undeground: {
-    height: 130,
+    display:"block",
+    height: '8.5rem',
     width: "100%",
   },
   classNameProp: {
@@ -124,7 +125,7 @@ function MediaControlCard(props) {
   return (
     <Consumer>
       {({ state, episode }) => (
-        <div>
+        <>
           <div className={classes.root}>
             {episode && (
               <div className={classes.card}>
@@ -212,8 +213,8 @@ function MediaControlCard(props) {
               </div>
             )}
           </div>
-          {props.episode && <div className={classes.undeground}></div>}
-        </div>
+          {episode && <div id={'under'} className={classes.undeground}>-</div>}
+        </>
       )}
     </Consumer>
   );
