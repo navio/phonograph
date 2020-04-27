@@ -202,7 +202,7 @@ function PodcastHeader(props) {
                 >
                   Last Updated:{" "}
                   {
-                    new Date(state.created || undefined)
+                    new Date(state.created || Date.now())
                       .toString()
                       .split("GMT")[0]
                   }
