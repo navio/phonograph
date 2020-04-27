@@ -60,6 +60,9 @@ const EpisodeListDescription = (props) => {
         {episode.season && (<Typography color={'secondary'}>Season {episode.season}</Typography>)}
           <Typography component="div" variant="subtitle1" noWrap>
             {clearText(episode.title)} 
+          </Typography>
+          <Typography variant="overline" component="div">
+            {episodeDate(episode.created)}
             {episode.episodeType && episode.episodeType !== "full" && (
               <Chip
                 style={{marginLeft:'10px'}}
@@ -69,9 +72,6 @@ const EpisodeListDescription = (props) => {
                 color="secondary"
               />
             )}
-          </Typography>
-          <Typography variant="overline" component="div">
-            {episodeDate(episode.created)}
           </Typography>
         </>
       }
