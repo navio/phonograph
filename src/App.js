@@ -151,7 +151,7 @@ class App extends Component {
             path={PODCASTVIEW}
             render={() =>
               this.state.title ? (
-                <div>
+                <>
                   <PodcastHeader
                     inLibrary={isPodcastInLibrary.bind(this)}
                     savePodcastToLibrary={saveToLibrary.bind(this)}
@@ -163,7 +163,7 @@ class App extends Component {
                     status={this.state.status}
                     playing={this.state.playing}
                   />
-                </div>
+                </>
               ) : (
                 <Redirect to={LIBVIEW} />
               )

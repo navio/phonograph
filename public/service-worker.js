@@ -1,5 +1,5 @@
 
-const version = 1.5;
+const version = 1.6;
 self.addEventListener("install", function(event) {
     event.waitUntil(
       caches
