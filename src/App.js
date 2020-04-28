@@ -1,11 +1,19 @@
-import React, { Component } from "react";
+import React, { Component, Suspense } from "react";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { ThemeProvider } from "@material-ui/core/styles";
-import theme, {switchHanlder} from "./Theme";
+import theme, { switchHanlder } from "./Theme";
 import audioqueue from "audioqueue";
+import Typography from "@material-ui/core/Typography";
+
 // import "babel-polyfill";
 
-import { ROOT, LIBVIEW, PODCASTVIEW, DISCOVERVIEW, SETTINGSVIEW } from "./constants";
+import {
+  ROOT,
+  LIBVIEW,
+  PODCASTVIEW,
+  DISCOVERVIEW,
+  SETTINGSVIEW,
+} from "./constants";
 
 // App Components
 // import Header from './app/Header';
@@ -17,9 +25,6 @@ import { clearNotification, addNotification } from "./engine/notifications";
 // Podcast Views
 import EpisodeList from "./podcast/EpisodeList";
 import PodcastHeader from "./podcast/PodcastHeader";
-import Library from "./podcast/Library";
-import Discover from "./podcast/Discover";
-import Settings from "./podcast/Settings";
 
 // Engine - Player Interactions
 import {
@@ -67,7 +72,7 @@ class App extends Component {
       created: null,
       loading: false,
       podcasts: [],
-      theme: true
+      theme: true,
     };
 
     this.episodes = new Map();
@@ -105,12 +110,20 @@ class App extends Component {
     window.notification = this.addNotification;
   }
 
-
   render() {
-    const finalTheme = ( this.state.theme === theme.os) ? theme.dark : theme.light
+    const Discover = React.lazy(async () => await import("./podcast/Discover"));
+    const Library = React.lazy(async () => await import("./podcast/Library"));
+    const Settings = React.lazy(async () =>await import("./podcast/Settings"));
+
+    const finalTheme = this.state.theme === theme.os ? theme.dark : theme.light;
     const episode = this.episodes.get(this.state.episode);
+
+  const Loading = (props) => <Typography align='center' variant="h5" style={{ display:'block', paddintTop: '40%' }} >
+                                  {props.children}
+                              </Typography>
+
     return (
-      <ThemeProvider theme={(finalTheme)}>
+      <ThemeProvider theme={finalTheme}>
         <AppContext.Provider
           value={{ state: this.state, global: this, episode: episode }}
         >
@@ -120,15 +133,17 @@ class App extends Component {
             callback={this.clearNotification}
             {...this.state.notification}
           />
-          
+
           <Route
             exact
             path={[LIBVIEW, ROOT]}
             render={({ history }) => (
-              <Library
-                addPodcastHandler={this.navigateTo(DISCOVERVIEW)} //{this.askForPodcast}
-                actionAfterSelectPodcast={this.navigateTo(PODCASTVIEW)}
-              />
+              <Suspense fallback={<Loading>Loading...</Loading>}>
+                <Library
+                  addPodcastHandler={this.navigateTo(DISCOVERVIEW)} //{this.askForPodcast}
+                  actionAfterSelectPodcast={this.navigateTo(PODCASTVIEW)}
+                />
+              </Suspense>
             )}
           />
 
@@ -159,22 +174,26 @@ class App extends Component {
             exact
             path={DISCOVERVIEW}
             render={({ history }) => (
-              <Discover
-                addPodcastHandler={loadaNewPodcast.bind(this)}
-                actionAfterClick={this.navigateTo(PODCASTVIEW)}
-                notificaions={this.addNotification}
-              />
+              <Suspense fallback={<Loading>Loading...</Loading>}>
+                <Discover
+                  addPodcastHandler={loadaNewPodcast.bind(this)}
+                  actionAfterClick={this.navigateTo(PODCASTVIEW)}
+                  notificaions={this.addNotification}
+                />
+              </Suspense>
             )}
           />
 
           <Route
             path={SETTINGSVIEW}
             render={() => (
-              <Settings
-                themeSwitcher={this.switchHanlder}
-                removePodcast={removePodcastFromLibrary.bind(this)}
-                podcasts={this.state.podcasts}
-              />
+              <Suspense fallback={<Loading>Loading...</Loading>}>
+                <Settings
+                  themeSwitcher={this.switchHanlder}
+                  removePodcast={removePodcastFromLibrary.bind(this)}
+                  podcasts={this.state.podcasts}
+                />
+              </Suspense>
             )}
           />
 

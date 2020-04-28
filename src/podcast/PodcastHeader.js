@@ -34,9 +34,10 @@ const styles = (theme) => ({
     flex: "1 0 auto",
   },
   cover: {
-    margin: 10,
-    padding: 40,
+    // margin: 10,
+    // padding: 40,
     height: "20em",
+
   },
   playIcon: {
     height: 38,
