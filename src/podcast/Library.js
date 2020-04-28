@@ -15,7 +15,7 @@ import AddIcon from "@material-ui/icons/Add";
 import Fab from "@material-ui/core/Fab";
 import { getPodcastColor, cachedContent } from "../engine/podcast";
 import { Consumer } from "../App.js";
-import ButtonBase from '@material-ui/core/ButtonBase';
+import phono from '../../public/phono.svg';
 
 export const styles = (theme) => ({
   podcastMedia: {
@@ -128,7 +128,11 @@ function PodCastGrid(props) {
                         </Card>
                       </Grid>
                     )
-                ): <Typography className={classes.empty} align="center" variant="h3">No podcasts bookmarked. </Typography>}
+                ): <Typography className={classes.empty} align="center" variant="h5">
+                    <img width={'85rem'} src={phono} />
+                      <br />
+                  No podcasts bookmarked.
+                  </Typography>}
             </Grid>
           </>
         );
