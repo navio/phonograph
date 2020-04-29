@@ -231,4 +231,4 @@ PodcastHeader.propTypes = {
   theme: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(PodcastHeader);
+export default withStyles(styles, { withTheme: true })(PodcastHeader);
