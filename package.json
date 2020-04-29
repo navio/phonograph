@@ -32,11 +32,12 @@
   ],
   "scripts": {
     "start": "parcel public/index.html",
-    "build": "parcel build public/index.html; yarn lambda:build",
+    "build": "yarn getter && parcel build public/index.html; yarn lambda:build",
     "serve": "parcel serve public/index.html",
     "lambda:build": "npx netlify-lambda build ./lambda",
     "lambda:serve": "npx netlify-lambda serve ./lambda",
-    "dev": "node proxy && yarn lambda:serve"
+    "dev": "yarn getter && node proxy && yarn lambda:serve",
+    "getter": "bash ./filegetter.sh"
   },
   "devDependencies": {
     "babel-plugin-transform-object-rest-spread": "^6.26.0",

@@ -4,8 +4,9 @@ import randomColor from "randomcolor";
 import PodcastEngine from "podcastsuite";
 import Podcast from "./Podcast";
 
-const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 
+const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
+const URI = 'https://www.listennotes.com/c/r/';
 const API = "/ln/";
 
 // This is insane.. but for now seems necessary.
@@ -267,14 +268,7 @@ export const getPopularPodcasts = (function () {
       this.setState(response);
       return;
     } else {
-      const headers = {
-        "User-Agent": "podcastsuite",
-        Accept: "application/json",
-      };
-      fetch("/ln/best_podcasts?page=1", {
-        headers,
-      })
-        .then((data) => data.json())
+      import("../../../public/top.json")
         .then((response) => {
           const { podcasts } = response;
           return podcasts;
@@ -291,7 +285,7 @@ export const getPopularPodcasts = (function () {
               earliest_pub_date_ms: startDate,
               publisher,
             } = podcast;
-            const rss = `https://www.listennotes.com/c/r/${id}`;
+            const rss = `${URI}${id}`;
             return {
               title: `${num + 1}. ${title}`,
               thumbnail,

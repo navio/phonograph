@@ -5,20 +5,8 @@
   functions = "functions/"
 
 [[redirects]]
-  from = "/rss-pg/*"
-  to = "https://:splat"
-  status = 200
-  force = true
-
-[[redirects]]
   from = "/rss-full/*"
   to = ":splat"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/rss-less-pg/*"
-  to = "http://:splat"
   status = 200
   force = true
 
@@ -26,28 +14,6 @@
   from = "/podcasts/*"
   to = "https://feedwrangler.net/api/v2/podcasts/:splat"
   status = 200
-
-[[redirects]]
-  from="/cacheds/*"
-  to ="https://:splat"
-  status = 200
-  [redirects.headers]
-    cache-control = '''
-    max-age=1800000,
-    no-cache,
-    no-store,
-    must-revalidate'''
-    
-[[redirects]]
-  from="/cached/*"
-  to ="http://:splat"
-  status = 200
-  [redirects.headers]
-    cache-control = '''
-    max-age=1800000,
-    no-cache,
-    no-store,
-    must-revalidate'''
 
 [[redirects]]
   from="/api/*"

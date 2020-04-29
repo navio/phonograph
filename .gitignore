@@ -61,3 +61,7 @@ functions
 .cache
 
 localhost.sh
+
+public/top.json
+public/curated.json
+public/genres.json
