@@ -18,9 +18,6 @@ const StyledField = withStyles((theme) => ({
     },
     marginLeft: 0,
     width: "100%",
-  },
-  'MuiOutlinedInput-notchedOutline': {
-    borderColor:theme.palette.common.white
   }
 }))(TextField);
 
