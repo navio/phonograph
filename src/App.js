@@ -4,7 +4,9 @@ import { ThemeProvider } from "@material-ui/core/styles";
 import theme, { switchHanlder } from "./Theme";
 import audioqueue from "audioqueue";
 import Typography from "@material-ui/core/Typography";
+import PodcastHeader from "./podcast/PodcastHeader";
 
+import loadingAnimation from '../public/loading.svg';
 // import "babel-polyfill";
 
 import {
@@ -19,12 +21,8 @@ import {
 // import Header from './app/Header';
 import Footer from "./app/Footer";
 import Notifications from "./app/Notifications";
-import MediaControl from "./app/MediaControl";
+// import MediaControl from "./app/MediaControl";
 import { clearNotification, addNotification } from "./engine/notifications";
-
-// Podcast Views
-import EpisodeList from "./podcast/EpisodeList";
-import PodcastHeader from "./podcast/PodcastHeader";
 
 // Engine - Player Interactions
 import {
@@ -54,6 +52,16 @@ import { withRouter } from "react-router";
 import { Route, Redirect } from "react-router-dom";
 
 const AppContext = React.createContext();
+
+// Code Module
+const Discover = React.lazy(async () => await import("./podcast/Discover"));
+const Library = React.lazy(async () => await import("./podcast/Library"));
+const Settings = React.lazy(async () => await import("./podcast/Settings"));
+const MediaControl = React.lazy(async () => await import("./app/MediaControl"));
+const EpisodeList = React.lazy(
+  async () => await import("./podcast/EpisodeList")
+);
+
 
 class App extends Component {
   constructor() {
@@ -111,16 +119,17 @@ class App extends Component {
   }
 
   render() {
-    const Discover = React.lazy(async () => await import("./podcast/Discover"));
-    const Library = React.lazy(async () => await import("./podcast/Library"));
-    const Settings = React.lazy(async () =>await import("./podcast/Settings"));
-
     const finalTheme = this.state.theme === theme.os ? theme.dark : theme.light;
     const episode = this.episodes.get(this.state.episode);
 
-  const Loading = (props) => <Typography align='center' variant="h5" style={{ display:'block', paddintTop: '40%' }} >
-                                  {props.children}
-                              </Typography>
+    const Loading = (props) => (
+      <Typography
+        align="center"
+        style={{ display: "block", paddintTop: "40%" }}
+      >
+        <img src={loadingAnimation} width="4rem" />
+      </Typography>
+    );
 
     return (
       <ThemeProvider theme={finalTheme}>
@@ -138,7 +147,7 @@ class App extends Component {
             exact
             path={[LIBVIEW, ROOT]}
             render={({ history }) => (
-              <Suspense fallback={<Loading>Loading...</Loading>}>
+              <Suspense fallback={<Loading />}>
                 <Library
                   addPodcastHandler={this.navigateTo(DISCOVERVIEW)} //{this.askForPodcast}
                   actionAfterSelectPodcast={this.navigateTo(PODCASTVIEW)}
@@ -152,17 +161,21 @@ class App extends Component {
             render={() =>
               this.state.title ? (
                 <>
-                  <PodcastHeader
-                    inLibrary={isPodcastInLibrary.bind(this)}
-                    savePodcastToLibrary={saveToLibrary.bind(this)}
-                    removePodcast={removePodcastFromLibrary.bind(this)}
-                  />
-                  <EpisodeList
-                    episodes={this.state.items}
-                    handler={this.playButton.bind(this)}
-                    status={this.state.status}
-                    playing={this.state.playing}
-                  />
+                  <Suspense fallback={<Loading>Header</Loading>}>
+                    <PodcastHeader
+                      inLibrary={isPodcastInLibrary.bind(this)}
+                      savePodcastToLibrary={saveToLibrary.bind(this)}
+                      removePodcast={removePodcastFromLibrary.bind(this)}
+                    />
+                  </Suspense>
+                  <Suspense fallback={<Loading>Loading</Loading>}>
+                    <EpisodeList
+                      episodes={this.state.items}
+                      handler={this.playButton.bind(this)}
+                      status={this.state.status}
+                      playing={this.state.playing}
+                    />
+                  </Suspense>
                 </>
               ) : (
                 <Redirect to={LIBVIEW} />
@@ -174,7 +187,7 @@ class App extends Component {
             exact
             path={DISCOVERVIEW}
             render={({ history }) => (
-              <Suspense fallback={<Loading>Loading...</Loading>}>
+              <Suspense fallback={<Loading />}>
                 <Discover
                   addPodcastHandler={loadaNewPodcast.bind(this)}
                   actionAfterClick={this.navigateTo(PODCASTVIEW)}
@@ -187,7 +200,7 @@ class App extends Component {
           <Route
             path={SETTINGSVIEW}
             render={() => (
-              <Suspense fallback={<Loading>Loading...</Loading>}>
+              <Suspense fallback={<Loading />}>
                 <Settings
                   themeSwitcher={this.switchHanlder}
                   removePodcast={removePodcastFromLibrary.bind(this)}
@@ -197,14 +210,16 @@ class App extends Component {
             )}
           />
 
-          <MediaControl
-            toCurrentPodcast={this.navigateTo(PODCASTVIEW)}
-            player={this.refs.player}
-            handler={this.playButton}
-            forward={this.forward30Seconds}
-            rewind={this.rewind10Seconds}
-            seek={this.seek}
-          />
+          <Suspense fallback={<Loading />}>
+            <MediaControl
+              toCurrentPodcast={this.navigateTo(PODCASTVIEW)}
+              player={this.refs.player}
+              handler={this.playButton}
+              forward={this.forward30Seconds}
+              rewind={this.rewind10Seconds}
+              seek={this.seek}
+            />
+          </Suspense>
 
           <Footer path={this.props.location.pathname} />
 
