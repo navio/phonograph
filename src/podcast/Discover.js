@@ -109,10 +109,11 @@ const Header = ({ searchHandler }) => (
 );
 
 const getFinalURL = async (url) => {
-  const URL = `/api/findFinal/?term=${url}`;
+  const URL = `${window.location.origin}/api/findFinal/?term=${url}`;
   try {
     const data = await fetch(URL);
     const result = await data.json();
+    
     return result.url;
   } catch (error) {
     new Error(error);

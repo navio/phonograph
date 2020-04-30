@@ -108,7 +108,7 @@ function PodCastGrid(props) {
                   (cast) =>
                     cast &&
                     cast.domain && (
-                      <Grid item xs={4} sm={3}  key={cast.domain}>
+                      <Grid item xs={4} sm={3} md={2}  key={cast.domain}>
                         <Card
                           raised={true}
                           classes={{ root: classes.card }}                
