@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
@@ -100,7 +100,10 @@ const Description = (props) => {
 };
 
 const EpisodeList = (props) => {
-  window && window.scrollTo && window.scrollTo(0, 0);
+
+  useEffect(()=>{
+    window && window.scrollTo && window.scrollTo(0, 0);
+  },[]);
   const [open, setOpen] = React.useState(null);
   const { classes } = props;
 
