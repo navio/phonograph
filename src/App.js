@@ -66,7 +66,9 @@ const EpisodeList = React.lazy(
 class App extends Component {
   constructor() {
     super();
-    this.state = {
+    const stateExist = JSON.parse(localStorage.getItem('state') || false );
+
+    this.state = stateExist || {
       playing: null,
       items: null,
       loaded: 0,
@@ -98,6 +100,7 @@ class App extends Component {
     this.addNotification = addNotification.bind(this);
 
     this.switchHanlder = switchHanlder.bind(this);
+    this.saveState = this.saveState.bind(this);
 
     // Mode
     const newPodcast = checkIfNewPodcastInURL.call(this);
@@ -118,6 +121,10 @@ class App extends Component {
     window.notification = this.addNotification;
   }
 
+  saveState(){
+      localStorage.setItem('state',JSON.stringify(this.state));
+  }
+
   render() {
     const finalTheme = this.state.theme === theme.os ? theme.dark : theme.light;
     const episode = this.episodes.get(this.state.episode);
@@ -130,7 +137,7 @@ class App extends Component {
         <img src={loadingAnimation} width="4rem" />
       </Typography>
     );
-
+    this.saveState.call(this);
     return (
       <ThemeProvider theme={finalTheme}>
         <AppContext.Provider
@@ -146,14 +153,15 @@ class App extends Component {
           <Route
             exact
             path={[LIBVIEW, ROOT]}
-            render={({ history }) => (
+            render={({ history }) => { 
+              return (
               <Suspense fallback={<Loading />}>
                 <Library
                   addPodcastHandler={this.navigateTo(DISCOVERVIEW)} //{this.askForPodcast}
                   actionAfterSelectPodcast={this.navigateTo(PODCASTVIEW)}
                 />
               </Suspense>
-            )}
+            )}}
           />
 
           <Route

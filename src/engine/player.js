@@ -46,10 +46,11 @@ export const rewind10Seconds = function () {
 };
 
 export const playButton = function (ev) {
+  
   let guid = ev.currentTarget.getAttribute("data-guid");
   console.log(guid, ev.target, ev.currentTarget);
   let episode = this.episodes.get(guid);
-
+  console.log('a',episode);
   if (this.state.playing === guid) {
     if (this.state.status === "pause") {
       this.refs.player.play();
