@@ -1,11 +1,8 @@
-import React from "react";
+import React, {useContext} from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
-// import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
 import Slider from "@material-ui/core/Slider";
-
-// import CardMedia from "@material-ui/core/CardMedia";
+import { useHistory } from "react-router-dom";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
 import SkipPreviousIcon from "@material-ui/icons/Replay10";
@@ -16,8 +13,10 @@ import SkipNextIcon from "@material-ui/icons/Forward30";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import Grid from "@material-ui/core/Grid";
 import { Link } from "react-router-dom";
-import { Consumer } from "../App.js";
-import blueGrey from "@material-ui/core/colors/blueGrey";
+import { AppContext } from "../App.js";
+import {
+  PODCASTVIEW,
+} from "../constants";
 
 const styles = (theme) => ({
   card: {
@@ -108,6 +107,8 @@ const convertMinsToHrsMins = (mins) => {
   return `${h}:${m}`;
 };
 
+
+
 const toMinutes = (totalTime, currentTime) => {
   totalTime = Math.floor(totalTime - currentTime);
   if (!Number.isInteger(totalTime)) return "∞";
@@ -121,24 +122,30 @@ const toMin = (theTime) =>
 
 //
 function MediaControlCard(props) {
+  const {state, dispatch} = useContext(AppContext);
   const { classes, theme } = props;
+  const history = useHistory();
+
+  const toOrigin = (audioOrigin) => () => {
+    console.log('redirect')
+    dispatch({type: 'updateCurrent', payload:audioOrigin});
+    history.push(PODCASTVIEW)
+  }
+
   return (
-    <Consumer>
-      {({ state, episode }) => (
         <>
           <div className={classes.root}>
-            {episode && (
+            {state.episode && (
               <div className={classes.card}>
                 <div className={classes.details}>
-                  <Link to="/podcast" style={{ textDecoration: "none" }}>
                     <Typography
+                      onClick={toOrigin(state.audioOrigin)}
                       align={"center"}
                       className={classes.title}
                       variant="h6"
-                    >
-                      {episode.title}
+                    > 
+                      {state.title}
                     </Typography>
-                  </Link>
 
                   <Grid container className={classes.player}>
                     <Grid item xs={2}>
@@ -184,10 +191,10 @@ function MediaControlCard(props) {
                       <IconButton
                         style={{ padding: "0" }}
                         aria-label="Play/pause"
-                        onClick={props.handler}
+                        onClick={()=>props.handler()}
                         data-guid={state.playing}
                       >
-                        {state.playing === episode.guid &&
+                        {state.playing === state.episode &&
                         state.status !== "pause" ? (
                           <PauseIcon className={classes.playIcon} />
                         ) : (
@@ -213,10 +220,8 @@ function MediaControlCard(props) {
               </div>
             )}
           </div>
-          {episode && <div id={'under'} className={classes.undeground}>-</div>}
+          {state.episode && <div id={'under'} className={classes.undeground}>-</div>}
         </>
-      )}
-    </Consumer>
   );
 }
 

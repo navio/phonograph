@@ -19,7 +19,7 @@ import { clearText } from "./EpisodeList";
 import ShareIcon from "@material-ui/icons/ShareOutlined";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 
-import { Consumer } from "../App.js";
+import { Consumer } from "../../App.js";
 import { useHistory } from "react-router-dom";
 
 const styles = (theme) => ({
@@ -66,14 +66,13 @@ function Alert(props) {
 }
 
 function PodcastHeader(props) {
-  const { classes, inLibrary, savePodcastToLibrary, removePodcast } = props;
-  const isInLibrary = inLibrary();
+  const { classes, inLibrary, savePodcast, removePodcast } = props;
   const [open, setOpen] = React.useState(false);
   const [message, setMessage] = React.useState("");
   let history = useHistory();
-
+  const isInLibrary = inLibrary()
   const saveThisPodcastToLibrary = (ev) => {
-    savePodcastToLibrary(ev);
+    savePodcast(ev);
     setMessage("Podcast Added to Library");
     setOpen(true);
   };
@@ -111,7 +110,7 @@ function PodcastHeader(props) {
   return (
     <Consumer>
       {(data) => {
-        const { state } = data;
+        const state  = props.podcast; 
         return (
           <>
             <Snackbar

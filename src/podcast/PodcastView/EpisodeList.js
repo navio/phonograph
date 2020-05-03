@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
@@ -12,14 +12,12 @@ import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import PauseIcon from "@material-ui/icons/Pause";
 import Typography from "@material-ui/core/Typography";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import EpisodeView from "./EpisodeView";
-import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogContent from "@material-ui/core/DialogContent";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Chip from "@material-ui/core/Chip";
 import createDOMPurify from "dompurify";
-import { Consumer } from "../App.js";
+import { Consumer } from "../../App.js";
 
 // const toMinutes = time => {
 //   return Math.floor(1 * time / 60) + ":" + (1 * time) % 60;
@@ -100,7 +98,10 @@ const Description = (props) => {
 };
 
 const EpisodeList = (props) => {
-  window && window.scrollTo && window.scrollTo(0, 0);
+
+  useEffect(()=>{
+    window && window.scrollTo && window.scrollTo(0, 0);
+  },[]);
   const [open, setOpen] = React.useState(null);
   const { classes } = props;
 
@@ -130,13 +131,13 @@ const EpisodeList = (props) => {
                         props.status !== "pause" ? (
                           <PauseIcon
                             className={classes.playIcon}
-                            onClick={props.handler}
+                            onClick={props.handler(episode.guid)}
                             data-guid={episode.guid}
                           />
                         ) : (
                           <PlayArrowIcon
                             className={classes.playIcon}
-                            onClick={props.handler}
+                            onClick={props.handler(episode.guid)}
                             data-guid={episode.guid}
                           />
                         )}

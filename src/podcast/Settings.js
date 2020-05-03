@@ -1,6 +1,6 @@
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
-import React from "react";
+import React, {useContext} from "react";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
@@ -18,6 +18,8 @@ import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
+import {AppContext} from '../App';
+
 
 const styles = (theme) => ({
   root: {
@@ -27,14 +29,22 @@ const styles = (theme) => ({
   },
 });
 
-const eraseThisPodcast = function (domain, fn) {
-  return function () {
-    fn(domain);
-  };
-};
 
-const GeneraList = (props) => {
-  const {themeSwitcher} = props;
+
+const Settings = (props) => {
+  const {state, dispatch} = useContext(AppContext)
+
+  const themeSwitcher = () =>{
+    const value = state.theme;
+    dispatch({type: 'setDark' , payload: !value });
+  };
+  
+  const eraseThisPodcast =  (podcast) => () => {
+      const podcasts = state.podcasts.filter((cast) => cast.domain !== podcast );
+      dispatch({type:'updatePodcasts', podcasts: podcasts});
+  };
+  const {podcasts} = state;
+
   return (
     <>
       <AppBar position="static">
@@ -59,9 +69,8 @@ const GeneraList = (props) => {
         <ExpansionPanelDetails>
             <List style={{width:'100%'}}>
               <Divider />
-              {props.podcasts &&
-                props.removePodcast &&
-                props.podcasts.map((podcast) => (
+              {podcasts &&
+                podcasts.map((podcast) => (
                   <div key={podcast.domain}>
                     <ListItem>
                       <ListItemText
@@ -78,8 +87,7 @@ const GeneraList = (props) => {
                         <IconButton
                           aria-label="Delete"
                           onClick={eraseThisPodcast(
-                            podcast.domain,
-                            props.removePodcast
+                            podcast.domain
                           )}
                         >
                           <DeleteIcon />
@@ -102,4 +110,4 @@ const GeneraList = (props) => {
   );
 };
 
-export default withStyles(styles)(GeneraList);
+export default withStyles(styles)(Settings);

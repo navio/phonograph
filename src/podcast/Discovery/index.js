@@ -7,17 +7,19 @@ import CardMedia from "@material-ui/core/CardMedia";
 import CardContent from "@material-ui/core/CardContent";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
-import {
-  getPopularPodcasts,
-  searchForPodcasts,
-  getPodcastColor,
-} from "../engine/podcast";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Typography from "@material-ui/core/Typography";
 import Backdrop from "@material-ui/core/Backdrop";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
+
+import {
+  getPopularPodcasts,
+  searchForPodcasts,
+  getPodcastColor,
+} from "../../engine";
+// import { Context } from "../App";
 
 
 import Search from "./Search";
@@ -122,14 +124,13 @@ const getFinalURL = async (url) => {
 };
 
 class Discover extends Component {
-  constructor(props) {
+  constructor() {
     super();
     this.state = {
       init: true,
       loading: false,
       podcasts: [],
       error: null,
-      term: null,
       loadContent: false,
     };
     this.searchForPodcasts = searchForPodcasts.bind(this);
@@ -172,7 +173,6 @@ class Discover extends Component {
   }
 
   render() {
-    const podcasts = this.state.podcasts;
     const topPodcasts = this.state.top;
     const { classes } = this.props;
     return (
@@ -246,3 +246,4 @@ Discover.propTypes = {
 };
 
 export default withStyles(styles)(Discover);
+  
