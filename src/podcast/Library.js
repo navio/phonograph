@@ -1,20 +1,16 @@
-import React from "react";
+import React, {useContext, useEffect} from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
-import IconButton from "@material-ui/core/IconButton";
-// import InfoIcon from '@material-ui/icons/Info';
 import Card from "@material-ui/core/Card";
 import CardMedia from "@material-ui/core/CardMedia";
 import CardContent from "@material-ui/core/CardContent";
-import Add from "@material-ui/icons/Add";
 import Typography from "@material-ui/core/Typography";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import AddIcon from "@material-ui/icons/Add";
 import Fab from "@material-ui/core/Fab";
-import { getPodcastColor, cachedContent } from "../engine/podcast";
-import { Consumer } from "../App.js";
+import { AppContext } from "../App.js";
 import phono from '../../public/phono.svg';
 
 export const styles = (theme) => ({
@@ -68,27 +64,16 @@ export const styles = (theme) => ({
   }
 });
 
-const addMore = "addmore";
-
-const getMyColor = (cast) =>
-  cast.domain === addMore
-    ? { backgroundColor: "white" }
-    : getPodcastColor(cast);
-
-function PodCastGrid(props) {
-  const { classes } = props;
-
-  return (
-    <Consumer>
-      {({ state, global }) => {
+const LibraryView = (props) => {
+  const { classes, actionAfterSelectPodcast, history } = props;
+  const {state , dispatch} = useContext(AppContext);
+  const podcasts = state.podcasts;
         const processClick = (ev) => {
-          global.loadPodcastToView(ev).then(props.actionAfterSelectPodcast);
+          const podcast = ev.currentTarget && ev.currentTarget.getAttribute('domain');
+          dispatch({type:'loadPodcast', payload: podcast});
+          actionAfterSelectPodcast();
         };
-
-        const casts = (state.podcasts && [...state.podcasts]) || [];
-
-        return (
-          <>
+        return <>
             <AppBar position="static">
               <Toolbar variant="dense">
                 <Typography variant="h6">Library</Typography>
@@ -103,26 +88,26 @@ function PodCastGrid(props) {
               <AddIcon />
             </Fab>
             <Grid container spacing={0} direction={"row"}>
-              {casts.length > 0 ?
-                casts.map(
-                  (cast) =>
-                    cast &&
-                    cast.domain && (
-                      <Grid item xs={4} sm={3} md={2}  key={cast.domain}>
+              {podcasts ?
+                podcasts.map(
+                  (podcast) =>
+                    podcast &&
+                    podcast.domain && (
+                      <Grid item xs={4} sm={3} md={2}  key={podcast.domain}>
                         <Card
                           raised={true}
                           classes={{ root: classes.card }}                
                         >
                           <div className={classes.relativeContainer}>
                             <CardContent className={classes.cardContent}>
-                              {cast.title}
+                              {podcast.title}
                             </CardContent>
                             <CardMedia
                               onClick={processClick}
-                              domain={cast.domain}
-                              title={cast.title}
+                              domain={podcast.domain}
+                              title={podcast.title}
                               className={classes.podcastMedia}
-                              image={cast.image}
+                              image={podcast.image}
                             />
                           </div>
                         </Card>
@@ -134,15 +119,11 @@ function PodCastGrid(props) {
                   No podcasts bookmarked.
                   </Typography>}
             </Grid>
-          </>
-        );
-      }}
-    </Consumer>
-  );
+          </>;
 }
 
-PodCastGrid.propTypes = {
+LibraryView.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(PodCastGrid);
+export default withStyles(styles)(LibraryView);

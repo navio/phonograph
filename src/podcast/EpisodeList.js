@@ -133,13 +133,13 @@ const EpisodeList = (props) => {
                         props.status !== "pause" ? (
                           <PauseIcon
                             className={classes.playIcon}
-                            onClick={props.handler}
+                            onClick={props.handler(episode.guid)}
                             data-guid={episode.guid}
                           />
                         ) : (
                           <PlayArrowIcon
                             className={classes.playIcon}
-                            onClick={props.handler}
+                            onClick={props.handler(episode.guid)}
                             data-guid={episode.guid}
                           />
                         )}

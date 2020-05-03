@@ -1,76 +1,62 @@
-import { driveThruDNS } from "./podcast";
-export const seek = function (ev, value) {
-  let player = this.refs.player;
-  let current = Math.floor((value * player.duration) / 100);
-  player.currentTime = current;
-  let loaded = player.buffered.length
-    ? (100 * player.buffered.end(0)) / player.duration
-    : 0;
-  this.setState({
-    loaded,
-    currentTime: player.currentTime,
-    duration: player.duration,
-    played: (100 * player.currentTime) / player.duration,
-  });
-};
-export const forward30Seconds = function () {
-  let player = this.refs.player;
-  player.currentTime += 30;
+export default (player, dispatch, state) => {
 
-  let loaded = player.buffered.length
-    ? (100 * player.buffered.end(0)) / player.duration
-    : 0;
-
-  this.setState({
-    loaded,
-    played: (100 * player.currentTime) / player.duration,
-    currentTime: player.currentTime,
-    duration: player.duration,
-  });
-};
-
-export const rewind10Seconds = function () {
-  let player = this.refs.player;
-  player.currentTime -= 10;
-
-  let loaded = player.buffered.length
-    ? (100 * player.buffered.end(0)) / player.duration
-    : 0;
-
-  this.setState({
-    loaded,
-    played: (100 * player.currentTime) / player.duration,
-    currentTime: player.currentTime,
-    duration: player.duration,
-  });
-};
-
-export const playButton = function (ev) {
+  const seek = function (ev, value) {
+    const current = Math.floor((value * player.current.duration) / 100);
+    player.current.currentTime = current;
+    const loaded = player.current.buffered.length
+      ? (100 * player.current.buffered.end(0)) / player.current.duration
+      : 0;
+      dispatch({type:'audioUpdate', payload: {
+        loaded,
+        currentTime: player.current.currentTime,
+        duration: player.current.duration,
+        played: (100 * player.current.currentTime) / player.current.duration,
+    }});
+  };
   
-  let guid = ev.currentTarget.getAttribute("data-guid");
-  console.log(guid, ev.target, ev.currentTarget);
-  let episode = this.episodes.get(guid);
-  console.log('a',episode);
-  if (this.state.playing === guid) {
-    if (this.state.status === "pause") {
-      this.refs.player.play();
-      this.setState({ status: "playing" });
-    } else {
-      this.refs.player.pause();
-      this.setState({ status: "pause" });
-    }
-  } else {
-    this.refs.player.setAttribute("src", episode.enclosures[0].url);
-    this.refs.player.play();
-    this.setState({
-      episode: episode.guid,
-      author: episode.itunes_author,
-      playing: guid,
-      status: "playing",
-    });
-  }
-};
+  const forward30Seconds = function () {
+    player.current.currentTime += 30;
+  
+    const loaded = player.current.buffered.length
+      ? (100 * player.current.buffered.end(0)) / player.current.duration
+      : 0;
+  
+      dispatch({type:'audioUpdate',payload: {
+        loaded,
+        played: (100 * player.current.currentTime) / player.current.duration,
+        currentTime: player.current.currentTime,
+        duration: player.current.duration,
+      }});
+  };
+  
+  const rewind10Seconds = function () {
+    player.current.currentTime -= 10;
+    const loaded = player.current.buffered.length
+      ? (100 * player.current.buffered.end(0)) / player.current.duration
+      : 0;
+      dispatch({type:'audioUpdate', payload: {
+        loaded,
+        played: (100 * player.current.currentTime) / player.current.duration,
+        currentTime: player.current.currentTime,
+        duration: player.current.duration,
+    }});
+  };
 
-export const navigateTo = function (path) {
-  return () => this.props.history.push(path);
+  const playButton = () => {
+      if (state.status === "pause") {
+        player.current.play();
+        dispatch({ type: 'playingStatus', status: "playing" });
+      } else {
+        player.current.pause();
+        dispatch({ type: 'playingStatus', status: "pause" });
+      }
+  };
+
+  return {
+    playButton,
+    rewind10Seconds,
+    forward30Seconds,
+    seek
+  }
+
 };

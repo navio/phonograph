@@ -6,10 +6,10 @@ import Podcast from "./Podcast";
 
 
 const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
-const URI = 'https://www.listennotes.com/c/r/';
+
 const API = "/ln/";
 
-// This is insane.. but for now seems necessary.
+// This is insane.. but for now seems necessary.lo
 const PROXY = DEBUG ?  {
   "https:": `//${window.location.host}/rss-full/?term=https://`,
   "http:": `//${window.location.host}/rss-full/?term=http://`,
@@ -40,36 +40,25 @@ const PodcastLibrary = new PodcastEngine({
   fresh: 1000*60*60,
   shouldInit: false
 });
+
+export const getPodcastColorEngine = () => PodcastLibrary;
+
 const current = new Podcast();
 
-/*
-export const removePodcastFromState = function() {
-  this.setState({
-    items: null,
-    title: "",
-    image: null,
-    link: null,
-    description: "",
-    podcast: null
-  });
-  this.episodes.clear();
-};
-*/
 
 /*
 Removes a podcast from library and from the application state.
 @string: URL with the podcast
 */
-export const removePodcastFromLibrary = function (domain) {
-  const url = typeof domain === "string" ? domain : current.get().url;
-  PodcastEngine.db.del(url).then(() => {
-    let podcastsState = this.state.podcasts;
-    let podcasts = podcastsState.filter((podcast) => podcast.domain !== url);
-    this.setState({
-      podcasts,
+export const removePodcastFromLibrary = (state,dispatch) =>
+  (domain) => {
+    const url = typeof domain === "string" ? domain : state.current;
+    PodcastEngine.db.del(url).then(() => {
+      const podcastsState = state.podcasts;
+      const podcasts = podcastsState.filter((podcast) => podcast.domain !== url);
+      dispatch({type:'updatePodcasts', podcasts})
     });
-  });
-};
+  };
 
 /*
 Receives a Podcast URL and Loads into the View.
@@ -103,36 +92,36 @@ Receives an Event from the view and gets the URL.
 @event from object with attribute to get URL
 @string attribute to get the URL, default domain.
 */
-export const loadPodcastToView = function (ev, attribute = "domain") {
-  const podcast =
-    ev && ev.currentTarget && ev.currentTarget.getAttribute(attribute);
-  return fetchPodcastToView.call(this, podcast);
-};
+// export const loadPodcastToView = function (ev, attribute = "domain") {
+//   const podcast =
+//     ev && ev.currentTarget && ev.currentTarget.getAttribute(attribute);
+//   return fetchPodcastToView.call(this, podcast);
+// };
 
 /*
 Save Current Podcast into Database and notify State of new add.
 */
-export const saveToLibrary = function () {
-  const cu = current.get();
-  retrievePodcast.call(this, cu.url, true);
-};
+// export const saveToLibrary = function () {
+//   const cu = current.get();
+//   retrievePodcast.call(this, cu.url, true);
+// };
 
 /*
 Receives an array of episodes from a podcast and load them into episodes object.
 @string: URL with the podcast
 */
-export const loadEpisodesToInAppMemory = function (RSS) {
-  // To Fix, remove old episodes.
-  RSS.forEach((item) => this.episodes.set(item.guid, item));
-};
+// export const loadEpisodesToInAppMemory = function (RSS) {
+//   // To Fix, remove old episodes.
+//   RSS.forEach((item) => this.episodes.set(item.guid, item));
+// };
 
 /*
 Retrieves all Podcast content, if save
 @string of podcast
 @boolean if to save or not the podcast
 */
-export const retrievePodcast = function (castArg, save = false) {
-  const cast = commonRules(castArg);
+export const retrievePodcast = function ({ state, dispatch,  podcast, save = false }) {
+  const cast = commonRules(podcast);
   current.clear();
   return new Promise((accept) => {
     PodcastLibrary.getPodcast(cast, { save }).then((castContent) => {
@@ -146,18 +135,20 @@ export const retrievePodcast = function (castArg, save = false) {
         domain: cast,
       };
       if (save) {
-        const podcasts = this.state.podcasts;
+        const podcasts = state.podcasts;
         newState.podcasts = [
           { ...castContent, domain: castContent.url },
           ...podcasts,
         ];
       }
       current.set(castContent);
-      this.setState(newState, () => {
-        loadEpisodesToInAppMemory.call(this, castContent.items.slice(0, 20));
-        accept({ ...castContent, ...cast });
-      });
-    });
+      dispatch({type:'updatePodcasts', payload: newState })
+      return {castContent,cast};
+    })
+    .then(({castContent, cast}) => {
+      //loadEpisodesToInAppMemory.call(this, castContent.items.slice(0, 20));
+      accept({ ...castContent, cast });
+    })
   });
 };
 
@@ -165,7 +156,7 @@ export const retrievePodcast = function (castArg, save = false) {
  Verifies if visible podcast is in library by checking.
 */
 export const isPodcastInLibrary = function () {
-  return this.state.podcasts.find((cast) => cast.domain === this.state.domain);
+  return state.podcasts.find((cast) => cast.domain === state.domain);
 };
 
 const podcastCleaner = (podcasts) => {
@@ -183,7 +174,7 @@ const podcastCleaner = (podcasts) => {
 /*
  Start the application and loads the library.
 */
-export const initializeLibrary = function () {
+export const initializeLibrary = function (dispatch) {
   PodcastLibrary.ready.then(() => {
     PodcastLibrary.getLibrary().then((podcastsArray) => {
       Promise.allSettled(
@@ -193,9 +184,7 @@ export const initializeLibrary = function () {
       .then((podcasts) => podcasts.map(podcast => podcast.value))
       .then((podcasts) => {
         if (podcasts) {
-          this.setState({
-            podcasts: podcastCleaner(podcasts),
-          });
+          dispatch({type: 'initLibrary', podcasts: podcastCleaner(podcasts)})
         }
       });
     });
@@ -237,12 +226,12 @@ export const loadaNewPodcast = function (cast, callback) {
 //   }
 // };
 
-export const driveThruDNS = (url) => {
-  const urlObj = new URL(url);
-  const domain = urlObj.href.replace(urlObj.protocol, "").slice(2);
-  const protocol = urlObj.protocol;
-  return DEBUG ? urlObj.toString() : `${PROXY[protocol]}${domain}`;
-};
+// export const driveThruDNS = (url) => {
+//   const urlObj = new URL(url);
+//   const domain = urlObj.href.replace(urlObj.protocol, "").slice(2);
+//   const protocol = urlObj.protocol;
+//   return DEBUG ? urlObj.toString() : `${PROXY[protocol]}${domain}`;
+// };
 
 export const checkIfNewPodcastInURL = function () {
   if (!window && !window.location)
@@ -259,7 +248,7 @@ export const getPopularPodcasts = (function () {
   const lsName = 'topCasts';
   const seconsToRefresh = 6 * 60 * 1000;
   
-
+  const URI = 'https://www.listennotes.com/c/r/';
   return function query() {
     
     let responseSaved = JSON.parse(localStorage.getItem(lsName)) || {};

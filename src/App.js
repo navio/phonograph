@@ -1,13 +1,11 @@
-import React, { Component, Suspense } from "react";
+import React, { useRef , Suspense, useReducer, useEffect } from "react";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { ThemeProvider } from "@material-ui/core/styles";
 import theme, { switchHanlder } from "./Theme";
 import audioqueue from "audioqueue";
 import Typography from "@material-ui/core/Typography";
-import PodcastHeader from "./podcast/PodcastHeader";
 
 import loadingAnimation from '../public/loading.svg';
-// import "babel-polyfill";
 
 import {
   ROOT,
@@ -18,31 +16,17 @@ import {
 } from "./constants";
 
 // App Components
-// import Header from './app/Header';
 import Footer from "./app/Footer";
-import Notifications from "./app/Notifications";
-// import MediaControl from "./app/MediaControl";
-import { clearNotification, addNotification } from "./engine/notifications";
 
 // Engine - Player Interactions
-import {
-  forward30Seconds,
-  rewind10Seconds,
-  playButton,
-  seek,
-  navigateTo,
-} from "./engine/player";
+import playerFunctions from "./engine/player";
 
 // Podcast Engine
 import {
+  getPodcastColorEngine,
   checkIfNewPodcastInURL,
-  loadPodcastToView,
   initializeLibrary,
-  loadaNewPodcast,
-  askForPodcast,
-  isPodcastInLibrary,
   removePodcastFromLibrary,
-  saveToLibrary,
 } from "./engine/podcast";
 
 import attachEvents from "./engine/events";
@@ -51,143 +35,123 @@ import attachEvents from "./engine/events";
 import { withRouter } from "react-router";
 import { Route, Redirect } from "react-router-dom";
 
-const AppContext = React.createContext();
+export const AppContext = React.createContext();
+export const Consumer = AppContext.Consumer;
+
+
+const initialState = JSON.parse(localStorage.getItem('state') || false ) || {
+  playing: null,
+  loaded: 0,
+  played: 0,
+  status: null,
+  title: "",
+  image: null,
+  loading: false,
+  podcasts: [],
+  theme: true,
+  current: null
+};
+
+const reducer = (state, action) => {
+  switch(action.type){
+    case 'updatePodcasts':
+    case 'initLibrary': 
+      return { ...state, podcasts: action.podcasts}
+    case 'loadPodcast':
+      return { ...state, current: action.payload }
+    case 'setDark':
+      return { ...state, theme: action.payload }
+    case 'playingStatus':
+      return {...state, status: action.status} 
+    case 'audioUpdate':
+      return { ...state, ...action.payload}
+  }
+}
 
 // Code Module
 const Discover = React.lazy(async () => await import("./podcast/Discover"));
 const Library = React.lazy(async () => await import("./podcast/Library"));
 const Settings = React.lazy(async () => await import("./podcast/Settings"));
 const MediaControl = React.lazy(async () => await import("./app/MediaControl"));
-const EpisodeList = React.lazy(
-  async () => await import("./podcast/EpisodeList")
+const PodcastView = React.lazy( async () => await import("./podcast/PodcastView"));
+
+const Loading = (props) => (
+  <Typography
+    align="center"
+    style={{ display: "block", paddintTop: "40%" }}
+  >
+    <img src={loadingAnimation} width="4rem" />
+  </Typography>
 );
 
 
-class App extends Component {
-  constructor() {
-    super();
-    const stateExist = JSON.parse(localStorage.getItem('state') || false );
 
-    this.state = stateExist || {
-      playing: null,
-      items: null,
-      loaded: 0,
-      played: 0,
-      author: null,
-      status: null,
-      title: "",
-      description: "",
-      image: null,
-      link: null,
-      created: null,
-      loading: false,
-      podcasts: [],
-      theme: true,
-    };
+const App = () => {
 
-    this.episodes = new Map();
-    // this.podcasts = new Map();
-    this.navigateTo = navigateTo.bind(this);
+    const player = useRef(null); //new audioqueue([]);
+    const engine = getPodcastColorEngine();
+    const [state, dispatch] = useReducer(reducer,initialState);
+    const mediaFunctions = playerFunctions(player, dispatch, state)
 
-    this.forward30Seconds = forward30Seconds.bind(this);
-    this.rewind10Seconds = rewind10Seconds.bind(this);
-    this.seek = seek.bind(this);
-    this.playButton = playButton.bind(this);
-    this.loadPodcastToView = loadPodcastToView.bind(this);
-    this.askForPodcast = askForPodcast.bind(this);
 
-    this.clearNotification = clearNotification.bind(this);
-    this.addNotification = addNotification.bind(this);
+    const loadPodcast = (podcast, cb) => {
+      dispatch({type:'loadPodcast', payload: podcast});
+      cb()
+    } 
 
-    this.switchHanlder = switchHanlder.bind(this);
-    this.saveState = this.saveState.bind(this);
 
     // Mode
-    const newPodcast = checkIfNewPodcastInURL.call(this);
-    newPodcast &&
-      loadaNewPodcast.call(this, newPodcast, this.navigateTo(PODCASTVIEW));
-  }
+    const newPodcast = checkIfNewPodcastInURL();
+    if(newPodcast){
+      loadPodcast(newPodcast, navigateTo(PODCASTVIEW));
+    }
 
-  componentDidMount() {
-    // Player
-    const player = new audioqueue([], { audioObject: this.refs.player });
-    attachEvents.call(this, player);
+    useEffect(() => {
+      initializeLibrary(dispatch);
+    },[]);
 
-    // Podcasts
-    initializeLibrary.call(this);
+    useEffect(
+      () => { 
+        if(player.current) {
+          console.log('audioReady', player.current)
+          attachEvents(player.current, dispatch, state)
+          window.player = player.current;
+          player.current.currentTime = state.currentTime;
+        }
+      },[player.current]);
 
-    // Debug
-    window.player = player;
-    window.notification = this.addNotification;
-  }
+    useEffect( () => localStorage.setItem('state',JSON.stringify(state)) , [state] );
 
-  saveState(){
-      localStorage.setItem('state',JSON.stringify(this.state));
-  }
+    const finalTheme = state.theme === theme.os ? theme.dark : theme.light;
 
-  render() {
-    const finalTheme = this.state.theme === theme.os ? theme.dark : theme.light;
-    const episode = this.episodes.get(this.state.episode);
-
-    const Loading = (props) => (
-      <Typography
-        align="center"
-        style={{ display: "block", paddintTop: "40%" }}
-      >
-        <img src={loadingAnimation} width="4rem" />
-      </Typography>
-    );
-    this.saveState.call(this);
     return (
       <ThemeProvider theme={finalTheme}>
-        <AppContext.Provider
-          value={{ state: this.state, global: this, episode: episode }}
-        >
+        <AppContext.Provider value={{ state, dispatch, engine, player: player.current }} >
           <CssBaseline />
-          <Notifications
-            show={!!this.state.showNotification}
-            callback={this.clearNotification}
-            {...this.state.notification}
-          />
-
-          <Route
+           
+           <Route
             exact
             path={[LIBVIEW, ROOT]}
-            render={({ history }) => { 
+            render={({history}) => { 
               return (
               <Suspense fallback={<Loading />}>
                 <Library
-                  addPodcastHandler={this.navigateTo(DISCOVERVIEW)} //{this.askForPodcast}
-                  actionAfterSelectPodcast={this.navigateTo(PODCASTVIEW)}
+                  history={history}
+                  addPodcastHandler={() => history.push(DISCOVERVIEW)} //{this.askForPodcast}
+                  actionAfterSelectPodcast={() => history.push(PODCASTVIEW)}
                 />
               </Suspense>
             )}}
-          />
-
+          /> 
+          
           <Route
             path={PODCASTVIEW}
-            render={() =>
-              this.state.title ? (
-                <>
-                  <Suspense fallback={<Loading>Header</Loading>}>
-                    <PodcastHeader
-                      inLibrary={isPodcastInLibrary.bind(this)}
-                      savePodcastToLibrary={saveToLibrary.bind(this)}
-                      removePodcast={removePodcastFromLibrary.bind(this)}
-                    />
+            render={({history}) =>
+               state.current ? (
+                  <Suspense fallback={<Loading />}>
+                    <PodcastView {...history} />
                   </Suspense>
-                  <Suspense fallback={<Loading>Loading</Loading>}>
-                    <EpisodeList
-                      episodes={this.state.items}
-                      handler={this.playButton.bind(this)}
-                      status={this.state.status}
-                      playing={this.state.playing}
-                    />
-                  </Suspense>
-                </>
-              ) : (
-                <Redirect to={LIBVIEW} />
-              )
+              ) : (<Redirect to={LIBVIEW} />)
             }
           />
 
@@ -197,52 +161,50 @@ class App extends Component {
             render={({ history }) => (
               <Suspense fallback={<Loading />}>
                 <Discover
-                  addPodcastHandler={loadaNewPodcast.bind(this)}
-                  actionAfterClick={this.navigateTo(PODCASTVIEW)}
-                  notificaions={this.addNotification}
+                  history={history}
+                  addPodcastHandler={loadPodcast}
+                  actionAfterClick={() => history.push(PODCASTVIEW)}
                 />
               </Suspense>
             )}
           />
-
+   
           <Route
             path={SETTINGSVIEW}
             render={() => (
               <Suspense fallback={<Loading />}>
                 <Settings
-                  themeSwitcher={this.switchHanlder}
-                  removePodcast={removePodcastFromLibrary.bind(this)}
-                  podcasts={this.state.podcasts}
+                  podcasts={state.podcasts}
                 />
               </Suspense>
             )}
           />
-
+     
           <Suspense fallback={<Loading />}>
-            <MediaControl
-              toCurrentPodcast={this.navigateTo(PODCASTVIEW)}
-              player={this.refs.player}
-              handler={this.playButton}
-              forward={this.forward30Seconds}
-              rewind={this.rewind10Seconds}
-              seek={this.seek}
-            />
+            { player.current && <MediaControl
+              // toCurrentPodcast={navigateTo(PODCASTVIEW)}
+              player={player.current}
+              handler={mediaFunctions.playButton}
+              forward={mediaFunctions.forward30Seconds}
+              rewind={mediaFunctions.rewind10Seconds}
+              seek={mediaFunctions.seek}
+            /> }
           </Suspense>
 
-          <Footer path={this.props.location.pathname} />
+          <Footer path={location.pathname} />
 
           <audio
             autoPlay={true}
-            ref="player"
+            ref={player}
             preload="auto"
-            title={(episode && episode.title) || ""}
-            poster={(episode && episode.itunes && episode.itunes.image) || ""}
+            title={ state.title || ""}
+            src={state.media}
+            // poster={(episode && episode.itunes && episode.itunes.image) || ""}
           />
         </AppContext.Provider>
       </ThemeProvider>
     );
-  }
 }
 
 export default withRouter(App);
-export const Consumer = AppContext.Consumer;
+
