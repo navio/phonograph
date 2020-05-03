@@ -151,7 +151,7 @@ const App = () => {
                   <Suspense fallback={<Loading />}>
                     <PodcastView {...history} />
                   </Suspense>
-              ) : (<Redirect to={LIBVIEW} />)
+              ) : (<Redirect to={LIBVIEW} history />)
             }
           />
 

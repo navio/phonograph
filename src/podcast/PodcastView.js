@@ -3,6 +3,7 @@ import {AppContext} from '../App';
 import EpisodeList from "./EpisodeList";
 import PodcastHeader from "./PodcastHeader";
 import PodcastEngine from "podcastsuite";
+import Typography from "@material-ui/core/Typography";
 // const PodcastView = React.lazy( async () => await import("./podcast/PodcastView"));
 
 
@@ -21,6 +22,7 @@ export default () => {
 
     const {state: global , engine, dispatch, player } = useContext(AppContext);
     const [ podcast, setPodcast ] = useState({});
+    const [ error, setError ] = useState({});
     const podcastURL = commonRules(global.current);
 
     const episodes = useRef(new Map());
@@ -28,6 +30,8 @@ export default () => {
     const loadEpisodes = (podcast) => podcast.forEach((episode) => episodes.current.set(episode.guid, episode));
 
     const getPodcast = async (save = false ) => {
+
+        try {
         const castContent = await engine.getPodcast(podcastURL, { save });
 
         let newPodcast = {
@@ -42,8 +46,13 @@ export default () => {
         };
         setPodcast(newPodcast);
         loadEpisodes(newPodcast.items);
-        
+        setError({});
         return { castContent, newPodcast };
+
+      } catch (error){
+        setError({error, message: 'Error loading podcast'})
+        setTimeout(()=>history.back(),5000);
+      }
     }
 
     const savePodcast = async () => {
@@ -91,8 +100,7 @@ export default () => {
         getPodcast()
     },[]);
     
-    return <>
-            { podcast && <> 
+    return podcast.domain ? <> 
                         <PodcastHeader  
                             savePodcast={savePodcast} 
                             podcast={podcast} 
@@ -104,8 +112,9 @@ export default () => {
                             handler={playButton}
                             status={global.status}
                             playing={global.playing}
-                        />
-                            </>
-                        }</>   
+                        /> 
+                        </>
+                        : <Typography align='center' letterSpacing={6} variant="h4">{ error && error.message }</Typography>
+                        
 }
 
