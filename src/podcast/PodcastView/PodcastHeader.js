@@ -19,7 +19,7 @@ import { clearText } from "./EpisodeList";
 import ShareIcon from "@material-ui/icons/ShareOutlined";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 
-import { Consumer } from "../App.js";
+import { Consumer } from "../../App.js";
 import { useHistory } from "react-router-dom";
 
 const styles = (theme) => ({

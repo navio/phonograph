@@ -1,12 +1,18 @@
 import React, { useRef , Suspense, useReducer, useEffect } from "react";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { ThemeProvider } from "@material-ui/core/styles";
-import theme, { switchHanlder } from "./Theme";
+import theme from "./theme";
+import { reducer, initialState } from "./reducer"
 import audioqueue from "audioqueue";
 import Typography from "@material-ui/core/Typography";
 
 import loadingAnimation from '../public/loading.svg';
 
+// Router
+import { withRouter } from "react-router";
+import { Route, Redirect } from "react-router-dom";
+
+// Constants
 import {
   ROOT,
   LIBVIEW,
@@ -23,53 +29,21 @@ import playerFunctions from "./engine/player";
 
 // Podcast Engine
 import {
-  getPodcastColorEngine,
+  getPodcastEngine,
   checkIfNewPodcastInURL,
   initializeLibrary,
-  removePodcastFromLibrary,
-} from "./engine/podcast";
+} from "./engine";
 
 import attachEvents from "./engine/events";
 
-// Router
-import { withRouter } from "react-router";
-import { Route, Redirect } from "react-router-dom";
+
 
 export const AppContext = React.createContext();
 export const Consumer = AppContext.Consumer;
 
 
-const initialState = JSON.parse(localStorage.getItem('state') || false ) || {
-  playing: null,
-  loaded: 0,
-  played: 0,
-  status: null,
-  title: "",
-  image: null,
-  loading: false,
-  podcasts: [],
-  theme: true,
-  current: null
-};
-
-const reducer = (state, action) => {
-  switch(action.type){
-    case 'updatePodcasts':
-    case 'initLibrary': 
-      return { ...state, podcasts: action.podcasts}
-    case 'loadPodcast':
-      return { ...state, current: action.payload }
-    case 'setDark':
-      return { ...state, theme: action.payload }
-    case 'playingStatus':
-      return {...state, status: action.status} 
-    case 'audioUpdate':
-      return { ...state, ...action.payload}
-  }
-}
-
 // Code Module
-const Discover = React.lazy(async () => await import("./podcast/Discover"));
+const Discover = React.lazy(async () => await import("./podcast/Discovery"));
 const Library = React.lazy(async () => await import("./podcast/Library"));
 const Settings = React.lazy(async () => await import("./podcast/Settings"));
 const MediaControl = React.lazy(async () => await import("./app/MediaControl"));
@@ -89,7 +63,7 @@ const Loading = (props) => (
 const App = () => {
 
     const player = useRef(null); //new audioqueue([]);
-    const engine = getPodcastColorEngine();
+    const engine = getPodcastEngine();
     const [state, dispatch] = useReducer(reducer,initialState);
     const mediaFunctions = playerFunctions(player, dispatch, state)
 
@@ -194,7 +168,7 @@ const App = () => {
           <Footer path={location.pathname} />
 
           <audio
-            autoPlay={true}
+            autoPlay={state.status !== 'pause'}
             ref={player}
             preload="auto"
             title={ state.title || ""}

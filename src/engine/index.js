@@ -1,8 +1,7 @@
-import { defaultCasts } from "../../podcast/podcast";
+import { podcasts } from "../podcast";
 import PodcastSearcher from "./PodcastSearcher";
 import randomColor from "randomcolor";
 import PodcastEngine from "podcastsuite";
-import Podcast from "./Podcast";
 
 
 const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
@@ -31,7 +30,7 @@ export const commonRules = (originalUrl) => {
   return url;
 };
 
-const initializeCast = []
+const initializeCast = [...podcasts]
 //defaultCasts.map(commonRules);
 
 const PodcastLibrary = new PodcastEngine({
@@ -41,9 +40,8 @@ const PodcastLibrary = new PodcastEngine({
   shouldInit: false
 });
 
-export const getPodcastColorEngine = () => PodcastLibrary;
+export const getPodcastEngine = () => PodcastLibrary;
 
-const current = new Podcast();
 
 
 /*
@@ -258,7 +256,7 @@ export const getPopularPodcasts = (function () {
       this.setState(response);
       return;
     } else {
-      import("../../../public/top.json")
+      import("../../public/top.json")
         .then((response) => {
           const { podcasts } = response;
           return podcasts;

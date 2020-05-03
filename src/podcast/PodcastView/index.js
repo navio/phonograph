@@ -1,5 +1,5 @@
 import React, {useRef, useContext, useEffect, useState} from 'react';
-import {AppContext} from '../App';
+import {AppContext} from '../../App';
 import EpisodeList from "./EpisodeList";
 import PodcastHeader from "./PodcastHeader";
 import PodcastEngine from "podcastsuite";
@@ -83,7 +83,8 @@ export default () => {
           console.log(episode.enclosures[0].url);
           player.setAttribute("src", episode.enclosures[0].url);
           player.play();
-          dispatch({ type:'audioUpdate', payload:{
+          dispatch({ type:'audioUpdate', payload: {
+            audioOrigin: podcastURL,
             episode: episode.guid,
             title: episode.title,
             media: episode.enclosures[0].url,
