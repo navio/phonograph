@@ -67,7 +67,7 @@ export const styles = (theme) => ({
 const LibraryView = (props) => {
   const { classes, actionAfterSelectPodcast, history } = props;
   const {state , dispatch} = useContext(AppContext);
-  const podcasts = state.podcasts || [];
+  const podcasts = state.podcasts;
         const processClick = (ev) => {
           const podcast = ev.currentTarget && ev.currentTarget.getAttribute('domain');
           dispatch({type:'loadPodcast', payload: podcast});
@@ -88,7 +88,7 @@ const LibraryView = (props) => {
               <AddIcon />
             </Fab>
             <Grid container spacing={0} direction={"row"}>
-              {podcasts ?
+              {podcasts.length > 0 ?
                 podcasts.map(
                   (podcast) =>
                     podcast &&
