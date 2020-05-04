@@ -1,10 +1,10 @@
 import React, {useRef, useContext, useEffect, useState} from 'react';
 import {AppContext} from '../../App';
+import {PODCASTVIEW, DISCOVERY} from '../../constants';
 import EpisodeList from "./EpisodeList";
 import PodcastHeader from "./PodcastHeader";
 import PodcastEngine from "podcastsuite";
 import Typography from "@material-ui/core/Typography";
-// const PodcastView = React.lazy( async () => await import("./podcast/PodcastView"));
 
 
 const commonRules = (originalUrl) => {
@@ -20,10 +20,12 @@ const commonRules = (originalUrl) => {
 
 export default () => {
 
+    const bringAPodcast = window.location.href.split(`${PODCASTVIEW}/`)[1];
+
     const {state: global , engine, dispatch, player } = useContext(AppContext);
     const [ podcast, setPodcast ] = useState({});
     const [ error, setError ] = useState({});
-    const podcastURL = commonRules(global.current);
+    const podcastURL = commonRules(bringAPodcast || global.current);
 
     const episodes = useRef(new Map());
 
@@ -51,7 +53,7 @@ export default () => {
 
       } catch (error){
         setError({error, message: 'Error loading podcast'})
-        setTimeout(()=>history.back(),5000);
+        setTimeout(()=>history.push(DISCOVERY),5000);
       }
     }
 
@@ -61,10 +63,10 @@ export default () => {
     }
 
     const removePodcast = async () => {
-        await PodcastEngine.db.del(podcastURL);
         const podcastsState = global.podcasts;
         const podcasts = podcastsState.filter((podcast) => podcast.url !== podcastURL);
-        dispatch({type:'updatePodcasts', podcasts})
+        dispatch({type:'updatePodcasts', podcasts});
+        await PodcastEngine.db.del(podcastURL);
     }
 
     const playButton = (guid) => () => {
