@@ -1,5 +1,6 @@
 import React, {useRef, useContext, useEffect, useState} from 'react';
 import {AppContext} from '../../App';
+import {DISCOVERY} from '../../constants';
 import EpisodeList from "./EpisodeList";
 import PodcastHeader from "./PodcastHeader";
 import PodcastEngine from "podcastsuite";
@@ -18,14 +19,15 @@ const commonRules = (originalUrl) => {
     return url;
   };
 
-export default (props) => {
-    console.log(props);
+export default () => {
+
+    const bringAPodcast = window.location.href.split('/podcast/')[1];
 
     const {state: global , engine, dispatch, player } = useContext(AppContext);
     const [ podcast, setPodcast ] = useState({});
     const [ error, setError ] = useState({});
-    const podcastURL = commonRules(global.current);
-    console.log(podcastURL)
+    const podcastURL = commonRules(bringAPodcast || global.current);
+
     const episodes = useRef(new Map());
 
     const loadEpisodes = (podcast) => podcast.forEach((episode) => episodes.current.set(episode.guid, episode));
