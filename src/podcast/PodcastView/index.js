@@ -53,7 +53,7 @@ export default () => {
 
       } catch (error){
         setError({error, message: 'Error loading podcast'})
-        setTimeout(()=>history.push(DISCOVERY),5000);
+        setTimeout(()=>history.push(DISCOVERY),3000);
       }
     }
 
