@@ -1,11 +1,10 @@
 import React, {useRef, useContext, useEffect, useState} from 'react';
 import {AppContext} from '../../App';
-import {DISCOVERY} from '../../constants';
+import {PODCASTVIEW, DISCOVERY} from '../../constants';
 import EpisodeList from "./EpisodeList";
 import PodcastHeader from "./PodcastHeader";
 import PodcastEngine from "podcastsuite";
 import Typography from "@material-ui/core/Typography";
-// const PodcastView = React.lazy( async () => await import("./podcast/PodcastView"));
 
 
 const commonRules = (originalUrl) => {
@@ -21,7 +20,7 @@ const commonRules = (originalUrl) => {
 
 export default () => {
 
-    const bringAPodcast = window.location.href.split('/podcast/')[1];
+    const bringAPodcast = window.location.href.split(`${PODCASTVIEW}/`)[1];
 
     const {state: global , engine, dispatch, player } = useContext(AppContext);
     const [ podcast, setPodcast ] = useState({});
@@ -54,7 +53,7 @@ export default () => {
 
       } catch (error){
         setError({error, message: 'Error loading podcast'})
-        setTimeout(()=>history.back(),5000);
+        setTimeout(()=>history.push(DISCOVERY),5000);
       }
     }
 
