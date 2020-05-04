@@ -18,13 +18,14 @@ const commonRules = (originalUrl) => {
     return url;
   };
 
-export default () => {
+export default (props) => {
+    console.log(props);
 
     const {state: global , engine, dispatch, player } = useContext(AppContext);
     const [ podcast, setPodcast ] = useState({});
     const [ error, setError ] = useState({});
     const podcastURL = commonRules(global.current);
-
+    console.log(podcastURL)
     const episodes = useRef(new Map());
 
     const loadEpisodes = (podcast) => podcast.forEach((episode) => episodes.current.set(episode.guid, episode));
@@ -61,10 +62,10 @@ export default () => {
     }
 
     const removePodcast = async () => {
-        await PodcastEngine.db.del(podcastURL);
         const podcastsState = global.podcasts;
         const podcasts = podcastsState.filter((podcast) => podcast.url !== podcastURL);
-        dispatch({type:'updatePodcasts', podcasts})
+        dispatch({type:'updatePodcasts', podcasts});
+        await PodcastEngine.db.del(podcastURL);
     }
 
     const playButton = (guid) => () => {
