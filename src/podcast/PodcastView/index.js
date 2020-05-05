@@ -46,7 +46,8 @@ export default () => {
             link: castContent.url,
             lastUpdated: Date.now(),
             domain: podcastURL,
-            url:podcastURL
+            url:podcastURL,
+            created: (Date.now())
         };
         setPodcast(newPodcast);
         loadEpisodes(newPodcast.items);
@@ -63,7 +64,7 @@ export default () => {
     const savePodcast = async () => {
         const {newPodcast} = await getPodcast(true);
         const {items, ...allPodcast } = newPodcast;
-        dispatch({ type:'updatePodcasts', podcasts: [...global.podcasts, allPodcast  ] })
+        dispatch({ type:'updatePodcasts', podcasts: [...global.podcasts, allPodcast ] })
     }
 
     const removePodcast = async () => {

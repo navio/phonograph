@@ -12,7 +12,7 @@
 
 
 export default function (player, dispatch, state) {
-
+  let tick = null;
   const completedLoading = function (ev) {
     dispatch({type:'audioUpdate', payload: { loading: "loaded" }});
   };
@@ -32,8 +32,9 @@ export default function (player, dispatch, state) {
   };
   
   const playTick = function (ev) {
+
     dispatch({ type: 'playingStatus', status: "playing" });
-    this.tick = setInterval(() => {
+    tick = setInterval(() => {
       let loaded = player.buffered.length
         ? (100 * player.buffered.end(0)) / player.duration
         : 0;
@@ -55,12 +56,12 @@ export default function (player, dispatch, state) {
   };
   
   const pauseTick = function () {
-    clearInterval(this.tick);
+    clearInterval(tick);
     dispatch({ type: 'playingStatus', status: "pause" });
   };
   
   const stopTick = function (ev) {
-    clearInterval(this.tick);
+    clearInterval(tick);
   };
 
   // player.addEventListener('loadstart',this.loading.bind(this));
