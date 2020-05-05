@@ -36,8 +36,6 @@ import {
 
 import attachEvents from "./engine/events";
 
-
-
 export const AppContext = React.createContext();
 export const Consumer = AppContext.Consumer;
 
