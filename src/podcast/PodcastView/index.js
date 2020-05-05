@@ -1,6 +1,8 @@
 import React, {useRef, useContext, useEffect, useState} from 'react';
 import {AppContext} from '../../App';
 import {PODCASTVIEW, DISCOVERY} from '../../constants';
+import loadingAnimation from '../../../public/loading.svg';
+
 import EpisodeList from "./EpisodeList";
 import PodcastHeader from "./PodcastHeader";
 import PodcastEngine from "podcastsuite";
@@ -105,21 +107,21 @@ export default () => {
         getPodcast()
     },[]);
     
-    return podcast.domain ? <> 
-                        <PodcastHeader  
-                            savePodcast={savePodcast} 
-                            podcast={podcast} 
-                            removePodcast={removePodcast} 
-                            inLibrary={isPodcastInLibrary} 
-                        />
-                        <EpisodeList
-                            episodes={podcast.items}
-                            handler={playButton}
-                            status={global.status}
-                            playing={global.playing}
-                        /> 
-                        </>
-                        : <Typography align='center' letterSpacing={6} variant="h4">{ error && error.message }</Typography>
+    return  podcast.domain ? <> 
+    <PodcastHeader  
+        savePodcast={savePodcast} 
+        podcast={podcast} 
+        removePodcast={removePodcast} 
+        inLibrary={isPodcastInLibrary} 
+    />
+    <EpisodeList
+        episodes={podcast.items}
+        handler={playButton}
+        status={global.status}
+        playing={global.playing}
+    /> 
+    </>
+    :<Typography align='center' letterSpacing={6} variant="h4"> <img src={loadingAnimation} width="20%" style={{paddingTop: '20%' }} /> <br /> { error && error.message }</Typography>
                         
 }
 
