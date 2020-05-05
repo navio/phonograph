@@ -19,16 +19,16 @@ const PROXY = DEBUG ?  {
 
 
 // Rules for URLS
-export const commonRules = (originalUrl) => {
-  let url = originalUrl;
-  url = url.indexOf("http:") > -1 ? url.replace("http:", "https:") : url;
-  url = url.search("http") < 0 ? "https://" + url : url;
-  url =
-    url.indexOf("feeds.feedburner") > -1 && url.indexOf("?format=xml") === -1
-      ? url + "?format=xml"
-      : url;
-  return url;
-};
+// export const commonRules = (originalUrl) => {
+//   let url = originalUrl;
+//   url = url.indexOf("http:") > -1 ? url.replace("http:", "https:") : url;
+//   url = url.search("http") < 0 ? "https://" + url : url;
+//   url =
+//     url.indexOf("feeds.feedburner") > -1 && url.indexOf("?format=xml") === -1
+//       ? url + "?format=xml"
+//       : url;
+//   return url;
+// };
 
 const initializeCast = [...podcasts]
 //defaultCasts.map(commonRules);
@@ -48,42 +48,42 @@ export const getPodcastEngine = () => PodcastLibrary;
 Removes a podcast from library and from the application state.
 @string: URL with the podcast
 */
-export const removePodcastFromLibrary = (state,dispatch) =>
-  (domain) => {
-    const url = typeof domain === "string" ? domain : state.current;
-    PodcastEngine.db.del(url).then(() => {
-      const podcastsState = state.podcasts;
-      const podcasts = podcastsState.filter((podcast) => podcast.domain !== url);
-      dispatch({type:'updatePodcasts', podcasts})
-    });
-  };
+// export const removePodcastFromLibrary = (state,dispatch) =>
+//   (domain) => {
+//     const url = typeof domain === "string" ? domain : state.current;
+//     PodcastEngine.db.del(url).then(() => {
+//       const podcastsState = state.podcasts;
+//       const podcasts = podcastsState.filter((podcast) => podcast.domain !== url);
+//       dispatch({type:'updatePodcasts', podcasts})
+//     });
+//   };
 
 /*
 Receives a Podcast URL and Loads into the View.
 @string: URL with the podcast
 */
-export const fetchPodcastToView = function (podcast) {
-  return new Promise((acc) => {
-    PodcastLibrary.getPodcast(commonRules(podcast))
-      .then((cast) => {
-        if (cast) {
-          let { title, image, description, url, created, link } = cast;
-          this.setState({
-            title,
-            image,
-            description,
-            domain: url,
-            podcast,
-            created,
-            link
-          });
-        }
-        retrievePodcast.call(this, podcast);
-        acc(cast);
-      })
-      .catch((error) => console.error);
-  });
-};
+// export const fetchPodcastToView = function (podcast) {
+//   return new Promise((acc) => {
+//     PodcastLibrary.getPodcast(commonRules(podcast))
+//       .then((cast) => {
+//         if (cast) {
+//           let { title, image, description, url, created, link } = cast;
+//           this.setState({
+//             title,
+//             image,
+//             description,
+//             domain: url,
+//             podcast,
+//             created,
+//             link
+//           });
+//         }
+//         retrievePodcast.call(this, podcast);
+//         acc(cast);
+//       })
+//       .catch((error) => console.error);
+//   });
+// };
 
 /*
 Receives an Event from the view and gets the URL.
@@ -118,44 +118,44 @@ Retrieves all Podcast content, if save
 @string of podcast
 @boolean if to save or not the podcast
 */
-export const retrievePodcast = function ({ state, dispatch,  podcast, save = false }) {
-  const cast = commonRules(podcast);
-  current.clear();
-  return new Promise((accept) => {
-    PodcastLibrary.getPodcast(cast, { save }).then((castContent) => {
-      let newState = {
-        items: castContent.items.slice(0, 20),
-        title: castContent.title,
-        description: castContent.description,
-        image: castContent.image,
-        link: castContent.url,
-        lastUpdated: Date.now(),
-        domain: cast,
-      };
-      if (save) {
-        const podcasts = state.podcasts;
-        newState.podcasts = [
-          { ...castContent, domain: castContent.url },
-          ...podcasts,
-        ];
-      }
-      current.set(castContent);
-      dispatch({type:'updatePodcasts', payload: newState })
-      return {castContent,cast};
-    })
-    .then(({castContent, cast}) => {
-      //loadEpisodesToInAppMemory.call(this, castContent.items.slice(0, 20));
-      accept({ ...castContent, cast });
-    })
-  });
-};
+// export const retrievePodcast = function ({ state, dispatch,  podcast, save = false }) {
+//   const cast = commonRules(podcast);
+//   current.clear();
+//   return new Promise((accept) => {
+//     PodcastLibrary.getPodcast(cast, { save }).then((castContent) => {
+//       let newState = {
+//         items: castContent.items.slice(0, 20),
+//         title: castContent.title,
+//         description: castContent.description,
+//         image: castContent.image,
+//         link: castContent.url,
+//         lastUpdated: Date.now(),
+//         domain: cast,
+//       };
+//       if (save) {
+//         const podcasts = state.podcasts;
+//         newState.podcasts = [
+//           { ...castContent, domain: castContent.url },
+//           ...podcasts,
+//         ];
+//       }
+//       current.set(castContent);
+//       dispatch({type:'updatePodcasts', payload: newState })
+//       return {castContent,cast};
+//     })
+//     .then(({castContent, cast}) => {
+//       //loadEpisodesToInAppMemory.call(this, castContent.items.slice(0, 20));
+//       accept({ ...castContent, cast });
+//     })
+//   });
+// };
 
 /*
  Verifies if visible podcast is in library by checking.
 */
-export const isPodcastInLibrary = function () {
-  return state.podcasts.find((cast) => cast.domain === state.domain);
-};
+// export const isPodcastInLibrary = function () {
+//   return state.podcasts.find((cast) => cast.domain === state.domain);
+// };
 
 const podcastCleaner = (podcasts) => {
   return podcasts.map((podcast) => {
@@ -300,13 +300,13 @@ export const getPopularPodcasts = (function () {
   };
 })();
 
-export const getPodcastColor = (cast) => ({
-  backgroundColor: randomColor({
-    seed: cast.title,
-    luminosity: "dark",
-    hue: "blue",
-  }),
-});
+// export const getPodcastColor = (cast) => ({
+//   backgroundColor: randomColor({
+//     seed: cast.title,
+//     luminosity: "dark",
+//     hue: "blue",
+//   }),
+// });
 
 /********* UTILS END *********/
 
