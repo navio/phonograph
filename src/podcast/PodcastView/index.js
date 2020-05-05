@@ -67,10 +67,11 @@ export default () => {
     }
 
     const removePodcast = async () => {
+        await PodcastEngine.db.del(podcastURL);
         const podcastsState = global.podcasts;
         const podcasts = podcastsState.filter((podcast) => podcast.url !== podcastURL);
         dispatch({type:'updatePodcasts', podcasts});
-        await PodcastEngine.db.del(podcastURL);
+  
     }
 
     const playButton = (guid) => () => {
