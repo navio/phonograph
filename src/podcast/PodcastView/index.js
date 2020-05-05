@@ -1,10 +1,12 @@
 import React, {useRef, useContext, useEffect, useState} from 'react';
 import {AppContext} from '../../App';
+import {PODCASTVIEW, DISCOVERY} from '../../constants';
+import loadingAnimation from '../../../public/loading.svg';
+
 import EpisodeList from "./EpisodeList";
 import PodcastHeader from "./PodcastHeader";
 import PodcastEngine from "podcastsuite";
 import Typography from "@material-ui/core/Typography";
-// const PodcastView = React.lazy( async () => await import("./podcast/PodcastView"));
 
 
 const commonRules = (originalUrl) => {
@@ -20,10 +22,12 @@ const commonRules = (originalUrl) => {
 
 export default () => {
 
+    const bringAPodcast = window.location.href.split(`${PODCASTVIEW}/`)[1];
+
     const {state: global , engine, dispatch, player } = useContext(AppContext);
     const [ podcast, setPodcast ] = useState({});
     const [ error, setError ] = useState({});
-    const podcastURL = commonRules(global.current);
+    const podcastURL = commonRules(bringAPodcast || global.current);
 
     const episodes = useRef(new Map());
 
@@ -35,7 +39,7 @@ export default () => {
         const castContent = await engine.getPodcast(podcastURL, { save });
 
         let newPodcast = {
-            items: castContent.items.slice(0, 20),
+            items: castContent.items,
             title: castContent.title,
             description: castContent.description,
             image: castContent.image,
@@ -47,24 +51,27 @@ export default () => {
         setPodcast(newPodcast);
         loadEpisodes(newPodcast.items);
         setError({});
+
         return { castContent, newPodcast };
 
       } catch (error){
         setError({error, message: 'Error loading podcast'})
-        setTimeout(()=>history.back(),5000);
+        setTimeout(()=>history.push(DISCOVERY),3000);
       }
     }
 
     const savePodcast = async () => {
         const {newPodcast} = await getPodcast(true);
-        dispatch({ type:'updatePodcasts', podcasts: [...global.podcasts, newPodcast  ] })
+        const {items, ...allPodcast } = newPodcast;
+        dispatch({ type:'updatePodcasts', podcasts: [...global.podcasts, allPodcast  ] })
     }
 
     const removePodcast = async () => {
         await PodcastEngine.db.del(podcastURL);
         const podcastsState = global.podcasts;
         const podcasts = podcastsState.filter((podcast) => podcast.url !== podcastURL);
-        dispatch({type:'updatePodcasts', podcasts})
+        dispatch({type:'updatePodcasts', podcasts});
+  
     }
 
     const playButton = (guid) => () => {
@@ -101,21 +108,21 @@ export default () => {
         getPodcast()
     },[]);
     
-    return podcast.domain ? <> 
-                        <PodcastHeader  
-                            savePodcast={savePodcast} 
-                            podcast={podcast} 
-                            removePodcast={removePodcast} 
-                            inLibrary={isPodcastInLibrary} 
-                        />
-                        <EpisodeList
-                            episodes={podcast.items}
-                            handler={playButton}
-                            status={global.status}
-                            playing={global.playing}
-                        /> 
-                        </>
-                        : <Typography align='center' letterSpacing={6} variant="h4">{ error && error.message }</Typography>
+    return  podcast.domain ? <> 
+    <PodcastHeader  
+        savePodcast={savePodcast} 
+        podcast={podcast} 
+        removePodcast={removePodcast} 
+        inLibrary={isPodcastInLibrary} 
+    />
+    <EpisodeList
+        episodes={podcast.items}
+        handler={playButton}
+        status={global.status}
+        playing={global.playing}
+    /> 
+    </>
+    :<Typography align='center' letterSpacing={6} variant="h4"> <img src={loadingAnimation} width="20%" style={{paddingTop: '20%' }} /> <br /> { error && error.message }</Typography>
                         
 }
 

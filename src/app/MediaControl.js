@@ -143,6 +143,8 @@ function MediaControlCard(props) {
                       align={"center"}
                       className={classes.title}
                       variant="h6"
+                      noWrap
+                      style={{ paddingLeft: '4rem', paddingRight: '4rem'}}
                     > 
                       {state.title}
                     </Typography>

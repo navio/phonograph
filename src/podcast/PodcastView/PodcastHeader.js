@@ -169,7 +169,7 @@ function PodcastHeader(props) {
                           onClick={share(
                             "Phonograph",
                             state.title,
-                            `${document.location.origin}?podcast=${state.domain}`
+                            `${document.location.origin}/podcast/${state.domain}`
                           )}
                         >
                           <ShareIcon />

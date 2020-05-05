@@ -10,7 +10,7 @@ import loadingAnimation from '../public/loading.svg';
 
 // Router
 import { withRouter } from "react-router";
-import { Route, Redirect } from "react-router-dom";
+import { Route, Redirect, useHistory } from "react-router-dom";
 
 // Constants
 import {
@@ -66,7 +66,7 @@ const App = () => {
     const engine = getPodcastEngine();
     const [state, dispatch] = useReducer(reducer,initialState);
     const mediaFunctions = playerFunctions(player, dispatch, state)
-
+    const history = useHistory();
 
     const loadPodcast = (podcast, cb) => {
       dispatch({type:'loadPodcast', payload: podcast});
@@ -77,7 +77,7 @@ const App = () => {
     // Mode
     const newPodcast = checkIfNewPodcastInURL();
     if(newPodcast){
-      loadPodcast(newPodcast, navigateTo(PODCASTVIEW));
+      loadPodcast(newPodcast, () => history.push(PODCASTVIEW));
     }
 
     useEffect(() => {
@@ -123,7 +123,7 @@ const App = () => {
             render={({history}) =>
                state.current ? (
                   <Suspense fallback={<Loading />}>
-                    <PodcastView {...history} />
+                    <PodcastView history={history} />
                   </Suspense>
               ) : (<Redirect to={LIBVIEW} history />)
             }
@@ -156,7 +156,6 @@ const App = () => {
      
           <Suspense fallback={<Loading />}>
             { player.current && <MediaControl
-              // toCurrentPodcast={navigateTo(PODCASTVIEW)}
               player={player.current}
               handler={mediaFunctions.playButton}
               forward={mediaFunctions.forward30Seconds}

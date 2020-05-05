@@ -10,6 +10,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import Dialog from "@material-ui/core/Dialog";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import PauseIcon from "@material-ui/icons/Pause";
+import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -103,8 +104,9 @@ const EpisodeList = (props) => {
     window && window.scrollTo && window.scrollTo(0, 0);
   },[]);
   const [open, setOpen] = React.useState(null);
-  const { classes } = props;
-
+  const [amount, setAmount] = React.useState(1);
+  const { classes, episodes } = props;
+  const episodeList = episodes.slice(0,(20 * amount));
   const handleClose = (value) => {
     setOpen(null);
     setSelectedValue(value);
@@ -116,9 +118,10 @@ const EpisodeList = (props) => {
       <Consumer>
         {(state) => (
           <div className={classes.root}>
-            {props.episodes ? (
+            {episodeList ? (
+              <>
               <List>
-                {props.episodes.map((episode, id) => (
+                {episodeList.map((episode, id) => (
                   <div key={episode.guid}>
                     <ListItem
                       className={
@@ -157,6 +160,12 @@ const EpisodeList = (props) => {
                   </div>
                 ))}
               </List>
+
+              { ( episodes.length > episodeList.length ) && 
+              <List align="center" onClick={() => setAmount(amount + 1) } >
+                <Button variant="outlined" style={{width: '80%'}} size="large" color="primary"> Load More Episodes </Button>
+              </List> }
+              </>
             ) : (
               <div className={classes.progressContainer}>
                 <CircularProgress className={classes.progress} />

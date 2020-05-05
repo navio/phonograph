@@ -18,6 +18,7 @@ import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
+import PodcastEngine from "podcastsuite";
 import {AppContext} from '../App';
 
 
@@ -39,9 +40,10 @@ const Settings = (props) => {
     dispatch({type: 'setDark' , payload: !value });
   };
   
-  const eraseThisPodcast =  (podcast) => () => {
+  const eraseThisPodcast =  (podcast) => async () => {
       const podcasts = state.podcasts.filter((cast) => cast.domain !== podcast );
       dispatch({type:'updatePodcasts', podcasts: podcasts});
+      await PodcastEngine.db.del(podcast);
   };
   const {podcasts} = state;
 
