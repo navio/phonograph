@@ -1,6 +1,8 @@
 import React, {useRef, useContext, useEffect, useState} from 'react';
 import {AppContext} from '../../App';
 import {PODCASTVIEW, DISCOVERY} from '../../constants';
+import loadingAnimation from '../../../public/loading.svg';
+
 import EpisodeList from "./EpisodeList";
 import PodcastHeader from "./PodcastHeader";
 import PodcastEngine from "podcastsuite";
@@ -65,10 +67,11 @@ export default () => {
     }
 
     const removePodcast = async () => {
+        await PodcastEngine.db.del(podcastURL);
         const podcastsState = global.podcasts;
         const podcasts = podcastsState.filter((podcast) => podcast.url !== podcastURL);
         dispatch({type:'updatePodcasts', podcasts});
-        await PodcastEngine.db.del(podcastURL);
+  
     }
 
     const playButton = (guid) => () => {
