@@ -37,7 +37,7 @@ export default () => {
         const castContent = await engine.getPodcast(podcastURL, { save });
 
         let newPodcast = {
-            items: castContent.items.slice(0, 20),
+            items: castContent.items,
             title: castContent.title,
             description: castContent.description,
             image: castContent.image,
@@ -49,6 +49,7 @@ export default () => {
         setPodcast(newPodcast);
         loadEpisodes(newPodcast.items);
         setError({});
+
         return { castContent, newPodcast };
 
       } catch (error){
@@ -59,7 +60,8 @@ export default () => {
 
     const savePodcast = async () => {
         const {newPodcast} = await getPodcast(true);
-        dispatch({ type:'updatePodcasts', podcasts: [...global.podcasts, newPodcast  ] })
+        const {items, ...allPodcast } = newPodcast;
+        dispatch({ type:'updatePodcasts', podcasts: [...global.podcasts, allPodcast  ] })
     }
 
     const removePodcast = async () => {
