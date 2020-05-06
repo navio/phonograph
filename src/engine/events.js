@@ -1,5 +1,3 @@
-
-
 // const updateStatus = function(){
 //   let player = this.refs.player;
 //   let loaded = (player.buffered.length) ? (100 * player.buffered.end(0) / player.duration) : 0;
@@ -9,8 +7,6 @@
 //     duration: player.duration });
 // }
 
-
-
 export default function (player, dispatch, state) {
   let tick = null;
   const completedLoading = function (ev) {
@@ -18,7 +14,7 @@ export default function (player, dispatch, state) {
   };
   
   const completedPlaying = function (ev) {
-    dispatch({type:'audioUpdate', payload: {
+    dispatch({type:'audioCompleted', payload: {
       episode: null,
       author: null,
       playing: null,

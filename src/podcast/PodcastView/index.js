@@ -8,7 +8,6 @@ import PodcastHeader from "./PodcastHeader";
 import PodcastEngine from "podcastsuite";
 import Typography from "@material-ui/core/Typography";
 
-
 const commonRules = (originalUrl) => {
     let url = originalUrl;
     url = url.indexOf("http:") > -1 ? url.replace("http:", "https:") : url;

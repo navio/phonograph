@@ -22,7 +22,7 @@ import {
 } from "./constants";
 
 // App Components
-import Footer from "./app/Footer";
+import Footer from "./core/Footer";
 
 // Engine - Player Interactions
 import playerFunctions from "./engine/player";
@@ -44,7 +44,7 @@ export const Consumer = AppContext.Consumer;
 const Discover = React.lazy(async () => await import("./podcast/Discovery"));
 const Library = React.lazy(async () => await import("./podcast/Library"));
 const Settings = React.lazy(async () => await import("./podcast/Settings"));
-const MediaControl = React.lazy(async () => await import("./app/MediaControl"));
+const MediaControl = React.lazy(async () => await import("./core/MediaControl"));
 const PodcastView = React.lazy( async () => await import("./podcast/PodcastView"));
 
 const Loading = (props) => (
