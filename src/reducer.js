@@ -10,7 +10,7 @@ export const initialState = JSON.parse(localStorage.getItem('state') || false ) 
     theme: true,
     current: null
   };
-  
+
 export const reducer = (state, action) => {
     switch(action.type){
       case 'updatePodcasts':
