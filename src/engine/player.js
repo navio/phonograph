@@ -44,6 +44,7 @@ export default (player, dispatch, state) => {
 
   const playButton = () => {
       if (state.status === "pause") {
+        player.current.currentTime = state.currentTime;
         player.current.play();
         dispatch({ type: 'playingStatus', status: "playing" });
       } else {
