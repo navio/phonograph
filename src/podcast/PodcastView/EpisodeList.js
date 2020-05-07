@@ -54,7 +54,7 @@ const saveOffline = async (mediaURL) => {
   // window.audio = audio;
   // console.log(audio.data);
 
-  const rawPodcast = await fetch(mediaURL);
+  const rawPodcast = await fetch('/rss-full/'+(mediaURL));
   const podcastBlob = await rawPodcast.blob();
   const response = new Response(podcastBlob)
 
@@ -69,7 +69,7 @@ const IsAvaliable = (url) => {
   const [hasIt, setHasIt ] = useState(false);
 
   const availableOffline = async (media) => {
-    const has = await caches.has(media);
+    const has = await caches.has('/rss-full/'+media);
     setHasIt(has);
   }
 
