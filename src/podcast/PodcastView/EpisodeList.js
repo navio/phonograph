@@ -54,13 +54,13 @@ const saveOffline = async (mediaURL) => {
   // window.audio = audio;
   // console.log(audio.data);
 
-  const rawPodcast = await fetch('/rss-full/'+(mediaURL));
-  const podcastBlob = await rawPodcast.blob();
-  const response = new Response(podcastBlob)
+  // const rawPodcast = await fetch('/rss-full/'+(mediaURL));
+  // const podcastBlob = await rawPodcast.blob();
+  // const response = new Response(podcastBlob)
 
-  const cache = await caches.open('offline-podcasts');
-  await cache.put(mediaURL, response);
-  cache.add(mediaURL);
+  // const cache = await caches.open('offline-podcasts');
+  // await cache.put(mediaURL, response);
+  // cache.add(mediaURL);
 }
 
 
@@ -180,11 +180,11 @@ const EpisodeList = (props) => {
                       <EpisodeListDescription
                         onClick={() => {
                           console.log(episode);
-                          saveOffline(episode.enclosures[0].url)
-                          // setOpen({
-                          //   description: episode.description,
-                          //   title: episode.title,
-                          // });
+                          // saveOffline(episode.enclosures[0].url)
+                          setOpen({
+                            description: episode.description,
+                            title: episode.title,
+                          });
                         }}
                         episode={episode}
                       />
