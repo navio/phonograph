@@ -93,7 +93,7 @@ const LibraryView = (props) => {
                   (podcast) =>
                     podcast &&
                     podcast.domain && (
-                      <Grid item xs={4} sm={3} md={2}  key={podcast.domain}>
+                      <Grid item xs={3} sm={2} md={1}  key={podcast.domain}>
                         <Card
                           raised={true}
                           classes={{ root: classes.card }}                

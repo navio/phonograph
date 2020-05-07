@@ -63,7 +63,7 @@ export default () => {
 
     const savePodcast = async () => {
         const {newPodcast} = await getPodcast(true);
-        const {items, ...allPodcast } = newPodcast;
+        const {items, description, link, created, ...allPodcast } = newPodcast;
         dispatch({ type:'updatePodcasts', podcasts: [...global.podcasts, allPodcast ] })
     }
 

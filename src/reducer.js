@@ -1,4 +1,4 @@
-export const initialState = JSON.parse(localStorage.getItem('state') || false ) || {
+const initialState = JSON.parse(localStorage.getItem('state') || false ) || {
     playing: null,
     loaded: 0,
     played: 0,
@@ -10,7 +10,16 @@ export const initialState = JSON.parse(localStorage.getItem('state') || false ) 
     theme: true,
     current: null
   };
-  
+
+// cleanup legacy
+delete initialState['items'];
+delete initialState['description'];
+delete initialState['image'];
+delete initialState['link'];
+delete initialState['created'];
+
+export { initialState };
+
 export const reducer = (state, action) => {
     switch(action.type){
       case 'updatePodcasts':

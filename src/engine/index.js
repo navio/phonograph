@@ -322,15 +322,15 @@ export const searchForPodcasts = function (search) {
 
 //Events
 // Ask for podcast URL.
-export const askForPodcast = function (callback) {
-  let input = prompt("URL or Name of Podcast");
-  if (!input) return;
-  input = input.trim();
-  try {
-    new URL(input) &&
-      addNewPodcast.call(this, convertURLToPodcast(input), callback);
-  } catch (err) {
-    // Maybe search the string?
-    console.log("error", err);
-  }
-};
+// export const askForPodcast = function (callback) {
+//   let input = prompt("URL or Name of Podcast");
+//   if (!input) return;
+//   input = input.trim();
+//   try {
+//     new URL(input) &&
+//       addNewPodcast.call(this, convertURLToPodcast(input), callback);
+//   } catch (err) {
+//     // Maybe search the string?
+//     console.log("error", err);
+//   }
+// };
