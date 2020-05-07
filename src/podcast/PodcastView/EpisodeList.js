@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
@@ -20,9 +20,7 @@ import Chip from "@material-ui/core/Chip";
 import createDOMPurify from "dompurify";
 import { Consumer } from "../../App.js";
 
-// const toMinutes = time => {
-//   return Math.floor(1 * time / 60) + ":" + (1 * time) % 60;
-// };
+
 const DOMPurify = createDOMPurify(window);
 const { sanitize } = DOMPurify;
 
@@ -44,13 +42,46 @@ export const styles = (theme) => ({
     margin: "auto",
   },
 });
+
 dayjs.extend(relativeTime);
 const today = dayjs();
 const episodeDate = (date) => today.from(date, true);
 
+const saveOffline = async (mediaURL) => {
+
+  // const audio = document.createElement('audio');
+  // audio.src = mediaURL;
+  // window.audio = audio;
+  // console.log(audio.data);
+
+  const rawPodcast = await fetch(mediaURL);
+  const podcastBlob = await rawPodcast.blob();
+  const response = new Response(podcastBlob)
+
+  const cache = await caches.open('offline-podcasts');
+  await cache.put(mediaURL, response);
+  cache.add(mediaURL);
+}
+
+
+
+const IsAvaliable = (url) => {
+  const [hasIt, setHasIt ] = useState(false);
+
+  const availableOffline = async (media) => {
+    const has = await caches.has(media);
+    setHasIt(has);
+  }
+
+  useEffect(()=>{
+    availableOffline(url.url)
+  },[])
+  
+  return  hasIt ? 'Saved' : '';
+}
+
 const EpisodeListDescription = (props) => {
   const episode = props.episode;
-
   return (
     <ListItemText
       {...props}
@@ -58,7 +89,7 @@ const EpisodeListDescription = (props) => {
         <>
         {episode.season && (<Typography color={'secondary'}>Season {episode.season}</Typography>)}
           <Typography component="div" variant="subtitle1" noWrap>
-            {clearText(episode.title)} 
+            {clearText(episode.title)} <IsAvaliable url={episode.enclosures[0].url} />
           </Typography>
           <Typography variant="overline" component="div">
             {episodeDate(episode.created)}
@@ -103,6 +134,7 @@ const EpisodeList = (props) => {
   useEffect(()=>{
     window && window.scrollTo && window.scrollTo(0, 0);
   },[]);
+
   const [open, setOpen] = React.useState(null);
   const [amount, setAmount] = React.useState(1);
   const { classes, episodes } = props;
@@ -148,10 +180,11 @@ const EpisodeList = (props) => {
                       <EpisodeListDescription
                         onClick={() => {
                           console.log(episode);
-                          setOpen({
-                            description: episode.description,
-                            title: episode.title,
-                          });
+                          saveOffline(episode.enclosures[0].url)
+                          // setOpen({
+                          //   description: episode.description,
+                          //   title: episode.title,
+                          // });
                         }}
                         episode={episode}
                       />
