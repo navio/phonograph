@@ -56,7 +56,8 @@ const Loading = (props) => (
   </Typography>
 );
 
-
+// Pausing for load or refresh
+initialState['status'] = "pause";
 
 const App = () => {
 
