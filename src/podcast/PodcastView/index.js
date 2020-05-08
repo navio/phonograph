@@ -87,8 +87,9 @@ export default () => {
       
         if (global.playing === guid) {
           if (global.status === "pause") {
-            player.play().then( () => {
+            player.play().then(() => {
               if(currentTime){
+                console.log('setting time',currentTime)
                 player.currentTime = currentTime;
               }
             })
@@ -102,7 +103,7 @@ export default () => {
         } else {
           console.log('loading new audio')
           player.setAttribute("src", episode.enclosures[0].url);
-          player.play();
+         
           
           const payload = {
             audioOrigin: podcastURL,
@@ -114,11 +115,12 @@ export default () => {
             status: "playing",
             played: 0,
           }
-
           if(currentTime){
+            console.log('setting time',currentTime)
             player.currentTime = currentTime;
             payload.currentTime = currentTime;
           }
+         
 
           recordEpisode(global);
           dispatch({ type:'audioUpdate', payload });

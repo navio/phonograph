@@ -222,10 +222,7 @@ const EpisodeList = (props) => {
                       />
                       <ListItemIcon >
                       {
-                        ( episodeData && episodeData.completed ) && <CheckCircleIcon color="secondary" />
-                      }
-                      {
-                        ( episodeData && episodeData.currentTime ) && <CheckCircleOutlineIcon onClick={ ()=> completeEpisode(episode.guid)} color="secondary" />
+                        ( episodeData && episodeData.completed ) ? <CheckCircleIcon color="secondary" /> : <CheckCircleOutlineIcon onClick={ ()=> completeEpisode(episode.guid)} color="secondary" />
                       }
                       </ListItemIcon>
                     </ListItem>
