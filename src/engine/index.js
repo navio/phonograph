@@ -16,23 +16,24 @@ const PROXY = DEBUG ?  {
 export const checkIfNewPodcastInURL = function () {;
   let urlPodcast = new window.URL(window.location.href);
   let podcast = urlPodcast.searchParams.get("podcast");
-  return podcast;
+  let shouldInit = urlPodcast.searchParams.get("init");
+  return {podcast, shouldInit};
 };
 
 
-const PodcastLibrary = new PodcastEngine({
+
+
+export const getPodcastEngine = (shouldInit = false ) => new PodcastEngine({
   podcasts: [...podcasts],
   proxy: PROXY,
   fresh: 1000*60*60,
-  shouldInit: false
+  shouldInit: shouldInit
 });
-
-export const getPodcastEngine = () => PodcastLibrary;
 
 /*
  Start the application and loads the library.
 */
-export const initializeLibrary = function (dispatch) {
+export const initializeLibrary = function (PodcastLibrary, dispatch) {
   PodcastLibrary.ready.then(() => {
     PodcastLibrary.getLibrary().then((podcastsArray) => {
       Promise.allSettled(
