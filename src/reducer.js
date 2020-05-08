@@ -1,12 +1,13 @@
-import { set,get } from 'idb-keyval';
+import PS from 'podcastsuite';
+const db = PS.createDatabase('history','podcasts');
 
 export const completeEpisode = async (feed,episode) => {
  if(feed && episode) {
-    const inMemory = await get(feed);
+    const inMemory = await db.get(feed);
     const current = inMemory || {};
     current[episode] = { completed: true };
     console.log(current[episode],feed,episode);
-    await set(feed,current);
+    await db.set(feed,current);
     return true;
  }
  return false;
@@ -14,10 +15,10 @@ export const completeEpisode = async (feed,episode) => {
 
 export const recordEpisode = async (feed, episode, currentTime, duration) => {
   console.log('record')
-  const inMemory = await get(feed);
+  const inMemory = await db.get(feed);
   const current = inMemory || {};
   current[episode] = { completed: false, currentTime, duration, duration };
-  return await set(feed,current);
+  return await db.set(feed,current);
 }
 const initialState = JSON.parse(localStorage.getItem('state') || false ) || {
     podcasts: [],

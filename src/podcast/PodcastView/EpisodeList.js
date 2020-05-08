@@ -19,13 +19,15 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import Chip from "@material-ui/core/Chip";
 import createDOMPurify from "dompurify";
 import { Consumer } from "../../App.js";
-import { get } from 'idb-keyval';
+import PS from 'podcastsuite';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import {completeEpisode as markAsFinished } from '../../reducer'
 
 const DOMPurify = createDOMPurify(window);
 const { sanitize } = DOMPurify;
+const db = PS.createDatabase('history','podcasts');
+
 
 export const clearText = (html) => {
   let tmp = document.createElement("div");
@@ -160,7 +162,7 @@ const EpisodeList = (props) => {
   }
 
   const getHistory = async (feed) => {
-    const history = await get(feed);
+    const history = await db.get(feed);
     setEpisodeHistory(history || {});
   }
 

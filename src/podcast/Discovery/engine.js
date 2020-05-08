@@ -19,7 +19,6 @@ let memory = {
 }
 export const getPopularPodcasts = function (query=null) {
         let data;
-        console.log(memory)
         if( memory && memory.top && query === null  ){
             this.setState(memory);
             return;
