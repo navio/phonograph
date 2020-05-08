@@ -22,7 +22,7 @@ const commonRules = (originalUrl) => {
     return url;
   };
 
-export default () => {
+export default (props) => {
 
     const bringAPodcast = window.location.href.split(`${PODCASTVIEW}/`)[1];
 
@@ -60,7 +60,7 @@ export default () => {
 
       } catch (error){
         setError({error, message: 'Error loading podcast'})
-        setTimeout(()=>history.push(DISCOVERY),3000);
+        setTimeout(()=>props.history.push(DISCOVERY),3000);
       }
     }
 
