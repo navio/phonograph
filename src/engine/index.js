@@ -1,12 +1,8 @@
 import { podcasts } from "../podcast";
-import PodcastSearcher from "./PodcastSearcher";
-import randomColor from "randomcolor";
 import PodcastEngine from "podcastsuite";
 
 
 const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
-
-const API = "/ln/";
 
 // This is insane.. but for now seems necessary.lo
 const PROXY = DEBUG ?  {
@@ -16,6 +12,67 @@ const PROXY = DEBUG ?  {
   "https:": `//${window.location.host}/rss-full/https://`,
   "http:": `//${window.location.host}/rss-full/http://`,
 }
+
+export const checkIfNewPodcastInURL = function () {;
+  let urlPodcast = new window.URL(window.location.href);
+  let podcast = urlPodcast.searchParams.get("podcast");
+  return podcast;
+};
+
+
+const PodcastLibrary = new PodcastEngine({
+  podcasts: [...podcasts],
+  proxy: PROXY,
+  fresh: 1000*60*60,
+  shouldInit: false
+});
+
+export const getPodcastEngine = () => PodcastLibrary;
+
+/*
+ Start the application and loads the library.
+*/
+export const initializeLibrary = function (dispatch) {
+  PodcastLibrary.ready.then(() => {
+    PodcastLibrary.getLibrary().then((podcastsArray) => {
+      Promise.allSettled(
+        podcastsArray.map((podcastRaw) => PodcastLibrary.getPodcast(podcastRaw))
+      )
+      .then((results) =>  results.filter((result) => result.status === 'fulfilled'))
+      .then((podcasts) => podcasts.map(podcast => podcast.value))
+      .then((podcasts) => {
+        if (podcasts) {
+          dispatch({type: 'initLibrary', podcasts: podcastCleaner(podcasts)})
+        }
+      });
+    });
+  });
+};
+
+const podcastCleaner = (podcasts) => {
+  return podcasts.map((podcast) => {
+    delete podcast['items'];
+    delete podcast['description'];
+    delete podcast['length'];
+    return {
+      ...podcast, 
+      domain: podcast.url,
+    }
+  });
+};
+
+
+/*
+Load a new podcast into the application
+!! IT DOES NOT SAVE IT IN MEMORY
+*/
+export const loadaNewPodcast = function (cast, callback) {
+  retrievePodcast
+    .call(this, cast, false) // RetrievePodcast
+    .then(() => {
+      callback && callback();
+    });
+};
 
 
 // Rules for URLS
@@ -29,19 +86,6 @@ const PROXY = DEBUG ?  {
 //       : url;
 //   return url;
 // };
-
-const initializeCast = [...podcasts]
-//defaultCasts.map(commonRules);
-
-const PodcastLibrary = new PodcastEngine({
-  podcasts: initializeCast,
-  proxy: PROXY,
-  fresh: 1000*60*60,
-  shouldInit: false
-});
-
-export const getPodcastEngine = () => PodcastLibrary;
-
 
 
 /*
@@ -157,49 +201,6 @@ Retrieves all Podcast content, if save
 //   return state.podcasts.find((cast) => cast.domain === state.domain);
 // };
 
-const podcastCleaner = (podcasts) => {
-  return podcasts.map((podcast) => {
-    delete podcast['items'];
-    delete podcast['description'];
-    delete podcast['length'];
-    return {
-      ...podcast, 
-      domain: podcast.url,
-    }
-  });
-};
-
-/*
- Start the application and loads the library.
-*/
-export const initializeLibrary = function (dispatch) {
-  PodcastLibrary.ready.then(() => {
-    PodcastLibrary.getLibrary().then((podcastsArray) => {
-      Promise.allSettled(
-        podcastsArray.map((podcastRaw) => PodcastLibrary.getPodcast(podcastRaw))
-      )
-      .then((results) =>  results.filter((result) => result.status === 'fulfilled'))
-      .then((podcasts) => podcasts.map(podcast => podcast.value))
-      .then((podcasts) => {
-        if (podcasts) {
-          dispatch({type: 'initLibrary', podcasts: podcastCleaner(podcasts)})
-        }
-      });
-    });
-  });
-};
-
-/*
-Load a new podcast into the application
-!! IT DOES NOT SAVE IT IN MEMORY
-*/
-export const loadaNewPodcast = function (cast, callback) {
-  retrievePodcast
-    .call(this, cast, false) // RetrievePodcast
-    .then(() => {
-      callback && callback();
-    });
-};
 
 /** LOCAL LIBRARY END */
 
@@ -231,74 +232,65 @@ export const loadaNewPodcast = function (cast, callback) {
 //   return DEBUG ? urlObj.toString() : `${PROXY[protocol]}${domain}`;
 // };
 
-export const checkIfNewPodcastInURL = function () {
-  if (!window && !window.location)
-    return {
-      domain: "www.npr.org/rss/podcast.php?id=510289",
-      protocol: "https:",
-    };
-  let urlPodcast = new window.URL(window.location.href);
-  let podcast = urlPodcast.searchParams.get("podcast");
-  return podcast;
-};
 
-export const getPopularPodcasts = (function () {
-  const lsName = 'topCasts';
-  const seconsToRefresh = 6 * 60 * 1000;
+
+// export const getPopularPodcasts = (function () {
+//   const lsName = 'topCasts';
+//   const seconsToRefresh = 6 * 60 * 1000;
   
-  const URI = 'https://www.listennotes.com/c/r/';
-  return function query() {
+//   const URI = 'https://www.listennotes.com/c/r/';
+//   return function query() {
     
-    let responseSaved = JSON.parse(localStorage.getItem(lsName)) || {};
-    const fresh = responseSaved.created + seconsToRefresh >  Date.now()
-    if (responseSaved.created && fresh ) {
-      const {response } = responseSaved;
-      this.setState(response);
-      return;
-    } else {
-      import("../../public/top.json")
-        .then((response) => {
-          const { podcasts } = response;
-          return podcasts;
-        })
-        .then((podcasts) => {
-          const cleanedCasts = podcasts.map((podcast, num) => {
-            const {
-              title,
-              domain,
-              thumbnail,
-              description,
-              id,
-              total_episodes: episodes,
-              earliest_pub_date_ms: startDate,
-              publisher,
-            } = podcast;
-            const rss = `${URI}${id}`;
-            return {
-              title: `${num + 1}. ${title}`,
-              thumbnail,
-              domain,
-              description,
-              rss,
-              episodes,
-              startDate,
-              publisher,
-            };
-          });
-          const response = {
-            top: cleanedCasts,
-            loading: false,
-            init: false,
-          };
-          this.setState(response);
-          responseSaved = { response, created: Date.now() }
-          console.log('response fetched and Saved', responseSaved)
-          localStorage.setItem(lsName,JSON.stringify(responseSaved));
+//     let responseSaved = JSON.parse(localStorage.getItem(lsName)) || {};
+//     const fresh = responseSaved.created + seconsToRefresh >  Date.now()
+//     if (responseSaved.created && fresh ) {
+//       const {response } = responseSaved;
+//       this.setState(response);
+//       return;
+//     } else {
+//       import("../../public/top.json")
+//         .then((response) => {
+//           const { podcasts } = response;
+//           return podcasts;
+//         })
+//         .then((podcasts) => {
+//           const cleanedCasts = podcasts.map((podcast, num) => {
+//             const {
+//               title,
+//               domain,
+//               thumbnail,
+//               description,
+//               id,
+//               total_episodes: episodes,
+//               earliest_pub_date_ms: startDate,
+//               publisher,
+//             } = podcast;
+//             const rss = `${URI}${id}`;
+//             return {
+//               title: `${num + 1}. ${title}`,
+//               thumbnail,
+//               domain,
+//               description,
+//               rss,
+//               episodes,
+//               startDate,
+//               publisher,
+//             };
+//           });
+//           const response = {
+//             top: cleanedCasts,
+//             loading: false,
+//             init: false,
+//           };
+//           this.setState(response);
+//           responseSaved = { response, created: Date.now() }
+//           console.log('response fetched and Saved', responseSaved)
+//           localStorage.setItem(lsName,JSON.stringify(responseSaved));
           
-        });
-    }
-  };
-})();
+//         });
+//     }
+//   };
+// })();
 
 // export const getPodcastColor = (cast) => ({
 //   backgroundColor: randomColor({
@@ -311,14 +303,16 @@ export const getPopularPodcasts = (function () {
 /********* UTILS END *********/
 
 // SEARCH!!!
-const SFP = new PodcastSearcher(API);
-export const searchForPodcasts = function (search) {
-  return new Promise(function (acc, rej) {
-    SFP.listennotes(search)
-      .then((data) => acc(data.podcasts))
-      .catch(console.error);
-  });
-};
+
+
+// const SFP = new PodcastSearcher(API);
+// export const searchForPodcasts = function (search) {
+//   return new Promise(function (acc, rej) {
+//     SFP.listennotes(search)
+//       .then((data) => acc(data.podcasts))
+//       .catch(console.error);
+//   });
+// };
 
 //Events
 // Ask for podcast URL.

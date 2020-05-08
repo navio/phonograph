@@ -41,6 +41,9 @@
     "dev": "node proxy && yarn lambda:serve",
     "getter": "bash ./filegetter.sh"
   },
+  "alias": {
+    "public": "./public/"
+  },
   "devDependencies": {
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "express": "^4.17.1",
