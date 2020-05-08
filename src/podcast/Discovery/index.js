@@ -13,14 +13,10 @@ import Backdrop from "@material-ui/core/Backdrop";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
+import Geners from './Geners';
+import Loading from '../../core/Loading';
 
-import {
-  getPopularPodcasts,
-  searchForPodcasts,
-  getPodcastColor,
-} from "../../engine";
-// import { Context } from "../App";
-
+import { getPopularPodcasts, searchForPodcasts } from './engine';
 
 import Search from "./Search";
 
@@ -127,7 +123,7 @@ class Discover extends Component {
   constructor() {
     super();
     this.state = {
-      init: true,
+      init: 0,
       loading: false,
       podcasts: [],
       error: null,
@@ -136,10 +132,11 @@ class Discover extends Component {
     this.searchForPodcasts = searchForPodcasts.bind(this);
     this.getFinalURL = getFinalURL.bind(this);
     this.searchHandler = this.searchHandler.bind(this);
+    this.getPopularPodcasts = getPopularPodcasts.bind(this);
   }
 
   componentDidMount() {
-    getPopularPodcasts.call(this);
+    this.getPopularPodcasts();
   }
 
   getClickHandler(domain) {
@@ -188,12 +185,16 @@ class Discover extends Component {
           <Card>
             <CardContent>
               <Typography variant={"h5"} pb={0} component={"h2"}>
-                Today's Top 20 Podcasts
+                Trending Today
               </Typography>
             </CardContent>
             <CardContent>
+              <Geners selected={this.state.init} getPopularPodcasts={this.getPopularPodcasts} />
+            </CardContent>
+            <CardContent>
+            <Typography variant={"h6"} >{this.state.name}</Typography>
               <Grid container>
-                {topPodcasts &&
+                {topPodcasts ?
                   topPodcasts.map((podcast) => (
                     <Grid key={podcast.title} item xs={12} sm={6} md={4} lg={3}>
                       <List
@@ -231,7 +232,7 @@ class Discover extends Component {
                         </ListItem>
                       </List>
                     </Grid>
-                  ))}
+                  )) : <Typography align='center' style={{paddingTop: '20%' }} letterSpacing={6} variant="h4"> <Loading /> </Typography>  }
               </Grid>
             </CardContent>
           </Card>

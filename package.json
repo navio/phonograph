@@ -16,7 +16,7 @@
     "netlify-lambda": "^1.6.3",
     "node-fetch": "^2.6.0",
     "podcast": "^1.1.0",
-    "podcastsuite": "^1.0.14",
+    "podcastsuite": "^1.0.18",
     "prop-types": "^15.7.2",
     "randomcolor": "^0.5.4",
     "react": "^16.10.2",
@@ -40,6 +40,9 @@
     "lambda:serve": "npx netlify-lambda serve ./lambda",
     "dev": "yarn getter && node proxy && yarn lambda:serve",
     "getter": "bash ./filegetter.sh"
+  },
+  "alias": {
+    "public": "./public/"
   },
   "devDependencies": {
     "babel-plugin-transform-object-rest-spread": "^6.26.0",

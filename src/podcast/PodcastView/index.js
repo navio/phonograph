@@ -2,12 +2,14 @@ import React, {useRef, useContext, useEffect, useState} from 'react';
 import {AppContext} from '../../App';
 import {PODCASTVIEW, DISCOVERY} from '../../constants';
 import loadingAnimation from '../../../public/loading.svg';
+import { recordEpisode as saveEpisodeState } from '../../reducer'
+
+import Loading from '../../core/Loading';
 
 import EpisodeList from "./EpisodeList";
 import PodcastHeader from "./PodcastHeader";
 import PodcastEngine from "podcastsuite";
 import Typography from "@material-ui/core/Typography";
-
 
 const commonRules = (originalUrl) => {
     let url = originalUrl;
@@ -20,13 +22,14 @@ const commonRules = (originalUrl) => {
     return url;
   };
 
-export default () => {
+export default (props) => {
 
     const bringAPodcast = window.location.href.split(`${PODCASTVIEW}/`)[1];
 
     const {state: global , engine, dispatch, player } = useContext(AppContext);
     const [ podcast, setPodcast ] = useState({});
     const [ error, setError ] = useState({});
+    const [shouldRefresh, setToRefresh] = useState(Date.now());
     const podcastURL = commonRules(bringAPodcast || global.current);
 
     const episodes = useRef(new Map());
@@ -57,7 +60,7 @@ export default () => {
 
       } catch (error){
         setError({error, message: 'Error loading podcast'})
-        setTimeout(()=>history.push(DISCOVERY),3000);
+        setTimeout(()=>props.history.push(DISCOVERY),3000);
       }
     }
 
@@ -75,23 +78,36 @@ export default () => {
   
     }
 
-    const playButton = (guid) => () => {
-        
+    const recordEpisode = async (state) => {
+      const {current, episode, currentTime, duration} = state;
+      await saveEpisodeState(current, episode, currentTime, duration);
+      await setToRefresh(Date.now());
+    }
+
+    const playButton = (guid, currentTime) => (ev) => {
         const episode = episodes.current.get(guid);
       
         if (global.playing === guid) {
           if (global.status === "pause") {
-            player.play();
+            player.play().then(() => {
+              if(currentTime){
+                console.log('setting time',currentTime)
+                player.currentTime = currentTime;
+              }
+            })
             dispatch({ type: 'playingStatus', status: "playing" });
+            recordEpisode(global)
           } else {
             player.pause();
             dispatch({ type: 'playingStatus', status: "pause" });
+            recordEpisode(global)
           }
         } else {
-          console.log(episode.enclosures[0].url);
+          console.log('loading new audio')
           player.setAttribute("src", episode.enclosures[0].url);
-          player.play();
-          dispatch({ type:'audioUpdate', payload: {
+         
+          
+          const payload = {
             audioOrigin: podcastURL,
             episode: episode.guid,
             title: episode.title,
@@ -99,17 +115,31 @@ export default () => {
             author: episode.itunes_author,
             playing: guid,
             status: "playing",
-          }});
+            played: 0,
+          }
+          if(currentTime){
+            console.log('setting time',currentTime)
+            player.currentTime = currentTime;
+            payload.currentTime = currentTime;
+          }
+         
+          recordEpisode(global);
+          dispatch({ type:'audioUpdate', payload });
         }
     };
     
     const isPodcastInLibrary = () => global.podcasts.some((cast) => cast.url == global.current);
 
     useEffect(()=>{
+      console.log('should refresh from global')
+       setToRefresh(Date.now());
+    },[global.refresh]);
+
+    useEffect(()=>{
         getPodcast()
     },[]);
     
-    return  podcast.domain ? <> 
+    return  podcast.domain ? <>
     <PodcastHeader  
         savePodcast={savePodcast} 
         podcast={podcast} 
@@ -121,9 +151,11 @@ export default () => {
         handler={playButton}
         status={global.status}
         playing={global.playing}
+        current={global.current}
+        shouldRefresh={shouldRefresh}
     /> 
     </>
-    :<Typography align='center' letterSpacing={6} variant="h4"> <img src={loadingAnimation} width="20%" style={{paddingTop: '20%' }} /> <br /> { error && error.message }</Typography>
+    : <Typography align='center' style={{paddingTop: '20%' }} letterSpacing={6} variant="h4"> <Loading  /> <br /> { error && error.message }</Typography>
                         
 }
 

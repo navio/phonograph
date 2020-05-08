@@ -46,9 +46,10 @@ export default (player, dispatch, state) => {
       if (state.status === "pause") {        
         player.current.play().then( () => player.current.currentTime = state.currentTime )
         dispatch({ type: 'playingStatus', status: "playing" });
+        player.current.currentTime = state.currentTime;
       } else {
         player.current.pause();
-        dispatch({ type: 'playingStatus', status: "pause" });
+        dispatch({ type: 'audioUpdate', payload:{ status:"pause", currentTime: player.current.currentTime } });
       }
   };
 

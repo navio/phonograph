@@ -1,7 +1,7 @@
 import React from "react";
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
-import SearchEngine from "../../engine/PodcastSearcher";
+import SearchEngine from "./PodcastSearcher";
 import { fade, withStyles } from "@material-ui/core/styles";
 
 const engine = new SearchEngine("/ln/");

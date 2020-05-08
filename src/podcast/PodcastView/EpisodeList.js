@@ -19,10 +19,15 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import Chip from "@material-ui/core/Chip";
 import createDOMPurify from "dompurify";
 import { Consumer } from "../../App.js";
-
+import PS from 'podcastsuite';
+import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import {completeEpisode as markAsFinished } from '../../reducer'
 
 const DOMPurify = createDOMPurify(window);
 const { sanitize } = DOMPurify;
+const db = PS.createDatabase('history','podcasts');
+
 
 export const clearText = (html) => {
   let tmp = document.createElement("div");
@@ -63,8 +68,6 @@ const saveOffline = async (mediaURL) => {
   // cache.add(mediaURL);
 }
 
-
-
 const IsAvaliable = (url) => {
   const [hasIt, setHasIt ] = useState(false);
 
@@ -74,7 +77,7 @@ const IsAvaliable = (url) => {
   }
 
   useEffect(()=>{
-    availableOffline(url.url)
+    availableOffline(url.url);
   },[])
   
   return  hasIt ? 'Saved' : '';
@@ -82,6 +85,8 @@ const IsAvaliable = (url) => {
 
 const EpisodeListDescription = (props) => {
   const episode = props.episode;
+  const history = props.history || {};
+
   return (
     <ListItemText
       {...props}
@@ -129,20 +134,53 @@ const Description = (props) => {
   );
 };
 
+
 const EpisodeList = (props) => {
+  const [episodeHistory, setEpisodeHistory] = useState({});
+  const [open, setOpen] = React.useState(null);
+  const [amount, setAmount] = React.useState(1);
+  const [fresh, reFresh ] = React.useState(Date.now());
+  const { classes, episodes } = props;
+  const episodeList = episodes.slice(0,(20 * amount));
 
   useEffect(()=>{
     window && window.scrollTo && window.scrollTo(0, 0);
   },[]);
-
-  const [open, setOpen] = React.useState(null);
-  const [amount, setAmount] = React.useState(1);
-  const { classes, episodes } = props;
-  const episodeList = episodes.slice(0,(20 * amount));
+  
   const handleClose = (value) => {
     setOpen(null);
     setSelectedValue(value);
   };
+
+  const completeEpisode = async (episode) => {
+    await markAsFinished(props.current,episode);
+    reFresh(Date.now())
+  }
+
+  const whenToStart = (history = {}) => {
+    return history.currentTime || null;
+  }
+
+  const getHistory = async (feed) => {
+    const history = await db.get(feed);
+    setEpisodeHistory(history || {});
+  }
+
+  const ShowProgress = ({guid, episodeData}) => {
+    const {currentTime, duration, completed } = episodeData;
+    if(completed) return <CheckCircleIcon color="secondary" />
+  
+    const total = (currentTime && duration) ? Math.round( ( currentTime * 100 ) / duration ) : null;
+    if (total){
+      return <div onClick={ ()=> completeEpisode(guid)}>{total}%</div>;
+    }
+    return <CheckCircleOutlineIcon onClick={ ()=> completeEpisode(guid)} color="secondary" />
+  }
+
+  useEffect(()=>{
+    console.log('getting new history')
+    getHistory(props.current);
+  }, [fresh, props.shouldRefresh]);
 
   return (
     <>
@@ -153,7 +191,9 @@ const EpisodeList = (props) => {
             {episodeList ? (
               <>
               <List>
-                {episodeList.map((episode, id) => (
+                {episodeList.map((episode, id) => { 
+                  const episodeData = episodeHistory[episode.guid] || {};
+                  return (
                   <div key={episode.guid}>
                     <ListItem
                       className={
@@ -166,14 +206,13 @@ const EpisodeList = (props) => {
                         props.status !== "pause" ? (
                           <PauseIcon
                             className={classes.playIcon}
-                            onClick={props.handler(episode.guid)}
-                            data-guid={episode.guid}
+                            onClick={props.handler(episode.guid, whenToStart(episodeData))}
+                            data-guid={episodeData}
                           />
                         ) : (
                           <PlayArrowIcon
                             className={classes.playIcon}
-                            onClick={props.handler(episode.guid)}
-                            data-guid={episode.guid}
+                            onClick={props.handler(episode.guid, whenToStart(episodeData))}
                           />
                         )}
                       </ListItemIcon>
@@ -186,12 +225,17 @@ const EpisodeList = (props) => {
                             title: episode.title,
                           });
                         }}
+                        history={episodeData}
                         episode={episode}
                       />
+                      <ListItemIcon >
+                        <ShowProgress guid={episode.guid} episodeData={episodeData} />
+                      </ListItemIcon>
                     </ListItem>
                     <Divider />
                   </div>
-                ))}
+                )} 
+                )}
               </List>
 
               { ( episodes.length > episodeList.length ) && 
