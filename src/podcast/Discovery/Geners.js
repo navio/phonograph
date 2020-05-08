@@ -34,8 +34,16 @@ export default ({getPopularPodcasts, selected}) => {
   },[])
   return (
     <div className={classes.root}>
-      {genres && genres.map((genre, id) => (
-        <Chip key={id} onClick={()=>getPopularPodcasts(genre.id)} label={genre.name} variant={ (selected === genre.id) ? 'default' : 'outlined'} color="primary" />
+      {genres && genres.sort((a,b)=> {
+        if(a.name < b.name) { return -1; }
+        if(a.name > b.name) { return 1; }
+        return 0;
+      }).map((genre, id) => (
+        <Chip key={id} 
+              onClick={()=>getPopularPodcasts(genre.id)} 
+              label={genre.name} 
+              variant={ (selected === genre.id) ? 'default' : 'outlined'} 
+              color={ genre.name === "Top" ? "secondary" : "primary" } />
       ))}
     </div>
   );
