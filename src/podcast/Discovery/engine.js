@@ -13,8 +13,17 @@ export const searchForPodcasts = function (search) {
 };
 
 const URI = 'https://www.listennotes.com/c/r/';
+let memory = {
+    top: null,
+    init: 0
+}
 export const getPopularPodcasts = function (query=null) {
         let data;
+        console.log(memory)
+        if( memory && memory.top && query === null  ){
+            this.setState(memory);
+            return;
+        }
         if(query){
             data = fetch(`/ln/best_podcasts?genre_id=${query}&page=1&region=us`).then(x=> x.json())
         } else {
@@ -58,6 +67,7 @@ export const getPopularPodcasts = function (query=null) {
                     init: query || 0,
                     name
                 };
+                memory = response;
                 this.setState(response);
 
             });
