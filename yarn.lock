@@ -5450,10 +5450,10 @@ podcast@^1.1.0:
   dependencies:
     rss "^1.2.2"
 
-podcastsuite@^1.0.14:
-  version "1.0.14"
-  resolved "https://registry.yarnpkg.com/podcastsuite/-/podcastsuite-1.0.14.tgz#2ff5ae8e35c2732373c237762bbf756a70705ad9"
-  integrity sha512-geGrlscG2WRn5Q+CQrTYsZ2xtaD/ZPZVKwBVYChU5d8/P8xuJUrkct42p3XeHpPcfsCHlloNVu8iiU2yroQm5w==
+podcastsuite@^1.0.18:
+  version "1.0.18"
+  resolved "https://registry.yarnpkg.com/podcastsuite/-/podcastsuite-1.0.18.tgz#348e2cf3a74d0c7ceab1554ba113e08b93a5e476"
+  integrity sha512-l2M/JEkFNxDiCw30BJ2JwhiLtAj3LDW85N4xMcSzWoa9sHfLpHYf20eYiHjUXhz8CTOFAjzCvMjnm9XaWKzjmQ==
   dependencies:
     "@babel/plugin-proposal-decorators" "^7.8.3"
     idb-keyval "^3.2.0"

@@ -2,6 +2,7 @@ import React, {useRef, useContext, useEffect, useState} from 'react';
 import {AppContext} from '../../App';
 import {PODCASTVIEW, DISCOVERY} from '../../constants';
 import loadingAnimation from '../../../public/loading.svg';
+import { recordEpisode as saveEpisodeState } from '../../reducer'
 
 import EpisodeList from "./EpisodeList";
 import PodcastHeader from "./PodcastHeader";
@@ -26,6 +27,7 @@ export default () => {
     const {state: global , engine, dispatch, player } = useContext(AppContext);
     const [ podcast, setPodcast ] = useState({});
     const [ error, setError ] = useState({});
+    const [shouldRefresh, setToRefresh] = useState(Date.now());
     const podcastURL = commonRules(bringAPodcast || global.current);
 
     const episodes = useRef(new Map());
@@ -74,23 +76,35 @@ export default () => {
   
     }
 
-    const playButton = (guid) => () => {
-        
+    const recordEpisode = async (state) => {
+      const {current, episode, currentTime, duration} = state;
+      await saveEpisodeState(current, episode, currentTime, duration);
+      await setToRefresh(Date.now());
+    }
+
+    const playButton = (guid, currentTime) => (ev) => {
         const episode = episodes.current.get(guid);
       
         if (global.playing === guid) {
           if (global.status === "pause") {
-            player.play();
+            player.play().then( () => {
+              if(currentTime){
+                player.currentTime = currentTime;
+              }
+            })
             dispatch({ type: 'playingStatus', status: "playing" });
+            recordEpisode(global)
           } else {
             player.pause();
             dispatch({ type: 'playingStatus', status: "pause" });
+            recordEpisode(global)
           }
         } else {
-          console.log(episode.enclosures[0].url);
+          console.log('loading new audio')
           player.setAttribute("src", episode.enclosures[0].url);
           player.play();
-          dispatch({ type:'audioUpdate', payload: {
+          
+          const payload = {
             audioOrigin: podcastURL,
             episode: episode.guid,
             title: episode.title,
@@ -98,7 +112,16 @@ export default () => {
             author: episode.itunes_author,
             playing: guid,
             status: "playing",
-          }});
+            played: 0,
+          }
+
+          if(currentTime){
+            player.currentTime = currentTime;
+            payload.currentTime = currentTime;
+          }
+
+          recordEpisode(global);
+          dispatch({ type:'audioUpdate', payload });
         }
     };
     
@@ -120,6 +143,8 @@ export default () => {
         handler={playButton}
         status={global.status}
         playing={global.playing}
+        current={global.current}
+        shouldRefresh={shouldRefresh}
     /> 
     </>
     :<Typography align='center' letterSpacing={6} variant="h4"> <img src={loadingAnimation} width="20%" style={{paddingTop: '20%' }} /> <br /> { error && error.message }</Typography>

@@ -1,25 +1,20 @@
-import PS from 'podcastsuite';
+import { set,get } from 'idb-keyval';
 
-const db = PS;
-console.log(db, PS)
-
-const completeEpisode = async (feed,episode) => {
-  // const inMemory = await db.get(feed) || {};
-  // const current = JSON.parse(inMemory);
-  // current[episode] = {completed: true };
-
-  await db.set(feed,current);
+export const completeEpisode = async (feed,episode) => {
+  const inMemory = await get(feed);
+  const current = inMemory || {};
+  current[episode] = { completed: true };
+  return await set(feed,current);
 }
 
-const recordEpisode = async (feed,episode,state) => {
-  // const inMemory = await db.get(feed) || {};
-  // const current = JSON.parse(inMemory);
-  // current[episode] = {completed: false, currentTime:state.currentTime };
-
-  // await db.set(feed,current);
+export const recordEpisode = async (feed, episode, currentTime, duration) => {
+  console.log('record')
+  const inMemory = await get(feed);
+  const current = inMemory || {};
+  current[episode] = { completed: false, currentTime, duration, duration };
+  return await set(feed,current);
 }
-
-export const initialState = JSON.parse(localStorage.getItem('state') || false ) || {
+const initialState = JSON.parse(localStorage.getItem('state') || false ) || {
     podcasts: [],
     theme: true,  
     current: null,
@@ -58,16 +53,16 @@ export const reducer = (state, action) => {
       case 'setDark':
         return { ...state, theme: action.payload }
       case 'playingStatus':
-        if(action.status === paused){
-          recordEpisode(state.audioOrigin,state.episode,state);
-        }
         return {...state, status: action.status} 
       case 'updateCurrent':
           return {...state, current: action.payload} 
       case 'audioCompleted':
-        completeEpisode(state.audioOrigin,state.episode);
+        if(sate.episode) completeEpisode(state.audioOrigin,state.episode);
         return { ...state, ...action.payload}
       case 'audioUpdate':
+        if(action.payload && (action.payload.status === 'pause')){
+          recordEpisode(state.audioOrigin,state.episode,state.currentTime, state.duration);
+        }
         return { ...state, ...action.payload}
     }
   }

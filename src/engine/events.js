@@ -8,6 +8,7 @@
 // }
 
 export default function (player, dispatch, state) {
+  console.log("attaching events");
   let tick = null;
   const completedLoading = function (ev) {
     dispatch({type:'audioUpdate', payload: { loading: "loaded" }});
