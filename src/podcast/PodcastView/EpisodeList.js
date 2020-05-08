@@ -14,7 +14,6 @@ import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import DialogContent from "@material-ui/core/DialogContent";
-import LinearProgress from '@material-ui/core/LinearProgress';
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Chip from "@material-ui/core/Chip";
@@ -85,8 +84,6 @@ const IsAvaliable = (url) => {
 const EpisodeListDescription = (props) => {
   const episode = props.episode;
   const history = props.history || {};
-  const {currentTime, duration } = history;
-  const total = (currentTime && duration) ? Math.round( ( currentTime * 100 ) / duration ) : null;
 
   return (
     <ListItemText
@@ -97,9 +94,6 @@ const EpisodeListDescription = (props) => {
           <Typography component="div" variant="subtitle1" noWrap>
             {clearText(episode.title)} <IsAvaliable url={episode.enclosures[0].url} />
           </Typography>
-          {
-              total ? <LinearProgress variant="determinate" style={{width:'90%'}} value={total} color="secondary" />: ''
-            }
           <Typography variant="overline" component="div">
             {episodeDate(episode.created)}
             {episode.episodeType && episode.episodeType !== "full" && (
@@ -138,6 +132,7 @@ const Description = (props) => {
   );
 };
 
+
 const EpisodeList = (props) => {
   const [episodeHistory, setEpisodeHistory] = useState({});
   const [open, setOpen] = React.useState(null);
@@ -169,6 +164,17 @@ const EpisodeList = (props) => {
     setEpisodeHistory(history || {});
   }
 
+  const ShowProgress = ({guid, episodeData}) => {
+    const {currentTime, duration, completed } = episodeData;
+    if(completed) return <CheckCircleIcon color="secondary" />
+  
+    const total = (currentTime && duration) ? Math.round( ( currentTime * 100 ) / duration ) : null;
+    if (total){
+      return <div onClick={ ()=> completeEpisode(guid)}>{total}%</div>;
+    }
+    return <CheckCircleOutlineIcon onClick={ ()=> completeEpisode(guid)} color="secondary" />
+  }
+
   useEffect(()=>{
     console.log('getting new history')
     getHistory(props.current);
@@ -184,7 +190,7 @@ const EpisodeList = (props) => {
               <>
               <List>
                 {episodeList.map((episode, id) => { 
-                  const episodeData = episodeHistory[episode.guid]
+                  const episodeData = episodeHistory[episode.guid] || {};
                   return (
                   <div key={episode.guid}>
                     <ListItem
@@ -221,9 +227,7 @@ const EpisodeList = (props) => {
                         episode={episode}
                       />
                       <ListItemIcon >
-                      {
-                        ( episodeData && episodeData.completed ) ? <CheckCircleIcon color="secondary" /> : <CheckCircleOutlineIcon onClick={ ()=> completeEpisode(episode.guid)} color="secondary" />
-                      }
+                        <ShowProgress guid={episode.guid} episodeData={episodeData} />
                       </ListItemIcon>
                     </ListItem>
                     <Divider />

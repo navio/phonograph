@@ -121,13 +121,17 @@ export default () => {
             payload.currentTime = currentTime;
           }
          
-
           recordEpisode(global);
           dispatch({ type:'audioUpdate', payload });
         }
     };
     
     const isPodcastInLibrary = () => global.podcasts.some((cast) => cast.url == global.current);
+
+    useEffect(()=>{
+      console.log('should refresh from global')
+       setToRefresh(Date.now());
+    },[global.refresh]);
 
     useEffect(()=>{
         getPodcast()

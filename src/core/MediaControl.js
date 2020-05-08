@@ -9,7 +9,6 @@ import SkipPreviousIcon from "@material-ui/icons/Replay10";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import PauseIcon from "@material-ui/icons/Pause";
 import SkipNextIcon from "@material-ui/icons/Forward30";
-// import {clearText} from './index'
 import LinearProgress from "@material-ui/core/LinearProgress";
 import Grid from "@material-ui/core/Grid";
 import { Link } from "react-router-dom";

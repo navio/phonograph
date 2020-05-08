@@ -14,13 +14,14 @@ export default function (player, dispatch, state) {
     dispatch({type:'audioUpdate', payload: { loading: "loaded" }});
   };
   
-  const completedPlaying = function (ev) {
-    dispatch({type:'audioCompleted', payload: {
-      episode: null,
-      author: null,
-      playing: null,
-      status: null,
-    }});
+  const completedPlaying = async function (ev) {
+      dispatch({type:'audioCompleted', payload: {
+        episode: null,
+        author: null,
+        playing: null,
+        status: null,
+      }});
+
   };
   
   const eventEcho = function (ev) {
@@ -49,12 +50,12 @@ export default function (player, dispatch, state) {
     let loaded = player.buffered.length
       ? (100 * player.buffered.end(0)) / player.duration
       : 100;
-      dispatch({type:'audioUpdate', payload: loaded })
+      dispatch({type:'audioUpdate', payload: {loaded} })
   };
   
   const pauseTick = function () {
     clearInterval(tick);
-    dispatch({ type: 'playingStatus', status: "pause" });
+    dispatch({ type: 'audioUpdate', payload: { status: "pause", refresh: Date.now() } });
   };
   
   const stopTick = function (ev) {

@@ -1,10 +1,15 @@
 import { set,get } from 'idb-keyval';
 
 export const completeEpisode = async (feed,episode) => {
-  const inMemory = await get(feed);
-  const current = inMemory || {};
-  current[episode] = { completed: true };
-  return await set(feed,current);
+ if(feed && episode) {
+    const inMemory = await get(feed);
+    const current = inMemory || {};
+    current[episode] = { completed: true };
+    console.log(current[episode],feed,episode);
+    await set(feed,current);
+    return true;
+ }
+ return false;
 }
 
 export const recordEpisode = async (feed, episode, currentTime, duration) => {
@@ -31,7 +36,8 @@ const initialState = JSON.parse(localStorage.getItem('state') || false ) || {
     image: null,
     episode: null,
     currentTime: null,
-    media:""
+    media:"",
+    refresh: Date.now()
   };
 
 // cleanup legacy
@@ -57,12 +63,14 @@ export const reducer = (state, action) => {
       case 'updateCurrent':
           return {...state, current: action.payload} 
       case 'audioCompleted':
-        if(sate.episode) completeEpisode(state.audioOrigin,state.episode);
-        return { ...state, ...action.payload}
+        completeEpisode(state.current, state.episode);
+        return { ...state, ...action.payload, refresh: Date.now()}
       case 'audioUpdate':
         if(action.payload && (action.payload.status === 'pause')){
           recordEpisode(state.audioOrigin,state.episode,state.currentTime, state.duration);
-        }
+          return { ...state, ...action.payload, refresh: Date.now() }
+        }else {
         return { ...state, ...action.payload}
+        }
     }
   }
