@@ -30,6 +30,7 @@ export default (props) => {
     const [ podcast, setPodcast ] = useState({});
     const [ error, setError ] = useState({});
     const [shouldRefresh, setToRefresh] = useState(Date.now());
+    
     const podcastURL = commonRules(bringAPodcast || global.current);
 
     const episodes = useRef(new Map());
@@ -128,7 +129,7 @@ export default (props) => {
         }
     };
     
-    const isPodcastInLibrary = () => global.podcasts.some((cast) => cast.url == global.current);
+    const isPodcastInLibrary = () => global.podcasts.some((cast) => cast.url === podcastURL);
 
     useEffect(()=>{
       console.log('should refresh from global')
