@@ -62,7 +62,7 @@ initialState['status'] = "pause";
 const App = () => {
 
     const player = useRef(null); //new audioqueue([]);
-    const engine = getPodcastEngine();
+    
     const [state, dispatch] = useReducer(reducer,initialState);
     const mediaFunctions = playerFunctions(player, dispatch, state)
     const history = useHistory();
@@ -74,13 +74,14 @@ const App = () => {
 
 
     // Mode
-    const newPodcast = checkIfNewPodcastInURL();
+    const {newPodcast, shouldInit } = checkIfNewPodcastInURL();
     if(newPodcast){
       loadPodcast(newPodcast, () => history.push(PODCASTVIEW));
     }
-
+    const engine = getPodcastEngine(shouldInit);
+    
     useEffect(() => {
-      initializeLibrary(dispatch);
+      initializeLibrary(engine, dispatch);
     },[]);
 
     useEffect(
