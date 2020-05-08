@@ -4,6 +4,8 @@ import {PODCASTVIEW, DISCOVERY} from '../../constants';
 import loadingAnimation from '../../../public/loading.svg';
 import { recordEpisode as saveEpisodeState } from '../../reducer'
 
+import Loading from '../../core/Loading';
+
 import EpisodeList from "./EpisodeList";
 import PodcastHeader from "./PodcastHeader";
 import PodcastEngine from "podcastsuite";
@@ -137,7 +139,7 @@ export default () => {
         getPodcast()
     },[]);
     
-    return  podcast.domain ? <> 
+    return  podcast.domain ? <>
     <PodcastHeader  
         savePodcast={savePodcast} 
         podcast={podcast} 
@@ -153,7 +155,7 @@ export default () => {
         shouldRefresh={shouldRefresh}
     /> 
     </>
-    :<Typography align='center' letterSpacing={6} variant="h4"> <img src={loadingAnimation} width="20%" style={{paddingTop: '20%' }} /> <br /> { error && error.message }</Typography>
+    : <Typography align='center' style={{paddingTop: '20%' }} letterSpacing={6} variant="h4"> <Loading  /> <br /> { error && error.message }</Typography>
                         
 }
 

@@ -14,6 +14,7 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import Geners from './Geners';
+import Loading from '../../core/Loading';
 
 import { getPopularPodcasts, searchForPodcasts } from './engine';
 
@@ -193,7 +194,7 @@ class Discover extends Component {
             <CardContent>
             <Typography variant={"h6"} >{this.state.name}</Typography>
               <Grid container>
-                {topPodcasts &&
+                {topPodcasts ?
                   topPodcasts.map((podcast) => (
                     <Grid key={podcast.title} item xs={12} sm={6} md={4} lg={3}>
                       <List
@@ -231,7 +232,7 @@ class Discover extends Component {
                         </ListItem>
                       </List>
                     </Grid>
-                  ))}
+                  )) : <Typography align='center' style={{paddingTop: '20%' }} letterSpacing={6} variant="h4"> <Loading /> </Typography>  }
               </Grid>
             </CardContent>
           </Card>
