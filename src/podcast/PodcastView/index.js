@@ -128,7 +128,7 @@ export default (props) => {
         }
     };
     
-    const isPodcastInLibrary = () => global.podcasts.some((cast) => cast.url == global.current);
+    const isPodcastInLibrary = () => global.podcasts.some((cast) => cast.url == podcastURL);
 
     useEffect(()=>{
       console.log('should refresh from global')
