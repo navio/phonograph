@@ -223,7 +223,7 @@ const EpisodeList = (props) => {
                       <EpisodeListDescription
                         onClick={() => {
                           console.log(episode);
-                          saveOffline(episode.enclosures[0].url)
+                          // saveOffline(episode.enclosures[0].url)
                           setOpen({
                             description: episode.description,
                             title: episode.title,

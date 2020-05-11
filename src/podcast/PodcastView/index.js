@@ -12,9 +12,6 @@ import PodcastEngine from "podcastsuite";
 import Typography from "@material-ui/core/Typography";
 
 
-const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
-const prod = DEBUG ? '' : '/image/'
-
 const commonRules = (originalUrl) => {
     let url = originalUrl;
     url = url.indexOf("http:") > -1 ? url.replace("http:", "https:") : url;
@@ -116,14 +113,14 @@ export default (props) => {
           }
         } else {
           console.log('loading new audio')
-          player.setAttribute("src", prod + episode.enclosures[0].url);
+          player.setAttribute("src",episode.enclosures[0].url);
          
           
           const payload = {
             audioOrigin: podcastURL,
             episode: episode.guid,
             title: episode.title,
-            media: (prod + episode.enclosures[0].url),
+            media: (episode.enclosures[0].url),
             author: episode.itunes_author,
             playing: guid,
             status: "playing",
