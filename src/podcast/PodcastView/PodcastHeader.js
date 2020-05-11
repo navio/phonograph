@@ -87,6 +87,10 @@ function PodcastHeader(props) {
   };
 
   // const colorThief = new ColorThief();
+
+  const makeMeAHash = (url) => btoa(url);
+
+
   const shareLink = !!(navigator.share || navigator.clipboard);
   const share = (title, text, url) => {
     if (navigator.share) {
@@ -99,7 +103,7 @@ function PodcastHeader(props) {
     } else if (navigator.clipboard) {
       return () => {
         navigator.clipboard.writeText(`${title} ${url.toString()}`);
-        setMessage("Link csopied to clipboard");
+        setMessage("Link copied to clipboard");
         setOpen(true);
       };
     } else {
@@ -169,7 +173,7 @@ function PodcastHeader(props) {
                           onClick={share(
                             "Phonograph",
                             state.title,
-                            `${document.location.origin}/podcast/${state.domain}`
+                            `${document.location.origin}/podcast/${makeMeAHash(state.domain)}`
                           )}
                         >
                           <ShareIcon />
