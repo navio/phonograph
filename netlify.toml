@@ -11,6 +11,14 @@
   force = true
 
 [[redirects]]
+  from = "/image/*"
+  to = ":splat"
+  status = 200
+  force = true
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[redirects]]
   from = "/podcasts/*"
   to = "https://feedwrangler.net/api/v2/podcasts/:splat"
   status = 200
