@@ -29,6 +29,10 @@ const { sanitize } = DOMPurify;
 const db = PS.createDatabase('history','podcasts');
 
 
+const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
+const prod = DEBUG ? '' : '/image/'
+
+
 export const clearText = (html) => {
   let tmp = document.createElement("div");
   tmp.innerHTML = html;
@@ -63,16 +67,16 @@ const saveOffline = async (mediaURL) => {
   // const podcastBlob = await rawPodcast.blob();
   // const response = new Response(podcastBlob)
 
-  // const cache = await caches.open('offline-podcasts');
-  // await cache.put(mediaURL, response);
-  // cache.add(mediaURL);
+  const cache = await caches.open('offline-podcasts');
+  await cache.put(mediaURL, response);
+  cache.add(prod + mediaURL);
 }
 
 const IsAvaliable = (url) => {
   const [hasIt, setHasIt ] = useState(false);
 
   const availableOffline = async (media) => {
-    const has = await caches.has('/rss-full/'+media);
+    const has = await caches.has(prod + media);
     setHasIt(has);
   }
 
@@ -219,7 +223,7 @@ const EpisodeList = (props) => {
                       <EpisodeListDescription
                         onClick={() => {
                           console.log(episode);
-                          // saveOffline(episode.enclosures[0].url)
+                          saveOffline(episode.enclosures[0].url)
                           setOpen({
                             description: episode.description,
                             title: episode.title,
