@@ -31,7 +31,7 @@ const ignoreMe = (url) => {
   return false;
 } 
 
-const shouldUpdate = () => {
+const shouldUpdate = (url) => {
   if (url.indexOf('.png') > -1) {
     return false;
   }
@@ -76,13 +76,6 @@ self.addEventListener('activate', event => {
 
 self.addEventListener("fetch", function (evt) {
 
-  if (evt.request.method !== 'GET') {
-    return fetch(evt.request);
-  }
-  if (ignoreMe(evt.request.url)) {
-    return fetch(evt.request);
-  }
-
   evt.respondWith(getOrGetAndStore(evt.request));
 
   evt.waitUntil(
@@ -92,6 +85,13 @@ self.addEventListener("fetch", function (evt) {
 });
 
 function getOrGetAndStore(request) {
+  console.log(request);
+  if (request.method !== 'GET') {
+    return fetch(request);
+  }
+  if (ignoreMe(request.url)) {
+    return fetch(request);
+  }
   
   return caches.open(CACHE)
   .then(function(cache) {
