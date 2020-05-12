@@ -163,7 +163,7 @@ const App = () => {
               seek={mediaFunctions.seek}
             /> }
           </Suspense>
-
+              
           <Footer path={location.pathname} />
 
           <audio
