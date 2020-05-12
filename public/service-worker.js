@@ -1,5 +1,37 @@
 const version = 1.7;
-const CACHE = 'phonograph-core-' + version
+const CACHE = 'phonograph-core-' + version;
+
+
+const ignoreMe = (url) => {
+
+  if (url.indexOf('chrome-extension') > -1) {
+    return true;
+  }
+  
+  if (url.indexOf('/api/') > -1) {
+    return true;
+  }
+  
+  if (url.indexOf('/rss-full/') > -1) {
+    return true;
+  }
+  
+  if (url.indexOf('/ln/') > -1) {
+    return true;
+  }
+
+  if (url.indexOf('wss://') > -1) {
+    return true;
+  }
+
+  if (url.indexOf('/ignoreme/') > -1) {
+    return true;
+  }
+
+  return false;
+} 
+
+
 self.addEventListener("install", function (event) {
   event.waitUntil(
     caches
@@ -14,7 +46,6 @@ self.addEventListener("install", function (event) {
 });
 
 self.addEventListener('activate', event => {
-  console.log('Service Worker Active');
   event.waitUntil(
     caches.keys().then(function (cacheNames) {
       return Promise.all(
@@ -29,28 +60,12 @@ self.addEventListener('activate', event => {
   event.waitUntil(self.clients.claim());
 });
 
-
-
-
 self.addEventListener("fetch", function (evt) {
 
   if (evt.request.method !== 'GET') {
     return fetch(evt.request);
   }
-
-  if (evt.request.url.indexOf('chrome-extension') > -1) {
-    return fetch(evt.request);
-  }
-  
-  if (evt.request.url.indexOf('/api/') > -1) {
-    return fetch(evt.request);
-  }
-  
-  if (evt.request.url.indexOf('/rss-full/') > -1) {
-    return fetch(evt.request);
-  }
-  
-  if (evt.request.url.indexOf('/ln/') > -1) {
+  if (ignoreMe(evt.request.url)) {
     return fetch(evt.request);
   }
 
@@ -69,20 +84,18 @@ function fromCache(request) {
     return cache.match(request)
     .then(function(res) {
       if(res){
-        console.log('The service worker is serving the asset.');
         return res;
       }else{
-        console.log('Attaching');
-        return fetch(request).then( r =>{
-          cache.put(request, r.clone());
-          return r;
-        })
+        return fetch(request)
       }
     })
   });
 }
 
 function update(request) {
+  if (ignoreMe(request.url)){
+    return;
+  }
   return caches.open(CACHE).then(function (cache) {
     return fetch(request).then(function (response) {
       return cache.put(request, response.clone()).then(function () {
