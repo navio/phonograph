@@ -30,13 +30,12 @@ const readFile = (file) => {
 
 const found = [];
 readDir('dist')
-.catch(console.err)
 .then(files => files.forEach((file) => found.push(`/${file}`)))
 .then(()=> {
 
-  readFile('swTemplate.js')
+  readFile('/dist/service-worker.js')
   .then( data => { 
-    const readyToWrite = data.replace("'/changeme/'",JSON.stringify(found));
+    const readyToWrite = data.replace("addAll()",`addAll(${JSON.stringify(found)})`);
     
     writeFile("/dist/service-worker.js", readyToWrite)
 

@@ -5,7 +5,7 @@ self.addEventListener("install", function (event) {
     caches
     .open(CACHE)
     .then(function (cache) {
-      return cache.addAll('/changeme/');
+      return cache.addAll();
     })
     .then(function () {
       console.log('WORKER: install completed');
