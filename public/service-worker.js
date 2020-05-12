@@ -38,6 +38,9 @@ const shouldUpdate = () => {
   if (url.indexOf('.jpg') > -1) {
     return false;
   }
+  if (url.indexOf('.mp3') > -1) {
+    return false;
+  }
   return true;
 }
 
@@ -53,6 +56,7 @@ self.addEventListener("install", function (event) {
       console.log('WORKER: install completed');
     })
   );
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', event => {
