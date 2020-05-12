@@ -1,5 +1,5 @@
 
-const version = 1.6;
+const version = 1.7;
 self.addEventListener("install", function(event) {
     event.waitUntil(
       caches
@@ -20,6 +20,17 @@ self.addEventListener("install", function(event) {
 
 self.addEventListener('activate', event => {
   console.log('Service Worker Active');
+  event.waitUntil(
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        cacheNames.filter(function(cacheName) {
+          return ( cacheName.toString().indexOf('phonograph') > -1 )
+        }).map(function(cacheName) {
+          return caches.delete(cacheName);
+        })
+      );
+    })
+  );
 });
 
 self.addEventListener("fetch", function(event) {
