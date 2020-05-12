@@ -1,115 +1,98 @@
-
 const version = 1.7;
-self.addEventListener("install", function(event) {
-    event.waitUntil(
-      caches
-        .open('phonograph-core-'+version)
-        .then(function(cache) {
-          return cache.addAll([
-            '/',
-            '/index.html',
-            '/favicon-16x16.png',
-            '/favicon-32x32.png"'
-          ]);
-        })
-        .then(function() {
-          console.log('WORKER: install completed');
-        })
-    );
+self.addEventListener("install", function (event) {
+  event.waitUntil(
+    caches
+    .open('phonograph-core-' + version)
+    .then(function (cache) {
+      return cache.addAll([
+        '/',
+        '/index.html',
+        '/favicon-16x16.png',
+        '/favicon-32x32.png',
+        '/safari-pinned-tab.svg',
+        '/apple-touch-icon.png'
+      ]);
+    })
+    .then(function () {
+      console.log('WORKER: install completed');
+    })
+  );
 });
 
 self.addEventListener('activate', event => {
   console.log('Service Worker Active');
   event.waitUntil(
-    caches.keys().then(function(cacheNames) {
+    caches.keys().then(function (cacheNames) {
       return Promise.all(
-        cacheNames.filter(function(cacheName) {
-          return ( cacheName.toString().indexOf('phonograph') > -1 )
-        }).map(function(cacheName) {
+        cacheNames.filter(function (cacheName) {
+          return (cacheName.toString().indexOf('phonograph') > -1)
+        }).map(function (cacheName) {
           return caches.delete(cacheName);
         })
       );
     })
   );
+  event.waitUntil(self.clients.claim());
 });
 
-self.addEventListener("fetch", function(event) {
-    console.log('WORKER: fetch event in progress.');
-    
-    if (event.request.method !== 'GET') {
-      return;
-    }
 
-    if(event.request.url.indexOf('/api/') > -1 ){
-      return;
-    }
 
-    if(event.request.url.indexOf('/rss-full/') > -1 ){
-      return;
-    }
 
-    if(event.request.url.indexOf('/ln/') > -1 ){
-      return;
-    }
+self.addEventListener("fetch", function (evt) {
+  console.log('The service worker is serving the asset.');
 
-    /* Similar to event.waitUntil in that it blocks the fetch event on a promise.
-       Fulfillment result will be used as the response, and rejection will end in a
-       HTTP response indicating failure.
-    */
-    event.respondWith(
-      caches
-        /* This method returns a promise that resolves to a cache entry matching
-           the request. Once the promise is settled, we can then provide a response
-           to the fetch request.
-        */
-        .match(event.request)
-        .then(function(cached) {
-
-          return cached || fetch(event.request)
-          .then(fetchedFromNetwork, unableToResolve)
-          .catch(unableToResolve);
+  if (evt.request.method !== 'GET') {
+    return fetch(evt.request);
+  }
   
-          function fetchedFromNetwork(response) {
-            var cacheCopy = response.clone();
+  if (evt.request.url.indexOf('/api/') > -1) {
+    return fetch(evt.request);
+  }
   
-            // console.log('WORKER: fetch response from network.', event.request.url);
+  if (evt.request.url.indexOf('/rss-full/') > -1) {
+    return fetch(evt.request);
+  }
   
-            caches
-              .open('phonograph-'+version)
-              .then(function add(cache) {
-                cache.put(event.request, cacheCopy);
-              })
-              .then(function() {
-                console.log('WORKER: fetch response stored in cache.', event.request.url);
-              });
-  
-              return response;
-          }
+  if (evt.request.url.indexOf('/ln/') > -1) {
+    return fetch(evt.request);
+  }
 
-          function unableToResolve () {
-            /* There's a couple of things we can do here.
-               - Test the Accept header and then return one of the `offlineFundamentals`
-                 e.g: `return caches.match('/some/cached/image.png')`
-               - You should also consider the origin. It's easier to decide what
-                 "unavailable" means for requests against your origins than for requests
-                 against a third party, such as an ad provider
-               - Generate a Response programmaticaly, as shown below, and return that
-            */
-  
-            // console.log('WORKER: fetch request failed in both cache and network.');
-  
-            /* Here we're creating a response programmatically. The first parameter is the
-               response body, and the second one defines the options for the response.
-            */
-            return new Response('<h1>Service Unavailable</h1>', {
-              status: 503,
-              statusText: 'Service Unavailable',
-              headers: new Headers({
-                'Content-Type': 'text/html'
-              })
-            });
-          }
+  evt.respondWith(fromCache(evt.request));
 
-        })
-    );
+  evt.waitUntil(
+    update(evt.request)
+    .then(refresh)
+  );
+
+});
+
+function fromCache(request) {
+  return caches.open(CACHE).then(function (cache) {
+    return cache.match(request);
   });
+}
+
+function update(request) {
+  return caches.open(CACHE).then(function (cache) {
+    return fetch(request).then(function (response) {
+      return cache.put(request, response.clone()).then(function () {
+        return response;
+      });
+    });
+  });
+}
+
+function refresh(response) {
+  return self.clients.matchAll().then(function (clients) {
+    clients.forEach(function (client) {
+      
+      const message = {
+        type: 'refresh',
+        url: response.url,
+        eTag: response.headers.get('ETag')
+      };
+
+      client.postMessage(JSON.stringify(message));
+    });
+  });
+}
