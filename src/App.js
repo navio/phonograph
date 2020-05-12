@@ -9,7 +9,7 @@ import Typography from "@material-ui/core/Typography";
 import loadingAnimation from '../public/loading.svg';
 
 // Router
-import { withRouter } from "react-router";
+import {  } from "react-router";
 import { Route, Redirect, useHistory } from "react-router-dom";
 
 // Constants
@@ -179,5 +179,5 @@ const App = () => {
     );
 }
 
-export default withRouter(App);
+export default (App);
 
