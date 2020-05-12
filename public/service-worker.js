@@ -59,14 +59,20 @@ self.addEventListener("fetch", function (evt) {
 
   evt.waitUntil(
     update(evt.request)
-    .then(refresh)
   );
 
 });
 
 function fromCache(request) {
-  return caches.open(CACHE).then(function (cache) {
-    return cache.match(request);
+  return caches.open(CACHE).then(function(cache) {
+    return cache.match(request)
+    .catch(function() {
+      return fetch(request);
+    })
+    .then(function(res) {
+      cache.put(request, res);
+      return res.clone();
+    })
   });
 }
 
@@ -76,21 +82,6 @@ function update(request) {
       return cache.put(request, response.clone()).then(function () {
         return response;
       });
-    });
-  });
-}
-
-function refresh(response) {
-  return self.clients.matchAll().then(function (clients) {
-    clients.forEach(function (client) {
-      
-      const message = {
-        type: 'refresh',
-        url: response.url,
-        eTag: response.headers.get('ETag')
-      };
-
-      client.postMessage(JSON.stringify(message));
     });
   });
 }
