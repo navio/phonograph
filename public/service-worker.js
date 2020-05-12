@@ -1,8 +1,9 @@
 const version = 1.7;
+const CACHE = 'phonograph-core-' + version
 self.addEventListener("install", function (event) {
   event.waitUntil(
     caches
-    .open('phonograph-core-' + version)
+    .open(CACHE)
     .then(function (cache) {
       return cache.addAll([
         '/',
