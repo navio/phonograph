@@ -31,6 +31,16 @@ const ignoreMe = (url) => {
   return false;
 } 
 
+const shouldUpdate = () => {
+  if (url.indexOf('.png') > -1) {
+    return false;
+  }
+  if (url.indexOf('.jpg') > -1) {
+    return false;
+  }
+  return true;
+}
+
 
 self.addEventListener("install", function (event) {
   event.waitUntil(
@@ -69,7 +79,7 @@ self.addEventListener("fetch", function (evt) {
     return fetch(evt.request);
   }
 
-  evt.respondWith(fromCache(evt.request));
+  evt.respondWith(getOrGetAndStore(evt.request));
 
   evt.waitUntil(
     update(evt.request)
@@ -77,7 +87,7 @@ self.addEventListener("fetch", function (evt) {
 
 });
 
-function fromCache(request) {
+function getOrGetAndStore(request) {
   
   return caches.open(CACHE)
   .then(function(cache) {
@@ -87,6 +97,13 @@ function fromCache(request) {
         return res;
       }else{
         return fetch(request)
+        .then(function(response) {
+          if (!response.ok) {
+            return response;
+          }
+          cache.put(request, response.clone());
+          return response;
+        })
       }
     })
   });
@@ -96,6 +113,10 @@ function update(request) {
   if (ignoreMe(request.url)){
     return;
   }
+  if(!shouldUpdate(request.url)){
+    return;
+  }
+
   return caches.open(CACHE).then(function (cache) {
     return fetch(request).then(function (response) {
       return cache.put(request, response.clone()).then(function () {
