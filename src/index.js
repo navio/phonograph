@@ -11,6 +11,4 @@ render(
   document.getElementById("root")
 );
 
-const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
-
-!DEBUG && serviceWorker();
+serviceWorker();

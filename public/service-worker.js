@@ -5,7 +5,7 @@ self.addEventListener("install", function (event) {
     caches
     .open(CACHE)
     .then(function (cache) {
-      return cache.addAll();
+      return cache.addAll([]);
     })
     .then(function () {
       console.log('WORKER: install completed');
@@ -33,7 +33,6 @@ self.addEventListener('activate', event => {
 
 
 self.addEventListener("fetch", function (evt) {
-  console.log('The service worker is serving the asset.');
 
   if (evt.request.method !== 'GET') {
     return fetch(evt.request);
@@ -64,14 +63,21 @@ self.addEventListener("fetch", function (evt) {
 });
 
 function fromCache(request) {
-  return caches.open(CACHE).then(function(cache) {
+  
+  return caches.open(CACHE)
+  .then(function(cache) {
     return cache.match(request)
-    .catch(function() {
-      return fetch(request);
-    })
     .then(function(res) {
-      cache.put(request, res);
-      return res.clone();
+      if(res){
+        console.log('The service worker is serving the asset.');
+        return res;
+      }else{
+        console.log('Attaching');
+        return fetch(request).then( r =>{
+          cache.put(request, r.clone());
+          return r;
+        })
+      }
     })
   });
 }

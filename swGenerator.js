@@ -35,7 +35,7 @@ readDir('dist')
 
   readFile('/dist/service-worker.js')
   .then( data => { 
-    const readyToWrite = data.replace("addAll()",`addAll(${JSON.stringify(found)})`);
+    const readyToWrite = data.replace("addAll([])",`addAll(${JSON.stringify(found)})`);
     
     writeFile("/dist/service-worker.js", readyToWrite)
 
