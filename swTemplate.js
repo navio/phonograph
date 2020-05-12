@@ -5,14 +5,7 @@ self.addEventListener("install", function (event) {
     caches
     .open(CACHE)
     .then(function (cache) {
-      return cache.addAll([
-        '/',
-        '/index.html',
-        '/favicon-16x16.png',
-        '/favicon-32x32.png',
-        '/safari-pinned-tab.svg',
-        '/apple-touch-icon.png'
-      ]);
+      return cache.addAll('/changeme/');
     })
     .then(function () {
       console.log('WORKER: install completed');
@@ -43,6 +36,10 @@ self.addEventListener("fetch", function (evt) {
   console.log('The service worker is serving the asset.');
 
   if (evt.request.method !== 'GET') {
+    return fetch(evt.request);
+  }
+
+  if (evt.request.url.indexOf('chrome-extension') > -1) {
     return fetch(evt.request);
   }
   
