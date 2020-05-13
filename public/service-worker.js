@@ -53,25 +53,22 @@ self.addEventListener("install", function (event) {
     .then(function (cache) {
       return cache.addAll([]);
     })
-    .then(function () {
-      console.log('WORKER: install completed');
-    })
   );
-  self.skipWaiting();
+  // self.skipWaiting();
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(function (cacheNames) {
-      return Promise.all(
-        cacheNames.filter(function (cacheName) {
-          return (cacheName.toString().indexOf('phonograph') > -1)
-        }).map(function (cacheName) {
-          return caches.delete(cacheName);
-        })
-      );
-    })
-  );
+  // event.waitUntil(
+  //   caches.keys().then(function (cacheNames) {
+  //     return Promise.all(
+  //       cacheNames.filter(function (cacheName) {
+  //         return (cacheName.toString().indexOf('phonograph') > -1)
+  //       }).map(function (cacheName) {
+  //         return caches.delete(cacheName);
+  //       })
+  //     );
+  //   })
+  // );
   event.waitUntil(self.clients.claim());
 });
 
@@ -86,7 +83,6 @@ self.addEventListener("fetch", function (evt) {
 });
 
 function getOrGetAndStore(request) {
-  console.log(request);
   if (request.method !== 'GET') {
     return fetch(request);
   }
