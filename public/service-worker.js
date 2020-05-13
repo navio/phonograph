@@ -83,26 +83,62 @@ self.addEventListener("fetch", function (evt) {
 });
 
 function getOrGetAndStore(request) {
+
+  let other;
+
   if (request.method !== 'GET') {
     return fetch(request);
   }
+
   if (ignoreMe(request.url)) {
     return fetch(request);
   }
-  
-  return caches.open(CACHE)
+
+  if (request.url.indexOf('/library') > -1) {
+    const ref = request.referrer + 'library';
+    const final = request.url.slice(ref)[0];
+    if (final) {
+      other = request.referrer;
+    }
+  }
+
+  if (request.url.indexOf('/podcast') > -1) {
+    const ref = request.referrer + 'podcast';
+    const final = request.url.slice(ref)[0];
+    if (final) {
+      other = request.referrer;
+    }
+  }
+
+  if (request.url.indexOf('/discover') > -1) {
+    const ref = request.referrer + 'discover';
+    const final = request.url.slice(ref)[0];
+    if (final) {
+      other = request.referrer;
+    }
+  }
+
+  if (request.url.indexOf('/settings') > -1) {
+    const ref = request.referrer + 'settings';
+    const final = request.url.slice(ref)[0];
+    if (final) {
+      other = request.referrer;
+    }
+  }
+
+ return caches.open(CACHE)
   .then(function(cache) {
-    return cache.match(request)
+    return cache.match(other || request)
     .then(function(res) {
       if(res){
         return res;
       }else{
-        return fetch(request)
+        return fetch(other || request)
         .then(function(response) {
           if (!response.ok) {
             return response;
           }
-          cache.put(request, response.clone());
+          cache.put((other || request), response.clone());
           return response;
         })
       }
