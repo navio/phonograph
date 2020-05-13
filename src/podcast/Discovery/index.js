@@ -99,7 +99,7 @@ const Header = ({ searchHandler }) => (
           <Typography variant="h6">Discover</Typography>
         </Grid>
         <Grid item md={4} xs={12}>
-          <Search onChange={searchHandler} />
+          {/* <Search onChange={searchHandler} /> */}
         </Grid>
       </Toolbar>
     </Grid>
@@ -188,9 +188,9 @@ class Discover extends Component {
                 Trending Today
               </Typography>
             </CardContent>
-            <CardContent>
+            {/* <CardContent>
               <Geners selected={this.state.init} getPopularPodcasts={this.getPopularPodcasts} />
-            </CardContent>
+            </CardContent> */}
             <CardContent>
             <Typography variant={"h6"} >{this.state.name}</Typography>
               <Grid container>
