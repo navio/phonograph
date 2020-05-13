@@ -34,7 +34,7 @@
   ],
   "scripts": {
     "start": "parcel public/index.html",
-    "build": "yarn getter && parcel build public/index.html && yarn sw; yarn lambda:build",
+    "build": "parcel build public/index.html && yarn sw; yarn lambda:build",
     "serve": "parcel serve public/index.html",
     "lambda:build": "npx netlify-lambda build ./lambda",
     "lambda:serve": "npx netlify-lambda serve ./lambda",

@@ -26,7 +26,7 @@ export const getPopularPodcasts = function (query=null) {
         if(query){
             data = fetch(`/ln/best_podcasts?genre_id=${query}&page=1&region=us`).then(x=> x.json())
         } else {
-            data = import("../../../public/top.json");
+            data = import("./top.json");
          }
         data
             .then((response) => {
