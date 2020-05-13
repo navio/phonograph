@@ -1,10 +1,10 @@
-export const podcasts = [
+export const defaultCaststest = [
   "http://rss.art19.com/the-daily",
 ];
 
 // ,"http://feeds.gimletmedia.com/heavyweightpodcast"
 
-export const defaultCaststest = [
+export const podcasts = [
   "http://rss.art19.com/the-daily",
   "https://media.rss.com/laradiodelarepublica/feed.xml",
   "https://feeds.npr.org/510289/podcast.xml",
