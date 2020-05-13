@@ -41,6 +41,7 @@ const shouldUpdate = (url) => {
   if (url.indexOf('.mp3') > -1) {
     return false;
   }
+
   return true;
 }
 
@@ -78,9 +79,9 @@ self.addEventListener("fetch", function (evt) {
 
   evt.respondWith(getOrGetAndStore(evt.request));
 
-  evt.waitUntil(
-    update(evt.request)
-  );
+  // evt.waitUntil(
+  //   update(evt.request)
+  // );
 
 });
 
