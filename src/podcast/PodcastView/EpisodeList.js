@@ -63,16 +63,16 @@ const saveOffline = async (mediaURL) => {
   // const podcastBlob = await rawPodcast.blob();
   // const response = new Response(podcastBlob)
 
-  // const cache = await caches.open('offline-podcasts');
-  // await cache.put(mediaURL, response);
-  // cache.add(mediaURL);
+  const cache = await caches.open('offline-podcasts');
+  await cache.put(mediaURL, response);
+  cache.add(mediaURL);
 }
 
 const IsAvaliable = (url) => {
   const [hasIt, setHasIt ] = useState(false);
 
   const availableOffline = async (media) => {
-    const has = await caches.has('/rss-full/'+media);
+    const has = await caches.has(media);
     setHasIt(has);
   }
 

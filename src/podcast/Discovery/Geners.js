@@ -19,7 +19,7 @@ export default ({getPopularPodcasts, selected}) => {
   const [genres, setGenres] = useState([]);
 
   const getCategories = () => {
-    import("../../../public/genres.json")
+    import("./genres.json")
             .then((response) => {
                 const {
                   genres

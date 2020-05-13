@@ -21,15 +21,17 @@ const StyledField = withStyles((theme) => ({
 }))(TextField);
 
 export default ({ onChange }) => {
-  const [options, setOptions] = React.useState([]);
+  const [options, setOptions] = React.useState(['']);
   const [term, setTerm] = React.useState("");
   const def = () => null;
 
   React.useEffect(() => {
-    engine.listennotes(term).then((data) => {
-      const { podcasts } = data;
-      setOptions(podcasts);
-    });
+    if(term.lenght > 3){
+      engine.listennotes(term).then((data) => {
+        const { podcasts } = data;
+        setOptions(podcasts);
+      });
+    }
   }, [term]);
   return (
     <Autocomplete

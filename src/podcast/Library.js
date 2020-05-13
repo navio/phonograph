@@ -13,6 +13,9 @@ import Fab from "@material-ui/core/Fab";
 import { AppContext } from "../App.js";
 import phono from '../../public/phono.svg';
 
+const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
+const prod = DEBUG ? '' : '/image/'
+
 export const styles = (theme) => ({
   podcastMedia: {
     paddingTop: "100%",
@@ -107,7 +110,7 @@ const LibraryView = (props) => {
                               domain={podcast.domain}
                               title={podcast.title}
                               className={classes.podcastMedia}
-                              image={podcast.image}
+                              image={(prod+podcast.image)}
                             />
                           </div>
                         </Card>

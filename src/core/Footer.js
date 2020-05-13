@@ -28,7 +28,8 @@ class SimpleBottomNavigation extends React.Component {
   }
   render() {
     const classes = this.props.classes;
-    const selected = this.props.path.substring(1) || "library";
+    const selected = this.props.location.pathname.length > 2 ?
+    this.props.location.pathname : LIBVIEW;
     return (
       <div>
         <Paper className={classes.root} elevation={4}>
@@ -40,19 +41,19 @@ class SimpleBottomNavigation extends React.Component {
           >
             <BottomNavigationAction
               label="Library"
-              value="library"
+              value={LIBVIEW}
               onClick={this.handleRedirect(LIBVIEW)}
               icon={<Favorite />}
             />
             <BottomNavigationAction
               label="Discover"
-              value="discover"
+              value={DISCOVERVIEW}
               onClick={this.handleRedirect(DISCOVERVIEW)}
               icon={<DiscoverIcon />}
             />
             <BottomNavigationAction
               label="Settings"
-              value="settings"
+              value={SETTINGSVIEW}
               onClick={this.handleRedirect(SETTINGSVIEW)}
               icon={<Settings />}
             />

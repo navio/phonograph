@@ -24,12 +24,20 @@ const commonRules = (originalUrl) => {
 
 export default (props) => {
 
-    const bringAPodcast = window.location.href.split(`${PODCASTVIEW}/`)[1];
+    let bringAPodcast = window.location.href.split(`${PODCASTVIEW}/`)[1];
+    if(bringAPodcast){
+      try {
+        new URL(bringAPodcast);
+      }catch{
+        bringAPodcast = atob(bringAPodcast)
+      }
+    }
 
     const {state: global , engine, dispatch, player } = useContext(AppContext);
     const [ podcast, setPodcast ] = useState({});
     const [ error, setError ] = useState({});
     const [shouldRefresh, setToRefresh] = useState(Date.now());
+    
     const podcastURL = commonRules(bringAPodcast || global.current);
 
     const episodes = useRef(new Map());
@@ -128,7 +136,8 @@ export default (props) => {
         }
     };
     
-    const isPodcastInLibrary = () => global.podcasts.some((cast) => cast.url == podcastURL);
+    const isPodcastInLibrary = () => global.podcasts.some((cast) => cast.url === podcastURL);
+
 
     useEffect(()=>{
       console.log('should refresh from global')
