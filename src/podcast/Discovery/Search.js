@@ -33,15 +33,16 @@ export default (props) => {
               justify="center"
               alignItems="center"
               >
-        <Grid itme xs={12} md={8} 
+        <Grid xs={12} md={8} 
               item >
           <FormControl variant="outlined" style={{width:'100%'}}>
             <InputLabel htmlFor="outlined-search">Search Podcasts</InputLabel>
-            <OutlinedInput 
+            <OutlinedInput
+              color={'primary'}
               id="outlined-search"
               variant="outlined"
               onKeyPress={onChange}
-              labelWidth={120}
+              labelWidth={125}
               endAdornment={
                 <InputAdornment position="end">
                   <IconButton type="submit" aria-label="search" onClick={onClick} >

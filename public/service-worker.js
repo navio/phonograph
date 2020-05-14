@@ -1,4 +1,4 @@
-const version = 1.7;
+const version = 1.8;
 const CACHE = 'phonograph-core-' + version;
 
 
@@ -62,17 +62,17 @@ self.addEventListener("install", function (event) {
 });
 
 self.addEventListener('activate', event => {
-  // event.waitUntil(
-  //   caches.keys().then(function (cacheNames) {
-  //     return Promise.all(
-  //       cacheNames.filter(function (cacheName) {
-  //         return (cacheName.toString().indexOf('phonograph') > -1)
-  //       }).map(function (cacheName) {
-  //         return caches.delete(cacheName);
-  //       })
-  //     );
-  //   })
-  // );
+  event.waitUntil(
+    caches.keys().then(function (cacheNames) {
+      return Promise.all(
+        cacheNames.filter(function (cacheName) {
+          return (cacheName.toString().indexOf('phonograph') > -1)
+        }).map(function (cacheName) {
+          return caches.delete(cacheName);
+        })
+      );
+    })
+  );
   event.waitUntil(self.clients.claim());
 });
 
