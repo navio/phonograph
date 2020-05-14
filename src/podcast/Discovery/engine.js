@@ -14,7 +14,7 @@ export const searchForPodcasts = function (search) {
                     return {
                         title: trackName,
                         rss: feedUrl,
-                        author: artistName,
+                        publisher: artistName,
                         thumbnail: artworkUrl100,
                         tag: genres
                     };
