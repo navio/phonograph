@@ -27,13 +27,18 @@ export default (props) => {
       setTerm(value);
     }
   
-    return ( <Grid>
-        <Grid xs={12} item >
+    return ( <Grid
+              container
+              direction="row"
+              justify="center"
+              alignItems="center"
+              >
+        <Grid itme xs={12} md={8} 
+              item >
           <FormControl variant="outlined" style={{width:'100%'}}>
             <InputLabel htmlFor="outlined-search">Search Podcasts</InputLabel>
             <OutlinedInput 
               id="outlined-search"
-              style={{flex: '1 100%'}} 
               variant="outlined"
               onKeyPress={onChange}
               labelWidth={120}

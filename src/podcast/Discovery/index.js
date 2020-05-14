@@ -230,11 +230,11 @@ class Discover extends Component {
                               elementtype: "span",
                               variant:'subtitle1'
                             }}
-                            primary={podcast.title}
                             secondaryTypographyProps={{
                               noWrap: true,
                               elementtype: "span",
                             }}
+                            primary={podcast.title}
                             secondary={podcast.publisher}
                           />
                         </ListItem>
