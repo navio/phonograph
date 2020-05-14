@@ -29,7 +29,7 @@ class SimpleBottomNavigation extends React.Component {
   render() {
     const classes = this.props.classes;
     const selected = this.props.location.pathname.length > 2 ?
-    this.props.location.pathname : LIBVIEW;
+    this.props.location.pathname : DISCOVERVIEW;
     return (
       <div>
         <Paper className={classes.root} elevation={4}>
