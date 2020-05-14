@@ -3,6 +3,20 @@ export default class PodcastSearcher {
     let currentRequest = null;
     this.API = API;
   }
+
+  querySearch(pattern, term){
+    this.currentRequest && this.currentRequest.abort();
+    this.currentRequest = new AbortController();
+    let { signal } = this.currentRequest;
+    const api = eval(pattern);
+    const headers = {
+      'User-Agent': 'podcastsuite',
+      'Accept': 'application/json',
+    }
+    const response = fetch(api, { headers, signal }).then(results => results.json());
+    return response;
+  }
+
   search(term) {
     this.currentRequest && this.currentRequest.abort();
     this.currentRequest = new AbortController();
@@ -19,17 +33,14 @@ export default class PodcastSearcher {
   }
 
   listennotes(term) {
-    this.currentRequest && this.currentRequest.abort();
-    this.currentRequest = new AbortController();
-    let { signal } = this.currentRequest;
-    const api = `${this.API}typeahead?q=${term}&show_podcasts=1`;
-    const headers = {
-      'User-Agent': 'podcastsuite',
-      'Accept': 'application/json',
-    }
-    const response = fetch(api, { headers, signal }).then(results => results.json());
-    return response;
+    return this.querySearch("`${this.API}typeahead?q=${term}&show_podcasts=1`", term);
   }
+
+  apple(term) {
+    return this.querySearch("`https://itunes.apple.com/search?media=podcast&limit=10&term=${term}`", term);
+  }
+
+
 
   static getFinalURL(url) {
     const method = "HEAD";

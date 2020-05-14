@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import PropTypes from "prop-types";
 import { withStyles, fade } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
@@ -13,12 +13,14 @@ import Backdrop from "@material-ui/core/Backdrop";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
-import Geners from './Geners';
+// import Geners from './Geners';
+// import QuickSearch from "./Search";
+import Search from "./Search";
 import Loading from '../../core/Loading';
+
 
 import { getPopularPodcasts, searchForPodcasts } from './engine';
 
-import Search from "./Search";
 
 const styles = (theme) => ({
   backdrop: {
@@ -99,7 +101,7 @@ const Header = ({ searchHandler }) => (
           <Typography variant="h6">Discover</Typography>
         </Grid>
         <Grid item md={4} xs={12}>
-          {/* <Search onChange={searchHandler} /> */}
+          {/* <QuickSearch onChange={searchHandler} /> */}
         </Grid>
       </Toolbar>
     </Grid>
@@ -128,15 +130,21 @@ class Discover extends Component {
       podcasts: [],
       error: null,
       loadContent: false,
+      term: ''
     };
     this.searchForPodcasts = searchForPodcasts.bind(this);
-    this.getFinalURL = getFinalURL.bind(this);
+    this.getFinalURL = getFinalURL;
     this.searchHandler = this.searchHandler.bind(this);
     this.getPopularPodcasts = getPopularPodcasts.bind(this);
+    this.updatePodcasts = this.updatePodcasts.bind(this);
   }
 
   componentDidMount() {
     this.getPopularPodcasts();
+  }
+
+  updatePodcasts(podcasts){
+    this.setState({podcasts})
   }
 
   getClickHandler(domain) {
@@ -170,7 +178,8 @@ class Discover extends Component {
   }
 
   render() {
-    const topPodcasts = this.state.top;
+    const {podcasts, top:top} = this.state;
+    const casts = podcasts.length > 0 ? podcasts : top ;
     const { classes } = this.props;
     return (
       <>
@@ -184,18 +193,17 @@ class Discover extends Component {
           <Header searchHandler={this.searchHandler} />
           <Card>
             <CardContent>
-              <Typography variant={"h5"} pb={0} component={"h2"}>
-                Trending Today
-              </Typography>
             </CardContent>
-            {/* <CardContent>
-              <Geners selected={this.state.init} getPopularPodcasts={this.getPopularPodcasts} />
-            </CardContent> */}
             <CardContent>
-            <Typography variant={"h6"} >{this.state.name}</Typography>
+              <Search handleChange={this.searchForPodcasts} updatePodcasts={this.updatePodcasts} />
+              {/* <Geners selected={this.state.init} getPopularPodcasts={this.getPopularPodcasts} /> */}
+            </CardContent>
+            <CardContent>
+            <Typography variant={"h6"} >{
+                podcasts && ( podcasts.length > 0 )? "Results" : "Trending" }</Typography>
               <Grid container>
-                {topPodcasts ?
-                  topPodcasts.map((podcast) => (
+                {casts ?
+                  casts.map((podcast) => (
                     <Grid key={podcast.title} item xs={12} sm={6} md={4} lg={3}>
                       <List
                         dense

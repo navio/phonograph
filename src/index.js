@@ -11,4 +11,4 @@ render(
   document.getElementById("root")
 );
 
-serviceWorker();
+// serviceWorker();

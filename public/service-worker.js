@@ -4,6 +4,10 @@ const CACHE = 'phonograph-core-' + version;
 
 const ignoreMe = (url) => {
 
+  if(url.indexOf('itunes.apple.com')){
+    return true;
+  }
+
   if (url.indexOf('chrome-extension') > -1) {
     return true;
   }
