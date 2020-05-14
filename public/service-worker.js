@@ -50,30 +50,24 @@ const shouldUpdate = (url) => {
 }
 
 
-self.addEventListener("install", function (event) {
+self.addEventListener("activate", function(event) {
   event.waitUntil(
-    caches
-    .open(CACHE)
-    .then(function (cache) {
-      return cache.addAll([]);
-    })
-  );
-  // self.skipWaiting();
-});
-
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(function (cacheNames) {
+    caches.keys().then(function(cacheNames) {
       return Promise.all(
-        cacheNames.filter(function (cacheName) {
-          return (cacheName.toString().indexOf('phonograph') > -1)
-        }).map(function (cacheName) {
-          return caches.delete(cacheName);
+        cacheNames.map(function(cacheName) {
+          if (CACHE_NAME !== cacheName &&  cacheName.startsWith("phonograph")) {
+            return caches.delete(cacheName);
+          }
         })
       );
     })
   );
-  event.waitUntil(self.clients.claim());
+});
+
+self.addEventListener('activate', function (){
+  caches.keys().then(function(names) {
+    for (let name of names) caches.delete(name);
+  });
 });
 
 self.addEventListener("fetch", function (evt) {
