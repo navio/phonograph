@@ -3,13 +3,10 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import { ThemeProvider } from "@material-ui/core/styles";
 import theme from "./theme";
 import { reducer, initialState } from "./reducer"
-import audioqueue from "audioqueue";
-import Typography from "@material-ui/core/Typography";
-
-import loadingAnimation from '../public/loading.svg';
+// import audioqueue from "audioqueue";
+import LoadingSVG from "./core/Loading";
 
 // Router
-import {  } from "react-router";
 import { Route, Redirect, useHistory, Switch } from "react-router-dom";
 
 // Constants
@@ -20,9 +17,6 @@ import {
   DISCOVERVIEW,
   SETTINGSVIEW,
 } from "./constants";
-
-// App Components
-import Footer from "./core/Footer";
 
 // Engine - Player Interactions
 import playerFunctions from "./engine/player";
@@ -46,14 +40,15 @@ const Library = React.lazy(async () => await import("./podcast/Library"));
 const Settings = React.lazy(async () => await import("./podcast/Settings"));
 const MediaControl = React.lazy(async () => await import("./core/MediaControl"));
 const PodcastView = React.lazy( async () => await import("./podcast/PodcastView"));
+const Footer = React.lazy( async () => await import("./core/Footer"));
 
-const Loading = (props) => (
-  <Typography
+const Loading = () => (
+  <div
     align="center"
-    style={{ display: "block", paddintTop: "40%" }}
+    style={{ margin: '0 auto', display: "block", paddintTop: "40%" }}
   >
-    <img src={loadingAnimation} width="4rem" />
-  </Typography>
+    <LoadingSVG />
+  </div>
 );
 
 // Pausing for load or refresh
@@ -62,9 +57,9 @@ initialState['status'] = "pause";
 const App = () => {
 
     const player = useRef(null); //new audioqueue([]);
-    
+
     const [state, dispatch] = useReducer(reducer,initialState);
-    const mediaFunctions = playerFunctions(player, dispatch, state)
+    const mediaFunctions = playerFunctions(player, dispatch, state);
     const history = useHistory();
 
     const loadPodcast = (podcast, cb) => {
@@ -78,6 +73,7 @@ const App = () => {
     if(newPodcast){
       loadPodcast(newPodcast, () => history.push(PODCASTVIEW));
     }
+
     const engine = getPodcastEngine(shouldInit);
     
     useEffect(() => {
@@ -167,8 +163,10 @@ const App = () => {
               seek={mediaFunctions.seek}
             /> }
           </Suspense>
-              
-          <Footer path={location.pathname} />
+
+          <Suspense fallback={<Loading />}>
+            <Footer path={location.pathname} />
+          </Suspense> 
 
           <audio
             autoPlay={state.status !== 'pause'}
