@@ -28,7 +28,7 @@ const readFile = (file) => {
 }
 
 
-const found = [];
+const found = ['/'];
 readDir('dist')
 .then(files => files.forEach((file) => found.push(`/${file}`)))
 .then(()=> {

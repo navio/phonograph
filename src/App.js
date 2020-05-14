@@ -10,7 +10,7 @@ import loadingAnimation from '../public/loading.svg';
 
 // Router
 import {  } from "react-router";
-import { Route, Redirect, useHistory } from "react-router-dom";
+import { Route, Redirect, useHistory, Switch } from "react-router-dom";
 
 // Constants
 import {
@@ -102,57 +102,61 @@ const App = () => {
       <ThemeProvider theme={finalTheme}>
         <AppContext.Provider value={{ state, dispatch, engine, player: player.current }} >
           <CssBaseline />
-           
-           <Route
-            exact
-            path={[LIBVIEW, ROOT]}
-            render={({history}) => { 
-              return (
-              <Suspense fallback={<Loading />}>
-                <Library
-                  history={history}
-                  addPodcastHandler={() => history.push(DISCOVERVIEW)} //{this.askForPodcast}
-                  actionAfterSelectPodcast={() => history.push(PODCASTVIEW)}
-                />
-              </Suspense>
-            )}}
-          /> 
-          
-          <Route
-            path={PODCASTVIEW}
-            render={({history}) =>
-               state.current ? (
-                  <Suspense fallback={<Loading />}>
-                    <PodcastView history={history} />
-                  </Suspense>
-              ) : (<Redirect to={LIBVIEW} history />)
-            }
-          />
+           <Switch>
+            <Route
+              exact
+              path={[LIBVIEW, ROOT]}
+              render={({history}) => { 
+                return (
+                <Suspense fallback={<Loading />}>
+                  <Library
+                    history={history}
+                    addPodcastHandler={() => history.push(DISCOVERVIEW)} //{this.askForPodcast}
+                    actionAfterSelectPodcast={() => history.push(PODCASTVIEW)}
+                  />
+                </Suspense>
+              )}}
+            /> 
+            
+            <Route
+              path={PODCASTVIEW}
+              render={({history}) =>
+                state.current ? (
+                    <Suspense fallback={<Loading />}>
+                      <PodcastView history={history} />
+                    </Suspense>
+                ) : (<Redirect to={LIBVIEW} history />)
+              }
+            />
 
-          <Route
-            exact
-            path={DISCOVERVIEW}
-            render={({ history }) => (
-              <Suspense fallback={<Loading />}>
-                <Discover
-                  history={history}
-                  addPodcastHandler={loadPodcast}
-                  actionAfterClick={() => history.push(PODCASTVIEW)}
-                />
-              </Suspense>
-            )}
-          />
-   
-          <Route
-            path={SETTINGSVIEW}
-            render={() => (
-              <Suspense fallback={<Loading />}>
-                <Settings
-                  podcasts={state.podcasts}
-                />
-              </Suspense>
-            )}
-          />
+            <Route
+              path={DISCOVERVIEW}
+              render={({ history }) => (
+                <Suspense fallback={<Loading />}>
+                  <Discover
+                    history={history}
+                    addPodcastHandler={loadPodcast}
+                    actionAfterClick={() => history.push(PODCASTVIEW)}
+                  />
+                </Suspense>
+              )}
+            />
+    
+            <Route
+              path={SETTINGSVIEW}
+              exact
+              render={() => (
+                <Suspense fallback={<Loading />}>
+                  <Settings
+                    podcasts={state.podcasts}
+                  />
+                </Suspense>
+              )}
+            />
+            <Route>
+              <Redirect to={DISCOVERVIEW} />
+            </Route>
+          </Switch>
      
           <Suspense fallback={<Loading />}>
             { player.current && <MediaControl
