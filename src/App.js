@@ -101,7 +101,7 @@ const App = () => {
            <Switch>
             <Route
               exact
-              path={[LIBVIEW, ROOT]}
+              path={[LIBVIEW]}
               render={({history}) => { 
                 return (
                 <Suspense fallback={<Loading />}>
@@ -126,7 +126,8 @@ const App = () => {
             />
 
             <Route
-              path={DISCOVERVIEW}
+              exact
+              path={[DISCOVERVIEW, ROOT]}
               render={({ history }) => (
                 <Suspense fallback={<Loading />}>
                   <Discover
