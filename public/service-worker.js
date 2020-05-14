@@ -65,10 +65,13 @@ self.addEventListener("activate", function(event) {
   event.waitUntil(self.clients.claim());
 });
 
-self.addEventListener('activate', function (){
-  caches.keys().then(function(names) {
-    for (let name of names) caches.delete(name);
-  });
+self.addEventListener('install', function (event){
+  event.waitUntil(
+    caches.open(CACHE)
+    .then(function (cache) {
+      return cache.addAll([]);
+    })
+  );
 });
 
 self.addEventListener("fetch", function (evt) {
