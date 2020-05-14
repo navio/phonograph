@@ -6,8 +6,21 @@ const SFP = new PodcastSearcher(API);
 
 export const searchForPodcasts = function (search) {
     return new Promise(function (acc) {
-        SFP.listennotes(search)
-            .then((data) => acc(data.podcasts))
+        SFP.apple(search)
+            .then((data) => {
+                const {results} = data;
+                const podcasts = results.map(podcast => {
+                    const { feedUrl, artistName, artworkUrl100, trackName, genres } = podcast;
+                    return {
+                        title: trackName,
+                        rss: feedUrl,
+                        author: artistName,
+                        thumbnail: artworkUrl100,
+                        tag: genres
+                    };
+                });
+                return acc(podcasts)
+            })
             .catch(console.error);
     });
 };

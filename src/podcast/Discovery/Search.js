@@ -1,68 +1,51 @@
-import React from "react";
-import TextField from "@material-ui/core/TextField";
-import Autocomplete from "@material-ui/lab/Autocomplete";
-import SearchEngine from "./PodcastSearcher";
-import { fade, withStyles } from "@material-ui/core/styles";
+import React, { useState } from 'react';
+import Grid from "@material-ui/core/Grid";
+import OutlinedInput from '@material-ui/core/OutlinedInput';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import FormControl from '@material-ui/core/FormControl';
 
-const engine = new SearchEngine("/ln/");
+import IconButton from '@material-ui/core/IconButton';
+import SearchIcon from '@material-ui/icons/Search';
+import InputLabel from '@material-ui/core/InputLabel';
 
-const StyledField = withStyles((theme) => ({
-  root: {
-    position: "relative",
-    borderRadius: theme.shape.borderRadius,
-    outline: theme.palette.common.white, 
-    backgroundColor: fade(theme.palette.common.white, 0.35),
-    "&:hover": {
-      backgroundColor: fade(theme.palette.common.white, 0.25),
-    },
-    marginLeft: 0,
-    width: "100%",
-  }
-}))(TextField);
 
-export default ({ onChange }) => {
-  const [options, setOptions] = React.useState(['']);
-  const [term, setTerm] = React.useState("");
-  const def = () => null;
-
-  React.useEffect(() => {
-    if(term.lenght > 3){
-      engine.listennotes(term).then((data) => {
-        const { podcasts } = data;
-        setOptions(podcasts);
-      });
+export default (props) => {
+    const [term, setTerm] = useState('');
+    const onClick = () => {
+      if(term.length < 2) return;
+      const { handleChange, updatePodcasts  } = props;
+      handleChange(term).then(updatePodcasts);
     }
-  }, [term]);
-  return (
-    <Autocomplete
-      filterOptions={(x) => x}
-      options={options}
-      popupIcon={<></>}
-      onChange={onChange}
-      getOptionLabel={(option) => option.title_original}
-      renderOption={(option, key) => (
-        <div width={"100%"} value={option.id} key={key}>
-           <img
-                            style={{ width: "2em", paddingRight:".2em" }}
-                            alt={option.title_original}
-                            src={option.thumbnail}
-                          />
-          {option.title_original}
-        </div>
-      )}
-      renderInput={(params) => {
-        return (
-          <StyledField
-            {...params}
-            placeholder="Podcast Search"
-            onChange={(ev) => setTerm(ev.target.value)}
-            margin="dense"
-            variant="outlined"
-            size="small"
-            InputLabelProps={{ shrink: true }}
-          />
-        );
-      }}
-    />
-  );
-};
+
+    const onChange = (ev) => {
+      const {value} = ev.target;
+      if (ev.key === 'Enter') {
+        if(value.length < 2) return;
+        const { handleChange, updatePodcasts  } = props;
+        handleChange(value).then(updatePodcasts);
+      }
+      setTerm(value);
+    }
+  
+    return ( <Grid>
+        <Grid xs={12} item >
+          <FormControl variant="outlined" style={{width:'100%'}}>
+            <InputLabel htmlFor="outlined-search">Search Podcasts</InputLabel>
+            <OutlinedInput 
+              id="outlined-search"
+              style={{flex: '1 100%'}} 
+              variant="outlined"
+              onKeyPress={onChange}
+              labelWidth={120}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton type="submit" aria-label="search" onClick={onClick} >
+                      <SearchIcon />
+                  </IconButton>
+                </InputAdornment>
+              }
+            />
+          </FormControl>
+        </Grid>
+      </Grid> );
+  }
