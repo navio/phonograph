@@ -1,7 +1,7 @@
 [build]
   base    = "/"
   publish = "/dist"
-  command = "yarn; yarn build"
+  command = "yarn; yarn build  --ignore-engines"
   functions = "functions/"
 
 [[redirects]]
