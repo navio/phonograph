@@ -38,19 +38,20 @@ self.addEventListener("fetch", function (evt) {
 function fetchTask(event) {
 
     const {request} = event;
+    const path = checkPath(request.url) ? new Request(self.origin) : request;
 
     event.respondWith(
-      caches.match(request).then(cachedResponse => {
+      caches.match(path).then(cachedResponse => {
         if (cachedResponse) {
           return cachedResponse;
         }
         return caches.open(CACHERUNTIME)
               .then(function(cache) { 
-                return fetch(request).then(response => {
+                return fetch(path).then(response => {
                   if (!response.ok) {
                     return response;
                   }
-                  return cache.put(request, response.clone())
+                  return cache.put(path, response.clone())
                   .then(() => {
                     return response;
                   });
@@ -92,6 +93,15 @@ function fetchTask(event) {
     }
   
     return false;
+  }
+
+  const localURLs = ['library', 'podcast', 'podcast/', 'discover', 'settings' ];
+  
+  const checkPath = (url) => {
+    return !!localURLs.find((current) => {
+      const origin = `${self.origin}/${current}`
+      return (url.indexOf(origin) > -1)
+    })
   } 
   
   // const shouldUpdate = (url) => {
