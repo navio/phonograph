@@ -3,8 +3,6 @@
   publish = "/dist"
   command = "yarn; yarn build  --ignore-engines"
   functions = "functions/"
-
-[context.production]
   environment = { NODE_ENV = "12.15.0" }
 
 [[redirects]]
