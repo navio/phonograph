@@ -1,5 +1,6 @@
 {
-  "name": "react-j5szav",
+  "name": "phonograph",
+  "version": "1.0.1",
   "description": "",
   "homepage": "/",
   "dependencies": {
@@ -27,7 +28,6 @@
     "smallfetch": "^1.0.8",
     "xml2js": "^0.4.22"
   },
-  "version": "0.1.5",
   "private": true,
   "browserslist": [
     "last 1 Chrome versions"
@@ -43,7 +43,7 @@
     "sw": "node swGenerator.js"
   },
   "alias": {
-    "public": "./public/"
+    "public": "/public/"
   },
   "devDependencies": {
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
