@@ -46,7 +46,6 @@ function fetchTask(event) {
         }
         return caches.open(CACHERUNTIME)
               .then(function(cache) { 
-                console.log('fetching',request);
                 return fetch(request).then(response => {
                   if (!response.ok) {
                     return response;
