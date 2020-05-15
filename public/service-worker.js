@@ -49,39 +49,33 @@ const shouldUpdate = (url) => {
   return true;
 }
 
-
-self.addEventListener("activate", function(event) {
-  // event.waitUntil(
-  //   caches.keys().then(function(cacheNames) {
-  //     return Promise.all(
-  //       cacheNames.map(function(cacheName) {
-  //         if (CACHE_NAME !== cacheName &&  cacheName.startsWith("phonograph")) {
-  //           return caches.delete(cacheName);
-  //         }
-  //       })
-  //     );
-  //   })
-  // );
-  event.waitUntil(self.clients.claim());
-});
-
 self.addEventListener('install', function (event){
   event.waitUntil(
     caches.open(CACHE)
     .then(function (cache) {
       return cache.addAll([]);
     })
+    .then(self.skipWaiting())
   );
 });
 
+
+self.addEventListener('activate', event => {
+  const currentCaches = [CACHE];
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return cacheNames.filter(cacheName => !currentCaches.includes(cacheName));
+    }).then(cachesToDelete => {
+      return Promise.all(cachesToDelete.map(cacheToDelete => {
+        return caches.delete(cacheToDelete);
+      }));
+    }).then(() => self.clients.claim())
+  );
+});
+
+
 self.addEventListener("fetch", function (evt) {
-
   evt.respondWith(getOrGetAndStore(evt.request));
-
-  // evt.waitUntil(
-  //   update(evt.request)
-  // );
-
 });
 
 function getOrGetAndStore(request) {
