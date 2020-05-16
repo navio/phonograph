@@ -1,7 +1,9 @@
 {
-  "name": "react-j5szav",
+  "name": "phonograph",
+  "version": "1.0.1",
   "description": "",
   "homepage": "/",
+  "engines" : { "node" : ">=0.12" },
   "dependencies": {
     "@material-ui/core": "^4.9.11",
     "@material-ui/icons": "4.9.1",
@@ -27,7 +29,6 @@
     "smallfetch": "^1.0.8",
     "xml2js": "^0.4.22"
   },
-  "version": "0.1.5",
   "private": true,
   "browserslist": [
     "last 1 Chrome versions"
@@ -43,12 +44,18 @@
     "sw": "node swGenerator.js"
   },
   "alias": {
-    "public": "./public/"
+    "public": "/public/"
   },
   "devDependencies": {
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "cz-conventional-changelog": "3.2.0",
     "express": "^4.17.1",
     "http-proxy-middleware": "^1.0.3",
     "parcel-bundler": "^1.12.4"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
