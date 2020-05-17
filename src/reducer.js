@@ -36,9 +36,12 @@ const initialState = JSON.parse(localStorage.getItem('state') || false ) || {
     title: "",
     image: null,
     episode: null,
+    episodeInfo:null,
+
     currentTime: null,
     media:"",
     refresh: Date.now()
+
   };
 
 // cleanup legacy
@@ -64,11 +67,11 @@ export const reducer = (state, action) => {
       case 'updateCurrent':
           return {...state, current: action.payload} 
       case 'audioCompleted':
-        completeEpisode(state.current, state.episode);
+        completeEpisode(state.current, state.episodeInfo.guid);
         return { ...state, ...action.payload, refresh: Date.now()}
       case 'audioUpdate':
         if(action.payload && (action.payload.status === 'pause')){
-          recordEpisode(state.audioOrigin,state.episode,state.currentTime, state.duration);
+          recordEpisode(state.audioOrigin,state.episodeInfo.guid,state.currentTime, state.duration);
           return { ...state, ...action.payload, refresh: Date.now() }
         }else {
         return { ...state, ...action.payload}

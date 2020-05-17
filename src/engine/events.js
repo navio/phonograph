@@ -20,6 +20,7 @@ export default function (player, dispatch, state) {
         author: null,
         playing: null,
         status: null,
+        episodeInfo:null,
       }});
 
   };
