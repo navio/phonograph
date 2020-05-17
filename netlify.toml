@@ -3,7 +3,6 @@
   publish = "/dist"
   command = "yarn; yarn build"
   functions = "functions/"
-  environment = { NODE_ENV = "12.15.0" }
 
 [[redirects]]
   from = "/rss-full/*"
