@@ -39,6 +39,7 @@
     "start": "parcel public/index.html",
     "build": "parcel build public/index.html && yarn sw; yarn lambda:build",
     "serve": "parcel serve public/index.html",
+    "SEO": "cp ./public/robots.txt ./dist/robots.txt",
     "lambda:build": "npx netlify-lambda build ./lambda",
     "lambda:serve": "npx netlify-lambda serve ./lambda",
     "dev": "yarn getter && node proxy && yarn lambda:serve",
