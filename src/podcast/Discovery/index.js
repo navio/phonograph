@@ -1,9 +1,8 @@
-import React, { Component, useState } from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { withStyles, fade } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Card from "@material-ui/core/Card";
-import CardMedia from "@material-ui/core/CardMedia";
 import CardContent from "@material-ui/core/CardContent";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -18,6 +17,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import Search from "./Search";
 import Loading from '../../core/Loading';
 
+// import Curated from "./curated.json";
 
 import { getPopularPodcasts, searchForPodcasts } from './engine';
 
@@ -137,6 +137,7 @@ class Discover extends Component {
     this.searchHandler = this.searchHandler.bind(this);
     this.getPopularPodcasts = getPopularPodcasts.bind(this);
     this.updatePodcasts = this.updatePodcasts.bind(this);
+    this.GridRender = this.GridRender.bind(this);
   }
 
   componentDidMount() {
@@ -144,7 +145,11 @@ class Discover extends Component {
   }
 
   updatePodcasts(podcasts){
-    this.setState({podcasts})
+    if(podcasts.length < 1){
+      this.setState({results: 'empty', podcasts:[]})
+      return;
+    }
+    this.setState({podcasts, results: '' })
   }
 
   getClickHandler(domain) {
@@ -177,76 +182,78 @@ class Discover extends Component {
       .catch(console.error);
   }
 
+  GridRender({casts, classes}) {
+    // xs={12} sm={6} md={4} lg={3}
+    return <Grid container>
+    {casts ?
+      casts.map((podcast) => (
+        <Grid key={podcast.title} item xs={12} sm={6} md={4} lg={3}>
+          <List
+            dense
+            component="nav"
+            aria-label="top podcast"
+            key={podcast.title}
+          >
+            <ListItem
+              button
+              onClick={this.getClickHandler.call(this, podcast.rss)}
+            >
+              <img
+                style={{ width: "8em", marginRight:".5em" }}
+                alt={podcast.title}
+                src={podcast.thumbnail}
+              />
+
+              <ListItemText
+                classes={{
+                  root: classes.listItem,
+                }}
+                primaryTypographyProps={{
+                  noWrap: true,
+                  elementtype: "span",
+                  variant:'subtitle1'
+                }}
+                secondaryTypographyProps={{
+                  noWrap: true,
+                  elementtype: "span",
+                }}
+                primary={podcast.title}
+                secondary={podcast.publisher}
+              />
+            </ListItem>
+          </List>
+        </Grid>
+      )) : <Typography align='center' style={{paddingTop: '20%' }} letterSpacing={6} variant="h4"> <Loading /> </Typography>  }
+  </Grid>
+  }
+
   render() {
-    const {podcasts, top:top} = this.state;
+    const { podcasts, top, results } = this.state;
     const casts = podcasts.length > 0 ? podcasts : top ;
     const { classes } = this.props;
-    return (
-      <>
-        <Backdrop
-          className={classes.backdrop}
-          open={this.state.loadContent || false}
-        >
-          <CircularProgress color="inherit" />
-        </Backdrop>
-        <Card>
+    const {GridRender } = this;
+    console.log(results);
+    return <>
           <Header searchHandler={this.searchHandler} />
           <Card>
-            <CardContent>
-            </CardContent>
-            <CardContent>
-              <Search handleChange={this.searchForPodcasts} updatePodcasts={this.updatePodcasts} />
               {/* <Geners selected={this.state.init} getPopularPodcasts={this.getPopularPodcasts} /> */}
-            </CardContent>
             <CardContent>
-            <Typography variant={"h6"} >{
-                podcasts && ( podcasts.length > 0 )? "Results" : "Trending" }</Typography>
-              <Grid container>
-                {casts ?
-                  casts.map((podcast) => (
-                    <Grid key={podcast.title} item xs={12} sm={6} md={4} lg={3}>
-                      <List
-                        dense
-                        component="nav"
-                        aria-label="top podcast"
-                        key={podcast.title}
-                      >
-                        <ListItem
-                          button
-                          onClick={this.getClickHandler.call(this, podcast.rss)}
-                        >
-                          <img
-                            style={{ width: "8em", marginRight:".5em" }}
-                            alt={podcast.title}
-                            src={podcast.thumbnail}
-                          />
-
-                          <ListItemText
-                            classes={{
-                              root: classes.listItem,
-                            }}
-                            primaryTypographyProps={{
-                              noWrap: true,
-                              elementtype: "span",
-                              variant:'subtitle1'
-                            }}
-                            secondaryTypographyProps={{
-                              noWrap: true,
-                              elementtype: "span",
-                            }}
-                            primary={podcast.title}
-                            secondary={podcast.publisher}
-                          />
-                        </ListItem>
-                      </List>
-                    </Grid>
-                  )) : <Typography align='center' style={{paddingTop: '20%' }} letterSpacing={6} variant="h4"> <Loading /> </Typography>  }
-              </Grid>
+            <Search handleChange={this.searchForPodcasts} updatePodcasts={this.updatePodcasts} />
+            <Typography variant={"h6"} >
+                { results !== 'empty' &&  ( podcasts.length > 0  ? `Results` : "Trending" )}     
+            </Typography>
+            {results === 'empty' ? 
+              <Typography variant={'h6'}>No results were found.</Typography>  : 
+              <GridRender casts={casts} classes={classes} />
+            }
             </CardContent>
           </Card>
-        </Card>
-      </>
-    );
+          <Backdrop
+            className={classes.backdrop}
+            open={this.state.loadContent || false}>
+            <CircularProgress color="inherit" />
+          </Backdrop>
+      </>;
   }
 }
 

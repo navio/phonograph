@@ -11,9 +11,10 @@ import InputLabel from '@material-ui/core/InputLabel';
 
 export default (props) => {
     const [term, setTerm] = useState('');
+
     const onClick = () => {
       if(term.length < 2) return;
-      const { handleChange, updatePodcasts  } = props;
+      const { handleChange, updatePodcasts } = props;
       handleChange(term).then(updatePodcasts);
     }
 
@@ -28,6 +29,7 @@ export default (props) => {
     }
   
     return ( <Grid
+              style={{paddingBottom: '2rem'}}
               container
               direction="row"
               justify="center"

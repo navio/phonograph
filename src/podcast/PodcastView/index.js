@@ -117,13 +117,12 @@ export default (props) => {
           
           const payload = {
             audioOrigin: podcastURL,
-            episode: episode.guid,
-            title: episode.title,
+            // episode: episode.guid,
             media: episode.enclosures[0].url,
-            author: episode.itunes_author,
             playing: guid,
             status: "playing",
             played: 0,
+            episodeInfo: episode,
           }
           if(currentTime){
             console.log('setting time',currentTime)

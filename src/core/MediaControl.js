@@ -94,6 +94,7 @@ const styles = (theme) => ({
     width: "100%",
     backgroundColor: theme.palette.background.paper,
     zIndex: 50,
+    // height: "calc(100% - 3.5rem)",
   },
 });
 
@@ -130,11 +131,12 @@ function MediaControlCard(props) {
     dispatch({type: 'updateCurrent', payload:audioOrigin});
     history.push(PODCASTVIEW)
   }
-
+  const {episodeInfo = {} } = state;
+  // console.log(episodeInfo)
   return (
         <>
           <div className={classes.root}>
-            {state.episode && (
+            {state.episodeInfo && (
               <div className={classes.card}>
                 <div className={classes.details}>
                     <Typography
@@ -145,8 +147,12 @@ function MediaControlCard(props) {
                       noWrap
                       style={{ paddingLeft: '4rem', paddingRight: '4rem'}}
                     > 
-                      {state.title}
+                      {episodeInfo.title}
                     </Typography>
+
+                    {/* <Typography>
+                      {episodeInfo.description}
+                    </Typography> */}
 
                   <Grid container className={classes.player}>
                     <Grid item xs={2}>
@@ -195,7 +201,7 @@ function MediaControlCard(props) {
                         onClick={()=>props.handler()}
                         data-guid={state.playing}
                       >
-                        {state.playing === state.episode &&
+                        {state.playing === (episodeInfo && episodeInfo.guid) &&
                         state.status !== "pause" ? (
                           <PauseIcon className={classes.playIcon} />
                         ) : (
@@ -221,7 +227,7 @@ function MediaControlCard(props) {
               </div>
             )}
           </div>
-          {state.episode && <div id={'under'} className={classes.undeground}>-</div>}
+          {episodeInfo && <div id={'under'} className={classes.undeground}>-</div>}
         </>
   );
 }
