@@ -201,7 +201,7 @@ function MediaControlCard(props) {
                         onClick={()=>props.handler()}
                         data-guid={state.playing}
                       >
-                        {state.playing === state.episodeInfo.guid &&
+                        {state.playing === episodeInfo.guid &&
                         state.status !== "pause" ? (
                           <PauseIcon className={classes.playIcon} />
                         ) : (
@@ -227,7 +227,7 @@ function MediaControlCard(props) {
               </div>
             )}
           </div>
-          {state.episodeInfo.guid && <div id={'under'} className={classes.undeground}>-</div>}
+          {episodeInfo.guid && <div id={'under'} className={classes.undeground}>-</div>}
         </>
   );
 }
