@@ -131,7 +131,7 @@ function MediaControlCard(props) {
     dispatch({type: 'updateCurrent', payload:audioOrigin});
     history.push(PODCASTVIEW)
   }
-  const {episodeInfo} = state;
+  const {episodeInfo = {} } = state;
   // console.log(episodeInfo)
   return (
         <>
@@ -201,7 +201,7 @@ function MediaControlCard(props) {
                         onClick={()=>props.handler()}
                         data-guid={state.playing}
                       >
-                        {state.playing === episodeInfo.guid &&
+                        {state.playing === (episodeInfo && episodeInfo.guid) &&
                         state.status !== "pause" ? (
                           <PauseIcon className={classes.playIcon} />
                         ) : (
@@ -227,7 +227,7 @@ function MediaControlCard(props) {
               </div>
             )}
           </div>
-          {episodeInfo.guid && <div id={'under'} className={classes.undeground}>-</div>}
+          {episodeInfo && <div id={'under'} className={classes.undeground}>-</div>}
         </>
   );
 }
