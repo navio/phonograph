@@ -67,10 +67,8 @@ export const reducer = (state, action) => {
       case 'updateCurrent':
           return {...state, current: action.payload} 
       case 'audioCompleted':
-        const guid = state.episodeInfo && state.episode.guid;
-        if(guid){
-          completeEpisode(state.current, state.episodeInfo.guid);
-        }
+        const guid = state.episodeInfo && state.episodeInfo.guid;
+        completeEpisode(state.current, guid);
         return { ...state, ...action.payload, refresh: Date.now()}
       case 'audioUpdate':
         if(action.payload && (action.payload.status === 'pause')){
