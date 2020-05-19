@@ -8,52 +8,77 @@ import IconButton from '@material-ui/core/IconButton';
 import SearchIcon from '@material-ui/icons/Search';
 import InputLabel from '@material-ui/core/InputLabel';
 
+import Chip from "@material-ui/core/Chip";
+
+import { makeStyles } from "@material-ui/core/styles";
+
+export const useStyles = makeStyles((theme) => ({
+  root: {
+    display: "flex",
+    justifyContent: "center",
+    flexWrap: "wrap",
+    "& > *": {
+      margin: theme.spacing(0.5),
+    },
+  },
+}));
+
+export const keys = [
+  'NPR', 'BBC', 'Earwolf', 'Gimlet', 'Parcast', 'Wondery', 'Libsyn'
+]
 
 export default (props) => {
-    const [term, setTerm] = useState('');
-
-    const onClick = () => {
-      if(term.length < 2) return;
-      const { handleChange, updatePodcasts } = props;
-      handleChange(term).then(updatePodcasts);
-    }
-
-    const onChange = (ev) => {
-      const {value} = ev.target;
-      if (ev.key === 'Enter') {
-        if(value.length < 2) return;
-        const { handleChange, updatePodcasts  } = props;
-        handleChange(value).then(updatePodcasts);
-      }
-      setTerm(value);
-    }
+  const classes = useStyles();
   
-    return ( <Grid
-              style={{paddingBottom: '2rem'}}
-              container
-              direction="row"
-              justify="center"
-              alignItems="center"
-              >
-        <Grid xs={12} md={8} 
-              item >
-          <FormControl variant="outlined" style={{width:'100%'}}>
-            <InputLabel htmlFor="outlined-search">Search Podcasts</InputLabel>
-            <OutlinedInput
-              color={'primary'}
-              id="outlined-search"
-              variant="outlined"
-              onKeyPress={onChange}
-              labelWidth={125}
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton type="submit" aria-label="search" onClick={onClick} >
-                      <SearchIcon />
-                  </IconButton>
-                </InputAdornment>
-              }
-            />
-          </FormControl>
-        </Grid>
-      </Grid> );
+  const [term, setTerm] = useState('');
+  const { handleChange, updatePodcasts } = props;
+
+  const action = (value = term) => (value.length > 2) && handleChange(value).then(updatePodcasts);
+  const onClick = () => action();
+  const onChange = (ev) => {
+    const { value } = ev.target;
+    if (ev.key === 'Enter') {
+      action(value)
+    }
+    setTerm(value);
   }
+
+  return (<> 
+    <Grid
+      style={{ paddingBottom: '.5rem' }}
+      container
+      direction="row"
+      justify="center"
+      alignItems="center"
+    >
+      <Grid xs={12} md={8}
+        item >
+        <FormControl variant="outlined" style={{ width: '100%' }}>
+          <InputLabel htmlFor="outlined-search">Search Podcasts</InputLabel>
+          <OutlinedInput
+            color={'primary'}
+            id="outlined-search"
+            variant="outlined"
+            onKeyPress={onChange}
+            labelWidth={125}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton type="submit" aria-label="search" onClick={onClick} >
+                  <SearchIcon />
+                </IconButton>
+              </InputAdornment>
+            }
+          />
+        </FormControl>
+      </Grid>
+    </Grid>
+    <div className={classes.root}>
+      {
+        keys.map(key => <Chip  
+          variant={ (term === key) ? 'default' : 'outlined'} 
+          label={key} key={key} variant={'outlined'} onClick={() => action(key)} color={"primary"} />)
+      }
+    </div>
+    </>
+  );
+}

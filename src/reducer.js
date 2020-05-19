@@ -6,7 +6,7 @@ export const completeEpisode = async (feed,episode) => {
     const inMemory = await db.get(feed);
     const current = inMemory || {};
     current[episode] = { completed: true };
-    console.log(current[episode],feed,episode);
+    // console.log(current[episode],feed,episode);
     await db.set(feed,current);
     return true;
  }
@@ -14,7 +14,7 @@ export const completeEpisode = async (feed,episode) => {
 }
 
 export const recordEpisode = async (feed, episode, currentTime, duration) => {
-  console.log('record')
+  // console.log('record')
   const inMemory = await db.get(feed);
   const current = inMemory || {};
   current[episode] = { completed: false, currentTime, duration, duration };

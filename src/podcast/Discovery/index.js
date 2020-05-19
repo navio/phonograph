@@ -232,7 +232,6 @@ class Discover extends Component {
     const casts = podcasts.length > 0 ? podcasts : top ;
     const { classes } = this.props;
     const {GridRender } = this;
-    console.log(results);
     return <>
           <Header searchHandler={this.searchHandler} />
           <Card>

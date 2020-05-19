@@ -25,7 +25,7 @@ export const searchForPodcasts = function (search) {
     });
 };
 
-const URI = 'https://www.listennotes.com/c/r/';
+// const URI = 'https://www.listennotes.com/c/r/';
 let memory = {
     top: null,
     init: 0
@@ -39,50 +39,30 @@ export const getPopularPodcasts = function (query=null) {
         if(query){
             data = fetch(`/ln/best_podcasts?genre_id=${query}&page=1&region=us`).then(x=> x.json())
         } else {
-            data = import("./top.json");
+            // data = import("./top.json");
+            data = fetch(`https://itunes.apple.com/search?term=podcast&limit=20`).then(x=> x.json())
          }
         data
-            .then((response) => {
-                const {
-                    podcasts,
-                    name
-                } = response;
-                return {podcasts, name};
-            })
-            .then(({podcasts, name }) => {
-                const cleanedCasts = podcasts.map((podcast, num) => {
-                    const {
-                        title,
-                        domain,
-                        thumbnail,
-                        description,
-                        id,
-                        total_episodes: episodes,
-                        earliest_pub_date_ms: startDate,
-                        publisher,
-                    } = podcast;
-                    const rss = `${URI}${id}`;
+            .then(({results}) => {
+                const podcasts = results.map(podcast => {
+                    const { feedUrl, artistName, artworkUrl100, trackName, genres } = podcast;
                     return {
-                        title: `${num + 1}. ${title}`,
-                        thumbnail,
-                        domain,
-                        description,
-                        rss,
-                        episodes,
-                        startDate,
-                        publisher,
+                        title: trackName,
+                        rss: feedUrl,
+                        publisher: artistName,
+                        thumbnail: artworkUrl100,
+                        tag: genres
                     };
                 });
                 const response = {
-                    top: cleanedCasts,
+                    top: podcasts,
                     loading: false,
                     init: query || 0,
-                    name
+                    name: 'Top'
                 };
                 memory = response;
                 this.setState(response);
-
-            });
+            })
     };
 
 // const lsName = 'topCasts';
@@ -98,3 +78,39 @@ export const getPopularPodcasts = function (query=null) {
     //     console.log('response fetched and Saved', responseSaved)
     //     localStorage.setItem(lsName,JSON.stringify(responseSaved));
     // //   }
+
+
+    // .then(({podcasts, name }) => {
+    //     const cleanedCasts = podcasts.map((podcast, num) => {
+    //         const {
+    //             title,
+    //             domain,
+    //             thumbnail,
+    //             description,
+    //             id,
+    //             total_episodes: episodes,
+    //             earliest_pub_date_ms: startDate,
+    //             publisher,
+    //         } = podcast;
+    //         const rss = `${URI}${id}`;
+    //         return {
+    //             title: `${num + 1}. ${title}`,
+    //             thumbnail,
+    //             domain,
+    //             description,
+    //             rss,
+    //             episodes,
+    //             startDate,
+    //             publisher,
+    //         };
+    //     });
+    //     const response = {
+    //         top: cleanedCasts,
+    //         loading: false,
+    //         init: query || 0,
+    //         name
+    //     };
+    //     memory = response;
+    //     this.setState(response);
+
+    // });

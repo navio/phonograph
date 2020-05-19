@@ -83,7 +83,7 @@ const App = () => {
     useEffect(
       () => { 
         if(player.current) {
-          console.log('audioReady', player.current)
+          // console.log('audioReady', player.current)
           attachEvents(player.current, dispatch, state)
           window.player = player.current;
           player.current.currentTime = Number(state.currentTime) || 0;
