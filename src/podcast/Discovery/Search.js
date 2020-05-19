@@ -33,8 +33,13 @@ export default (props) => {
   const [term, setTerm] = useState('');
   const { handleChange, updatePodcasts } = props;
 
-  const action = (value = term) => (value.length > 2) && handleChange(value).then(updatePodcasts);
-  const onClick = () => action();
+  const action = (value) => 
+  (value.length > 2) && handleChange(value).then((podcasts)=>updatePodcasts({value, podcasts}));
+  
+  const clickHandler = () => { 
+    action(term);
+  }
+  
   const onChange = (ev) => {
     const { value } = ev.target;
     if (ev.key === 'Enter') {
@@ -63,7 +68,7 @@ export default (props) => {
             labelWidth={125}
             endAdornment={
               <InputAdornment position="end">
-                <IconButton type="submit" aria-label="search" onClick={onClick} >
+                <IconButton type="submit" aria-label="search" onClick={()=>clickHandler(term)} >
                   <SearchIcon />
                 </IconButton>
               </InputAdornment>
@@ -74,8 +79,7 @@ export default (props) => {
     </Grid>
     <div className={classes.root}>
       {
-        keys.map(key => <Chip  
-          variant={ (term === key) ? 'default' : 'outlined'} 
+        keys.map(key => <Chip   
           label={key} key={key} variant={'outlined'} onClick={() => action(key)} color={"primary"} />)
       }
     </div>

@@ -144,12 +144,13 @@ class Discover extends Component {
     this.getPopularPodcasts();
   }
 
-  updatePodcasts(podcasts){
+  updatePodcasts({podcasts, value}){
+
     if(podcasts.length < 1){
       this.setState({results: 'empty', podcasts:[]})
       return;
     }
-    this.setState({podcasts, results: '' })
+    this.setState({podcasts, term:value, results: '' })
   }
 
   getClickHandler(domain) {
