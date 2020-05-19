@@ -37,7 +37,7 @@ export default class PodcastSearcher {
   }
 
   apple(term) {
-    return this.querySearch("`https://itunes.apple.com/search?media=podcast&limit=20&term=${term}`", term);
+    return this.querySearch("`/rss-full/https://itunes.apple.com/search?media=podcast&limit=20&term=${term}`", term);
   }
 
 

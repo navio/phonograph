@@ -40,7 +40,7 @@ export const getPopularPodcasts = function (query=null) {
             data = fetch(`/ln/best_podcasts?genre_id=${query}&page=1&region=us`).then(x=> x.json())
         } else {
             // data = import("./top.json");
-            data = fetch(`https://itunes.apple.com/search?term=podcast&limit=20`).then(x=> x.json())
+            data = fetch(`/rss-full/https://itunes.apple.com/search?term=podcast&limit=20`).then(x=> x.json())
          }
         data
             .then(({results}) => {
