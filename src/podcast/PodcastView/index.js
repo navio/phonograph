@@ -1,7 +1,7 @@
 import React, {useRef, useContext, useEffect, useState} from 'react';
 import {AppContext} from '../../App';
+import useOnline from '../../engine/useOnline';
 import {PODCASTVIEW, DISCOVERY} from '../../constants';
-import loadingAnimation from '../../../public/loading.svg';
 import { recordEpisode as saveEpisodeState } from '../../reducer'
 
 import Loading from '../../core/Loading';
@@ -45,8 +45,11 @@ export default (props) => {
     const loadEpisodes = (podcast) => podcast.forEach((episode) => episodes.current.set(episode.guid, episode));
 
     const getPodcast = async (save = false ) => {
-
+          
         try {
+        const online = useOnline();
+        console.log('Im online',online);
+        const getFromMemory = online ? null : Infinity;
         const castContent = await engine.getPodcast(podcastURL, { save });
 
         let newPodcast = {
