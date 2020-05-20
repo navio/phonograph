@@ -47,9 +47,9 @@ export default (props) => {
     const getPodcast = async (save = false ) => {
           
         try {
-        const online = useOnline();
-        console.log('Im online',online);
-        const getFromMemory = online ? null : Infinity;
+        // const online = useOnline();
+        // console.log('Im online',online);
+        // const getFromMemory = online ? null : Infinity;
         const castContent = await engine.getPodcast(podcastURL, { save });
 
         let newPodcast = {

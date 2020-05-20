@@ -5328,7 +5328,7 @@ podcast@^1.1.0:
   dependencies:
     rss "^1.2.2"
 
-podcastsuite@^1.0.19:
+podcastsuite@^1.0.18:
   version "1.0.19"
   resolved "https://registry.yarnpkg.com/podcastsuite/-/podcastsuite-1.0.19.tgz#e68b72f02b1978171e18fa971d52c4265d06eb1f"
   integrity sha512-v8DQJm7wWK8rTT4M31PSg2sVt1fIEM71edn1YHL7LZEwGDW3IBPk+mltO0ut3DB/5kdGryMvNzc++1p0p7n8MQ==
