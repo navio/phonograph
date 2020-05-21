@@ -47,10 +47,8 @@ export default (props) => {
     const getPodcast = async (save = false ) => {
           
         try {
-        // const online = useOnline();
-        // console.log('Im online',online);
-        // const getFromMemory = online ? null : Infinity;
-        const castContent = await engine.getPodcast(podcastURL, { save });
+        const fresh = navigator.onLine ? undefined : Infinity;
+        const castContent = await engine.getPodcast(podcastURL, { save, fresh });
 
         let newPodcast = {
             items: castContent.items,
@@ -70,7 +68,8 @@ export default (props) => {
         return { castContent, newPodcast };
 
       } catch (error){
-        setError({error, message: 'Error loading podcast'})
+        console.log(error);
+        setError({error, message: `There was a problem loading the podcast.`})
         setTimeout(()=>props.history.push(DISCOVERY),3000);
       }
     }
@@ -166,7 +165,12 @@ export default (props) => {
         shouldRefresh={shouldRefresh}
     /> 
     </>
-    : <Typography align='center' style={{paddingTop: '20%' }} letterSpacing={6} variant="h4"> <Loading  /> <br /> { error && error.message }</Typography>
+    : <Typography align='center' style={{paddingTop: '20%' }} letterSpacing={6} variant="h4">
+         <Loading  /> 
+         <br /> 
+         { error && error.message }<br />
+         { error && error.error && error.error.toString() }
+     </Typography>
                         
 }
 
