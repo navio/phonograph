@@ -116,13 +116,11 @@ const App = () => {
             
             <Route
               path={[PODCASTVIEW, `${PODCASTVIEW}/:podcastname`]}
-              render={({history}) =>
-                state.current ? (
+              render={({history}) => 
                     <Suspense fallback={<Loading />}>
                       <PodcastView history={history} />
                     </Suspense>
-                ) : (<Redirect to={LIBVIEW} history />)
-              }
+                 }
             />
 
             <Route

@@ -12,6 +12,7 @@ import PodcastEngine from "podcastsuite";
 import Typography from "@material-ui/core/Typography";
 
 const commonRules = (originalUrl) => {
+    if (!originalUrl) return;
     let url = originalUrl;
     url = url.indexOf("http:") > -1 ? url.replace("http:", "https:") : url;
     url = url.search("http") < 0 ? "https://" + url : url;
@@ -23,7 +24,7 @@ const commonRules = (originalUrl) => {
   };
 
 export default (props) => {
-    console.log(props);
+    
     let bringAPodcast = window.location.href.split(`${PODCASTVIEW}/`)[1];
 
     if(bringAPodcast){
