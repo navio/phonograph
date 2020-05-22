@@ -62,6 +62,10 @@ functions
 
 localhost.sh
 
+src/podcast/Discovery/top.json
+src/podcast/Discovery/curated.json
+public/genres.json
 public/top.json
 public/curated.json
-public/genres.json
+
+

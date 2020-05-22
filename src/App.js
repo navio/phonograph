@@ -115,7 +115,7 @@ const App = () => {
             /> 
             
             <Route
-              path={PODCASTVIEW}
+              path={[PODCASTVIEW, `${PODCASTVIEW}/:podcastname`]}
               render={({history}) =>
                 state.current ? (
                     <Suspense fallback={<Loading />}>

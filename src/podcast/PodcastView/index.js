@@ -23,8 +23,9 @@ const commonRules = (originalUrl) => {
   };
 
 export default (props) => {
-
+    console.log(props);
     let bringAPodcast = window.location.href.split(`${PODCASTVIEW}/`)[1];
+
     if(bringAPodcast){
       try {
         new URL(bringAPodcast);
