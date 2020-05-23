@@ -161,8 +161,8 @@ class Discover extends Component {
       this.setState({ loadContent: true });
       request(domain)
         .then((finalDomain) => {
-          addPodcastHandler(finalDomain, actionAfterClick);
           this.setState({ loadContent: false });
+          addPodcastHandler(finalDomain, actionAfterClick);
         })
         .catch(console.error);
     };
