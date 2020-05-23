@@ -115,7 +115,6 @@ function PodcastHeader(props) {
     <Consumer>
       {(data) => {
         const state = props.podcast;
-        console.log(data, state)
         return (
           <>
             <Snackbar
@@ -229,7 +228,7 @@ function PodcastHeader(props) {
                   <Button onClick={saveThisPodcastToLibrary}
                   style={{ marginRight: '1rem' }} variant="outlined" color="primary" >Subscribe</Button>}
               </Grid>
-              <Grid xs={12}>
+              <Grid item xs={12}>
                 <Typography style={{ marginLeft: '.5rem' }}>
                   <b>Episodes:</b> {state.items.length}
                 </Typography>
