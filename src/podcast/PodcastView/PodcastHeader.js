@@ -144,8 +144,8 @@ function PodcastHeader(props) {
                       <Tooltip title="Remove from library" placement="bottom">
                         <IconButton
                           className={classes.addToLibrary}
-                          color="secondary"
                           size="small"
+                          style={{ color: "#fff" }}
                           onClick={removePodcast}
                           aria-label="Remove from Library"
                         >
@@ -156,7 +156,7 @@ function PodcastHeader(props) {
                       <Tooltip title="Add to Library" placement="bottom">
                         <IconButton
                           size="small"
-                          color="secondary"
+                          style={{ color: "#fff" }}
                           onClick={saveThisPodcastToLibrary}
                           className={classes.addToLibrary}
                         >
@@ -167,7 +167,7 @@ function PodcastHeader(props) {
                     {shareLink && (
                       <Tooltip title="Share Podcast" placement="bottom">
                         <IconButton
-                          color="secondary"
+                          style={{ color: "#fff" }}
                           size="small"
                           className={classes.addToLibrary}
                           onClick={share(
