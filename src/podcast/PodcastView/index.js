@@ -50,6 +50,7 @@ export default (props) => {
           
         try {
         const fresh = navigator.onLine ? undefined : Infinity;
+        console.log('freshStatus',fresh);
         const castContent = await engine.getPodcast(podcastURL, { save, fresh });
 
         let newPodcast = {
