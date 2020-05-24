@@ -1,4 +1,4 @@
-import React, {useContext} from "react";
+import React, { useContext, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import Slider from "@material-ui/core/Slider";
@@ -10,8 +10,9 @@ import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import PauseIcon from "@material-ui/icons/Pause";
 import SkipNextIcon from "@material-ui/icons/Forward30";
 import LinearProgress from "@material-ui/core/LinearProgress";
-import Grid from "@material-ui/core/Grid";
-import { Link } from "react-router-dom";
+import { Grid } from "@material-ui/core";
+import CloseIcon from '@material-ui/icons/Close';
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import { AppContext } from "../App.js";
 import {
   PODCASTVIEW,
@@ -19,7 +20,7 @@ import {
 
 const styles = (theme) => ({
   card: {
-    width: "100%",
+
   },
   details: {
     flexDirection: "column",
@@ -33,11 +34,13 @@ const styles = (theme) => ({
     margin: "30px",
   },
   controls: {
-    paddingLeft: theme.spacing(1),
-    paddingBottom: theme.spacing(1),
+    paddingTop: '.5rem'
+    // padding: theme.spacing(2),
   },
   left: {
-    textAlign: "left",
+    padding: 0,
+  },
+  right: {
     padding: 0,
   },
   line: {
@@ -53,29 +56,31 @@ const styles = (theme) => ({
   trackAfter: {
     display: "none",
   },
-  right: {
-    textAlign: "right",
-    padding: 0,
-  },
   center: {
     textAlign: "center",
     padding: 0,
   },
+  playClosed: {
+    width: '3rem',
+    height: '3rem'
+  },
   playIcon: {
-    height: 45,
-    width: 45,
+    height: 70,
+    width: 70,
   },
   controlIcon: {
-    height: 30,
-    width: 30,
+    top: '100%',
+    position: 'absolute',
+    height: 40,
+    width: 40,
     color: theme.palette.secondary.main
   },
   player: {
-    paddingLeft: 20,
-    paddingRight: 20,
+    // paddingLeft: 20,
+    // paddingRight: 20,
   },
   undeground: {
-    display:"block",
+    display: "block",
     height: '8.5rem',
     width: "100%",
   },
@@ -84,17 +89,40 @@ const styles = (theme) => ({
   },
   container: {
     position: "relative",
+    top: '-.5rem',
   },
-  title: { paddingTop: "10px", paddingBottom: "10px", color: theme.palette.text.primary },
+
+  podcastImage: {
+    width: "100%",
+    display: "block",
+    margin: "0 auto",
+    paddingBottom: "5vh"
+  },
+  podcastImageClosed: {
+    width: '50%',
+    display: 'block',
+  },
+  title: {
+    paddingTop: "10px",
+    paddingBottom: "10px",
+    color: theme.palette.text.primary
+  },
+  rootClosed: {
+    bottom: '3.53rem',
+    width: '100%',
+    borderTop: `1px solid ${theme.palette.secondary.main}`,
+    backgroundColor: theme.palette.background.paper,
+    position: "fixed",
+  },
   root: {
-    borderTop: "2px solid",
+    border: "2px solid",
     borderColor: theme.palette.secondary.main,
     position: "fixed",
-    bottom: 56,
     width: "100%",
     backgroundColor: theme.palette.background.paper,
     zIndex: 50,
-    // height: "calc(100% - 3.5rem)",
+    height: "100%",
+    top: "1px"
   },
 });
 
@@ -107,128 +135,170 @@ const convertMinsToHrsMins = (mins) => {
   return `${h}:${m}`;
 };
 
-
-
 const toMinutes = (totalTime, currentTime) => {
   totalTime = Math.floor(totalTime - currentTime);
   if (!Number.isInteger(totalTime)) return "∞";
   return "- " + convertMinsToHrsMins(totalTime);
 };
 
-const toMin = (theTime) =>
-  typeof theTime === "number"
-    ? convertMinsToHrsMins(Math.floor(theTime))
-    : `00:00`;
+const toMin = (theTime) => typeof theTime === "number"
+  ? convertMinsToHrsMins(Math.floor(theTime))
+  : `00:00`;
 
-//
-function MediaControlCard(props) {
-  const {state, dispatch} = useContext(AppContext);
+const MediaControlCard = (props) => {
+  const { state, dispatch } = useContext(AppContext);
+  const [open, setOpen] = useState(true);
   const { classes, theme } = props;
   const history = useHistory();
 
+
+
   const toOrigin = (audioOrigin) => () => {
     console.log('redirect')
-    dispatch({type: 'updateCurrent', payload:audioOrigin});
+    dispatch({ type: 'updateCurrent', payload: audioOrigin });
     history.push(PODCASTVIEW)
   }
-  const {episodeInfo = {} } = state;
-  // console.log(episodeInfo)
+  const { episodeInfo = {} } = state;
+  console.log('openValue:', open)
   return (
-        <>
-          <div className={classes.root}>
-            {state.episodeInfo && (
-              <div className={classes.card}>
-                <div className={classes.details}>
-                    <Typography
-                      onClick={toOrigin(state.audioOrigin)}
-                      align={"center"}
-                      className={classes.title}
-                      variant="h6"
-                      noWrap
-                      style={{ paddingLeft: '4rem', paddingRight: '4rem'}}
-                    > 
-                      {episodeInfo.title}
-                    </Typography>
+    <>
+      <div className={open ? classes.root : classes.rootClosed}>
+        {open && <Grid container direction="row-reverse">
+          <Grid item style={{ padding: '.5rem' }}>
+            <IconButton onClick={() => setOpen(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Grid>
+        </Grid>}
+        {state.episodeInfo && (
+          <div className={classes.card}>
+            {open && <Grid container container
+              direction="row"
+              justify="center"
+              alignItems="center"  >
+              <Grid item xs={8} md={4} lg={4}>
+                <img className={classes.podcastImage} src={state.podcastImage} />
+              </Grid>
+            </Grid>}
+            <div className={classes.details}>
+              {open && <Typography
+                onClick={toOrigin(state.audioOrigin)}
+                align={"center"}
+                className={classes.title}
+                variant="h6"
+                noWrap
+              >
+                {episodeInfo.title}
+              </Typography>}
 
-                    {/* <Typography>
-                      {episodeInfo.description}
-                    </Typography> */}
+              {open && <Typography variant="subtitle1" align="center" style={{margin:'1rem 2em'}} gutterBottom >
+                {episodeInfo.subtitle}
+              </Typography>}
 
-                  <Grid container className={classes.player}>
-                    <Grid item xs={2}>
-                      <span>{toMin(state.currentTime)}</span>
-                    </Grid>
-                    <Grid className={classes.container} item xs={8}>
-                      <LinearProgress
-                        className={classes.progress}
-                        variant="buffer"
-                        value={state.played}
-                        valueBuffer={state.loaded}
-                      />
-                      <Slider
-                        style={{ padding: "0px" }}
-                        className={classes.line}
-                        value={state.played}
-                        aria-labelledby="audio"
-                        onChange={props.seek}
-                      />
-                    </Grid>
-                    <Grid item xs={2} className={classes.right}>
-                      <span>
-                        {toMinutes(state.duration, state.currentTime)}
-                      </span>
-                    </Grid>
-                  </Grid>
-
-                  <Grid container className={classes.controls}>
-                    <Grid className={classes.right} item xs={4}>
-                      <IconButton
-                        style={{ padding: "0" }}
-                        aria-label="Previous"
-                        onClick={props.rewind}
-                      >
-                        {theme.direction === "rtl" ? (
-                          <SkipNextIcon className={classes.controlIcon} />
-                        ) : (
-                          <SkipPreviousIcon className={classes.controlIcon} />
-                        )}
-                      </IconButton>
-                    </Grid>
-                    <Grid item xs={4} className={classes.center}>
-                      <IconButton
-                        style={{ padding: "0" }}
-                        aria-label="Play/pause"
-                        onClick={()=>props.handler()}
-                        data-guid={state.playing}
-                      >
-                        {state.playing === (episodeInfo && episodeInfo.guid) &&
+              <Grid container
+                direction="row"
+                justify="center"
+                alignItems="center"
+                className={classes.player}>
+                {!open && <>
+                  {<Grid item align="left" style={{ paddingLeft: '.14rem' }} xs={1}>
+                    <img className={classes.podcastImageClosed} src={state.podcastImage} />
+                  </Grid>}
+                  <Grid item align="center" xs={1}>
+                    <IconButton onClick={() => setOpen(true)}
+                      style={{ padding: "0" }}
+                      aria-label="Play/pause"
+                      onClick={() => props.handler()}
+                      data-guid={state.playing}
+                    >
+                      {state.playing === (episodeInfo && episodeInfo.guid) &&
                         state.status !== "pause" ? (
-                          <PauseIcon className={classes.playIcon} />
+                          <PauseIcon className={classes.playClosed}  />
                         ) : (
-                          <PlayArrowIcon className={classes.playIcon} />
+                          <PlayArrowIcon className={classes.playClosed}  />
                         )}
-                      </IconButton>
-                    </Grid>
-                    <Grid item xs={4} className={classes.left}>
-                      <IconButton
-                        style={{ padding: "0" }}
-                        aria-label="Next"
-                        onClick={props.forward}
-                      >
-                        {theme.direction === "rtl" ? (
-                          <SkipPreviousIcon className={classes.controlIcon} />
-                        ) : (
-                          <SkipNextIcon className={classes.controlIcon} />
-                        )}
-                      </IconButton>
-                    </Grid>
-                  </Grid>
-                </div>
-              </div>
-            )}
+                    </IconButton>
+                  </Grid></>}
+                <Grid align="center" item xs={2} md={1} >
+                  <span>{toMin(state.currentTime)}</span>
+                </Grid>
+                <Grid className={classes.container} item xs={open ? 5 : 4} md={7} >
+                  <LinearProgress
+                    className={classes.progress}
+                    variant="buffer"
+                    value={state.played}
+                    valueBuffer={state.loaded}
+                  />
+                  <Slider
+                    style={{ padding: "0px" }}
+                    className={classes.line}
+                    value={state.played}
+                    aria-labelledby="audio"
+                    onChange={props.seek}
+                  />
+                </Grid>
+                <Grid align="center" item xs={2} md={1} >
+                  <span>
+                    {toMinutes(state.duration, state.currentTime)}
+                  </span>
+                </Grid>
+                {!open && <Grid align="right" item xs={1}>
+                  <IconButton onClick={() => setOpen(true)}>
+                    <ExpandLessIcon />
+                  </IconButton>
+                </Grid>}
+              </Grid>
+
+              {open && <Grid container className={classes.controls}>
+                <Grid item xs={3} sm={4} align={open ? 'right' : "center"} className={classes.right}>
+                  <IconButton
+                    style={{ padding: "0" }}
+                    aria-label="Previous"
+                    onClick={props.rewind}
+                  >
+                    {theme.direction === "rtl" ? (
+                      <SkipNextIcon className={classes.controlIcon} />
+                    ) : (
+                        <SkipPreviousIcon className={classes.controlIcon} />
+                      )}
+                  </IconButton>
+                </Grid>
+                <Grid item xs={6} sm={4} className={classes.center}>
+                  <IconButton
+                    style={{ padding: "0" }}
+                    aria-label="Play/pause"
+                    onClick={() => props.handler()}
+                    data-guid={state.playing}
+                  >
+                    {state.playing === (episodeInfo && episodeInfo.guid) &&
+                      state.status !== "pause" ? (
+                        <PauseIcon className={classes.playIcon} />
+                      ) : (
+                        <PlayArrowIcon className={classes.playIcon} />
+                      )}
+                  </IconButton>
+                </Grid>
+                <Grid item xs={3} sm={4} align={open ? 'left' : "center"} className={classes.left}>
+                  <IconButton
+                    style={{ padding: "0" }}
+                    aria-label="Next"
+                    onClick={props.forward}
+                  >
+                    {theme.direction === "rtl" ? (
+                      <SkipPreviousIcon className={classes.controlIcon} />
+                    ) : (
+                        <SkipNextIcon className={classes.controlIcon} />
+                      )}
+                  </IconButton>
+                </Grid>
+              </Grid>}
+            </div>
           </div>
-          {episodeInfo && <div id={'under'} className={classes.undeground}>-</div>}
-        </>
+
+        )}
+      </div>
+      {episodeInfo && <div id={'under'} className={classes.undeground}>-</div>}
+    </>
   );
 }
 
