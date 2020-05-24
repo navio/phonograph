@@ -34,7 +34,7 @@ const styles = (theme) => ({
     margin: "30px",
   },
   controls: {
-    paddingTop: '.5rem'
+    paddingTop: '2rem'
     // padding: theme.spacing(2),
   },
   left: {
@@ -161,12 +161,13 @@ const MediaControlCard = (props) => {
 
 
   const toOrigin = (audioOrigin) => () => {
-    console.log('redirect')
-    dispatch({ type: 'updateCurrent', payload: audioOrigin });
+    dispatch({ type: 'updateCurrent', payload: audioOrigin })
     history.push(PODCASTVIEW)
+  
+    
   }
+
   const { episodeInfo = {} } = state;
-  console.log('openValue:', open)
   return (
     <>
       <div className={open ? classes.root : classes.rootClosed}>
@@ -183,7 +184,7 @@ const MediaControlCard = (props) => {
               direction="row"
               justify="center"
               alignItems="center" >
-              <Grid item xs={8} md={4} lg={3}>
+              <Grid item xs={8} sm={6} md={4} lg={3}>
                 <img className={classes.podcastImage} src={state.podcastImage} />
               </Grid>
             </Grid>}
@@ -204,16 +205,17 @@ const MediaControlCard = (props) => {
 
               <Grid container
                 direction="row"
-                justify="space-between"
+                justify={open ? "space-around": "space-between"}
                 alignItems="center"
                 className={classes.player}>
                 {!open && <>
                   {<Grid item align="left" style={{ paddingLeft: '.14rem' }} xs={1}>
-                    <img className={classes.podcastImageClosed} src={state.podcastImage} />
+                    <img  onClick={toOrigin(state.audioOrigin)}
+                          className={classes.podcastImageClosed} 
+                          src={state.podcastImage} />
                   </Grid>}
                   <Grid item align="center" xs={1}>
                     <IconButton onClick={() => setOpen(true)}
-                      // style={{ padding: "0" }}
                       aria-label="Play/pause"
                       onClick={() => props.handler()}
                       data-guid={state.playing}
@@ -225,7 +227,7 @@ const MediaControlCard = (props) => {
                           <PlayArrowIcon className={classes.playClosed}  />
                         )}
                     </IconButton>
-                  </Grid></>}
+                  </Grid></> }
                 <Grid align="center" item xs={2} md={1} >
                   <span>{toMin(state.currentTime)}</span>
                 </Grid>
@@ -249,7 +251,7 @@ const MediaControlCard = (props) => {
                     {toMinutes(state.duration, state.currentTime)}
                   </span>
                 </Grid>
-                {!open && <Grid align="right" item xs={1} style={{paddingRight:'.5rem'}}>
+                {!open && <Grid align="right" item xs={1} style={{ paddingRight: '.14rem' }}>
                   <IconButton onClick={() => setOpen(true)}>
                     <ExpandLessIcon />
                   </IconButton>

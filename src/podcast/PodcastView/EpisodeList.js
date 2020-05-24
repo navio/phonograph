@@ -142,7 +142,7 @@ const EpisodeList = (props) => {
   const [fresh, reFresh ] = React.useState(Date.now());
   const { classes, episodes, podcast } = props;
   const episodeList = episodes.slice(0,(20 * amount));
-  console.log('heree',podcast);
+  // console.log('heree',podcast);
 
   useEffect(()=>{
     window && window.scrollTo && window.scrollTo(0, 0);

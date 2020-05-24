@@ -3,7 +3,7 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import { ThemeProvider } from "@material-ui/core/styles";
 import theme from "./theme";
 import { reducer, initialState } from "./reducer"
-// import audioqueue from "audioqueue";
+import audioqueue from "audioqueue";
 import LoadingSVG from "./core/Loading";
 
 // Router
@@ -56,7 +56,7 @@ initialState['status'] = "pause";
 
 const App = () => {
 
-    const player = useRef(null); //new audioqueue([]);
+    const player = useRef(null);
 
     const [state, dispatch] = useReducer(reducer,initialState);
     const mediaFunctions = playerFunctions(player, dispatch, state);
@@ -83,10 +83,11 @@ const App = () => {
     useEffect(
       () => { 
         if(player.current) {
+          const playerequeue = new audioqueue([], {audioObject: player.current});
           // console.log('audioReady', player.current)
-          attachEvents(player.current, dispatch, state)
-          window.player = player.current;
-          player.current.currentTime = Number(state.currentTime) || 0;
+          attachEvents(playerequeue, dispatch, state)
+          window.player = playerequeue;
+          playerequeue.currentTime = Number(state.currentTime) || 0;
         }
       },[player.current]);
 
