@@ -62,7 +62,8 @@ const styles = (theme) => ({
   },
   playClosed: {
     width: '3rem',
-    height: '3rem'
+    maxHeight: '3rem',
+    minHeight: '2rem'
   },
   playIcon: {
     height: 70,
@@ -81,7 +82,7 @@ const styles = (theme) => ({
   },
   undeground: {
     display: "block",
-    height: '8.5rem',
+    height: '3.5rem',
     width: "100%",
   },
   classNameProp: {
@@ -99,23 +100,29 @@ const styles = (theme) => ({
     paddingBottom: "5vh"
   },
   podcastImageClosed: {
-    width: '50%',
     display: 'block',
+    maxWidth: '5rem', 
+    width: '3rem'
   },
   title: {
     paddingTop: "10px",
     paddingBottom: "10px",
     color: theme.palette.text.primary
   },
+  subtitle: {
+    margin: '0 2em 1rem',
+    height: '3.5rem',
+    display: 'block',
+    overflow: 'hidden',
+  },
   rootClosed: {
-    bottom: '3.53rem',
+    bottom: '3.50rem',
     width: '100%',
     borderTop: `1px solid ${theme.palette.secondary.main}`,
     backgroundColor: theme.palette.background.paper,
     position: "fixed",
   },
   root: {
-    border: "2px solid",
     borderColor: theme.palette.secondary.main,
     position: "fixed",
     width: "100%",
@@ -175,8 +182,8 @@ const MediaControlCard = (props) => {
             {open && <Grid container container
               direction="row"
               justify="center"
-              alignItems="center"  >
-              <Grid item xs={8} md={4} lg={4}>
+              alignItems="center" >
+              <Grid item xs={8} md={4} lg={3}>
                 <img className={classes.podcastImage} src={state.podcastImage} />
               </Grid>
             </Grid>}
@@ -191,13 +198,13 @@ const MediaControlCard = (props) => {
                 {episodeInfo.title}
               </Typography>}
 
-              {open && <Typography variant="subtitle1" align="center" style={{margin:'1rem 2em'}} gutterBottom >
+              {open && <Typography variant="subtitle1" align="center" className={classes.subtitle} gutterBottom >
                 {episodeInfo.subtitle}
               </Typography>}
 
               <Grid container
                 direction="row"
-                justify="center"
+                justify="space-between"
                 alignItems="center"
                 className={classes.player}>
                 {!open && <>
@@ -206,7 +213,7 @@ const MediaControlCard = (props) => {
                   </Grid>}
                   <Grid item align="center" xs={1}>
                     <IconButton onClick={() => setOpen(true)}
-                      style={{ padding: "0" }}
+                      // style={{ padding: "0" }}
                       aria-label="Play/pause"
                       onClick={() => props.handler()}
                       data-guid={state.playing}
@@ -222,7 +229,7 @@ const MediaControlCard = (props) => {
                 <Grid align="center" item xs={2} md={1} >
                   <span>{toMin(state.currentTime)}</span>
                 </Grid>
-                <Grid className={classes.container} item xs={open ? 5 : 4} md={7} >
+                <Grid className={classes.container} item xs={open ? 5 : 4} md={6  } >
                   <LinearProgress
                     className={classes.progress}
                     variant="buffer"
@@ -242,7 +249,7 @@ const MediaControlCard = (props) => {
                     {toMinutes(state.duration, state.currentTime)}
                   </span>
                 </Grid>
-                {!open && <Grid align="right" item xs={1}>
+                {!open && <Grid align="right" item xs={1} style={{paddingRight:'.5rem'}}>
                   <IconButton onClick={() => setOpen(true)}>
                     <ExpandLessIcon />
                   </IconButton>
