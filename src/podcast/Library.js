@@ -64,7 +64,10 @@ export const styles = (theme) => ({
     width:"100%",
     marginTop:"18%",
     color: theme.palette.text.secondary
-  }
+  },
+  appHeader: {
+    WebkitAppRegion: 'drag',
+  },
 });
 
 const LibraryView = (props) => {
@@ -77,7 +80,7 @@ const LibraryView = (props) => {
           actionAfterSelectPodcast();
         };
         return <>
-            <AppBar position="static">
+            <AppBar className={classes.appHeader} position="static">
               <Toolbar variant="dense">
                 <Typography variant="h6">Library</Typography>
               </Toolbar>

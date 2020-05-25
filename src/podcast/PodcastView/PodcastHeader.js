@@ -60,6 +60,9 @@ const styles = (theme) => ({
     paddingRight: "1em",
     lineClamp: 2
   },
+  appHeader: {
+    WebkitAppRegion: 'drag',
+  }
 });
 
 function Alert(props) {
@@ -126,7 +129,7 @@ function PodcastHeader(props) {
             >
               <Alert severity="success">{message}</Alert>
             </Snackbar>
-            <AppBar position="static">
+            <AppBar className={classes.appHeader} position="static">
               <Toolbar variant="dense">
                 <Grid container spacing={2}>
                   <Grid item xs={6}>
