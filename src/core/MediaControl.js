@@ -10,7 +10,7 @@ import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import PauseIcon from "@material-ui/icons/Pause";
 import SkipNextIcon from "@material-ui/icons/Forward30";
 import LinearProgress from "@material-ui/core/LinearProgress";
-import { Grid, Card } from "@material-ui/core";
+import { Grid, Card, Hidden } from "@material-ui/core";
 import CloseIcon from '@material-ui/icons/Close';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import { AppContext } from "../App.js";
@@ -123,8 +123,7 @@ const styles = (theme) => ({
     position: "fixed",
   },
   root: {
-    borderColor: theme.palette.secondary.main,
-    borderTop: '1px solid',
+    borderTop: `1px solid ${theme.palette.secondary.main}`,
     position: "fixed",
     width: "100%",
     backgroundColor: theme.palette.background.paper,
@@ -170,7 +169,7 @@ const MediaControlCard = (props) => {
 
   const { episodeInfo = {} } = state;
   return (
-    <>
+    state.episodeInfo && <>
       <Card  variant="outlined" className={open ? classes.root : classes.rootClosed}>
         {open && <Grid container direction="row-reverse">
           <Grid item style={{ padding: '.5rem' }}>
@@ -211,7 +210,7 @@ const MediaControlCard = (props) => {
                 className={classes.player}>
                 {!open && <>
                   {<Grid item align="left" style={{ paddingLeft: '.14rem' }} xs={1}>
-                    <img  onClick={toOrigin(state.audioOrigin)}
+                    <img  onClick={() => setOpen(true)}
                           className={classes.podcastImageClosed} 
                           src={state.podcastImage} />
                   </Grid>}
@@ -252,11 +251,11 @@ const MediaControlCard = (props) => {
                     {toMinutes(state.duration, state.currentTime)}
                   </span>
                 </Grid>
-                {!open && <Grid align="right" item xs={1} style={{ paddingRight: '.14rem' }}>
+                {!open && <Hidden only={'xs'} ><Grid align="right" item xs={1} style={{ paddingRight: '.14rem' }}>
                   <IconButton onClick={() => setOpen(true)}>
                     <ExpandLessIcon />
                   </IconButton>
-                </Grid>}
+                </Grid></Hidden>}
               </Grid>
 
               {open && <Grid container className={classes.controls}>
