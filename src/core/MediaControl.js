@@ -34,8 +34,8 @@ const styles = (theme) => ({
     margin: "30px",
   },
   controls: {
-    paddingTop: '2rem'
-    // padding: theme.spacing(2),
+    //paddingTop: '2rem'
+    paddingTop: theme.spacing(2),
   },
   left: {
     padding: 0,
@@ -199,7 +199,7 @@ const MediaControlCard = (props) => {
                 {episodeInfo.title}
               </Typography>}
 
-              {open && <Typography variant="subtitle1" align="center" className={classes.subtitle} gutterBottom >
+              {open && episodeInfo.subtitle && <Typography variant="subtitle1" align="center" className={classes.subtitle} gutterBottom >
                 {episodeInfo.subtitle}
               </Typography>}
 
