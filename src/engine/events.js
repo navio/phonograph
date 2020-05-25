@@ -21,6 +21,11 @@ export default function (player, dispatch, state) {
         playing: null,
         status: null,
         episodeInfo: null,
+        podcastImage: null,
+        audioOrigin: null,
+        media: null,
+        played: null,
+        currentTime: null
       }});
 
   };

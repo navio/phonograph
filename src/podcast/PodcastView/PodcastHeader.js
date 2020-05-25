@@ -47,7 +47,11 @@ const styles = (theme) => ({
     float: "right",
   },
   desc: {
+<<<<<<< HEAD
     maxHeight: "13em",
+=======
+    maxHeight: "14vh",
+>>>>>>> preprod
     marginTop: "1em",
     overflow: "hidden",
     marginLeft: ".5em",
@@ -57,7 +61,8 @@ const styles = (theme) => ({
     marginTop: 3,
     whiteSpace: "pre-wrap",
     marginLeft: 10,
-    paddingRight: "1em"
+    paddingRight: "1em",
+    lineClamp: 2
   },
 });
 
@@ -194,7 +199,6 @@ function PodcastHeader(props) {
                   />
                 )}
               </Grid>
-
               <Grid item sm={12} md={8}>
                 <Box mb='1rem'>
                 <Typography className={classes.title} variant="h4" noWrap>
