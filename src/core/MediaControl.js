@@ -10,7 +10,7 @@ import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import PauseIcon from "@material-ui/icons/Pause";
 import SkipNextIcon from "@material-ui/icons/Forward30";
 import LinearProgress from "@material-ui/core/LinearProgress";
-import { Grid } from "@material-ui/core";
+import { Grid, Card } from "@material-ui/core";
 import CloseIcon from '@material-ui/icons/Close';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import { AppContext } from "../App.js";
@@ -124,12 +124,13 @@ const styles = (theme) => ({
   },
   root: {
     borderColor: theme.palette.secondary.main,
+    borderTop: '1px solid',
     position: "fixed",
     width: "100%",
     backgroundColor: theme.palette.background.paper,
     zIndex: 50,
     height: "100%",
-    top: "1px"
+    top: "0px"
   },
 });
 
@@ -170,7 +171,7 @@ const MediaControlCard = (props) => {
   const { episodeInfo = {} } = state;
   return (
     <>
-      <div className={open ? classes.root : classes.rootClosed}>
+      <Card  variant="outlined" className={open ? classes.root : classes.rootClosed}>
         {open && <Grid container direction="row-reverse">
           <Grid item style={{ padding: '.5rem' }}>
             <IconButton onClick={() => setOpen(false)}>
@@ -305,7 +306,7 @@ const MediaControlCard = (props) => {
           </div>
 
         )}
-      </div>
+      </Card>
       {episodeInfo && <div id={'under'} className={classes.undeground}>-</div>}
     </>
   );
