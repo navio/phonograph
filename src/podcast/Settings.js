@@ -1,6 +1,6 @@
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
-import React, {useContext} from "react";
+import React, { useContext } from "react";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
@@ -16,10 +16,11 @@ import Typography from "@material-ui/core/Typography";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
-import FormControlLabel from '@material-ui/core/FormControlLabel';
+import {FormControlLabel, Button } from '@material-ui/core';
 import Switch from '@material-ui/core/Switch';
 import PodcastEngine from "podcastsuite";
-import {AppContext} from '../App';
+import { AppContext } from '../App';
+import { CardHeader } from "@material-ui/core";
 
 
 const styles = (theme) => ({
@@ -33,19 +34,23 @@ const styles = (theme) => ({
 
 
 const Settings = (props) => {
-  const {state, dispatch} = useContext(AppContext)
+  const { state, dispatch } = useContext(AppContext)
 
-  const themeSwitcher = () =>{
+  const themeSwitcher = () => {
     const value = state.theme;
-    dispatch({type: 'setDark' , payload: !value });
+    dispatch({ type: 'setDark', payload: !value });
   };
-  
-  const eraseThisPodcast =  (podcast) => async () => {
-      const podcasts = state.podcasts.filter((cast) => cast.domain !== podcast );
-      dispatch({type:'updatePodcasts', podcasts: podcasts});
-      await PodcastEngine.db.del(podcast);
+
+  const eraseThisPodcast = (podcast) => async () => {
+    const podcasts = state.podcasts.filter((cast) => cast.domain !== podcast);
+    dispatch({ type: 'updatePodcasts', podcasts: podcasts });
+    await PodcastEngine.db.del(podcast);
   };
-  const {podcasts} = state;
+
+  const flushData = () => {
+    dispatch()
+  }
+  const { podcasts } = state;
 
   return (
     <>
@@ -55,10 +60,10 @@ const Settings = (props) => {
         </Toolbar>
       </AppBar>
       <Card variant="outlined">
-      <CardContent>
-        <Typography variant="h5">Configurations</Typography>
-        <FormControlLabel control={<Switch color="primary" onChange={themeSwitcher} />} label="Toggle Theme" />
-      </CardContent>
+      <CardHeader title="Configurations" />
+        <CardContent>
+          <FormControlLabel control={<Switch color="primary" onChange={themeSwitcher} />} label="Toggle Theme" />
+        </CardContent>
       </Card>
       <ExpansionPanel defaultExpanded>
         <ExpansionPanelSummary
@@ -69,44 +74,50 @@ const Settings = (props) => {
           <Typography variant="h5"> Podcasts Data</Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
-            <List style={{width:'100%'}}>
-              <Divider />
-              {podcasts &&
-                podcasts.map((podcast) => (
-                  <div key={podcast.domain}>
-                    <ListItem>
-                      <ListItemText
-                        secondary={
-                          <Typography component="span" variant="subtitle1">
-                            {podcast.title} <br />
-                            <Typography component="span" variant="caption">
-                              {new Date(podcast.created).toLocaleString()}
-                            </Typography>
+          <List style={{ width: '100%' }}>
+            <Divider />
+            {podcasts &&
+              podcasts.map((podcast) => (
+                <div key={podcast.domain}>
+                  <ListItem>
+                    <ListItemText
+                      secondary={
+                        <Typography component="span" variant="subtitle1">
+                          {podcast.title} <br />
+                          <Typography component="span" variant="caption">
+                            {new Date(podcast.created).toLocaleString()}
                           </Typography>
-                        }
-                      />
-                      <ListItemSecondaryAction>
-                        <IconButton
-                          aria-label="Delete"
-                          onClick={eraseThisPodcast(
-                            podcast.domain
-                          )}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                    <Divider />
-                  </div>
-                ))}
-            </List>
+                        </Typography>
+                      }
+                    />
+                    <ListItemSecondaryAction>
+                      <IconButton
+                        aria-label="Delete"
+                        onClick={eraseThisPodcast(
+                          podcast.domain
+                        )}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  <Divider />
+                </div>
+              ))}
+          </List>
         </ExpansionPanelDetails>
       </ExpansionPanel>
+      {/* <Card variant="outlined">
+        <CardHeader title="Data" />
+        <CardContent>
+          <Button variant="outlined" > Flush Data </Button>
+        </CardContent>
+      </Card> */}
       <Card variant="outlined">
-      <CardContent align="center">
-         <Typography variant="h5">Phonograph</Typography>
-        <Typography>is developed with ❤️ in Hoboken, NJ</Typography>
-      </CardContent>
+        <CardContent align="center">
+          <Typography variant="h5">Phonograph</Typography>
+          <Typography>is developed with ❤️ in Hoboken, NJ</Typography>
+        </CardContent>
       </Card>
     </>
   );

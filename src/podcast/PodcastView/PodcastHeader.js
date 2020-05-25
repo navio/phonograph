@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
-import { Hidden } from "@material-ui/core";
+import { Hidden, Box, Button, TextField } from "@material-ui/core";
 import CardMedia from "@material-ui/core/CardMedia";
 import Typography from "@material-ui/core/Typography";
 import Tooltip from "@material-ui/core/Tooltip";
@@ -47,17 +47,17 @@ const styles = (theme) => ({
     float: "right",
   },
   desc: {
-    maxHeight: "12.5em",
+    maxHeight: "13em",
     marginTop: "1em",
     overflow: "hidden",
     marginLeft: ".5em",
-    paddingRight:"1em"
+    paddingRight: "1em"
   },
   title: {
     marginTop: 3,
     whiteSpace: "pre-wrap",
     marginLeft: 10,
-    paddingRight:"1em"
+    paddingRight: "1em"
   },
 });
 
@@ -114,7 +114,7 @@ function PodcastHeader(props) {
   return (
     <Consumer>
       {(data) => {
-        const state  = props.podcast; 
+        const state = props.podcast;
         return (
           <>
             <Snackbar
@@ -144,8 +144,8 @@ function PodcastHeader(props) {
                       <Tooltip title="Remove from library" placement="bottom">
                         <IconButton
                           className={classes.addToLibrary}
-                          color="secondary"
                           size="small"
+                          style={{ color: "#fff" }}
                           onClick={removePodcast}
                           aria-label="Remove from Library"
                         >
@@ -153,21 +153,21 @@ function PodcastHeader(props) {
                         </IconButton>
                       </Tooltip>
                     ) : (
-                      <Tooltip title="Add to Library" placement="bottom">
-                        <IconButton
-                          size="small"
-                          color="secondary"
-                          onClick={saveThisPodcastToLibrary}
-                          className={classes.addToLibrary}
-                        >
-                          <BookmarkBorderIcon />
-                        </IconButton>
-                      </Tooltip>
-                    )}
+                        <Tooltip title="Add to Library" placement="bottom">
+                          <IconButton
+                            size="small"
+                            style={{ color: "#fff" }}
+                            onClick={saveThisPodcastToLibrary}
+                            className={classes.addToLibrary}
+                          >
+                            <BookmarkBorderIcon />
+                          </IconButton>
+                        </Tooltip>
+                      )}
                     {shareLink && (
                       <Tooltip title="Share Podcast" placement="bottom">
                         <IconButton
-                          color="secondary"
+                          style={{ color: "#fff" }}
                           size="small"
                           className={classes.addToLibrary}
                           onClick={share(
@@ -196,10 +196,11 @@ function PodcastHeader(props) {
               </Grid>
 
               <Grid item sm={12} md={8}>
+                <Box mb='1rem'>
                 <Typography className={classes.title} variant="h4" noWrap>
                   {state.title}
                 </Typography>
-                <Typography
+                {/* <Typography
                   className={classes.title}
                   variant="subtitle2"
                   noWrap
@@ -210,8 +211,8 @@ function PodcastHeader(props) {
                       .toString()
                       .split("GMT")[0]
                   }
-                </Typography>
-                <Hidden smDown={true}>
+                </Typography> */}
+                <Hidden>
                   <Typography
                     align={"justify"}
                     className={classes.desc}
@@ -219,7 +220,18 @@ function PodcastHeader(props) {
                   >
                     {clearText(state.description)}
                   </Typography>
-                </Hidden>
+                </Hidden >
+                </Box>
+              </Grid>
+              <Grid item xs={12} pt={2} align="right">
+                {!isInLibrary &&
+                  <Button onClick={saveThisPodcastToLibrary}
+                  style={{ marginRight: '1rem' }} variant="outlined" color="primary" >Subscribe</Button>}
+              </Grid>
+              <Grid item xs={12}>
+                <Typography style={{ marginLeft: '.5rem' }}>
+                  <b>Episodes:</b> {state.items.length}
+                </Typography>
               </Grid>
             </Grid>
           </>

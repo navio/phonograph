@@ -1,7 +1,11 @@
+
+const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
+
 export default class PodcastSearcher {
   constructor(API) {
     let currentRequest = null;
     this.API = API;
+    this.prodProxy = !DEBUG ? '/rss-full/'  : '' ;
   }
 
   querySearch(pattern, term){
@@ -37,7 +41,7 @@ export default class PodcastSearcher {
   }
 
   apple(term) {
-    return this.querySearch("`/rss-full/https://itunes.apple.com/search?media=podcast&limit=20&term=${term}`", term);
+    return this.querySearch("`${this.prodProxy}https://itunes.apple.com/search?media=podcast&limit=20&term=${term}`", term);
   }
 
 

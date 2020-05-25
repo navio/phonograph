@@ -140,8 +140,9 @@ const EpisodeList = (props) => {
   const [open, setOpen] = React.useState(null);
   const [amount, setAmount] = React.useState(1);
   const [fresh, reFresh ] = React.useState(Date.now());
-  const { classes, episodes } = props;
+  const { classes, episodes, podcast } = props;
   const episodeList = episodes.slice(0,(20 * amount));
+  // console.log('heree',podcast);
 
   useEffect(()=>{
     window && window.scrollTo && window.scrollTo(0, 0);
@@ -206,13 +207,13 @@ const EpisodeList = (props) => {
                         props.status !== "pause" ? (
                           <PauseIcon
                             className={classes.playIcon}
-                            onClick={props.handler(episode.guid, whenToStart(episodeData))}
+                            onClick={props.handler(episode.guid, whenToStart(episodeData), podcast)}
                             data-guid={episodeData}
                           />
                         ) : (
                           <PlayArrowIcon
                             className={classes.playIcon}
-                            onClick={props.handler(episode.guid, whenToStart(episodeData))}
+                            onClick={props.handler(episode.guid, whenToStart(episodeData), podcast)}
                           />
                         )}
                       </ListItemIcon>

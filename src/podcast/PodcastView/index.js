@@ -50,6 +50,7 @@ export default (props) => {
           
         try {
         const fresh = navigator.onLine ? undefined : Infinity;
+        console.log('freshStatus',fresh);
         const castContent = await engine.getPodcast(podcastURL, { save, fresh });
 
         let newPodcast = {
@@ -96,14 +97,13 @@ export default (props) => {
       await setToRefresh(Date.now());
     }
 
-    const playButton = (guid, currentTime) => (ev) => {
+    const playButton = (guid, currentTime, podcast) => (ev) => {
         const episode = episodes.current.get(guid);
       
         if (global.playing === guid) {
           if (global.status === "pause") {
             player.play().then(() => {
               if(currentTime){
-                console.log('setting time',currentTime)
                 player.currentTime = currentTime;
               }
             })
@@ -127,6 +127,7 @@ export default (props) => {
             status: "playing",
             played: 0,
             episodeInfo: episode,
+            podcastImage: podcast.image
           }
           if(currentTime){
             console.log('setting time',currentTime)
@@ -160,6 +161,7 @@ export default (props) => {
     />
     <EpisodeList
         episodes={podcast.items}
+        podcast={podcast}
         handler={playButton}
         status={global.status}
         playing={global.playing}

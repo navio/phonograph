@@ -161,8 +161,8 @@ class Discover extends Component {
       this.setState({ loadContent: true });
       request(domain)
         .then((finalDomain) => {
-          addPodcastHandler(finalDomain, actionAfterClick);
           this.setState({ loadContent: false });
+          addPodcastHandler(finalDomain, actionAfterClick);
         })
         .catch(console.error);
     };
@@ -242,7 +242,7 @@ class Discover extends Component {
             <Typography variant={"h6"} >
                 { results !== 'empty' &&  ( podcasts.length > 0  ? `Results` : "Trending" )}     
             </Typography>
-            {results === 'empty' ? 
+            { results === 'empty' ? 
               <Typography variant={'h6'}>No results were found.</Typography>  : 
               <GridRender casts={casts} classes={classes} />
             }

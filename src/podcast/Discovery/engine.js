@@ -40,7 +40,6 @@ export const getPopularPodcasts = function (query=null) {
             data = fetch(`/ln/best_podcasts?genre_id=${query}&page=1&region=us`).then(x=> x.json())
         } else {
             data = import("./top.json");
-            // data = fetch(`/rss-full/https://itunes.apple.com/search?term=podcast&limit=20`).then(x=> x.json())
          }
         data
         .then(({podcasts, name }) => {
@@ -97,53 +96,3 @@ export const getPopularPodcasts = function (query=null) {
             //     this.setState(response);
             // })
     };
-
-// const lsName = 'topCasts';
-// const seconsToRefresh = 6 * 60 * 1000;
-    //   let responseSaved = JSON.parse(localStorage.getItem(lsName)) || {};
-    //   const fresh = responseSaved.created + seconsToRefresh >  Date.now()
-    //   console.log('aa')
-    //   if (responseSaved.created && fresh ) {
-    //     const {response } = responseSaved;
-    //     this.setState(response);
-    //     return;
-    //   } else {
-    //     console.log('response fetched and Saved', responseSaved)
-    //     localStorage.setItem(lsName,JSON.stringify(responseSaved));
-    // //   }
-
-
-    // .then(({podcasts, name }) => {
-    //     const cleanedCasts = podcasts.map((podcast, num) => {
-    //         const {
-    //             title,
-    //             domain,
-    //             thumbnail,
-    //             description,
-    //             id,
-    //             total_episodes: episodes,
-    //             earliest_pub_date_ms: startDate,
-    //             publisher,
-    //         } = podcast;
-    //         const rss = `${URI}${id}`;
-    //         return {
-    //             title: `${num + 1}. ${title}`,
-    //             thumbnail,
-    //             domain,
-    //             description,
-    //             rss,
-    //             episodes,
-    //             startDate,
-    //             publisher,
-    //         };
-    //     });
-    //     const response = {
-    //         top: cleanedCasts,
-    //         loading: false,
-    //         init: query || 0,
-    //         name
-    //     };
-    //     memory = response;
-    //     this.setState(response);
-
-    // });
