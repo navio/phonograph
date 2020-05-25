@@ -199,7 +199,13 @@ const MediaControlCard = (props) => {
                 {episodeInfo.title}
               </Typography>}
 
-              {open && episodeInfo.subtitle && <Typography variant="subtitle1" align="center" className={classes.subtitle} gutterBottom >
+              {open && state.podcastAuthor && 
+              <Typography variant="body2" align="center"  gutterBottom >
+                {state.podcastAuthor}
+              </Typography>}
+
+              {open && episodeInfo.subtitle && 
+              <Typography variant="subtitle1" align="center" className={classes.subtitle} gutterBottom >
                 {episodeInfo.subtitle}
               </Typography>}
 
