@@ -61,7 +61,7 @@ functions
 .cache
 
 localhost.sh
-
+src/podcasts/Discovery/genres.json
 src/podcast/Discovery/top.json
 src/podcast/Discovery/curated.json
 public/genres.json

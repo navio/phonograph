@@ -47,11 +47,7 @@ const styles = (theme) => ({
     float: "right",
   },
   desc: {
-<<<<<<< HEAD
-    maxHeight: "13em",
-=======
     maxHeight: "14vh",
->>>>>>> preprod
     marginTop: "1em",
     overflow: "hidden",
     marginLeft: ".5em",
