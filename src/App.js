@@ -99,6 +99,15 @@ const App = ({}) => {
       <ThemeProvider theme={finalTheme}>
         <AppContext.Provider value={{ state, dispatch, engine, player: player.current }} >
           <CssBaseline />
+          <Suspense fallback={<Loading />}>
+            { player.current && <MediaControl
+              player={player.current}
+              handler={mediaFunctions.playButton}
+              forward={mediaFunctions.forward30Seconds}
+              rewind={mediaFunctions.rewind10Seconds}
+              seek={mediaFunctions.seek}
+            /> }
+          </Suspense>
            <Switch>
             <Route
               exact
@@ -153,16 +162,7 @@ const App = ({}) => {
               <Redirect to={DISCOVERVIEW} />
             </Route>
           </Switch>
-     
-          <Suspense fallback={<Loading />}>
-            { player.current && <MediaControl
-              player={player.current}
-              handler={mediaFunctions.playButton}
-              forward={mediaFunctions.forward30Seconds}
-              rewind={mediaFunctions.rewind10Seconds}
-              seek={mediaFunctions.seek}
-            /> }
-          </Suspense>
+    
 
           <Suspense fallback={<Loading />}>
             <Footer path={location.pathname} />

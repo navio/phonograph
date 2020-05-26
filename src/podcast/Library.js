@@ -12,6 +12,8 @@ import AddIcon from "@material-ui/icons/Add";
 import Fab from "@material-ui/core/Fab";
 import { AppContext } from "../App.js";
 import phono from '../../public/phono.svg';
+import ButtonBase from '@material-ui/core/ButtonBase';
+
 
 const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 const prod = DEBUG ? '' : '/image/'
@@ -98,8 +100,8 @@ const LibraryView = (props) => {
                 podcasts.map(
                   (podcast) =>
                     podcast &&
-                    podcast.domain && (
-                      <Grid item xs={3} sm={2} md={1}  key={podcast.domain}>
+                    podcast.domain && 
+                      <Grid item xs={3} sm={2} md={1}  key={podcast.domain} tabindex="1">
                         <Card
                           raised={true}
                           classes={{ root: classes.card }}                
@@ -118,12 +120,12 @@ const LibraryView = (props) => {
                           </div>
                         </Card>
                       </Grid>
-                    )
-                ): <Typography className={classes.empty} align="center" variant="h5">
+                ) : 
+                <Typography className={classes.empty} align="center" variant="h5">
                     <img width={'85rem'} src={phono} />
                       <br />
                   No podcasts bookmarked.
-                  </Typography>}
+                </Typography>}
             </Grid>
           </>;
 }

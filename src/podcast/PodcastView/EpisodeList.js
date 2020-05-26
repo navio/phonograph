@@ -168,16 +168,17 @@ const EpisodeList = (props) => {
   }
 
   const ShowProgress = ({ guid, episodeData }) => {
+    
     const { currentTime, duration, completed } = episodeData;
-    if (completed) return <CheckCircleIcon color="secondary" />;
+    if (completed) return <IconButton><CheckCircleIcon color="secondary" /></IconButton>;
 
     const total = (currentTime && duration) ? Math.round((currentTime * 100) / duration) : null;
     if (total) {
       return <div onClick={() => completeEpisode(guid)}>{total}%</div>;
     }
-    return  (<IconButton>
+    return  <IconButton>
               <CheckCircleOutlineIcon onClick={() => completeEpisode(guid)} color="secondary" />
-            </IconButton>);
+            </IconButton>;
   }
 
   useEffect(() => {
@@ -205,24 +206,16 @@ const EpisodeList = (props) => {
                         // button
                         >
                           <ListItemIcon>
-                            <IconButton>
+                            <IconButton onClick={props.handler(episode.guid, whenToStart(episodeData), podcast)}>
                               {props.playing === episode.guid &&
-                                props.status !== "pause" ? (
-                                  <PauseIcon
-                                    className={classes.playIcon}
-                                    onClick={props.handler(episode.guid, whenToStart(episodeData), podcast)}
-                                    data-guid={episodeData}
-                                  />
-                                ) : (
-                                  <PlayArrowIcon
-                                    className={classes.playIcon}
-                                    onClick={props.handler(episode.guid, whenToStart(episodeData), podcast)}
-                                  />
-                                )}</IconButton>
+                                props.status !== "pause" 
+                                ? <PauseIcon  className={classes.playIcon}  />
+                                : <PlayArrowIcon className={classes.playIcon} />
+                                }</IconButton>
                           </ListItemIcon>
                           <EpisodeListDescription
                             onClick={() => {
-                              console.log(episode);
+                              // console.log(episode);
                               // saveOffline(episode.enclosures[0].url)
                               setOpen({
                                 description: episode.description,
