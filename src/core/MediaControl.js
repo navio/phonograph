@@ -200,7 +200,7 @@ const MediaControlCard = (props) => {
               </Typography>}
 
               {open && state.podcastAuthor && 
-              <Typography variant="body2" align="center"  gutterBottom >
+              <Typography variant="body2" align="center" gutterBottom >
                 {state.podcastAuthor}
               </Typography>}
 
@@ -264,7 +264,9 @@ const MediaControlCard = (props) => {
                 </Grid></Hidden>}
               </Grid>
 
-              {open && <Grid container className={classes.controls}>
+              {open && 
+              <>
+              <Grid container className={classes.controls}>
                 <Grid item xs={3} sm={4} align={open ? 'right' : "center"} className={classes.right}>
                   <IconButton
                     style={{ padding: "0" }}
@@ -306,7 +308,9 @@ const MediaControlCard = (props) => {
                       )}
                   </IconButton>
                 </Grid>
-              </Grid>}
+              </Grid>
+              </>
+              }
             </div>
           </div>
 
