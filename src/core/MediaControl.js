@@ -121,6 +121,7 @@ const styles = (theme) => ({
     borderTop: `1px solid ${theme.palette.secondary.main}`,
     backgroundColor: theme.palette.background.paper,
     position: "fixed",
+    zIndex: 1
   },
   root: {
     borderTop: `1px solid ${theme.palette.secondary.main}`,
@@ -129,7 +130,8 @@ const styles = (theme) => ({
     backgroundColor: theme.palette.background.paper,
     zIndex: 50,
     height: "100%",
-    top: "0px"
+    top: "0px",
+    zIndex: 1
   },
 });
 
@@ -325,7 +327,7 @@ const MediaControlCard = (props) => {
           </div>
         )}
       </Card>
-      {episodeInfo && <div id={'under'} className={classes.undeground}>-</div>}
+      {/* {episodeInfo && <div id={'under'} className={classes.undeground}>-</div>} */}
     </>
   );
 }
