@@ -10,9 +10,10 @@ import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import PauseIcon from "@material-ui/icons/Pause";
 import SkipNextIcon from "@material-ui/icons/Forward30";
 import LinearProgress from "@material-ui/core/LinearProgress";
-import { Grid, Card, Hidden } from "@material-ui/core";
+import { Grid, Card, Hidden, Paper } from "@material-ui/core";
 import CloseIcon from '@material-ui/icons/Close';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
+import SpeedIcon from '@material-ui/icons/Speed';
 import { AppContext } from "../App.js";
 import {
   PODCASTVIEW,
@@ -309,11 +310,19 @@ const MediaControlCard = (props) => {
                   </IconButton>
                 </Grid>
               </Grid>
+                <Grid
+                  direction="row"
+                  justify={"space-between"}
+                  alignItems="center"
+                >
+                  <Grid item>
+                    <Typography component="span">1.0 <SpeedIcon /> </Typography>
+                  </Grid>
+                </Grid>
               </>
               }
             </div>
           </div>
-
         )}
       </Card>
       {episodeInfo && <div id={'under'} className={classes.undeground}>-</div>}
