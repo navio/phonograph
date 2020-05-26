@@ -29,11 +29,15 @@ const styles = (theme) => ({
     maxWidth: 360,
     backgroundColor: theme.palette.background.paper,
   },
+  appHeader: {
+    WebkitAppRegion: 'drag',
+  },
 });
 
 
 
 const Settings = (props) => {
+  const { classes } = props;
   const { state, dispatch } = useContext(AppContext)
 
   const themeSwitcher = () => {
@@ -54,7 +58,7 @@ const Settings = (props) => {
 
   return (
     <>
-      <AppBar position="static">
+      <AppBar className={classes.appHeader} position="static">
         <Toolbar variant="dense">
           <Typography variant="h6">Settings</Typography>
         </Toolbar>

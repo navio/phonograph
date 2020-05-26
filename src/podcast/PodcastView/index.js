@@ -52,7 +52,7 @@ export default (props) => {
         const fresh = navigator.onLine ? undefined : Infinity;
         console.log('freshStatus',fresh);
         const castContent = await engine.getPodcast(podcastURL, { save, fresh });
-
+        console.log(castContent);
         let newPodcast = {
             items: castContent.items,
             title: castContent.title,
@@ -62,6 +62,7 @@ export default (props) => {
             lastUpdated: Date.now(),
             domain: podcastURL,
             url:podcastURL,
+            author: castContent.author,
             created: (Date.now())
         };
         setPodcast(newPodcast);
@@ -127,7 +128,8 @@ export default (props) => {
             status: "playing",
             played: 0,
             episodeInfo: episode,
-            podcastImage: podcast.image
+            podcastImage: podcast.image,
+            podcastAuthor: podcast.author
           }
           if(currentTime){
             console.log('setting time',currentTime)

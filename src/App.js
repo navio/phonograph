@@ -54,7 +54,7 @@ const Loading = () => (
 // Pausing for load or refresh
 initialState['status'] = "pause";
 
-const App = () => {
+const App = ({}) => {
 
     const player = useRef(null);
 
@@ -67,9 +67,9 @@ const App = () => {
       cb()
     } 
 
-
     // Mode
     const {newPodcast, shouldInit } = checkIfNewPodcastInURL();
+
     if(newPodcast){
       loadPodcast(newPodcast, () => history.push(PODCASTVIEW));
     }
@@ -174,7 +174,7 @@ const App = () => {
             preload="auto"
             title={ state.title || ""}
             src={state.media}
-            // poster={(episode && episode.itunes && episode.itunes.image) || ""}
+            poster={ state.podcastImage || "" }
           />
         </AppContext.Provider>
       </ThemeProvider>

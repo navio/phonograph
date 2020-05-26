@@ -199,7 +199,13 @@ const MediaControlCard = (props) => {
                 {episodeInfo.title}
               </Typography>}
 
-              {open && episodeInfo.subtitle && <Typography variant="subtitle1" align="center" className={classes.subtitle} gutterBottom >
+              {open && state.podcastAuthor && 
+              <Typography variant="body2" align="center" gutterBottom >
+                {state.podcastAuthor}
+              </Typography>}
+
+              {open && episodeInfo.subtitle && 
+              <Typography variant="subtitle1" align="center" className={classes.subtitle} gutterBottom >
                 {episodeInfo.subtitle}
               </Typography>}
 
@@ -258,7 +264,9 @@ const MediaControlCard = (props) => {
                 </Grid></Hidden>}
               </Grid>
 
-              {open && <Grid container className={classes.controls}>
+              {open && 
+              <>
+              <Grid container className={classes.controls}>
                 <Grid item xs={3} sm={4} align={open ? 'right' : "center"} className={classes.right}>
                   <IconButton
                     style={{ padding: "0" }}
@@ -300,7 +308,9 @@ const MediaControlCard = (props) => {
                       )}
                   </IconButton>
                 </Grid>
-              </Grid>}
+              </Grid>
+              </>
+              }
             </div>
           </div>
 

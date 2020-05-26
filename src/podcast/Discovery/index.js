@@ -78,6 +78,9 @@ const styles = (theme) => ({
   inputRoot: {
     color: "inherit",
   },
+  appHeader: {
+    WebkitAppRegion: 'drag',
+  },
   inputInput: {
     padding: theme.spacing(1, 1, 1, 0),
     // vertical padding + font size from searchIcon
@@ -93,8 +96,8 @@ const styles = (theme) => ({
   },
 });
 
-const Header = ({ searchHandler }) => (
-  <AppBar position="static">
+const Header = ({ searchHandler, classes }) => (
+  <AppBar  className={classes.appHeader}  position="static">
     <Grid>
       <Toolbar variant="dense">
         <Grid item xs={8}>
@@ -234,7 +237,7 @@ class Discover extends Component {
     const { classes } = this.props;
     const {GridRender } = this;
     return <>
-          <Header searchHandler={this.searchHandler} />
+          <Header classes={classes}  searchHandler={this.searchHandler} />
           <Card>
               {/* <Geners selected={this.state.init} getPopularPodcasts={this.getPopularPodcasts} /> */}
             <CardContent>
