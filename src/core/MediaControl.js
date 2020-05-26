@@ -106,8 +106,7 @@ const styles = (theme) => ({
     width: '3rem'
   },
   title: {
-    paddingTop: "10px",
-    paddingBottom: "10px",
+    padding: "10px 5px",
     color: theme.palette.text.primary
   },
   subtitle: {
@@ -310,7 +309,8 @@ const MediaControlCard = (props) => {
                   </IconButton>
                 </Grid>
               </Grid>
-                <Grid
+                {/* <Grid
+                  container
                   direction="row"
                   justify={"space-between"}
                   alignItems="center"
@@ -318,7 +318,7 @@ const MediaControlCard = (props) => {
                   <Grid item>
                     <Typography component="span">1.0 <SpeedIcon /> </Typography>
                   </Grid>
-                </Grid>
+                </Grid> */}
               </>
               }
             </div>
