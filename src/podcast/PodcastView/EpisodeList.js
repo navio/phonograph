@@ -170,14 +170,14 @@ const EpisodeList = (props) => {
   const ShowProgress = ({ guid, episodeData }) => {
     
     const { currentTime, duration, completed } = episodeData;
-    if (completed) return <IconButton><CheckCircleIcon color="secondary" /></IconButton>;
+    if (completed) return <IconButton><CheckCircleIcon style={{ color: 'lightgreen' }} /></IconButton>;
 
     const total = (currentTime && duration) ? Math.round((currentTime * 100) / duration) : null;
     if (total) {
       return <div onClick={() => completeEpisode(guid)}>{total}%</div>;
     }
     return  <IconButton>
-              <CheckCircleOutlineIcon onClick={() => completeEpisode(guid)} color="secondary" />
+              <CheckCircleOutlineIcon onClick={() => completeEpisode(guid)} />
             </IconButton>;
   }
 

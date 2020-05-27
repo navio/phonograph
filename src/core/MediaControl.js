@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
-import Slider from "@material-ui/core/Slider";
+import { Slider, Box } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
@@ -14,6 +14,8 @@ import { Grid, Card, Hidden, Paper } from "@material-ui/core";
 import CloseIcon from '@material-ui/icons/Close';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import SpeedIcon from '@material-ui/icons/Speed';
+import NightsStayIcon from '@material-ui/icons/NightsStay';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { AppContext } from "../App.js";
 import {
   PODCASTVIEW,
@@ -102,7 +104,7 @@ const styles = (theme) => ({
   },
   podcastImageClosed: {
     display: 'block',
-    maxWidth: '5rem', 
+    maxWidth: '5rem',
     width: '3rem'
   },
   title: {
@@ -121,7 +123,7 @@ const styles = (theme) => ({
     borderTop: `1px solid ${theme.palette.secondary.main}`,
     backgroundColor: theme.palette.background.paper,
     position: "fixed",
-    zIndex: 1
+    zIndex: 2
   },
   root: {
     borderTop: `1px solid ${theme.palette.secondary.main}`,
@@ -131,7 +133,7 @@ const styles = (theme) => ({
     zIndex: 50,
     height: "100%",
     top: "0px",
-    zIndex: 1
+    zIndex: 2
   },
 });
 
@@ -165,14 +167,14 @@ const MediaControlCard = (props) => {
   const toOrigin = (audioOrigin) => () => {
     dispatch({ type: 'updateCurrent', payload: audioOrigin })
     history.push(PODCASTVIEW)
-  
-    
+
+
   }
 
   const { episodeInfo = {} } = state;
   return (
     state.episodeInfo && <>
-      <Card  variant="outlined" className={open ? classes.root : classes.rootClosed}>
+      <Card variant="outlined" className={open ? classes.root : classes.rootClosed}>
         {open && <Grid container direction="row-reverse">
           <Grid item style={{ padding: '.5rem' }}>
             <IconButton onClick={() => setOpen(false)}>
@@ -201,45 +203,45 @@ const MediaControlCard = (props) => {
                 {episodeInfo.title}
               </Typography>}
 
-              {open && state.podcastAuthor && 
-              <Typography variant="body2" align="center" gutterBottom >
-                {state.podcastAuthor}
-              </Typography>}
+              {open && state.podcastAuthor &&
+                <Typography variant="body2" align="center" gutterBottom >
+                  {state.podcastAuthor}
+                </Typography>}
 
-              {open && episodeInfo.subtitle && 
-              <Typography variant="subtitle1" align="center" className={classes.subtitle} gutterBottom >
-                {episodeInfo.subtitle}
-              </Typography>}
+              {open && episodeInfo.subtitle &&
+                <Typography variant="subtitle1" align="center" className={classes.subtitle} gutterBottom >
+                  {episodeInfo.subtitle}
+                </Typography>}
 
               <Grid container
                 direction="row"
-                justify={open ? "space-around": "space-between"}
+                justify={open ? "space-around" : "space-between"}
                 alignItems="center"
                 className={classes.player}>
                 {!open && <>
                   {<Grid item align="left" style={{ paddingLeft: '.14rem' }} xs={1}>
-                    <img  onClick={() => setOpen(true)}
-                          className={classes.podcastImageClosed} 
-                          src={state.podcastImage} />
+                    <img onClick={() => setOpen(true)}
+                      className={classes.podcastImageClosed}
+                      src={state.podcastImage} />
                   </Grid>}
                   <Grid item align="center" xs={1}>
-                    <IconButton onClick={() => setOpen(true)}
+                    <IconButton 
                       aria-label="Play/pause"
                       onClick={() => props.handler()}
                       data-guid={state.playing}
                     >
                       {state.playing === (episodeInfo && episodeInfo.guid) &&
                         state.status !== "pause" ? (
-                          <PauseIcon className={classes.playClosed}  />
+                          <PauseIcon className={classes.playClosed} />
                         ) : (
-                          <PlayArrowIcon className={classes.playClosed}  />
+                          <PlayArrowIcon className={classes.playClosed} />
                         )}
                     </IconButton>
-                  </Grid></> }
+                  </Grid></>}
                 <Grid align="center" item xs={2} md={1} >
                   <span>{toMin(state.currentTime)}</span>
                 </Grid>
-                <Grid className={classes.container} item xs={open ? 5 : 4} md={6  } >
+                <Grid className={classes.container} item xs={open ? 5 : 4} md={6} >
                   <LinearProgress
                     className={classes.progress}
                     variant="buffer"
@@ -266,62 +268,70 @@ const MediaControlCard = (props) => {
                 </Grid></Hidden>}
               </Grid>
 
-              {open && 
-              <>
-              <Grid container className={classes.controls}>
-                <Grid item xs={3} sm={4} align={open ? 'right' : "center"} className={classes.right}>
-                  <IconButton
-                    style={{ padding: "0" }}
-                    aria-label="Previous"
-                    onClick={props.rewind}
-                  >
-                    {theme.direction === "rtl" ? (
-                      <SkipNextIcon className={classes.controlIcon} />
-                    ) : (
-                        <SkipPreviousIcon className={classes.controlIcon} />
-                      )}
-                  </IconButton>
-                </Grid>
-                <Grid item xs={6} sm={4} className={classes.center}>
-                  <IconButton
-                    style={{ padding: "0" }}
-                    aria-label="Play/pause"
-                    onClick={() => props.handler()}
-                    data-guid={state.playing}
-                  >
-                    {state.playing === (episodeInfo && episodeInfo.guid) &&
-                      state.status !== "pause" ? (
-                        <PauseIcon className={classes.playIcon} />
-                      ) : (
-                        <PlayArrowIcon className={classes.playIcon} />
-                      )}
-                  </IconButton>
-                </Grid>
-                <Grid item xs={3} sm={4} align={open ? 'left' : "center"} className={classes.left}>
-                  <IconButton
-                    style={{ padding: "0" }}
-                    aria-label="Next"
-                    onClick={props.forward}
-                  >
-                    {theme.direction === "rtl" ? (
-                      <SkipPreviousIcon className={classes.controlIcon} />
-                    ) : (
-                        <SkipNextIcon className={classes.controlIcon} />
-                      )}
-                  </IconButton>
-                </Grid>
-              </Grid>
-                {/* <Grid
-                  container
-                  direction="row"
-                  justify={"space-between"}
-                  alignItems="center"
-                >
-                  <Grid item>
-                    <Typography component="span">1.0 <SpeedIcon /> </Typography>
+              {open &&
+                <>
+                  <Grid container className={classes.controls}>
+                    <Grid item xs={3} sm={4} align={open ? 'right' : "center"} className={classes.right}>
+                      <IconButton
+                        style={{ padding: "0" }}
+                        aria-label="Previous"
+                        onClick={props.rewind}
+                      >
+                        {theme.direction === "rtl" ? (
+                          <SkipNextIcon className={classes.controlIcon} />
+                        ) : (
+                            <SkipPreviousIcon className={classes.controlIcon} />
+                          )}
+                      </IconButton>
+                    </Grid>
+                    <Grid item xs={6} sm={4} className={classes.center}>
+                      <IconButton
+                        style={{ padding: "0" }}
+                        aria-label="Play/pause"
+                        onClick={() => props.handler()}
+                        data-guid={state.playing}
+                      >
+                        {state.playing === (episodeInfo && episodeInfo.guid) &&
+                          state.status !== "pause" ? (
+                            <PauseIcon className={classes.playIcon} />
+                          ) : (
+                            <PlayArrowIcon className={classes.playIcon} />
+                          )}
+                      </IconButton>
+                    </Grid>
+                    <Grid item xs={3} sm={4} align={open ? 'left' : "center"} className={classes.left}>
+                      <IconButton
+                        style={{ padding: "0" }}
+                        aria-label="Next"
+                        onClick={props.forward}
+                      >
+                        {theme.direction === "rtl" ? (
+                          <SkipPreviousIcon className={classes.controlIcon} />
+                        ) : (
+                            <SkipNextIcon className={classes.controlIcon} />
+                          )}
+                      </IconButton>
+                    </Grid>
                   </Grid>
-                </Grid> */}
-              </>
+                  {/* <Box m={2}>
+                    <Grid
+                      container
+                      direction="row"
+                      justify="space-evenly"
+                      alignItems="center"
+                    >
+                      <Grid item>
+                        <IconButton><SpeedIcon /></IconButton>
+                      </Grid>
+                      <Grid item>
+                        <IconButton><NightsStayIcon /></IconButton>
+                      </Grid>
+                      <Grid item>
+                        <IconButton><MoreVertIcon /></IconButton>
+                      </Grid>
+                    </Grid>
+                  </Box> */}
+                </>
               }
             </div>
           </div>
