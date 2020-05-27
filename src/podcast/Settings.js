@@ -16,11 +16,18 @@ import Typography from "@material-ui/core/Typography";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
-import {FormControlLabel, Button } from '@material-ui/core';
+import { FormControlLabel, Button } from '@material-ui/core';
 import Switch from '@material-ui/core/Switch';
 import PodcastEngine from "podcastsuite";
 import { AppContext } from '../App';
 import { CardHeader } from "@material-ui/core";
+
+import ToggleButton from '@material-ui/lab/ToggleButton';
+import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
+
+import BrightnessLowIcon from '@material-ui/icons/WbSunny';
+import BrightnessHighIcon from '@material-ui/icons/NightsStay';
+import BrightnessMediumIcon from '@material-ui/icons/BrightnessMedium';
 
 
 const styles = (theme) => ({
@@ -40,9 +47,8 @@ const Settings = (props) => {
   const { classes } = props;
   const { state, dispatch } = useContext(AppContext)
 
-  const themeSwitcher = () => {
-    const value = state.theme;
-    dispatch({ type: 'setDark', payload: !value });
+  const themeSwitcher = (ev, input) => {
+    dispatch({ type: 'setDark', payload: input });
   };
 
   const eraseThisPodcast = (podcast) => async () => {
@@ -64,9 +70,25 @@ const Settings = (props) => {
         </Toolbar>
       </AppBar>
       <Card variant="outlined">
-      <CardHeader title="Configurations" />
+        <CardHeader title="Configurations" />
         <CardContent>
-          <FormControlLabel control={<Switch color="primary" onChange={themeSwitcher} />} label="Toggle Theme" />
+          <Typography>Theme Selector</Typography>
+          <ToggleButtonGroup
+            value={state.theme}
+            exclusive
+            onChange={themeSwitcher}
+            aria-label="text alignment"
+          >
+            <ToggleButton value={'light'} aria-label="White">
+              <BrightnessLowIcon />
+            </ToggleButton>
+            <ToggleButton value={'dark'} aria-label="Black">
+              <BrightnessHighIcon />
+            </ToggleButton>
+            <ToggleButton value={'os'} aria-label="right aligned">
+              OS
+            </ToggleButton>
+          </ToggleButtonGroup>
         </CardContent>
       </Card>
       <ExpansionPanel defaultExpanded>

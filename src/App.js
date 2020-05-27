@@ -99,7 +99,25 @@ const App = ({}) => {
     state,
   ]);
 
-  const finalTheme = state.theme === theme.os ? theme.dark : theme.light;
+  useEffect(() => {
+    const {theme} = state;
+
+  }, [
+    state.theme,
+  ]);
+
+  let finalTheme;
+  switch(state.theme) {
+    case 'dark':
+      finalTheme = theme.dark;
+    break;
+    case 'light':
+      finalTheme = theme.light;
+    break;
+    case 'os':
+    default:
+      finalTheme = theme.os ? theme.dark: theme.light;
+  }
 
   return (
     <ThemeProvider theme={finalTheme}>
