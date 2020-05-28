@@ -19,6 +19,10 @@ import { clearText } from "./EpisodeList";
 import ShareIcon from "@material-ui/icons/ShareOutlined";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+
 import { Consumer } from "../../App.js";
 import { useHistory } from "react-router-dom";
 
@@ -37,7 +41,11 @@ const styles = (theme) => ({
     margin: 10,
     padding: 40,
     height: "20em",
-
+  },
+  coverSM: {
+    // margin: 10,
+    // padding: 40,
+    height: "20em",
   },
   playIcon: {
     height: 38,
@@ -191,45 +199,56 @@ function PodcastHeader(props) {
             <Grid style={{ paddingBottom: "1em" }} elevation={3} container >
               <Grid item xs={12} md={4}>
                 {state.image && (
-                  <CardMedia
-                    className={classes.cover}
-                    image={state.image}
-                    title={`${state.title} cover`}
-                  />
+                  <>
+                  <Hidden smDown >
+                    <CardMedia
+                      className={classes.cover}
+                      image={state.image}
+                      title={`${state.title} cover`}
+                    />
+                  </Hidden>
+                   <Hidden mdUp>
+                   <CardMedia
+                     className={classes.coverSM}
+                     image={state.image}
+                     title={`${state.title} cover`}
+                   />
+                 </Hidden>
+                </>
                 )}
               </Grid>
               <Grid item sm={12} md={8}>
                 <Box mb='1rem'>
-                <Typography className={classes.title} variant="h4" noWrap>
-                  {state.title}
-                </Typography>
-                {/* <Typography
-                  className={classes.title}
-                  variant="subtitle2"
-                  noWrap
-                >
-                  Last Updated:{" "}
-                  {
-                    new Date(state.created || Date.now())
-                      .toString()
-                      .split("GMT")[0]
-                  }
-                </Typography> */}
-                <Hidden>
-                  <Typography
-                    align={"justify"}
-                    className={classes.desc}
-                    color="textSecondary"
-                  >
-                    {clearText(state.description)}
-                  </Typography>
-                </Hidden >
+                  <Hidden smDown >
+                    <Typography className={classes.title} variant="h4" noWrap>
+                      {state.title}
+                    </Typography>
+                    <Typography
+                      align={"justify"}
+                      className={classes.desc}
+                      color="textSecondary"
+                    >
+                      {clearText(state.description)}
+                    </Typography>
+                  </Hidden>
+                  <Hidden mdUp>
+                    <ExpansionPanel>
+                      <ExpansionPanelSummary>
+                        <Typography className={classes.title} variant="h4" noWrap>
+                          {state.title}
+                        </Typography>
+                      </ExpansionPanelSummary>
+                      <ExpansionPanelDetails>
+                        {clearText(state.description)}
+                      </ExpansionPanelDetails>
+                    </ExpansionPanel>
+                  </Hidden>
                 </Box>
               </Grid>
               <Grid item xs={12} pt={2} align="right">
                 {!isInLibrary &&
                   <Button onClick={saveThisPodcastToLibrary}
-                  style={{ marginRight: '1rem' }} variant="outlined" color="primary" >Subscribe</Button>}
+                    style={{ marginRight: '1rem' }} variant="outlined" color="primary" >Subscribe</Button>}
               </Grid>
               <Grid item xs={12}>
                 <Typography style={{ marginLeft: '.5rem' }}>
