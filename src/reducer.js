@@ -77,5 +77,7 @@ export const reducer = (state, action) => {
         }else {
         return { ...state, ...action.payload}
         }
+      case 'resetState':
+        return {} 
     }
   }

@@ -50,6 +50,11 @@ const Settings = (props) => {
     dispatch({ type: 'setDark', payload: input });
   };
 
+  const clearState = () => {
+    dispatch({ type: 'resetState' });
+    window.location.reload()
+  }
+
   const eraseThisPodcast = (podcast) => async () => {
     const podcasts = state.podcasts.filter((cast) => cast.domain !== podcast);
     dispatch({ type: 'updatePodcasts', podcasts: podcasts });
@@ -143,12 +148,12 @@ const Settings = (props) => {
           </ExpansionPanel>
         
       </Card>
-      {/* <Card variant="outlined">
-        <CardHeader title="Data" />
+      <Card variant="outlined">
+        {/* <CardHeader title="Data" /> */}
         <CardContent>
-          <Button variant="outlined" > Flush Data </Button>
+          <Button variant="outlined" color="primary" onClick={clearState} > Reset State </Button>
         </CardContent>
-      </Card> */}
+      </Card>
       <Card>
         <CardContent align="center">
           <Typography variant="h5">Phonograph</Typography>

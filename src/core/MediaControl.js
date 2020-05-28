@@ -167,13 +167,11 @@ const MediaControlCard = (props) => {
   const toOrigin = (audioOrigin) => () => {
     dispatch({ type: 'updateCurrent', payload: audioOrigin })
     history.push(PODCASTVIEW)
-
-
   }
 
   const { episodeInfo = {} } = state;
   return (
-    state.episodeInfo && <>
+    state.episodeInfo ? <>
       <Card variant="outlined" className={open ? classes.root : classes.rootClosed}>
         {open && <Grid container direction="row-reverse">
           <Grid item style={{ padding: '.5rem' }}>
@@ -338,7 +336,7 @@ const MediaControlCard = (props) => {
         )}
       </Card>
       {/* {episodeInfo && <div id={'under'} className={classes.undeground}>-</div>} */}
-    </>
+    </> : <></>
   );
 }
 
