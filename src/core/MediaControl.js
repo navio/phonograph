@@ -13,10 +13,15 @@ import LinearProgress from "@material-ui/core/LinearProgress";
 import { Grid, Card, Hidden, Paper } from "@material-ui/core";
 import CloseIcon from '@material-ui/icons/Close';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
-import SpeedIcon from '@material-ui/icons/Speed';
 import NightsStayIcon from '@material-ui/icons/NightsStay';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { AppContext } from "../App.js";
+
+import SpeedControl from './SpeedControl';
+// import SpeedIcon from '@material-ui/icons/Speed';
+// import ToggleButton from '@material-ui/lab/ToggleButton';
+// import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
+
 import {
   PODCASTVIEW,
 } from "../constants";
@@ -223,7 +228,7 @@ const MediaControlCard = (props) => {
                       src={state.podcastImage} />
                   </Grid>}
                   <Grid item align="center" xs={1}>
-                    <IconButton 
+                    <IconButton
                       aria-label="Play/pause"
                       onClick={() => props.handler()}
                       data-guid={state.playing}
@@ -311,24 +316,24 @@ const MediaControlCard = (props) => {
                       </IconButton>
                     </Grid>
                   </Grid>
-                  {/* <Box m={2}>
+                  <Box m={2}>
                     <Grid
                       container
                       direction="row"
                       justify="space-evenly"
                       alignItems="center"
                     >
-                      <Grid item>
-                        <IconButton><SpeedIcon /></IconButton>
+                      <Grid item align="center">
+                        <SpeedControl />
                       </Grid>
-                      <Grid item>
+                      {/* <Grid item>
                         <IconButton><NightsStayIcon /></IconButton>
-                      </Grid>
-                      <Grid item>
+                      </Grid> */}
+                      {/* <Grid item>
                         <IconButton><MoreVertIcon /></IconButton>
-                      </Grid>
+                      </Grid> */}
                     </Grid>
-                  </Box> */}
+                  </Box>
                 </>
               }
             </div>
