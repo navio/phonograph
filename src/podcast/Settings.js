@@ -20,14 +20,13 @@ import { FormControlLabel, Button } from '@material-ui/core';
 import Switch from '@material-ui/core/Switch';
 import PodcastEngine from "podcastsuite";
 import { AppContext } from '../App';
-import { CardHeader } from "@material-ui/core";
+import {version} from '../../package.json';
 
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 
 import BrightnessLowIcon from '@material-ui/icons/WbSunny';
 import BrightnessHighIcon from '@material-ui/icons/NightsStay';
-import BrightnessMediumIcon from '@material-ui/icons/BrightnessMedium';
 
 
 const styles = (theme) => ({
@@ -69,8 +68,11 @@ const Settings = (props) => {
           <Typography variant="h6">Settings</Typography>
         </Toolbar>
       </AppBar>
-      <Card><CardContent>
+      <Card>
+        <CardContent>
         <Typography variant={'h5'}>Configurations</Typography>
+        Version: {version}
+        
       </CardContent>
       </Card>
 
