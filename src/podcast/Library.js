@@ -101,7 +101,7 @@ const LibraryView = (props) => {
                   (podcast) =>
                     podcast &&
                     podcast.domain && 
-                      <Grid item xs={3} sm={2} md={1}  key={podcast.domain} tabindex="1">
+                      <Grid item xs={3} sm={2} md={1}  key={podcast.domain} >
                         <Card
                           raised={true}
                           classes={{ root: classes.card }}                
@@ -110,7 +110,7 @@ const LibraryView = (props) => {
                             <CardContent className={classes.cardContent}>
                               {podcast.title}
                             </CardContent>
-                            <CardMedia
+                            <CardMedia tabIndex="1"
                               onClick={processClick}
                               domain={podcast.domain}
                               title={podcast.title}
