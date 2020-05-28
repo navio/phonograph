@@ -19,6 +19,7 @@ export default () => {
 
     return (<>
         <IconButton onClick={() => setVisible((val) => !val)}><SpeedIcon /></IconButton>
+        <br />
         {visible && <ToggleButtonGroup
             value={speed}
             exclusive
