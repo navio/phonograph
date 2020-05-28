@@ -69,10 +69,14 @@ const Settings = (props) => {
           <Typography variant="h6">Settings</Typography>
         </Toolbar>
       </AppBar>
-      <Card variant="outlined">
-        <CardHeader title="Configurations" />
+      <Card><CardContent>
+        <Typography variant={'h5'}>Configurations</Typography>
+      </CardContent>
+      </Card>
+
+      <Card>
         <CardContent>
-          <Typography>Theme Selector</Typography>
+          <Typography variant={'h6'} gutterBottom >Theme Selector</Typography>
           <ToggleButtonGroup
             value={state.theme}
             exclusive
@@ -91,55 +95,59 @@ const Settings = (props) => {
           </ToggleButtonGroup>
         </CardContent>
       </Card>
-      <ExpansionPanel defaultExpanded>
-        <ExpansionPanelSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel1a-content"
-          id="panel1a-header"
-        >
-          <Typography variant="h5"> Podcasts Data</Typography>
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
-          <List style={{ width: '100%' }}>
-            <Divider />
-            {podcasts &&
-              podcasts.map((podcast) => (
-                <div key={podcast.domain}>
-                  <ListItem>
-                    <ListItemText
-                      secondary={
-                        <Typography component="span" variant="subtitle1">
-                          {podcast.title} <br />
-                          <Typography component="span" variant="caption">
-                            {new Date(podcast.created).toLocaleString()}
-                          </Typography>
-                        </Typography>
-                      }
-                    />
-                    <ListItemSecondaryAction>
-                      <IconButton
-                        aria-label="Delete"
-                        onClick={eraseThisPodcast(
-                          podcast.domain
-                        )}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                  <Divider />
-                </div>
-              ))}
-          </List>
-        </ExpansionPanelDetails>
-      </ExpansionPanel>
+      <Card >
+        
+          <ExpansionPanel defaultExpanded>
+            <ExpansionPanelSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel1a-content"
+              id="panel1a-header"
+            >
+               <Typography variant="h6" gutterBottom > Data </Typography>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+              <List style={{ width: '100%' }}>
+                <Divider />
+                {podcasts &&
+                  podcasts.map((podcast) => (
+                    <div key={podcast.domain}>
+                      <ListItem>
+                        <ListItemText
+                          secondary={
+                            <Typography component="span" variant="subtitle1">
+                              {podcast.title} <br />
+                              <Typography component="span" variant="caption">
+                                {new Date(podcast.created).toLocaleString()}
+                              </Typography>
+                            </Typography>
+                          }
+                        />
+                        <ListItemSecondaryAction>
+                          <IconButton
+                            aria-label="Delete"
+                            onClick={eraseThisPodcast(
+                              podcast.domain
+                            )}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                      <Divider />
+                    </div>
+                  ))}
+              </List>
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
+        
+      </Card>
       {/* <Card variant="outlined">
         <CardHeader title="Data" />
         <CardContent>
           <Button variant="outlined" > Flush Data </Button>
         </CardContent>
       </Card> */}
-      <Card variant="outlined">
+      <Card>
         <CardContent align="center">
           <Typography variant="h5">Phonograph</Typography>
           <Typography>is developed with ❤️ in Hoboken, NJ</Typography>
