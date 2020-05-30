@@ -26,6 +26,9 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import { Consumer } from "../../App.js";
 import { useHistory } from "react-router-dom";
 
+
+const prod = DEBUG ? '' : '/image/'
+
 const styles = (theme) => ({
   card: {
     display: "flex",
@@ -203,7 +206,7 @@ function PodcastHeader(props) {
                   <Hidden smDown >
                     <CardMedia
                       className={classes.cover}
-                      image={state.image}
+                      image={prod + state.image}
                       title={`${state.title} cover`}
                     />
                   </Hidden>
@@ -234,7 +237,7 @@ function PodcastHeader(props) {
                   <Hidden mdUp>
                     <ExpansionPanel>
                       <ExpansionPanelSummary>
-                        <Typography className={classes.title} variant="h4" noWrap>
+                        <Typography className={classes.title} variant="h6" noWrap>
                           {state.title}
                         </Typography>
                       </ExpansionPanelSummary>

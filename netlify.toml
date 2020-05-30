@@ -17,6 +17,7 @@
   force = true
   [headers.values]
     Cache-Control = "public, max-age=604800"
+    Expires = "Mon Jul 31 2023 22:40:30 GMT-0400"
 
 [[redirects]]
   from = "/ignoreme/*"

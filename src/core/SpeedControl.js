@@ -7,18 +7,24 @@ import IconButton from "@material-ui/core/IconButton";
 
 import { AppContext } from "../App.js";
 
-export default () => {
+export default ({onClick}) => {
     
     const { player } = useContext(AppContext);
     const [speed, setSpeed] = useState(player.playbackRate);
     const [visible, setVisible] = useState(false)
     const changeSpeed = (newSpeed) =>{
-        setSpeed(newSpeed);
-        player.playbackRate = newSpeed;
+        onClick(val => !val) 
+        if (newSpeed ){
+            setSpeed(newSpeed);
+            player.playbackRate = newSpeed;
+        }
+        setVisible(false);
     }
 
     return (<>
-        <IconButton onClick={() => setVisible((val) => !val)}><SpeedIcon /></IconButton>
+        <IconButton onClick={() => { setVisible((val) => !val); onClick(val => !val); } }>
+        { speed !== 1.0 ? `${speed}x ` : <SpeedIcon /> } 
+        </IconButton>
         <br />
         {visible && <ToggleButtonGroup
             value={speed}
