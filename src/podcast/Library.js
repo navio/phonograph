@@ -15,9 +15,6 @@ import phono from '../../public/phono.svg';
 import ButtonBase from '@material-ui/core/ButtonBase';
 
 
-const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
-const prod = DEBUG ? '' : '/image/'
-
 export const styles = (theme) => ({
   podcastMedia: {
     paddingTop: "100%",
@@ -74,7 +71,8 @@ export const styles = (theme) => ({
 
 const LibraryView = (props) => {
   const { classes, actionAfterSelectPodcast, history } = props;
-  const {state , dispatch} = useContext(AppContext);
+  const {state , dispatch, debug } = useContext(AppContext);
+  const cachedRoute = debug ? '' : '/image/'
   const podcasts = state.podcasts;
         const processClick = (ev) => {
           const podcast = ev.currentTarget && ev.currentTarget.getAttribute('domain');
@@ -115,7 +113,7 @@ const LibraryView = (props) => {
                               domain={podcast.domain}
                               title={podcast.title}
                               className={classes.podcastMedia}
-                              image={(prod+podcast.image)}
+                              image={(cachedRoute+podcast.image)}
                             />
                           </div>
                         </Card>

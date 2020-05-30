@@ -33,6 +33,8 @@ import attachEvents from "./engine/events";
 export const AppContext = React.createContext();
 export const Consumer = AppContext.Consumer;
 
+const debug = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
+
 // Code Module
 const Discover = React.lazy(async () => await import("./podcast/Discovery"));
 const Library = React.lazy(async () => await import("./podcast/Library"));
@@ -122,7 +124,7 @@ const App = ({}) => {
   return (
     <ThemeProvider theme={finalTheme}>
       <AppContext.Provider
-        value={{ state, dispatch, engine, player: player.current }}
+        value={{ state, dispatch, engine, debug, player: player.current }}
       >
         <CssBaseline />
 
