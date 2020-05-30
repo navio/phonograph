@@ -20,7 +20,7 @@ const convertMinsToHrsMins = (mins) => {
     return `${h}:${m}`;
 };
 
-export default () => {
+export default ({onClick}) => {
 
     const { player } = useContext(AppContext);
 
@@ -30,7 +30,7 @@ export default () => {
 
     const setTimer = (time) => {
         const {timerId, intervalId} = window;
-        
+        onClick(val => !val) 
         if (time) {
             setTimeto(time);
 
@@ -77,7 +77,7 @@ export default () => {
     }
 
     return (<>
-        <IconButton onClick={() => setVisible((val) => !val)}>
+        <IconButton onClick={() => { setVisible(val => !val); onClick(val => !val) }}>
             <NightsStayIcon />
             {timeLeft && toMin(timeLeft / 1000)}
         </IconButton>

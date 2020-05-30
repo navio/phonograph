@@ -169,6 +169,9 @@ const MediaControlCard = (props) => {
   const { classes, theme } = props;
   const history = useHistory();
 
+  const [showSpeed, setShowSpeed ] = useState(true);
+  const [showTimer, setShowTimer ] = useState(true);
+
 
 
   const toOrigin = (audioOrigin) => () => {
@@ -193,7 +196,7 @@ const MediaControlCard = (props) => {
               direction="row"
               justify="center"
               alignItems="center" >
-              <Grid item xs={8} sm={6} md={4} lg={3}>
+              <Grid item xs={7} sm={6} md={4} lg={3}>
                 <img className={classes.podcastImage} src={state.podcastImage} />
               </Grid>
             </Grid>}
@@ -325,12 +328,12 @@ const MediaControlCard = (props) => {
                       justify="space-evenly"
                       alignItems="center"
                     >
-                      <Grid item align="center">
-                        <SpeedControl />
-                      </Grid>
-                      <Grid item>
-                        <SleepTimer />
-                      </Grid>
+                      {showSpeed && <Grid item align="center">
+                        <SpeedControl onClick={setShowTimer} />
+                      </Grid>}
+                      {showTimer && <Grid item align="center" >
+                        <SleepTimer onClick={setShowSpeed} />
+                      </Grid>}
                       {/* <Grid item>
                         <IconButton><MoreVertIcon /></IconButton>
                       </Grid> */}
