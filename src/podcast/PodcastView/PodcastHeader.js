@@ -26,7 +26,7 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import { Consumer } from "../../App.js";
 import { useHistory } from "react-router-dom";
 
-
+const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 const prod = DEBUG ? '' : '/image/'
 
 const styles = (theme) => ({
