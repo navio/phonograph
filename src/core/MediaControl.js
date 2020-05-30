@@ -179,7 +179,10 @@ const MediaControlCard = (props) => {
     history.push(PODCASTVIEW)
   }
 
-  const { episodeInfo = {} } = state;
+  const { episodeInfo = {}, media } = state;
+
+  useEffect(() => setOpen(true) ,[media]);
+  
   return (
     state.episodeInfo ? <>
       <Card variant="outlined" className={open ? classes.root : classes.rootClosed}>
