@@ -234,7 +234,7 @@ function PodcastHeader(props) {
                   <Hidden mdUp>
                     <ExpansionPanel>
                       <ExpansionPanelSummary>
-                        <Typography className={classes.title} variant="h4" noWrap>
+                        <Typography className={classes.title} variant="h6" noWrap>
                           {state.title}
                         </Typography>
                       </ExpansionPanelSummary>
