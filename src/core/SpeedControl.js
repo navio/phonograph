@@ -17,10 +17,13 @@ export default () => {
             setSpeed(newSpeed);
             player.playbackRate = newSpeed;
         }
+        setVisible(false);
     }
 
     return (<>
-        <IconButton onClick={() => setVisible((val) => !val)}><SpeedIcon /></IconButton>
+        <IconButton onClick={() => setVisible((val) => !val)}>
+        { speed !== 1.0 ? `${speed}x ` : <SpeedIcon /> } 
+        </IconButton>
         <br />
         {visible && <ToggleButtonGroup
             value={speed}

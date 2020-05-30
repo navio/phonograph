@@ -13,11 +13,11 @@ import LinearProgress from "@material-ui/core/LinearProgress";
 import { Grid, Card, Hidden, Paper } from "@material-ui/core";
 import CloseIcon from '@material-ui/icons/Close';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
-import NightsStayIcon from '@material-ui/icons/NightsStay';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { AppContext } from "../App.js";
 
 import SpeedControl from './SpeedControl';
+import SleepTimer from './SleepTimer';
 // import SpeedIcon from '@material-ui/icons/Speed';
 // import ToggleButton from '@material-ui/lab/ToggleButton';
 // import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
@@ -142,14 +142,7 @@ const styles = (theme) => ({
   },
 });
 
-const convertMinsToHrsMins = (mins) => {
-  if (!Number.isInteger(mins)) return "";
-  let h = Math.floor(mins / 60);
-  let m = mins % 60;
-  h = h < 10 ? "0" + h : h;
-  m = m < 10 ? "0" + m : m;
-  return `${h}:${m}`;
-};
+
 
 const toMinutes = (totalTime, currentTime) => {
   totalTime = Math.floor(totalTime - currentTime);
@@ -160,6 +153,15 @@ const toMinutes = (totalTime, currentTime) => {
 const toMin = (theTime) => typeof theTime === "number"
   ? convertMinsToHrsMins(Math.floor(theTime))
   : `00:00`;
+
+const convertMinsToHrsMins = (mins) => {
+    if (!Number.isInteger(mins)) return "";
+    let h = Math.floor(mins / 60);
+    let m = mins % 60;
+    h = h < 10 ? "0" + h : h;
+    m = m < 10 ? "0" + m : m;
+    return `${h}:${m}`;
+  };
 
 const MediaControlCard = (props) => {
   const { state, dispatch } = useContext(AppContext);
@@ -326,9 +328,9 @@ const MediaControlCard = (props) => {
                       <Grid item align="center">
                         <SpeedControl />
                       </Grid>
-                      {/* <Grid item>
-                        <IconButton><NightsStayIcon /></IconButton>
-                      </Grid> */}
+                      <Grid item>
+                        <SleepTimer />
+                      </Grid>
                       {/* <Grid item>
                         <IconButton><MoreVertIcon /></IconButton>
                       </Grid> */}
