@@ -37,6 +37,20 @@ export default function (player, dispatch, state) {
   
   const playTick = function (ev) {
 
+    if ('mediaSession' in navigator) {
+      const { episodeInfo, podcastAuthor, podcastImage } = state;
+      const { title, description} = episodeInfo;
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: title,
+        artist: podcastAuthor,
+        album: description,
+        artwork: [
+          { src: podcastImage },
+        ]
+      });
+    }
+    
+
     dispatch({ type: 'playingStatus', status: "playing" });
     tick = setInterval(() => {
       let loaded = player.buffered.length
