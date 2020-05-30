@@ -13,9 +13,10 @@ export default () => {
     const [speed, setSpeed] = useState(player.playbackRate);
     const [visible, setVisible] = useState(false)
     const changeSpeed = (newSpeed) =>{
-        if (speed === newSpeed) return;
-        setSpeed(newSpeed);
-        player.playbackRate = newSpeed;
+        if (newSpeed ){
+            setSpeed(newSpeed);
+            player.playbackRate = newSpeed;
+        }
     }
 
     return (<>
