@@ -11,30 +11,42 @@ export default function (player, dispatch, state) {
   console.log("attaching events");
   let tick = null;
   const completedLoading = function (ev) {
-    dispatch({type:'audioUpdate', payload: { loading: "loaded" }});
+    dispatch({ type: 'audioUpdate', payload: { loading: "loaded" } });
   };
-  
-  const completedPlaying = async function (ev) {
-      dispatch({type:'audioCompleted', payload: {
-        episode: null,
-        author: null,
-        playing: null,
-        status: null,
-        episodeInfo: null,
-        podcastImage: null,
-        audioOrigin: null,
-        media: null,
-        played: null,
-        currentTime: null
-      }});
 
+  const completedPlaying = async function (ev) {
+    const { playlist } = state;
+
+    if (playlist && playlist.length < 1) {
+      dispatch({
+        type: 'audioCompleted', 
+        payload: {
+          episode: null,
+          author: null,
+          playing: null,
+          status: null,
+          episodeInfo: null,
+          podcastImage: null,
+          audioOrigin: null,
+          media: null,
+          played: null,
+          currentTime: null
+        }
+      });
+    } else {
+      const nextEpisode = playlist.shift();
+      dispatch({
+        type: 'audioCompleted', 
+        payload: { ...nextEpisode, playlist }
+      });
+    }
   };
-  
+
   const eventEcho = function (ev) {
     if (!process.env.NODE_ENV || process.env.NODE_ENV === "development")
       console.log(ev.type, player.buffered, ev);
   };
-  
+
   const playTick = function (ev) {
 
     dispatch({ type: 'playingStatus', status: "playing" });
@@ -42,12 +54,14 @@ export default function (player, dispatch, state) {
       let loaded = player.buffered.length
         ? (100 * player.buffered.end(0)) / player.duration
         : 0;
-      dispatch({type:'audioUpdate',payload: {
-        loaded,
-        played: (100 * player.currentTime) / player.duration,
-        currentTime: player.currentTime,
-        duration: player.duration,
-      }});
+      dispatch({
+        type: 'audioUpdate', payload: {
+          loaded,
+          played: (100 * player.currentTime) / player.duration,
+          currentTime: player.currentTime,
+          duration: player.duration,
+        }
+      });
     }, 500);
   };
 
@@ -56,14 +70,14 @@ export default function (player, dispatch, state) {
     let loaded = player.buffered.length
       ? (100 * player.buffered.end(0)) / player.duration
       : 100;
-      dispatch({type:'audioUpdate', payload: {loaded} })
+    dispatch({ type: 'audioUpdate', payload: { loaded } })
   };
-  
+
   const pauseTick = function () {
     clearInterval(tick);
     dispatch({ type: 'audioUpdate', payload: { status: "pause", refresh: Date.now() } });
   };
-  
+
   const stopTick = function (ev) {
     clearInterval(tick);
   };

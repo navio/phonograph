@@ -38,6 +38,8 @@ const initialState = JSON.parse(localStorage.getItem('state') || false ) || {
     episode: null,
     episodeInfo:null,
 
+    playlist: [],
+
     currentTime: null,
     media:"",
     refresh: Date.now()
