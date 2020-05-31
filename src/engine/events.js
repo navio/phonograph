@@ -21,7 +21,16 @@ export default function (player, dispatch, state) {
   const completedPlaying = async function (ev) {
     const { playlist } = state;
 
-    if (playlist && playlist.length < 1) {
+    if (playlist && playlist.length > 1) {
+      
+      const nextEpisode = playlist.shift();
+      dispatch({
+        type: 'audioCompleted', 
+        payload: { ...nextEpisode, playlist }
+      });
+
+    } else {
+
       dispatch({
         type: 'audioCompleted', 
         payload: {
@@ -37,12 +46,6 @@ export default function (player, dispatch, state) {
           currentTime: null
         }
       });
-    } else {
-      const nextEpisode = playlist.shift();
-      dispatch({
-        type: 'audioCompleted', 
-        payload: { ...nextEpisode, playlist }
-      });
     }
   };
 
@@ -53,26 +56,26 @@ export default function (player, dispatch, state) {
 
   const playTick = function (ev) {
 
-    if ('mediaSession' in navigator) {
-      const { episodeInfo, podcastAuthor, podcastImage, title } = state;
-      const { title: episodeTitle } = episodeInfo;
-      console.log({
-          title: episodeTitle,
-          artist: podcastAuthor,
-          album: title,
-          artwork: [
-            { src: podcastImage },
-          ]
-        } )
+    // if ('mediaSession' in navigator) {
+    //   const { episodeInfo, podcastAuthor, podcastImage, title } = state;
+    //   const { title: episodeTitle } = episodeInfo;
+    //   console.log({
+    //       title: episodeTitle,
+    //       artist: podcastAuthor,
+    //       album: title,
+    //       artwork: [
+    //         { src: podcastImage },
+    //       ]
+    //     } )
       
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: episodeTitle,
-        artist: podcastAuthor,
-        album: title,
-        artwork: [
-          { src: podcastImage },
-        ]
-      });
+    //   navigator.mediaSession.metadata = new MediaMetadata({
+    //     title: episodeTitle,
+    //     artist: podcastAuthor,
+    //     album: title,
+    //     artwork: [
+    //       { src: podcastImage },
+    //     ]
+    //   });
     }
     
     dispatch({ type: 'playingStatus', status: "playing" });

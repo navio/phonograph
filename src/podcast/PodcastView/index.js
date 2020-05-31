@@ -116,9 +116,10 @@ export default (props) => {
             recordEpisode(global)
           }
         } else {
-          console.log('loading new audio')
-          player.setAttribute("src", episode.enclosures[0].url);
-         
+
+          console.log('loading new audio', global.playing );
+          // episode.enclosures[0].url
+          player.setAttribute("src", episode.media);
           
           const payload = {
             audioOrigin: podcastURL,
@@ -130,7 +131,40 @@ export default (props) => {
             episodeInfo: episode,
             podcastImage: podcast.image,
             podcastAuthor: podcast.author,
+          };
+
+          if(global.playing){
+            
+            const {
+              audioOrigin,
+              media,
+              playing,
+              status,
+              played,
+              episodeInfo,
+              podcastImage,
+              podcastAuthor,
+              playlist = [],
+            } = global;
+
+            const prevPodcasts = { 
+              audioOrigin,
+              media,
+              playing,
+              status,
+              played,
+              episodeInfo,
+              podcastImage,
+              podcastAuthor,
+              currentTime,
+            };
+            console.log('saving prev!!!!');  
+
+            payload.playlist = [...playlist, prevPodcasts];
+            console.log(payload);
           }
+
+
           if(currentTime){
             console.log('setting time',currentTime)
             player.currentTime = currentTime;

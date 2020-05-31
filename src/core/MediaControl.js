@@ -180,7 +180,16 @@ const MediaControlCard = (props) => {
   }
 
   const { episodeInfo = {}, media } = state;
-
+  
+  useEffect(() => {
+    const overflow = "overflow: hidden;";
+    if(open){
+      document.body.style = overflow;
+    }else{
+      document.body.style = '';
+    }
+  },[open]);
+  
   useEffect(() => setOpen(true) ,[media]);
   
   return (
