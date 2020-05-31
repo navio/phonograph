@@ -165,7 +165,7 @@ const convertMinsToHrsMins = (mins) => {
 
 const MediaControlCard = (props) => {
   const { state, dispatch } = useContext(AppContext);
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(null);
   const { classes, theme } = props;
   const history = useHistory();
 
@@ -179,11 +179,12 @@ const MediaControlCard = (props) => {
     history.push(PODCASTVIEW)
   }
 
-  const { episodeInfo = {}, media } = state;
+  const { episodeInfo = {}, media, playing } = state;
 
   useEffect(() => {
     const overflow = "overflow: hidden;";
-    if (open) {
+    if (open && playing) {
+      console.log('locking scrolling',open)
       document.body.style = overflow;
     } else {
       document.body.style = '';
