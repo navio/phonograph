@@ -155,22 +155,22 @@ const toMin = (theTime) => typeof theTime === "number"
   : `00:00`;
 
 const convertMinsToHrsMins = (mins) => {
-    if (!Number.isInteger(mins)) return "";
-    let h = Math.floor(mins / 60);
-    let m = mins % 60;
-    h = h < 10 ? "0" + h : h;
-    m = m < 10 ? "0" + m : m;
-    return `${h}:${m}`;
-  };
+  if (!Number.isInteger(mins)) return "";
+  let h = Math.floor(mins / 60);
+  let m = mins % 60;
+  h = h < 10 ? "0" + h : h;
+  m = m < 10 ? "0" + m : m;
+  return `${h}:${m}`;
+};
 
 const MediaControlCard = (props) => {
   const { state, dispatch } = useContext(AppContext);
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(null);
   const { classes, theme } = props;
   const history = useHistory();
 
-  const [showSpeed, setShowSpeed ] = useState(true);
-  const [showTimer, setShowTimer ] = useState(true);
+  const [showSpeed, setShowSpeed] = useState(true);
+  const [showTimer, setShowTimer] = useState(true);
 
 
 
@@ -179,10 +179,20 @@ const MediaControlCard = (props) => {
     history.push(PODCASTVIEW)
   }
 
-  const { episodeInfo = {}, media } = state;
+  const { episodeInfo = {}, media, playing } = state;
 
-  useEffect(() => setOpen(true) ,[media]);
-  
+  useEffect(() => {
+    const overflow = "overflow: hidden;";
+    if (open && playing) {
+      console.log('locking scrolling',open)
+      document.body.style = overflow;
+    } else {
+      document.body.style = '';
+    }
+  }, [open]);
+
+  useEffect(() => setOpen(true), [media]);
+
   return (
     state.episodeInfo ? <>
       <Card variant="outlined" className={open ? classes.root : classes.rootClosed}>
