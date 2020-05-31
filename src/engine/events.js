@@ -50,12 +50,12 @@ export default function (player, dispatch, state) {
   const playTick = function (ev) {
 
     if ('mediaSession' in navigator) {
-      const { episodeInfo, podcastAuthor, podcastImage } = state;
-      const { title, description} = episodeInfo;
+      const { episodeInfo, podcastAuthor, podcastImage, title } = state;
+      const { title: episodeTitle } = episodeInfo;
       navigator.mediaSession.metadata = new MediaMetadata({
-        title: title,
+        title: episodeTitle,
         artist: podcastAuthor,
-        album: description,
+        album: title,
         artwork: [
           { src: podcastImage },
         ]

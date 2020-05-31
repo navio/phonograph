@@ -63,7 +63,7 @@ export default (props) => {
             domain: podcastURL,
             url:podcastURL,
             author: castContent.author,
-            created: (Date.now())
+            created: (Date.now()),
         };
         setPodcast(newPodcast);
         loadEpisodes(newPodcast.items);
@@ -129,7 +129,7 @@ export default (props) => {
             played: 0,
             episodeInfo: episode,
             podcastImage: podcast.image,
-            podcastAuthor: podcast.author
+            podcastAuthor: podcast.author,
           }
           if(currentTime){
             console.log('setting time',currentTime)
