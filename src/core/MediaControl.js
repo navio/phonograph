@@ -192,7 +192,6 @@ const MediaControlCard = (props) => {
 
   useEffect(() => setOpen(true), [media]);
 
-  const { episodeInfo = {} } = state;
   return (
     state.episodeInfo ? <>
       <Card variant="outlined" className={open ? classes.root : classes.rootClosed}>
