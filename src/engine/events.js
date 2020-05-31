@@ -10,9 +10,13 @@
 export default function (player, dispatch, state) {
   console.log("attaching events");
   let tick = null;
+
   const completedLoading = function (ev) {
     dispatch({ type: 'audioUpdate', payload: { loading: "loaded" } });
   };
+
+  const loadMeida = (ev) => {
+  }
 
   const completedPlaying = async function (ev) {
     const { playlist } = state;
@@ -52,6 +56,15 @@ export default function (player, dispatch, state) {
     if ('mediaSession' in navigator) {
       const { episodeInfo, podcastAuthor, podcastImage, title } = state;
       const { title: episodeTitle } = episodeInfo;
+      console.log({
+          title: episodeTitle,
+          artist: podcastAuthor,
+          album: title,
+          artwork: [
+            { src: podcastImage },
+          ]
+        } )
+      
       navigator.mediaSession.metadata = new MediaMetadata({
         title: episodeTitle,
         artist: podcastAuthor,
@@ -62,7 +75,6 @@ export default function (player, dispatch, state) {
       });
     }
     
-
     dispatch({ type: 'playingStatus', status: "playing" });
     tick = setInterval(() => {
       let loaded = player.buffered.length
@@ -97,7 +109,7 @@ export default function (player, dispatch, state) {
   };
 
   // player.addEventListener('loadstart',this.loading.bind(this));
-  player.addEventListener("loadeddata", eventEcho);
+  player.addEventListener("loadeddata", loadMeida);
   player.addEventListener("progress", progress);
   player.addEventListener("canplaythrough", eventEcho);
 
