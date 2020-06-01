@@ -19,34 +19,8 @@ export default function (player, dispatch, state) {
   }
 
   const completedPlaying = async function (ev) {
-    const { playlist } = state;
-
-    if (playlist && playlist.length > 1) {
-      
-      const nextEpisode = playlist.shift();
-      dispatch({
-        type: 'audioCompleted', 
-        payload: { ...nextEpisode, playlist }
-      });
-
-    } else {
-
-      dispatch({
-        type: 'audioCompleted', 
-        payload: {
-          episode: null,
-          author: null,
-          playing: null,
-          status: null,
-          episodeInfo: null,
-          podcastImage: null,
-          audioOrigin: null,
-          media: null,
-          played: null,
-          currentTime: null
-        }
-      });
-    }
+    console.log('hitted!',ev, ev.target)
+    dispatch({type: 'audioCompleted', payload: true});
   };
 
   const eventEcho = function (ev) {
@@ -55,28 +29,6 @@ export default function (player, dispatch, state) {
   };
 
   const playTick = function (ev) {
-
-    // if ('mediaSession' in navigator) {
-    //   const { episodeInfo, podcastAuthor, podcastImage, title } = state;
-    //   const { title: episodeTitle } = episodeInfo;
-    //   console.log({
-    //       title: episodeTitle,
-    //       artist: podcastAuthor,
-    //       album: title,
-    //       artwork: [
-    //         { src: podcastImage },
-    //       ]
-    //     } )
-      
-    //   navigator.mediaSession.metadata = new MediaMetadata({
-    //     title: episodeTitle,
-    //     artist: podcastAuthor,
-    //     album: title,
-    //     artwork: [
-    //       { src: podcastImage },
-    //     ]
-    //   });
-    }
     
     dispatch({ type: 'playingStatus', status: "playing" });
     tick = setInterval(() => {
@@ -92,8 +44,8 @@ export default function (player, dispatch, state) {
         }
       });
     }, 500);
-  };
 
+  };
 
   const progress = function (ev) {
     let loaded = player.buffered.length
@@ -111,6 +63,7 @@ export default function (player, dispatch, state) {
     clearInterval(tick);
   };
 
+
   // player.addEventListener('loadstart',this.loading.bind(this));
   player.addEventListener("loadeddata", loadMeida);
   player.addEventListener("progress", progress);
@@ -124,4 +77,5 @@ export default function (player, dispatch, state) {
   // Media Events
   player.addEventListener("canplay", completedLoading);
   player.addEventListener("ended", completedPlaying);
+
 }

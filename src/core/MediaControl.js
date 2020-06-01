@@ -142,8 +142,6 @@ const styles = (theme) => ({
   },
 });
 
-
-
 const toMinutes = (totalTime, currentTime) => {
   totalTime = Math.floor(totalTime - currentTime);
   if (!Number.isInteger(totalTime)) return "∞";
@@ -184,7 +182,7 @@ const MediaControlCard = (props) => {
   useEffect(() => {
     const overflow = "overflow: hidden;";
     if (open && playing) {
-      console.log('locking scrolling',open)
+      console.log('locking scrolling')
       document.body.style = overflow;
     } else {
       document.body.style = '';
@@ -241,7 +239,8 @@ const MediaControlCard = (props) => {
                 className={classes.player}>
                 {!open && <>
                   {<Grid item align="left" style={{ paddingLeft: '.14rem' }} xs={1}>
-                    <img onClick={() => setOpen(true)}
+                    <img 
+                      onClick={() => setOpen(true)}
                       className={classes.podcastImageClosed}
                       src={state.podcastImage} />
                   </Grid>}

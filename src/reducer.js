@@ -1,7 +1,7 @@
 import PS from 'podcastsuite';
 const db = PS.createDatabase('history','podcasts');
 
-export const completeEpisode = async (feed,episode) => {
+export const completeEpisodeHistory = async (feed,episode) => {
  if(feed && episode) {
     const inMemory = await db.get(feed);
     const current = inMemory || {};
@@ -13,13 +13,50 @@ export const completeEpisode = async (feed,episode) => {
  return false;
 }
 
+export const completeEpisode = (state) => {
+  const {playlist} = state;
+  const { player } = window;
+  if ( playlist && playlist.length > 0 ) {
+    
+    console.log("queue next",);
+    const nextEpisode = playlist.shift();
+    // Todo: Fix to use player in scope. This is a hack.
+    player.src = nextEpisode.media;
+    player.currentTime = nextEpisode.currentTime;
+
+    return { ...state, ...nextEpisode, playlist, refresh: Date.now() };
+
+  } else {
+    const cleanPayload = {
+      episode: null,
+      author: null,
+      playing: null,
+      status: null,
+      episodeInfo: null,
+      podcastImage: null,
+      audioOrigin: null,
+      media: null,
+      played: null,
+      currentTime: null,
+      refresh: Date.now()
+    };
+
+    return {
+      ...state,
+      ...cleanPayload
+    }
+  }
+
+}
+
 export const recordEpisode = async (feed, episode, currentTime, duration) => {
-  // console.log('record')
+  //console.log('record')
   const inMemory = await db.get(feed);
   const current = inMemory || {};
   current[episode] = { completed: false, currentTime, duration, duration };
   return await db.set(feed,current);
 }
+
 const initialState = JSON.parse(localStorage.getItem('state') || false ) || {
     podcasts: [],
     theme: true,  
@@ -70,14 +107,14 @@ export const reducer = (state, action) => {
           return {...state, current: action.payload} 
       case 'audioCompleted':
         const guid = state.episodeInfo && state.episodeInfo.guid;
-        completeEpisode(state.current, guid);
-        return { ...state, ...action.payload, refresh: Date.now()}
+        completeEpisodeHistory(state.current, guid);
+        return completeEpisode(state);
       case 'audioUpdate':
         if(action.payload && (action.payload.status === 'pause')){
           recordEpisode(state.audioOrigin,state.episodeInfo.guid,state.currentTime, state.duration);
           return { ...state, ...action.payload, refresh: Date.now() }
         }else {
-        return { ...state, ...action.payload}
+          return { ...state, ...action.payload}
         }
       case 'resetState':
         return {} 

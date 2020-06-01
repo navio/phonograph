@@ -176,8 +176,8 @@ const EpisodeList = (props) => {
     if (total) {
       return <div onClick={() => completeEpisode(guid)}>{total}%</div>;
     }
-    return  <IconButton>
-              <CheckCircleOutlineIcon onClick={() => completeEpisode(guid)} />
+    return  <IconButton onClick={() => completeEpisode(guid)} >
+              <CheckCircleOutlineIcon  />
             </IconButton>;
   }
 
@@ -237,8 +237,8 @@ const EpisodeList = (props) => {
                 </List>
 
                 {(episodes.length > episodeList.length) &&
-                  <List align="center" onClick={() => setAmount(amount + 1)} >
-                    <Button variant="outlined" style={{ width: '80%' }} size="large" color="primary"> Load More Episodes </Button>
+                  <List align="center" >
+                    <Button onClick={() => setAmount(amount + 1)} variant="outlined" style={{ width: '80%' }} size="large" color="primary"> Load More Episodes </Button>
                   </List>}
               </>
             ) : (

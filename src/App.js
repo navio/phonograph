@@ -84,18 +84,19 @@ const App = ({}) => {
   const engine = getPodcastEngine(shouldInit);
 
   useEffect(() => {
-    initializeLibrary(engine, dispatch);
+    // initializeLibrary(engine, dispatch);x
   }, []);
 
   useEffect(() => {
+    console.log(player)
     if (player.current) {
-      const playerequeue = player.current;
+      // const playerequeue = player.current;
       //new audioqueue([], { audioObject: player.current });
-      attachEvents(playerequeue, dispatch, state);
-      window.player = playerequeue;
-      playerequeue.currentTime = Number(state.currentTime) || 0;
+      attachEvents(player.current, dispatch, state);
+      window.player = player.current;
+      player.current.currentTime = Number(state.currentTime) || 0;
     }
-  }, [player.current]);
+  }, []);
 
   useEffect(() => localStorage.setItem("state", JSON.stringify(state)), [
     state,
