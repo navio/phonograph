@@ -34,20 +34,20 @@ export const getPodcastEngine = (shouldInit = false ) => new PodcastEngine({
  Start the application and loads the library.
 */
 export const initializeLibrary = function (PodcastLibrary, dispatch) {
-  // PodcastLibrary.ready.then(() => {
-  //   PodcastLibrary.getLibrary().then((podcastsArray) => {
-  //     Promise.allSettled(
-  //       podcastsArray.map((podcastRaw) => PodcastLibrary.getPodcast(podcastRaw))
-  //     )
-  //     .then((results) =>  results.filter((result) => result.status === 'fulfilled'))
-  //     .then((podcasts) => podcasts.map(podcast => podcast.value))
-  //     .then((podcasts) => {
-  //       if (podcasts) {
-  //         dispatch({type: 'initLibrary', podcasts: podcastCleaner(podcasts)})
-  //       }
-  //     });
-  //   });
-  // });
+  PodcastLibrary.ready.then(() => {
+    PodcastLibrary.getLibrary().then((podcastsArray) => {
+      Promise.allSettled(
+        podcastsArray.map((podcastRaw) => PodcastLibrary.getPodcast(podcastRaw))
+      )
+      .then((results) =>  results.filter((result) => result.status === 'fulfilled'))
+      .then((podcasts) => podcasts.map(podcast => podcast.value))
+      .then((podcasts) => {
+        if (podcasts) {
+          dispatch({type: 'initLibrary', podcasts: podcastCleaner(podcasts)})
+        }
+      });
+    });
+  });
 };
 
 const podcastCleaner = (podcasts) => {

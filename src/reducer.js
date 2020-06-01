@@ -57,7 +57,8 @@ export const recordEpisode = async (feed, episode, currentTime, duration) => {
   return await db.set(feed,current);
 }
 
-const initialState = JSON.parse(localStorage.getItem('state') || false ) || {
+
+const defaultState = {
     podcasts: [],
     theme: true,  
     current: null,
@@ -80,8 +81,9 @@ const initialState = JSON.parse(localStorage.getItem('state') || false ) || {
     currentTime: null,
     media:"",
     refresh: Date.now()
-
   };
+
+  const initialState = JSON.parse(localStorage.getItem('state') || false ) || defaultState;
 
 // cleanup legacy
 delete initialState['items'];
@@ -117,6 +119,6 @@ export const reducer = (state, action) => {
           return { ...state, ...action.payload}
         }
       case 'resetState':
-        return {} 
+        return defaultState; 
     }
   }

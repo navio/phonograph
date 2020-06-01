@@ -84,7 +84,7 @@ const App = ({}) => {
   const engine = getPodcastEngine(shouldInit);
 
   useEffect(() => {
-    // initializeLibrary(engine, dispatch);x
+    // initializeLibrary(engine, dispatch);
   }, []);
 
   useEffect(() => {

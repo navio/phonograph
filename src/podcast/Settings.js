@@ -28,6 +28,7 @@ import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import BrightnessLowIcon from '@material-ui/icons/WbSunny';
 import BrightnessHighIcon from '@material-ui/icons/NightsStay';
 
+import { initializeLibrary } from '../engine/index'
 
 const styles = (theme) => ({
   root: {
@@ -44,15 +45,16 @@ const styles = (theme) => ({
 
 const Settings = (props) => {
   const { classes } = props;
-  const { state, dispatch } = useContext(AppContext)
+  const { state, dispatch, engine } = useContext(AppContext)
 
   const themeSwitcher = (ev, input) => {
     dispatch({ type: 'setDark', payload: input });
   };
 
-  const clearState = () => {
-    dispatch({ type: 'resetState' });
-    window.location.reload()
+  const clearState = async () => {
+    await dispatch({ type: 'resetState' });
+    await initializeLibrary(engine, dispatch)
+    // window.location.reload()
   }
 
   const eraseThisPodcast = (podcast) => async () => {
