@@ -18,7 +18,6 @@ export const completeEpisode = (state) => {
   const { player } = window;
   if ( playlist && playlist.length > 0 ) {
     
-    console.log("queue next",);
     const nextEpisode = playlist.shift();
     // Todo: Fix to use player in scope. This is a hack.
     player.src = nextEpisode.media;

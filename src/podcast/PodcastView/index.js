@@ -142,10 +142,12 @@ export default (props) => {
         dispatch({ type: 'playingStatus', status: "playing" });
         recordEpisode(global)
       } else {
-        player.pause();
-        dispatch({ type: 'playingStatus', status: "pause" });
-        recordEpisode(global)
         updateMediaSessionState('paused');
+        player.pause().then(
+          () => recordEpisode(global)
+        );
+        dispatch({ type: 'playingStatus', status: "pause" });
+        
       }
     } else {
 
@@ -195,8 +197,7 @@ export default (props) => {
 
         console.log('saving prev!!!!');
 
-        payload.playlist = [...playlist, prevPodcasts];
-        console.log(payload);
+        payload.playlist = [prevPodcasts, ...playlist];
       }
 
 
