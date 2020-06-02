@@ -88,7 +88,6 @@ const App = ({}) => {
   }, []);
 
   useEffect(() => {
-    console.log(player)
     if (player.current) {
       // const playerequeue = player.current;
       //new audioqueue([], { audioObject: player.current });
@@ -102,12 +101,11 @@ const App = ({}) => {
     state,
   ]);
 
-  useEffect(() => {
-    const {theme} = state;
-
-  }, [
-    state.theme,
+  useEffect(() => window.title = `Phonograph: ${state.episodeInfo.title}`, [
+    state.episodeInfo.title,
   ]);
+
+  let {title} = state.episodeInfo || {};
 
   let finalTheme;
   switch(state.theme) {
@@ -205,8 +203,8 @@ const App = ({}) => {
           autoPlay={state.status !== "pause"}
           ref={player}
           preload="auto"
-          title={state.title || ""}
-          src={state.media}
+          title={ title || ""}
+          src={ state.media }
           poster={state.podcastImage || ""}
         />
       </AppContext.Provider>
