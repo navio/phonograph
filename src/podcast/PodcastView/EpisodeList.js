@@ -25,6 +25,7 @@ import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import { completeEpisodeHistory as markAsFinished } from "../../reducer";
 import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
+import DoneIcon from '@material-ui/icons/Done';
 
 const DOMPurify = createDOMPurify(window);
 const { sanitize } = DOMPurify;
@@ -37,16 +38,10 @@ export const clearText = (html) => {
 };
 
 export const styles = (theme) => ({
-  root: {
-    // width: "100%",
-  },
-  progress: {
-    margin: theme.spacing(2),
-  },
-  progressContainer: {
-    width: 0,
-    margin: "auto",
-  },
+
+  inProgress: {
+    color: theme.palette.primary.main,
+  }
 });
 
 dayjs.extend(relativeTime);
@@ -86,12 +81,12 @@ const IsAvaliable = (url) => {
 const EpisodeListDescription = (props) => {
   const episode = props.episode;
   const refresh = props.refresh;
+  const classes = props.classes;
   const { currentTime, duration, completed } = props.history || {};
-  const total =
-    currentTime && duration ? Math.round((currentTime * 100) / duration) : null;
-  if (total) {
-    return <div onClick={() => completeEpisode(guid)}>{total}%</div>;
-  }
+  const total = currentTime && duration ? Math.round((currentTime * 100) / duration) : null;
+  // if (total) {
+  //   return <div onClick={() => completeEpisode(guid)}>{total}%</div>;
+  // }
   return (
     <ListItemText
       {...props}
@@ -106,23 +101,25 @@ const EpisodeListDescription = (props) => {
           </Typography>
           <Typography variant="overline" component="div">
             {episodeDate(episode.created)}
-            {completed && (
+            {!isNaN(refresh) && (completed || total ) && (
               <Chip
                 style={{ marginLeft: "10px" }}
                 variant="outlined"
                 size="small"
-                label="Completed"
-                color="primary"
+                label={total ? `Progress: ${total}%` : "Completed"}
+                // color="primary"
+                className={classes.inProgress}
+                deleteIcon={<DoneIcon />}
               />
             )}
-            {!isNaN(refresh) &&
+            {
               episode.episodeType &&
               episode.episodeType !== "full" && (
                 <Chip
                   style={{ marginLeft: "10px" }}
                   variant="outlined"
                   size="small"
-                  label={total ? episode.episodeType : total}
+                  label={episode.episodeType}
                   color="secondary"
                 />
               )}
@@ -154,12 +151,11 @@ const Description = (props) => {
 };
 
 const EpisodeList = (props) => {
-  const { playNext, playLast } = props;
   const [episodeHistory, setEpisodeHistory] = useState({});
   const [open, setOpen] = React.useState(null);
   const [amount, setAmount] = React.useState(1);
   const [fresh, reFresh] = React.useState(Date.now());
-  const { classes, episodes, podcast } = props;
+  const { classes, episodes, podcast, playNext, playLast } = props;
   const episodeList = episodes.slice(0, 20 * amount);
   const [drawer, openDrawer] = useState(false);
   const [currentEpisode, setCurrentEpisode] = useState(null);
@@ -171,7 +167,7 @@ const EpisodeList = (props) => {
 
   const handleClose = (value) => {
     setOpen(null);
-    setSelectedValue(value);
+    // setSelectedValue(value);
   };
 
   const completeEpisode = async (episode) => {
@@ -233,7 +229,7 @@ const EpisodeList = (props) => {
   );
 
   useEffect(() => {
-    console.log("getting new history");
+    // console.log("getting new history");
     getHistory(props.current);
   }, [fresh, props.shouldRefresh]);
   return (
@@ -309,6 +305,7 @@ const EpisodeList = (props) => {
                             </IconButton>
                           </ListItemIcon>
                           <EpisodeListDescription
+                            classes={classes}
                             refresh={fresh}
                             onClick={() => {
                               // console.log(episode);

@@ -182,7 +182,7 @@ const MediaControlCard = (props) => {
   useEffect(() => {
     const overflow = "overflow: hidden;";
     if (open && playing) {
-      console.log('locking scrolling')
+      // console.log('locking scrolling')
       document.body.style = overflow;
     } else {
       document.body.style = '';

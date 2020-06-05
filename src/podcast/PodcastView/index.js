@@ -52,9 +52,9 @@ export default (props) => {
 
     try {
       const fresh = navigator.onLine ? undefined : Infinity;
-      console.log('freshStatus', fresh);
+      // console.log('freshStatus', fresh);
       const castContent = await engine.getPodcast(podcastURL, { save, fresh });
-      console.log(castContent);
+      // console.log(castContent);
       let newPodcast = {
         items: castContent.items,
         title: castContent.title,
