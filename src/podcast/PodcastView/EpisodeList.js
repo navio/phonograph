@@ -19,15 +19,16 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { Chip, IconButton } from "@material-ui/core";
 import createDOMPurify from "dompurify";
 import { Consumer } from "../../App.js";
-import PS from 'podcastsuite';
-import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
-import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import { completeEpisode as markAsFinished } from '../../reducer'
+import PS from "podcastsuite";
+import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
+import CheckCircleIcon from "@material-ui/icons/CheckCircle";
+import { completeEpisodeHistory as markAsFinished } from "../../reducer";
+import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
 
 const DOMPurify = createDOMPurify(window);
 const { sanitize } = DOMPurify;
-const db = PS.createDatabase('history', 'podcasts');
-
+const db = PS.createDatabase("history", "podcasts");
 
 export const clearText = (html) => {
   let tmp = document.createElement("div");
@@ -53,7 +54,6 @@ const today = dayjs();
 const episodeDate = (date) => today.from(date, true);
 
 const saveOffline = async (mediaURL) => {
-
   // const audio = document.createElement('audio');
   // audio.src = mediaURL;
   // window.audio = audio;
@@ -63,10 +63,10 @@ const saveOffline = async (mediaURL) => {
   // const podcastBlob = await rawPodcast.blob();
   // const response = new Response(podcastBlob)
 
-  const cache = await caches.open('offline-podcasts');
+  const cache = await caches.open("offline-podcasts");
   await cache.put(mediaURL, response);
   cache.add(mediaURL);
-}
+};
 
 const IsAvaliable = (url) => {
   const [hasIt, setHasIt] = useState(false);
@@ -74,39 +74,58 @@ const IsAvaliable = (url) => {
   const availableOffline = async (media) => {
     const has = await caches.has(media);
     setHasIt(has);
-  }
+  };
 
   useEffect(() => {
     availableOffline(url.url);
-  }, [])
+  }, []);
 
-  return hasIt ? 'Saved' : '';
-}
+  return hasIt ? "Saved" : "";
+};
 
 const EpisodeListDescription = (props) => {
   const episode = props.episode;
-  const history = props.history || {};
-
+  const refresh = props.refresh;
+  const { currentTime, duration, completed } = props.history || {};
+  const total =
+    currentTime && duration ? Math.round((currentTime * 100) / duration) : null;
+  if (total) {
+    return <div onClick={() => completeEpisode(guid)}>{total}%</div>;
+  }
   return (
     <ListItemText
       {...props}
       primary={
         <>
-          {episode.season && (<Typography color={'secondary'}>Season {episode.season}</Typography>)}
+          {episode.season && (
+            <Typography color={"secondary"}>Season {episode.season}</Typography>
+          )}
           <Typography component="div" variant="subtitle1" noWrap>
-            {clearText(episode.title)} <IsAvaliable url={episode.enclosures[0].url} />
+            {clearText(episode.title)}{" "}
+            <IsAvaliable url={episode.enclosures[0].url} />
           </Typography>
           <Typography variant="overline" component="div">
             {episodeDate(episode.created)}
-            {episode.episodeType && episode.episodeType !== "full" && (
+            {completed && (
               <Chip
-                style={{ marginLeft: '10px' }}
+                style={{ marginLeft: "10px" }}
                 variant="outlined"
                 size="small"
-                label={episode.episodeType}
-                color="secondary"
+                label="Completed"
+                color="primary"
               />
             )}
+            {!isNaN(refresh) &&
+              episode.episodeType &&
+              episode.episodeType !== "full" && (
+                <Chip
+                  style={{ marginLeft: "10px" }}
+                  variant="outlined"
+                  size="small"
+                  label={total ? episode.episodeType : total}
+                  color="secondary"
+                />
+              )}
           </Typography>
         </>
       }
@@ -126,7 +145,7 @@ const Description = (props) => {
         <DialogTitle id="simple-dialog-title">
           <span dangerouslySetInnerHTML={{ __html: sanitize(title) }} />
         </DialogTitle>
-        <DialogContent style={{ paddingBottom: '1rem' }}>
+        <DialogContent style={{ paddingBottom: "1rem" }}>
           <div dangerouslySetInnerHTML={{ __html: sanitize(description) }} />
         </DialogContent>
       </Dialog>
@@ -134,14 +153,16 @@ const Description = (props) => {
   );
 };
 
-
 const EpisodeList = (props) => {
+  const { playNext, playLast } = props;
   const [episodeHistory, setEpisodeHistory] = useState({});
   const [open, setOpen] = React.useState(null);
   const [amount, setAmount] = React.useState(1);
   const [fresh, reFresh] = React.useState(Date.now());
   const { classes, episodes, podcast } = props;
-  const episodeList = episodes.slice(0, (20 * amount));
+  const episodeList = episodes.slice(0, 20 * amount);
+  const [drawer, openDrawer] = useState(false);
+  const [currentEpisode, setCurrentEpisode] = useState(null);
   // console.log('heree',podcast);
 
   useEffect(() => {
@@ -154,44 +175,108 @@ const EpisodeList = (props) => {
   };
 
   const completeEpisode = async (episode) => {
+    reFresh(Date.now());
     await markAsFinished(props.current, episode);
-    reFresh(Date.now())
-  }
+  };
 
   const whenToStart = (history = {}) => {
     return history.currentTime || null;
-  }
+  };
 
   const getHistory = async (feed) => {
     const history = await db.get(feed);
     setEpisodeHistory(history || {});
-  }
+  };
 
   const ShowProgress = ({ guid, episodeData }) => {
-    
     const { currentTime, duration, completed } = episodeData;
-    if (completed) return <IconButton><CheckCircleIcon style={{ color: 'lightgreen' }} /></IconButton>;
+    if (completed)
+      return (
+        <IconButton>
+          <CheckCircleIcon style={{ color: "lightgreen" }} />
+        </IconButton>
+      );
 
-    const total = (currentTime && duration) ? Math.round((currentTime * 100) / duration) : null;
+    const total =
+      currentTime && duration
+        ? Math.round((currentTime * 100) / duration)
+        : null;
     if (total) {
       return <div onClick={() => completeEpisode(guid)}>{total}%</div>;
     }
-    return  <IconButton onClick={() => completeEpisode(guid)} >
-              <CheckCircleOutlineIcon  />
-            </IconButton>;
-  }
+    return (
+      <IconButton onClick={() => completeEpisode(guid)}>
+        <CheckCircleOutlineIcon />
+      </IconButton>
+    );
+  };
+
+  const EpisodeDrawer = ({ open, onClose, onOpen, actions }) => (
+    <SwipeableDrawer
+      anchor={"bottom"}
+      onClose={onClose}
+      onOpen={onOpen}
+      open={open}
+    >
+      <EpisodeActions actions={actions} />
+    </SwipeableDrawer>
+  );
+
+  const EpisodeActions = ({ actions = [] }) => (
+    <List component="nav">
+      {actions.map((action, key) => (
+        <ListItem key={key} button onClick={action.callback}>
+          <ListItemText primary={action.label} />
+        </ListItem>
+      ))}
+    </List>
+  );
 
   useEffect(() => {
-    console.log('getting new history')
+    console.log("getting new history");
     getHistory(props.current);
   }, [fresh, props.shouldRefresh]);
-
   return (
     <>
       <Description handleClose={handleClose} open={open} />
       <Consumer>
         {(state) => (
           <div className={classes.root}>
+            <EpisodeDrawer
+              onClose={() => {
+                openDrawer(false);
+                setCurrentEpisode(null);
+              }}
+              onOpen={() => openDrawer(true)}
+              open={drawer}
+              actions={[
+                {
+                  label: "Queue Next",
+                  callback: () => {
+                    openDrawer(false);
+                    playNext(currentEpisode);
+                  },
+                },
+                {
+                  label: "Queue Last",
+                  callback: () => {
+                    openDrawer(false);
+                    playLast(currentEpisode);
+                  },
+                },
+                {
+                  label: "Mark as Played",
+                  callback: () => {
+                    openDrawer(false);
+                    completeEpisode(currentEpisode);
+                  },
+                },
+                // {
+                //   label: "Mark everything before as Played",
+                //   callback: (guid) => openDrawer(false),
+                // },
+              ]}
+            />
             {episodeList ? (
               <>
                 <List>
@@ -201,19 +286,30 @@ const EpisodeList = (props) => {
                       <div key={episode.guid}>
                         <ListItem
                           className={
-                            state.playing === episode.guid ? classes.selected : null
+                            state.playing === episode.guid
+                              ? classes.selected
+                              : null
                           }
-                        // button
+                          // button
                         >
                           <ListItemIcon>
-                            <IconButton onClick={props.handler(episode.guid, whenToStart(episodeData), podcast)}>
+                            <IconButton
+                              onClick={props.handler(
+                                episode.guid,
+                                whenToStart(episodeData),
+                                podcast
+                              )}
+                            >
                               {props.playing === episode.guid &&
-                                props.status !== "pause" 
-                                ? <PauseIcon  className={classes.playIcon}  />
-                                : <PlayArrowIcon className={classes.playIcon} />
-                                }</IconButton>
+                              props.status !== "pause" ? (
+                                <PauseIcon className={classes.playIcon} />
+                              ) : (
+                                <PlayArrowIcon className={classes.playIcon} />
+                              )}
+                            </IconButton>
                           </ListItemIcon>
                           <EpisodeListDescription
+                            refresh={fresh}
                             onClick={() => {
                               // console.log(episode);
                               // saveOffline(episode.enclosures[0].url)
@@ -225,27 +321,48 @@ const EpisodeList = (props) => {
                             history={episodeData}
                             episode={episode}
                           />
-                          <ListItemIcon >
-                            <ShowProgress guid={episode.guid} episodeData={episodeData} />
+                          <ListItemIcon>
+                            <IconButton
+                              onClick={() => {
+                                openDrawer(true);
+                                setCurrentEpisode(episode.guid);
+                              }}
+                            >
+                              <MoreVertIcon />
+                            </IconButton>
+
+                            {/* <ShowProgress
+                              guid={episode.guid}
+                              episodeData={episodeData}
+                            /> */}
                           </ListItemIcon>
                         </ListItem>
                         <Divider />
                       </div>
-                    )
-                  }
-                  )}
+                    );
+                  })}
                 </List>
 
-                {(episodes.length > episodeList.length) &&
-                  <List align="center" >
-                    <Button onClick={() => setAmount(amount + 1)} variant="outlined" style={{ width: '80%' }} size="large" color="primary"> Load More Episodes </Button>
-                  </List>}
+                {episodes.length > episodeList.length && (
+                  <List align="center">
+                    <Button
+                      onClick={() => setAmount(amount + 1)}
+                      variant="outlined"
+                      style={{ width: "80%" }}
+                      size="large"
+                      color="primary"
+                    >
+                      {" "}
+                      Load More Episodes{" "}
+                    </Button>
+                  </List>
+                )}
               </>
             ) : (
-                <div className={classes.progressContainer}>
-                  <CircularProgress className={classes.progress} />
-                </div>
-              )}
+              <div className={classes.progressContainer}>
+                <CircularProgress className={classes.progress} />
+              </div>
+            )}
           </div>
         )}
       </Consumer>

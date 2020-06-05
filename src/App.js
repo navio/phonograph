@@ -101,9 +101,9 @@ const App = ({}) => {
     state,
   ]);
 
-  useEffect(() => window.title = `Phonograph: ${state.episodeInfo.title}`, [
-    state.episodeInfo.title,
-  ]);
+  // useEffect(() => window.title = `Phonograph: ${state.episodeInfo.title}`, [
+  //   state.episodeInfo.title,
+  // ]);
 
   let {title} = state.episodeInfo || {};
 

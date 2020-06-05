@@ -6,6 +6,7 @@ import { recordEpisode as saveEpisodeState } from '../../reducer'
 
 import Loading from '../../core/Loading';
 
+
 import EpisodeList from "./EpisodeList";
 import PodcastHeader from "./PodcastHeader";
 import PodcastEngine from "podcastsuite";
@@ -128,6 +129,40 @@ export default (props) => {
     }
   }
 
+  const playNext = (podcast) => (guid) => {
+    const episode = episodes.current.get(guid);
+    const payload = {
+      audioOrigin: podcastURL,
+      // episode: episode.guid,
+      media: episode.enclosures[0].url,
+      playing: guid,
+      status: "playing",
+      played: 0,
+      episodeInfo: episode,
+      podcastImage: podcast.image,
+      podcastAuthor: podcast.author,
+    };
+
+    dispatch({ type: 'addNext', payload });
+  }
+
+  const playLast = (podcast) => (guid) => {
+    const episode = episodes.current.get(guid);
+    const payload = {
+      audioOrigin: podcastURL,
+      // episode: episode.guid,
+      media: episode.enclosures[0].url,
+      playing: guid,
+      status: "playing",
+      played: 0,
+      episodeInfo: episode,
+      podcastImage: podcast.image,
+      podcastAuthor: podcast.author,
+    };
+
+    dispatch({ type: 'addLast', payload });
+  }
+
   const playButton = (guid, currentTime, podcast) => (ev) => {
     const episode = episodes.current.get(guid);
 
@@ -166,6 +201,7 @@ export default (props) => {
         podcastImage: podcast.image,
         podcastAuthor: podcast.author,
       };
+
       updateMediaSessionState('playing');
       updateMediaSession(payload);
 
@@ -235,6 +271,8 @@ export default (props) => {
       episodes={podcast.items}
       podcast={podcast}
       handler={playButton}
+      playNext={playNext(podcast)}
+      playLast={playLast(podcast)}
       status={global.status}
       playing={global.playing}
       current={global.current}

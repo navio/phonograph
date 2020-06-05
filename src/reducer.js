@@ -3,6 +3,7 @@ const db = PS.createDatabase('history','podcasts');
 
 export const completeEpisodeHistory = async (feed,episode) => {
  if(feed && episode) {
+   console.log('marked',episode);
     const inMemory = await db.get(feed);
     const current = inMemory || {};
     current[episode] = { completed: true };
@@ -106,6 +107,16 @@ export const reducer = (state, action) => {
         return {...state, status: action.status} 
       case 'updateCurrent':
           return {...state, current: action.payload} 
+      case 'addNext': {
+        const {playlist = []} = state;
+          playlist.unshift(action.payload);
+          return {...state, playlist }
+      }
+      case 'addLast': {
+          const {playlist = []} = state;
+          playlist.push(action.payload);
+          return {...state, playlist } 
+      }
       case 'audioCompleted':
         const guid = state.episodeInfo && state.episodeInfo.guid;
         completeEpisodeHistory(state.current, guid);
