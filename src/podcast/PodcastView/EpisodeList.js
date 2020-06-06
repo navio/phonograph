@@ -230,6 +230,7 @@ const EpisodeList = (props) => {
           onClick={() => {
             openDrawer(false);
             playNext(currentEpisode);
+            setMessage("Queued to play next");
           }}
         >
           <ListItemIcon>
@@ -242,7 +243,7 @@ const EpisodeList = (props) => {
           onClick={() => {
             openDrawer(false);
             playLast(currentEpisode);
-            setMessage("Queue to play next");
+            setMessage("Added to queue");
           }}
         >
           <ListItemIcon>
@@ -255,7 +256,6 @@ const EpisodeList = (props) => {
           onClick={() => {
             openDrawer(false);
             completeEpisode(currentEpisode);
-            setMessage("Added to queue");
           }}
         >
           <ListItemIcon>
