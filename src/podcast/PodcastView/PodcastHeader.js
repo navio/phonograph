@@ -13,8 +13,9 @@ import Favorite from "@material-ui/icons/Bookmark";
 import BookmarkBorderIcon from "@material-ui/icons/BookmarkBorder";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
-import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
+import Snackbar from "@material-ui/core/Snackbar";
+
 import { clearText } from "./EpisodeList";
 import ShareIcon from "@material-ui/icons/ShareOutlined";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";

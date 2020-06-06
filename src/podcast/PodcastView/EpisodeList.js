@@ -25,7 +25,14 @@ import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import { completeEpisodeHistory as markAsFinished } from "../../reducer";
 import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
-import DoneIcon from '@material-ui/icons/Done';
+import DoneIcon from "@material-ui/icons/Done";
+
+import QueuePlayNextIcon from "@material-ui/icons/QueuePlayNext";
+import AddToQueueIcon from "@material-ui/icons/AddToQueue";
+import DoneOutlineIcon from "@material-ui/icons/DoneOutline";
+
+import MuiAlert from "@material-ui/lab/Alert";
+import Snackbar from "@material-ui/core/Snackbar";
 
 const DOMPurify = createDOMPurify(window);
 const { sanitize } = DOMPurify;
@@ -38,10 +45,9 @@ export const clearText = (html) => {
 };
 
 export const styles = (theme) => ({
-
   inProgress: {
     color: theme.palette.primary.main,
-  }
+  },
 });
 
 dayjs.extend(relativeTime);
@@ -80,10 +86,10 @@ const IsAvaliable = (url) => {
 
 const EpisodeListDescription = (props) => {
   const episode = props.episode;
-  const refresh = props.refresh;
   const classes = props.classes;
   const { currentTime, duration, completed } = props.history || {};
-  const total = currentTime && duration ? Math.round((currentTime * 100) / duration) : null;
+  const total =
+    currentTime && duration ? Math.round((currentTime * 100) / duration) : null;
   // if (total) {
   //   return <div onClick={() => completeEpisode(guid)}>{total}%</div>;
   // }
@@ -100,29 +106,30 @@ const EpisodeListDescription = (props) => {
             <IsAvaliable url={episode.enclosures[0].url} />
           </Typography>
           <Typography variant="overline" component="div">
+            {(completed || total > 97) && (
+              <DoneOutlineIcon size="small" color="primary" fontSize="small" />
+            )}
             {episodeDate(episode.created)}
-            {!isNaN(refresh) && (completed || total ) && (
+            {total && (
               <Chip
                 style={{ marginLeft: "10px" }}
                 variant="outlined"
                 size="small"
-                label={total ? `Progress: ${total}%` : "Completed"}
-                // color="primary"
+                label={`Progress: ${total}%`}
                 className={classes.inProgress}
                 deleteIcon={<DoneIcon />}
               />
             )}
-            {
-              episode.episodeType &&
-              episode.episodeType !== "full" && (
-                <Chip
-                  style={{ marginLeft: "10px" }}
-                  variant="outlined"
-                  size="small"
-                  label={episode.episodeType}
-                  color="secondary"
-                />
-              )}
+
+            {episode.episodeType && episode.episodeType !== "full" && (
+              <Chip
+                style={{ marginLeft: "10px" }}
+                variant="outlined"
+                size="small"
+                label={episode.episodeType}
+                color="secondary"
+              />
+            )}
           </Typography>
         </>
       }
@@ -151,6 +158,7 @@ const Description = (props) => {
 };
 
 const EpisodeList = (props) => {
+  console.log("remderEpisodeList");
   const [episodeHistory, setEpisodeHistory] = useState({});
   const [open, setOpen] = React.useState(null);
   const [amount, setAmount] = React.useState(1);
@@ -159,6 +167,7 @@ const EpisodeList = (props) => {
   const episodeList = episodes.slice(0, 20 * amount);
   const [drawer, openDrawer] = useState(false);
   const [currentEpisode, setCurrentEpisode] = useState(null);
+  const [ message, setMessage ] = useState(null);
   // console.log('heree',podcast);
 
   useEffect(() => {
@@ -167,12 +176,13 @@ const EpisodeList = (props) => {
 
   const handleClose = (value) => {
     setOpen(null);
+    // reFresh(Date.now());
     // setSelectedValue(value);
   };
 
   const completeEpisode = async (episode) => {
-    reFresh(Date.now());
-    await markAsFinished(props.current, episode);
+    const refreshCB = () => reFresh(Date.now());
+    await markAsFinished(props.current, episode, refreshCB);
   };
 
   const whenToStart = (history = {}) => {
@@ -206,34 +216,74 @@ const EpisodeList = (props) => {
       </IconButton>
     );
   };
-
-  const EpisodeDrawer = ({ open, onClose, onOpen, actions }) => (
+  const closeMessage = () => setMessage(null);
+  const EpisodeDrawer = ({ open, onClose, onOpen }) => (
     <SwipeableDrawer
       anchor={"bottom"}
       onClose={onClose}
       onOpen={onOpen}
       open={open}
     >
-      <EpisodeActions actions={actions} />
+      <List component="nav">
+        <ListItem
+          button
+          onClick={() => {
+            openDrawer(false);
+            playNext(currentEpisode);
+          }}
+        >
+          <ListItemIcon>
+            <QueuePlayNextIcon />
+          </ListItemIcon>
+          <ListItemText primary={"Play Next"} />
+        </ListItem>
+        <ListItem
+          button
+          onClick={() => {
+            openDrawer(false);
+            playLast(currentEpisode);
+            setMessage("Queue to play next");
+          }}
+        >
+          <ListItemIcon>
+            <AddToQueueIcon />
+          </ListItemIcon>
+          <ListItemText primary={"Add to Queue"} />
+        </ListItem>
+        <ListItem
+          button
+          onClick={() => {
+            openDrawer(false);
+            completeEpisode(currentEpisode);
+            setMessage("Added to queue");
+          }}
+        >
+          <ListItemIcon>
+            <DoneOutlineIcon color="primary" />
+          </ListItemIcon>
+          <ListItemText primary={"Mark as Played"} />
+        </ListItem>
+      </List>
     </SwipeableDrawer>
   );
-
-  const EpisodeActions = ({ actions = [] }) => (
-    <List component="nav">
-      {actions.map((action, key) => (
-        <ListItem key={key} button onClick={action.callback}>
-          <ListItemText primary={action.label} />
-        </ListItem>
-      ))}
-    </List>
-  );
-
+  function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+  }
+    
   useEffect(() => {
     // console.log("getting new history");
     getHistory(props.current);
   }, [fresh, props.shouldRefresh]);
   return (
     <>
+      <Snackbar
+        open={message}
+        onClose={closeMessage}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        autoHideDuration={4000}
+      >
+        <Alert severity="success">{message}</Alert>
+      </Snackbar>
       <Description handleClose={handleClose} open={open} />
       <Consumer>
         {(state) => (
@@ -245,33 +295,6 @@ const EpisodeList = (props) => {
               }}
               onOpen={() => openDrawer(true)}
               open={drawer}
-              actions={[
-                {
-                  label: "Queue Next",
-                  callback: () => {
-                    openDrawer(false);
-                    playNext(currentEpisode);
-                  },
-                },
-                {
-                  label: "Queue Last",
-                  callback: () => {
-                    openDrawer(false);
-                    playLast(currentEpisode);
-                  },
-                },
-                {
-                  label: "Mark as Played",
-                  callback: () => {
-                    openDrawer(false);
-                    completeEpisode(currentEpisode);
-                  },
-                },
-                // {
-                //   label: "Mark everything before as Played",
-                //   callback: (guid) => openDrawer(false),
-                // },
-              ]}
             />
             {episodeList ? (
               <>
@@ -306,7 +329,6 @@ const EpisodeList = (props) => {
                           </ListItemIcon>
                           <EpisodeListDescription
                             classes={classes}
-                            refresh={fresh}
                             onClick={() => {
                               // console.log(episode);
                               // saveOffline(episode.enclosures[0].url)

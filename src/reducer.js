@@ -1,14 +1,18 @@
 import PS from 'podcastsuite';
 const db = PS.createDatabase('history','podcasts');
 
-export const completeEpisodeHistory = async (feed,episode) => {
+export const completeEpisodeHistory = async (feed,episode,fb) => {
  if(feed && episode) {
    console.log('marked',episode);
     const inMemory = await db.get(feed);
+
     const current = inMemory || {};
     current[episode] = { completed: true };
     // console.log(current[episode],feed,episode);
     await db.set(feed,current);
+    if(fb){
+      fb();
+    }
     return true;
  }
  return false;
