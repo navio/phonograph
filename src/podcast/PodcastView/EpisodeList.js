@@ -158,7 +158,6 @@ const Description = (props) => {
 };
 
 const EpisodeList = (props) => {
-  console.log("remderEpisodeList");
   const [episodeHistory, setEpisodeHistory] = useState({});
   const [open, setOpen] = React.useState(null);
   const [amount, setAmount] = React.useState(1);
@@ -167,7 +166,7 @@ const EpisodeList = (props) => {
   const episodeList = episodes.slice(0, 20 * amount);
   const [drawer, openDrawer] = useState(false);
   const [currentEpisode, setCurrentEpisode] = useState(null);
-  const [ message, setMessage ] = useState(null);
+  const [message, setMessage] = useState(null);
   // console.log('heree',podcast);
 
   useEffect(() => {
@@ -269,7 +268,7 @@ const EpisodeList = (props) => {
   function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
   }
-    
+
   useEffect(() => {
     // console.log("getting new history");
     getHistory(props.current);
@@ -285,17 +284,17 @@ const EpisodeList = (props) => {
         <Alert severity="success">{message}</Alert>
       </Snackbar>
       <Description handleClose={handleClose} open={open} />
+      <EpisodeDrawer
+        onClose={() => {
+          openDrawer(false);
+          setCurrentEpisode(null);
+        }}
+        onOpen={() => openDrawer(true)}
+        open={drawer}
+      />
       <Consumer>
         {(state) => (
           <div className={classes.root}>
-            <EpisodeDrawer
-              onClose={() => {
-                openDrawer(false);
-                setCurrentEpisode(null);
-              }}
-              onOpen={() => openDrawer(true)}
-              open={drawer}
-            />
             {episodeList ? (
               <>
                 <List>

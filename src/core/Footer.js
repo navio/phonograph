@@ -6,9 +6,16 @@ import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
 import Favorite from "@material-ui/icons/Bookmark"; //Headsert
 import DiscoverIcon from "@material-ui/icons/FilterDrama";
 import Settings from "@material-ui/icons/Settings";
+import Playlist from "@material-ui/icons/PlaylistPlay";
 import Paper from "@material-ui/core/Paper";
 import { withRouter } from "react-router-dom";
-import { ROOT, LIBVIEW, PODCASTVIEW, DISCOVERVIEW, SETTINGSVIEW } from "../constants";
+import {
+  ROOT,
+  LIBVIEW,
+  DISCOVERVIEW,
+  SETTINGSVIEW,
+  PLAYLIST
+} from "../constants";
 const styles = {
   root: {
     position: "fixed",
@@ -28,8 +35,10 @@ class SimpleBottomNavigation extends React.Component {
   }
   render() {
     const classes = this.props.classes;
-    const selected = this.props.location.pathname.length > 2 ?
-    this.props.location.pathname : DISCOVERVIEW;
+    const selected =
+      this.props.location.pathname.length > 2
+        ? this.props.location.pathname
+        : DISCOVERVIEW;
     return (
       <div>
         <Paper className={classes.root} elevation={4}>
@@ -40,10 +49,16 @@ class SimpleBottomNavigation extends React.Component {
             className={classes.root}
           >
             <BottomNavigationAction
-              label="Library"
+              label="Favorites"
               value={LIBVIEW}
               onClick={this.handleRedirect(LIBVIEW)}
               icon={<Favorite />}
+            />
+            <BottomNavigationAction
+              label="Playlist"
+              value={PLAYLIST}
+              onClick={this.handleRedirect(PLAYLIST)}
+              icon={<Playlist />}
             />
             <BottomNavigationAction
               label="Discover"

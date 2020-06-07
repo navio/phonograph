@@ -4,3 +4,4 @@ export const LIBVIEW = "/library";
 export const PODCASTVIEW = "/podcast";
 export const DISCOVERVIEW = "/discover";
 export const SETTINGSVIEW = "/settings";
+export const PLAYLIST = "/playlist";

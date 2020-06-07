@@ -13,6 +13,7 @@ import { Route, Redirect, useHistory, Switch } from "react-router-dom";
 import {
   ROOT,
   LIBVIEW,
+  PLAYLIST,
   PODCASTVIEW,
   DISCOVERVIEW,
   SETTINGSVIEW,
@@ -39,6 +40,7 @@ const debug = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 const Discover = React.lazy(async () => await import("./podcast/Discovery"));
 const Library = React.lazy(async () => await import("./podcast/Library"));
 const Settings = React.lazy(async () => await import("./podcast/Settings"));
+const Playlist = React.lazy(async () => await import("./core/Playlist"));
 const MediaControl = React.lazy(
   async () => await import("./core/MediaControl")
 );
@@ -50,7 +52,8 @@ const Footer = React.lazy(async () => await import("./core/Footer"));
 const Loading = () => (
   <div
     align="center"
-    style={{ margin: "0 auto", display: "block", paddintTop: "40%" }} >
+    style={{ margin: "0 auto", display: "block", paddintTop: "40%" }}
+  >
     <LoadingSVG />
   </div>
 );
@@ -105,19 +108,19 @@ const App = ({}) => {
   //   state.episodeInfo.title,
   // ]);
 
-  let {title} = state.episodeInfo || {};
+  let { title } = state.episodeInfo || {};
 
   let finalTheme;
-  switch(state.theme) {
-    case 'dark':
+  switch (state.theme) {
+    case "dark":
       finalTheme = theme.dark;
-    break;
-    case 'light':
+      break;
+    case "light":
       finalTheme = theme.light;
-    break;
-    case 'os':
+      break;
+    case "os":
     default:
-      finalTheme = theme.os ? theme.dark: theme.light;
+      finalTheme = theme.os ? theme.dark : theme.light;
   }
 
   return (
@@ -166,6 +169,16 @@ const App = ({}) => {
           />
 
           <Route
+            path={PLAYLIST}
+            exact
+            render={() => (
+              <Suspense fallback={<Loading />}>
+                <Playlist />
+              </Suspense>
+            )}
+          />
+
+          <Route
             exact
             path={[DISCOVERVIEW, ROOT]}
             render={({ history }) => (
@@ -203,8 +216,8 @@ const App = ({}) => {
           autoPlay={state.status !== "pause"}
           ref={player}
           preload="auto"
-          title={ title || ""}
-          src={ state.media }
+          title={title || ""}
+          src={state.media}
           poster={state.podcastImage || ""}
         />
       </AppContext.Provider>
