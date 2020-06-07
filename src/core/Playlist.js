@@ -29,7 +29,7 @@ const styles = (theme) => ({
 
 const Playlist = ({ classes }) => {
   const { state, dispatch } = useContext(AppContext);
-  const removeFromList = (episode) => () => dispatch({type:'removeFromList', episode});
+  const removeFromList = (episode) => () => { dispatch({type:'removeFromList', episode}); console.log(episode) }
   return (
     <>
       <AppBar className={classes.appHeader} position="static">
@@ -57,10 +57,10 @@ const Playlist = ({ classes }) => {
           {state.playlist && state.playlist.map((mediaElement, key) => (
             <ListItem key={key}>
               <img className={classes.images} src={mediaElement.podcastImage} />
-              <div>
+              <ListItemText>
                   <Typography variant='body2' display="block" noWrap>{mediaElement.episodeInfo.title} </Typography>
                   <Typography variant='caption' display="block" noWrap>{mediaElement.episodeInfo.author}</Typography>
-              </div>
+              </ListItemText>
               <ListItemSecondaryAction>
                 <IconButton onClick={removeFromList(key)}>
                     <RemoveCircleOutlineIcon />
