@@ -132,11 +132,13 @@ export const reducer = (state, action) => {
         }else {
           return { ...state, ...action.payload}
         }
-      case 'removeFromList':
+      case 'removeFromPlayList':
         const {episode} = action;
         const {playlist} = state;
         playlist.splice(episode,1);
         return {...state, playlist};
+      case 'clearPlayList':
+        return {...state, playlist:[]};
       case 'resetState':
         return defaultState; 
     }
