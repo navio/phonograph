@@ -40,7 +40,7 @@ const SimpleBottomNavigation = ({ history, classes, location }) => {
     return () => history.push(url);
   };
   const { state } = useContext(AppContext);
-  const amount = state.playlist.length || 0;
+  const amount = (state.playlist && state.playlist.length) || 0;
   const selected =
     location.pathname.length > 2 ? location.pathname : DISCOVERVIEW;
   return (
