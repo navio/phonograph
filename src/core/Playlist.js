@@ -39,28 +39,32 @@ const Playlist = ({ classes }) => {
     <>
       <AppBar className={classes.appHeader} position="static">
         <Toolbar variant="dense">
-          <Typography variant="h6">PlayList</Typography>
+          <Typography variant="h6">Playlist</Typography>
         </Toolbar>
       </AppBar>
-      <Paper>
-        <Box component="div" m={1}>
-          <Grid
-            container
-            direction="row"
-            justify="flex-end"
-            spacing={2}
-            alignItems="center"
-          >
-            <Grid item>
-              <Button variant="contained" color="secondary">
-                Clear
-              </Button>
+      {state.playlist && state.playlist.length > 0 ? (
+        <Paper>
+          <Box component="div" m={1}>
+            <Grid
+              container
+              direction="row"
+              justify="flex-end"
+              spacing={2}
+              alignItems="center"
+            >
+              <Grid item>
+                <Button
+                  onClick={removeAll}
+                  variant="contained"
+                  color="secondary"
+                >
+                  Clear
+                </Button>
+              </Grid>
             </Grid>
-          </Grid>
-        </Box>
-        <List>
-          {state.playlist &&
-            state.playlist.map((mediaElement, key) => (
+          </Box>
+          <List>
+            {state.playlist.map((mediaElement, key) => (
               <ListItem key={key}>
                 <img
                   className={classes.images}
@@ -81,8 +85,13 @@ const Playlist = ({ classes }) => {
                 </ListItemSecondaryAction>
               </ListItem>
             ))}
-        </List>
-      </Paper>
+          </List>
+        </Paper>
+      ) : (
+        <Box m={2}>
+          <Typography variant="h4">Empty Playlist.</Typography>{" "}
+        </Box>
+      )}
     </>
   );
 };

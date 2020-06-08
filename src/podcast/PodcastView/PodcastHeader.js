@@ -252,7 +252,7 @@ function PodcastHeader(props) {
               <Grid item xs={12} pt={2} align="right">
                 {!isInLibrary &&
                   <Button onClick={saveThisPodcastToLibrary}
-                    style={{ marginRight: '1rem' }} variant="outlined" color="primary" >Subscribe</Button>}
+                    style={{ marginRight: '1rem' }} variant="outlined" color="secondary" >Subscribe</Button>}
               </Grid>
               <Grid item xs={12}>
                 <Typography style={{ marginLeft: '.5rem' }}>
