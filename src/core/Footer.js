@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useContext } from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import BottomNavigation from "@material-ui/core/BottomNavigation";
+import Badge from "@material-ui/core/Badge";
 import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
 import Favorite from "@material-ui/icons/Bookmark"; //Headsert
 import DiscoverIcon from "@material-ui/icons/FilterDrama";
@@ -9,13 +10,10 @@ import Settings from "@material-ui/icons/Settings";
 import Playlist from "@material-ui/icons/PlaylistPlay";
 import Paper from "@material-ui/core/Paper";
 import { withRouter } from "react-router-dom";
-import {
-  ROOT,
-  LIBVIEW,
-  DISCOVERVIEW,
-  SETTINGSVIEW,
-  PLAYLIST
-} from "../constants";
+import { LIBVIEW, DISCOVERVIEW, SETTINGSVIEW, PLAYLIST } from "../constants";
+
+import { AppContext } from "../App.js";
+
 const styles = {
   root: {
     position: "fixed",
@@ -29,56 +27,60 @@ const styles = {
   },
 };
 
-class SimpleBottomNavigation extends React.Component {
-  handleRedirect(url) {
-    return () => this.props.history.push(url);
-  }
-  render() {
-    const classes = this.props.classes;
-    const selected =
-      this.props.location.pathname.length > 2
-        ? this.props.location.pathname
-        : DISCOVERVIEW;
-    return (
-      <div>
-        <Paper className={classes.root} elevation={4}>
-          <BottomNavigation
-            value={selected}
-            onChange={this.handleChange}
-            showLabels
-            className={classes.root}
-          >
-            <BottomNavigationAction
-              label="Favorites"
-              value={LIBVIEW}
-              onClick={this.handleRedirect(LIBVIEW)}
-              icon={<Favorite />}
-            />
-            <BottomNavigationAction
-              label="Playlist"
-              value={PLAYLIST}
-              onClick={this.handleRedirect(PLAYLIST)}
-              icon={<Playlist />}
-            />
-            <BottomNavigationAction
-              label="Discover"
-              value={DISCOVERVIEW}
-              onClick={this.handleRedirect(DISCOVERVIEW)}
-              icon={<DiscoverIcon />}
-            />
-            <BottomNavigationAction
-              label="Settings"
-              value={SETTINGSVIEW}
-              onClick={this.handleRedirect(SETTINGSVIEW)}
-              icon={<Settings />}
-            />
-          </BottomNavigation>
-        </Paper>
-        <div className={classes.underground} />
-      </div>
-    );
-  }
-}
+const StyledBadge = withStyles((theme) => ({
+  badge: {
+    right: -3,
+    top: 5,
+
+  },
+}))(Badge);
+
+const SimpleBottomNavigation = ({ history, classes, location }) => {
+  const handleRedirect = (url) => {
+    return () => history.push(url);
+  };
+  const { state } = useContext(AppContext);
+  const amount = state.playlist.length || 0;
+  const selected =
+    location.pathname.length > 2 ? location.pathname : DISCOVERVIEW;
+  return (
+    <div>
+      <Paper className={classes.root} elevation={4}>
+        <BottomNavigation value={selected} showLabels className={classes.root}>
+          <BottomNavigationAction
+            label="Favorites"
+            value={LIBVIEW}
+            onClick={handleRedirect(LIBVIEW)}
+            icon={<Favorite />}
+          />
+          <BottomNavigationAction
+            label="Playlist"
+            value={PLAYLIST}
+            onClick={handleRedirect(PLAYLIST)}
+            icon={
+              <StyledBadge badgeContent={amount} color="secondary">
+                <Playlist />
+              </StyledBadge>
+            }
+          />
+          <BottomNavigationAction
+            label="Discover"
+            value={DISCOVERVIEW}
+            onClick={handleRedirect(DISCOVERVIEW)}
+            icon={<DiscoverIcon />}
+          />
+          <BottomNavigationAction
+            label="Settings"
+            value={SETTINGSVIEW}
+            onClick={handleRedirect(SETTINGSVIEW)}
+            icon={<Settings />}
+          />
+        </BottomNavigation>
+      </Paper>
+      <div className={classes.underground} />
+    </div>
+  );
+};
 
 SimpleBottomNavigation.propTypes = {
   classes: PropTypes.object.isRequired,
