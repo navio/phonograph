@@ -82,7 +82,7 @@ const styles = (theme) => ({
     position: 'absolute',
     height: 40,
     width: 40,
-    color: theme.palette.secondary.main
+    // color: theme.palette.secondary.main
   },
   player: {
     // paddingLeft: 20,
@@ -261,7 +261,7 @@ const MediaControlCard = (props) => {
                 <Grid align="center" item xs={2} md={1} >
                   <span>{toMin(state.currentTime)}</span>
                 </Grid>
-                <Grid className={classes.container} item xs={open ? 5 : 4} md={6} >
+                <Grid className={classes.container} item xs={5} md={6} >
                   <LinearProgress
                     className={classes.progress}
                     variant="buffer"
