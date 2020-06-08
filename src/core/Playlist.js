@@ -8,6 +8,7 @@ import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import { withStyles, fade } from "@material-ui/core/styles";
 import RemoveCircleOutlineIcon from "@material-ui/icons/RemoveCircleOutline";
+import phono from '../../public/phono.svg';
 import {
   List,
   ListItem,
@@ -24,6 +25,12 @@ const styles = (theme) => ({
   },
   appHeader: {
     WebkitAppRegion: "drag",
+  },
+  empty: {
+    display:"block",
+    width:"100%",
+    marginTop:"18%",
+    color: theme.palette.text.secondary
   },
 });
 
@@ -88,9 +95,11 @@ const Playlist = ({ classes }) => {
           </List>
         </Paper>
       ) : (
-        <Box m={2}>
-          <Typography variant="h4">Empty Playlist.</Typography>{" "}
-        </Box>
+        <Typography className={classes.empty} align="center" variant="h5">
+          <img width={"85rem"} src={phono} />
+          <br />
+          Playlist is empty.
+        </Typography>
       )}
     </>
   );
