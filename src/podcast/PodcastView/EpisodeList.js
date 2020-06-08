@@ -20,16 +20,15 @@ import { Chip, IconButton } from "@material-ui/core";
 import createDOMPurify from "dompurify";
 import { Consumer } from "../../App.js";
 import PS from "podcastsuite";
-import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import { completeEpisodeHistory as markAsFinished } from "../../reducer";
 import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
-import DoneIcon from "@material-ui/icons/Done";
 
 import QueuePlayNextIcon from "@material-ui/icons/QueuePlayNext";
 import AddToQueueIcon from "@material-ui/icons/AddToQueue";
 import DoneOutlineIcon from "@material-ui/icons/DoneOutline";
+import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 
 import MuiAlert from "@material-ui/lab/Alert";
 import Snackbar from "@material-ui/core/Snackbar";
@@ -106,10 +105,11 @@ const EpisodeListDescription = (props) => {
             <IsAvaliable url={episode.enclosures[0].url} />
           </Typography>
           <Typography variant="overline" component="div">
+          
             {(completed || total > 97) && (
-              <DoneOutlineIcon size="small" color="primary" fontSize="small" />
-            )}
-            {episodeDate(episode.created)}
+              <CheckCircleOutlineIcon color="primary" fontSize="small" />
+            )}{' '}{episodeDate(episode.created)}
+            
             {total && (
               <Chip
                 style={{ marginLeft: "10px" }}
@@ -117,7 +117,6 @@ const EpisodeListDescription = (props) => {
                 size="small"
                 label={`Progress: ${total}%`}
                 className={classes.inProgress}
-                deleteIcon={<DoneIcon />}
               />
             )}
 
