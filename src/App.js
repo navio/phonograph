@@ -213,6 +213,7 @@ const App = ({}) => {
         </Suspense>
 
         <audio
+          preload="metadata"
           autoPlay={state.status !== "pause"}
           ref={player}
           preload="auto"
