@@ -8,7 +8,7 @@ import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import { withStyles, fade } from "@material-ui/core/styles";
 import RemoveCircleOutlineIcon from "@material-ui/icons/RemoveCircleOutline";
-import phono from '../../public/phono.svg';
+import phono from "../../public/phono.svg";
 import {
   List,
   ListItem,
@@ -27,10 +27,10 @@ const styles = (theme) => ({
     WebkitAppRegion: "drag",
   },
   empty: {
-    display:"block",
-    width:"100%",
-    marginTop:"18%",
-    color: theme.palette.text.secondary
+    display: "block",
+    width: "100%",
+    marginTop: "18%",
+    color: theme.palette.text.secondary,
   },
 });
 
@@ -50,16 +50,18 @@ const Playlist = ({ classes }) => {
         </Toolbar>
       </AppBar>
       {state.playlist && state.playlist.length > 0 ? (
-        <Paper>
+        <>
           <Box component="div" m={1}>
             <Grid
               container
               direction="row"
-              justify="flex-end"
-              spacing={2}
+              justify="space-between"
               alignItems="center"
             >
               <Grid item>
+                <Typography variant="h6">Playing next:</Typography>
+              </Grid>
+              <Grid item zeroMinWidth>
                 <Button
                   onClick={removeAll}
                   variant="contained"
@@ -71,29 +73,31 @@ const Playlist = ({ classes }) => {
             </Grid>
           </Box>
           <List>
-            {state.playlist.map((mediaElement, key) => (
-              <ListItem key={key}>
-                <img
-                  className={classes.images}
-                  src={mediaElement.podcastImage}
-                />
-                <ListItemText>
-                  <Typography variant="body2" display="block" noWrap>
-                    {mediaElement.episodeInfo.title}{" "}
-                  </Typography>
-                  <Typography variant="caption" display="block" noWrap>
-                    {mediaElement.episodeInfo.author}
-                  </Typography>
-                </ListItemText>
-                <ListItemSecondaryAction>
-                  <IconButton onClick={removeFromList(key)}>
-                    <RemoveCircleOutlineIcon />
-                  </IconButton>
-                </ListItemSecondaryAction>
-              </ListItem>
-            ))}
+            <Paper variant="outlined">
+              {state.playlist.map((mediaElement, key) => (
+                <ListItem key={key}>
+                  <img
+                    className={classes.images}
+                    src={mediaElement.podcastImage}
+                  />
+                  <ListItemText>
+                    <Typography variant="body2" display="block" noWrap>
+                      <b>{key + 1}:</b> {mediaElement.episodeInfo.title}{" "}
+                    </Typography>
+                    <Typography variant="caption" display="block" noWrap>
+                      {mediaElement.episodeInfo.author}
+                    </Typography>
+                  </ListItemText>
+                  <ListItemSecondaryAction>
+                    <IconButton onClick={removeFromList(key)}>
+                      <RemoveCircleOutlineIcon />
+                    </IconButton>
+                  </ListItemSecondaryAction>
+                </ListItem>
+              ))}
+            </Paper>
           </List>
-        </Paper>
+        </>
       ) : (
         <Typography className={classes.empty} align="center" variant="h5">
           <img width={"85rem"} src={phono} />
