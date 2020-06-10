@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import BottomNavigation from "@material-ui/core/BottomNavigation";
@@ -35,10 +35,40 @@ const StyledBadge = withStyles((theme) => ({
   },
 }))(Badge);
 
+const hotkeys = (redirects) => {
+  document.body.addEventListener('keyup',(ev)=> {
+    const {target, key} = ev;
+      if(document.body == target){
+        switch(key){
+          case "f":
+          case "l":
+            redirects(LIBVIEW)
+          break;
+          case "p":
+            redirects(PLAYLIST)
+          break;
+          case "d":
+            redirects(DISCOVERVIEW)
+          break;
+          case "/":
+            redirects(DISCOVERVIEW);
+            document.getElementById('outlined-search').focus();
+          break;
+          case "s":
+            redirects(SETTINGSVIEW)
+          break;
+
+        }
+      }
+  })
+};
+
 const SimpleBottomNavigation = ({ history, classes, location }) => {
   const handleRedirect = (url) => {
     return () => history.push(url);
   };
+  useEffect(() => hotkeys((url) => history.push(url)) ,[])
+  
   const { state } = useContext(AppContext);
   const amount = (state.playlist && state.playlist.length) || 0;
   const selected =
