@@ -19,7 +19,6 @@ export default function (player, dispatch, state) {
   }
 
   const completedPlaying = async function (ev) {
-    console.log('hitted!',ev, ev.target)
     dispatch({type: 'audioCompleted', payload: true});
   };
 

@@ -201,12 +201,17 @@ const MediaControlCard = (props) => {
   }, [open]);
 
   useEffect(() => setOpen(true), [media]);
+  useEffect(() => {
+    const {episodeInfo} = state;
+    if(episodeInfo === null) {
+      document.body.style = "";
+    }
+  } ,[state.episodeInfo])
 
   useEffect(() => {
     hotkeys(setOpen);
     if(localStorage){
       const status = localStorage.getItem('openPlayer') || true;
-      console.log('value', status, setOpen );
       setOpen(false);
     }
   }, []);
