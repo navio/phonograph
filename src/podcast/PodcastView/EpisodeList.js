@@ -184,7 +184,7 @@ const EpisodeList = (props) => {
   };
 
   const whenToStart = (history = {}) => {
-    return history.currentTime || null;
+    return history.currentTime || 0;
   };
 
   const getHistory = async (feed) => {

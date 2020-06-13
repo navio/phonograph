@@ -200,6 +200,7 @@ export default (props) => {
         episodeInfo: episode,
         podcastImage: podcast.image,
         podcastAuthor: podcast.author,
+        currentTime
       };
 
       updateMediaSessionState('playing');
@@ -216,6 +217,7 @@ export default (props) => {
           episodeInfo,
           podcastImage,
           podcastAuthor,
+          currentTime: prevCurrentTime,
           playlist = [],
         } = global;
 
@@ -228,10 +230,9 @@ export default (props) => {
           episodeInfo,
           podcastImage,
           podcastAuthor,
-          currentTime,
+          currentTime: prevCurrentTime
         };
 
-        console.log('saving prev!!!!');
 
         payload.playlist = [prevPodcasts, ...playlist];
       }
@@ -240,7 +241,6 @@ export default (props) => {
       if (currentTime) {
         console.log('setting time', currentTime)
         player.currentTime = currentTime;
-        payload.currentTime = currentTime;
       }
 
       recordEpisode(global);
