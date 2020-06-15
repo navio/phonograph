@@ -12,8 +12,8 @@ export default function (player, dispatch, state) {
   let tick = null;
 
   const completedLoading = function (ev) {
-    console.log('setting', state.currentTime);
-    player.currentTime = state.currentTime || 0;
+    // console.log('setting', state.currentTime);
+    // player.currentTime = state.currentTime || 0;
     dispatch({ type: 'audioUpdate', payload: { loading: "loaded" } });
   };
 
