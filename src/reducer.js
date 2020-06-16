@@ -26,7 +26,7 @@ export const completeEpisode = (state) => {
     const nextEpisode = playlist.shift();
     // Todo: Fix to use player in scope. This is a hack.
     player.src = nextEpisode.media;
-    player.currentTime = nextEpisode.currentTime;
+    player.currentTime = nextEpisode.currentTime || 0;
 
     return { ...state, ...nextEpisode, playlist, refresh: Date.now() };
 
