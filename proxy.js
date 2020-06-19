@@ -8,7 +8,7 @@ const http = require('http');
 const {createProxyMiddleware: proxy} = require('http-proxy-middleware');
 
 const app = express();
-
+const apitoken = process.env.listennotes;
 app.use('/api', proxy({
   pathRewrite: {'/api' : '/.netlify/functions/'},
   target: 'http://localhost:9000',
@@ -21,12 +21,18 @@ app.use('/rss-full', proxy({
   changeOrigin: true,
 }));
 
+app.use('/rss-audio', proxy({
+  pathRewrite: {'/rss-audio' : '/rss-audio'},
+  target: 'http://phonograph.app',
+  changeOrigin: true,
+}));
+
 app.use('/ln', proxy({
     pathRewrite: {'/ln' : '/api/v2/'},
     target: 'https://listen-api.listennotes.com',
     changeOrigin: true,
     onProxyReq(proxyReq, req, res){
-      proxyReq.setHeader('X-ListenAPI-Key','ebbd0481aa1b4acc8949a9ffeedf4d7b');
+      proxyReq.setHeader('X-ListenAPI-Key',apitoken);
       proxyReq.setHeader('X-From', 'Gramophone-DEV');
       proxyReq.end();
     }
