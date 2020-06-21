@@ -9,7 +9,7 @@ This project is powered by Remote and Local Cache to provide a PWA
 https://phonograph.app
 
 # Architecture
-* Todo
+-
 
 # Goals
 Provide a First Class a PWA for Audio Execution. The first release focused on Podcasts.
@@ -22,12 +22,12 @@ App
 - [X] Audio Download Progress
 - [X] App UI ( Material UI )
 - [ ] Global Web Worker
-- [ ] Global Caching Services
-- [ ] Remote Plugin Loader
-- [ ] Audio Queue
+- [X] Global Caching Services
+- [X] Audio Queue
+- [ ] Core Services Doc
 - [ ] Electron Release 
 - [ ] Chrome Extension
-- [ ] Core Services Doc
+- [ ] Remote Plugin Loader
 
 Podcasts - Phonocast?
 - [X] RSS Parsing
@@ -35,5 +35,5 @@ Podcasts - Phonocast?
 - [X] Auto Update of Library Contens
 - [X] Search for Podcasts
 - [X] Settings
-- [ ] Top Podcasts (Welcome)
+- [X] Top Podcasts (Welcome)
 - [ ] Offline Mode
