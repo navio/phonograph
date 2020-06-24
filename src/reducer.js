@@ -67,6 +67,28 @@ export const updateMediaSessionState = (value) => {
   }
 }
 
+export const checkIfMediaSessionLodaded = (state) =>{
+  if ('mediaSession' in navigator && navigator.mediaSession.metadata === null) {
+    const { episodeInfo, podcastAuthor, podcastImage, title } = state;
+    const { title: episodeTitle } = episodeInfo;
+
+
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: episodeTitle,
+      artist: podcastAuthor,
+      album: title,
+      artwork: [
+        { src: podcastImage,  sizes: '96x96',   type: 'image/png' },
+        { src: podcastImage, sizes: '128x128', type: 'image/png' },
+        { src: podcastImage, sizes: '192x192', type: 'image/png' },
+        { src: podcastImage, sizes: '256x256', type: 'image/png' },
+        { src: podcastImage, sizes: '384x384', type: 'image/png' },
+        { src: podcastImage, sizes: '512x512', type: 'image/png' },
+      ]
+    });
+  }
+}
+
 const defaultState = {
     podcasts: [],
     theme: true,  
@@ -115,6 +137,7 @@ export const reducer = (state, action) => {
       case 'playingStatus':
         const {status} = action;
         updateMediaSessionState(status);
+        checkIfMediaSessionLodaded(state);
         return {...state, status} 
       case 'updateCurrent':
           return {...state, current: action.payload} 
