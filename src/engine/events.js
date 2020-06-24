@@ -9,6 +9,18 @@
 
 export default function (player, dispatch, state) {
   console.log("attaching events");
+
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.setActionHandler('play', function() { 
+      player.play()
+      .then(() => dispatch({type:'playingStatus', status:'playing'}));
+    });
+    navigator.mediaSession.setActionHandler('pause', function() {
+      player.pause();
+      dispatch({type:'playingStatus', status:'pause'});
+     });
+  }
+
   let tick = null;
 
   const completedLoading = function (ev) {
@@ -57,7 +69,7 @@ export default function (player, dispatch, state) {
 
   const pauseTick = function () {
     clearInterval(tick);
-    dispatch({ type: 'audioUpdate', payload: { status: "pause", refresh: Date.now() } });
+    dispatch({ type: 'audioUpdate', payload: { status: "paused", refresh: Date.now() } });
   };
 
   const stopTick = function (ev) {

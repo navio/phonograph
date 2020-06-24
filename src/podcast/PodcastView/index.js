@@ -167,7 +167,7 @@ export default (props) => {
     const episode = episodes.current.get(guid);
 
     if (global.playing === guid) {
-      if (global.status === "pause") {
+      if (global.status === "paused") {
         player.play().then(() => {
           if (currentTime) {
             player.currentTime = currentTime;
@@ -177,11 +177,10 @@ export default (props) => {
         dispatch({ type: 'playingStatus', status: "playing" });
         recordEpisode(global)
       } else {
-        updateMediaSessionState('paused');
         player.pause().then(
           () => recordEpisode(global)
         );
-        dispatch({ type: 'playingStatus', status: "pause" });
+        dispatch({ type: 'playingStatus', status: "paused" });
         
       }
     } else {

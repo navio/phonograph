@@ -1,11 +1,6 @@
 
 export default (player, dispatch, state) => {
   
-  const updateMediaSessionState = (state) => {
-    if ('mediaSession' in navigator) {
-      navigator.mediaSession.playbackState = state;
-    }
-  }
 
   const seek = function (ev, value) {
     const current = Math.floor((value * player.current.duration) / 100);
@@ -50,19 +45,17 @@ export default (player, dispatch, state) => {
   };
 
   const playButton = () => {
-      if (state.status === "pause") {
+      if (state.status === "paused") {
         
         player.current
         .play()
-        .then( () => player.current.currentTime = state.currentTime );
+        .then( _ => player.current.currentTime = state.currentTime );
 
         dispatch({ type: 'playingStatus', status: "playing" });
         player.current.currentTime = state.currentTime;
-        updateMediaSessionState('playing');
       } else {
         player.current.pause();
-        dispatch({ type: 'audioUpdate', payload:{ status:"pause", currentTime: player.current.currentTime } });
-        updateMediaSessionState('paused');
+        dispatch({ type: 'audioUpdate', payload:{ status:"paused", currentTime: player.current.currentTime } });
       }
   };
 

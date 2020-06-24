@@ -61,6 +61,11 @@ export const recordEpisode = async (feed, episode, currentTime, duration) => {
   return await db.set(feed,current);
 }
 
+export const updateMediaSessionState = (value) => {
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.playbackState = value;
+  }
+}
 
 const defaultState = {
     podcasts: [],
@@ -108,7 +113,9 @@ export const reducer = (state, action) => {
       case 'setDark':
         return { ...state, theme: action.payload }
       case 'playingStatus':
-        return {...state, status: action.status} 
+        const {status} = action;
+        updateMediaSessionState(status);
+        return {...state, status} 
       case 'updateCurrent':
           return {...state, current: action.payload} 
       case 'addNext': {
@@ -126,7 +133,8 @@ export const reducer = (state, action) => {
         completeEpisodeHistory(state.current, guid);
         return completeEpisode(state);
       case 'audioUpdate':
-        if(action.payload && (action.payload.status === 'pause')){
+        updateMediaSessionState(action.payload.status);
+        if(action.payload && (action.payload.status === 'paused')){
           recordEpisode(state.audioOrigin,state.episodeInfo.guid,state.currentTime, state.duration);
           return { ...state, ...action.payload, refresh: Date.now() }
         }else {
