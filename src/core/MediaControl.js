@@ -309,7 +309,7 @@ const MediaControlCard = (props) => {
                         data-guid={state.playing}
                       >
                         {state.playing === (episodeInfo && episodeInfo.guid) &&
-                        state.status !== "pause" ? (
+                        state.status !== "paused" ? (
                           <PauseIcon className={classes.playClosed} />
                         ) : (
                           <PlayArrowIcon className={classes.playClosed} />
@@ -385,7 +385,7 @@ const MediaControlCard = (props) => {
                         data-guid={state.playing}
                       >
                         {state.playing === (episodeInfo && episodeInfo.guid) &&
-                        state.status !== "pause" ? (
+                        state.status !== "paused" ? (
                           <PauseIcon className={classes.playIcon} />
                         ) : (
                           <PlayArrowIcon className={classes.playIcon} />

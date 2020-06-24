@@ -63,7 +63,7 @@ const Underground = () => (
 );
 
 // Pausing for load or refresh
-initialState["status"] = "pause";
+initialState["status"] = "paused";
 
 const App = ({}) => {
   const player = useRef(null);
@@ -214,7 +214,7 @@ const App = ({}) => {
 
         <audio
           preload="metadata"
-          autoPlay={state.status !== "pause"}
+          autoPlay={state.status !== "paused"}
           ref={player}
           preload="auto"
           title={title || ""}

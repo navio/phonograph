@@ -318,7 +318,7 @@ const EpisodeList = (props) => {
                               )}
                             >
                               {props.playing === episode.guid &&
-                              props.status !== "pause" ? (
+                              props.status !== "paused" ? (
                                 <PauseIcon className={classes.playIcon} />
                               ) : (
                                 <PlayArrowIcon className={classes.playIcon} />
