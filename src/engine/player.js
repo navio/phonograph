@@ -1,6 +1,13 @@
 
 export default (player, dispatch, state) => {
   
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.setActionHandler("seekbackward", () => {
+      rewind10Seconds();
+    });
+    navigator.mediaSession.setActionHandler("seekforward", () => {
+      forward30Seconds(); }
+    )}
 
   const seek = function (ev, value) {
     const current = Math.floor((value * player.current.duration) / 100);
