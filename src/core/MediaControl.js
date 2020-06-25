@@ -113,8 +113,8 @@ const styles = (theme) => ({
     color: theme.palette.text.primary,
   },
   subtitle: {
-    margin: "0 2em 1rem",
-    height: "3.5rem",
+    margin: "0 1em 1rem",
+    height: "rem",
     display: "block",
     overflow: "hidden",
   },
@@ -421,12 +421,12 @@ const MediaControlCard = (props) => {
                     >
                       {showSpeed && (
                         <Grid item align="center">
-                          <SpeedControl onClick={setShowTimer} />
+                          <SpeedControl fontSize="large" onClick={setShowTimer} />
                         </Grid>
                       )}
                       {showTimer && (
                         <Grid item align="center">
-                          <SleepTimer onClick={setShowSpeed} />
+                          <SleepTimer fontSize="large" onClick={setShowSpeed} />
                         </Grid>
                       )}
                       {/* <Grid item>
