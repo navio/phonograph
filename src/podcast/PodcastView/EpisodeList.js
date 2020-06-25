@@ -319,9 +319,9 @@ const EpisodeList = (props) => {
                             >
                               {props.playing === episode.guid &&
                               props.status !== "paused" ? (
-                                <PauseIcon className={classes.playIcon} />
+                                <PauseIcon fontSize="large" className={classes.playIcon} />
                               ) : (
-                                <PlayArrowIcon className={classes.playIcon} />
+                                <PlayArrowIcon fontSize="large" className={classes.playIcon} />
                               )}
                             </IconButton>
                           </ListItemIcon>
@@ -340,6 +340,7 @@ const EpisodeList = (props) => {
                           />
                           <ListItemIcon>
                             <IconButton
+                              edge="end"
                               onClick={() => {
                                 openDrawer(true);
                                 setCurrentEpisode(episode.guid);

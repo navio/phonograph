@@ -1,9 +1,9 @@
 import React, { useContext, useEffect } from "react";
-import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import BottomNavigation from "@material-ui/core/BottomNavigation";
 import Badge from "@material-ui/core/Badge";
 import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
+import PropTypes from "prop-types";
 import Favorite from "@material-ui/icons/Bookmark"; //Headsert
 import DiscoverIcon from "@material-ui/icons/FilterDrama";
 import Settings from "@material-ui/icons/Settings";
@@ -26,6 +26,14 @@ const styles = {
     width: "100%",
   },
 };
+const StyledBottomNavigationAction = withStyles((theme) => ({
+  label: {
+    fontSize: '.8rem',
+  },
+  selected: {
+    fontSize: '.8rem !important',
+  },
+}))(BottomNavigationAction);
 
 const StyledBadge = withStyles((theme) => ({
   badge: {
@@ -77,13 +85,13 @@ const SimpleBottomNavigation = ({ history, classes, location }) => {
     <div>
       <Paper className={classes.root} elevation={4}>
         <BottomNavigation value={selected} showLabels className={classes.root}>
-          <BottomNavigationAction
+          <StyledBottomNavigationAction
             label="Favorites"
             value={LIBVIEW}
             onClick={handleRedirect(LIBVIEW)}
             icon={<Favorite />}
           />
-          <BottomNavigationAction
+          <StyledBottomNavigationAction
             label="Playlist"
             value={PLAYLIST}
             onClick={handleRedirect(PLAYLIST)}
@@ -93,13 +101,13 @@ const SimpleBottomNavigation = ({ history, classes, location }) => {
               </StyledBadge>
             }
           />
-          <BottomNavigationAction
+          <StyledBottomNavigationAction
             label="Discover"
             value={DISCOVERVIEW}
             onClick={handleRedirect(DISCOVERVIEW)}
             icon={<DiscoverIcon />}
           />
-          <BottomNavigationAction
+          <StyledBottomNavigationAction
             label="Settings"
             value={SETTINGSVIEW}
             onClick={handleRedirect(SETTINGSVIEW)}
