@@ -65,6 +65,9 @@ const Underground = () => (
 // Pausing for load or refresh
 initialState["status"] = "paused";
 
+const worker = new Worker('./serviceworker/worker.js')
+
+
 const App = ({}) => {
   const player = useRef(null);
 
@@ -87,6 +90,7 @@ const App = ({}) => {
   const engine = getPodcastEngine(shouldInit);
 
   useEffect(() => {
+    worker.postMessage({action:'update'});
     // initializeLibrary(engine, dispatch);
   }, []);
 
@@ -126,7 +130,7 @@ const App = ({}) => {
   return (
     <ThemeProvider theme={finalTheme}>
       <AppContext.Provider
-        value={{ state, dispatch, engine, debug, player: player.current }}
+        value={{ state, dispatch, engine, debug, worker, player: player.current }}
       >
         <CssBaseline />
 
