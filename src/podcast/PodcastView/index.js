@@ -6,7 +6,6 @@ import { recordEpisode as saveEpisodeState } from '../../reducer'
 
 import Loading from '../../core/Loading';
 
-
 import EpisodeList from "./EpisodeList";
 import PodcastHeader from "./PodcastHeader";
 import PodcastEngine from "podcastsuite";
@@ -36,7 +35,7 @@ export default (props) => {
     }
   }
 
-  const { state: global, engine, dispatch, player } = useContext(AppContext);
+  const { state: global, debug, engine, dispatch, player } = useContext(AppContext);
   // console.log('ar',global, engine, player)
   const [podcast, setPodcast] = useState({});
   const [error, setError] = useState({});
@@ -185,9 +184,10 @@ export default (props) => {
       }
     } else {
 
+      const proxy = !debug ? '/media/' : '';
       console.log('loading new audio', player);
 
-      player.setAttribute("src", episode.media);
+      player.setAttribute("src", proxy+episode.media);
 
       const payload = {
         audioOrigin: podcastURL,
