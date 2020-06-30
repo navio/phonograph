@@ -34,6 +34,7 @@ export const getPodcastEngine = (shouldInit = false ) => new PodcastEngine({
  Start the application and loads the library.
 */
 export const initializeLibrary = function (PodcastLibrary, dispatch) {
+  console.log('initting');
   PodcastLibrary.ready.then(() => {
     PodcastLibrary.getLibrary().then((podcastsArray) => {
       Promise.allSettled(

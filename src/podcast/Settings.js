@@ -57,6 +57,10 @@ const Settings = (props) => {
     // window.location.reload()
   }
 
+  const reloadCasts = async () => {
+    await initializeLibrary(engine, dispatch);
+  }
+
   const eraseThisPodcast = (podcast) => async () => {
     const podcasts = state.podcasts.filter((cast) => cast.domain !== podcast);
     dispatch({ type: 'updatePodcasts', podcasts: podcasts });
@@ -106,7 +110,7 @@ const Settings = (props) => {
       </Card>
       <Card >
         
-          <ExpansionPanel defaultExpanded>
+          <ExpansionPanel >
             <ExpansionPanelSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel1a-content"
@@ -154,6 +158,7 @@ const Settings = (props) => {
         {/* <CardHeader title="Data" /> */}
         <CardContent>
           <Button variant="outlined" color="primary" onClick={clearState} > Reset State </Button>
+          <Button variant="outlined" color="primary" onClick={reloadCasts} >Reload Saved Podcasts </Button>
         </CardContent>
       </Card>
       <Card>

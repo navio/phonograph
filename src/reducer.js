@@ -129,7 +129,6 @@ export const reducer = (state, action) => {
     switch(action.type){
       case 'updatePodcasts':
       case 'initLibrary':
-        console.log('initing')
         return { ...state, podcasts: action.podcasts}
       case 'loadPodcast':
         return { ...state, current: action.payload }
