@@ -128,7 +128,8 @@ export { initialState };
 export const reducer = (state, action) => {
     switch(action.type){
       case 'updatePodcasts':
-      case 'initLibrary': 
+      case 'initLibrary':
+        console.log('initing')
         return { ...state, podcasts: action.podcasts}
       case 'loadPodcast':
         return { ...state, current: action.payload }
@@ -171,6 +172,6 @@ export const reducer = (state, action) => {
       case 'clearPlayList':
         return {...state, playlist:[]};
       case 'resetState':
-        return defaultState; 
+        return defaultState;
     }
   }
