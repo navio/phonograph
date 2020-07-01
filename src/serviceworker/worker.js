@@ -28,20 +28,12 @@ const updateLibrary = () => {
         podcastEngine.getLibrary().then((podcastsArray) => {
           Promise.allSettled(
             podcastsArray.map((podcastRaw) => podcastEngine.getPodcast(podcastRaw))
-          )
-        //   .then((results) =>  results.filter((result) => result.status === 'fulfilled'))
-        //   .then((podcasts) => podcasts.map(podcast => podcast.value))
-        //   .then((podcasts) => {
-        //     if (podcasts) {
-        //       dispatch({type: 'initLibrary', podcasts: podcastCleaner(podcasts)})
-        //     }
-        //   });
+          );
         });
       });
 }
 
 self.onmessage = (raw) => {
-  console.log('a',raw);
   const {data} = raw;
   switch (data.action) {
     case "update":
