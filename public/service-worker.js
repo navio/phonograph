@@ -1,4 +1,4 @@
-const version = 1.8;
+const version = 1.9;
 const CACHE = 'phonograph-core-' + version;
 const CACHERUNTIME = 'phonograph-runtime-' + version;
 
