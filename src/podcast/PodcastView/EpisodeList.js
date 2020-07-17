@@ -94,7 +94,7 @@ const EpisodeListDescription = (props) => {
   // }
   return (
     <ListItemText
-      {...props}
+      // {...props}
       primary={
         <>
           {episode.season && (
