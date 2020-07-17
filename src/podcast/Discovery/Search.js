@@ -42,7 +42,6 @@ export default (props) => {
 
   const onSetTerm = (ev) => {
     const { value } = ev.target;
-    console.log(value);
     setTerm(value);
   }
 
