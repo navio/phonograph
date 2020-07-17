@@ -39,13 +39,18 @@ export default (props) => {
   const clickHandler = () => { 
     action(term);
   }
-  
+
+  const onSetTerm = (ev) => {
+    const { value } = ev.target;
+    console.log(value);
+    setTerm(value);
+  }
+
   const onChange = (ev) => {
     const { value } = ev.target;
     if (ev.key === 'Enter') {
       action(value)
     }
-    setTerm(value);
   }
 
   return (<> 
@@ -64,11 +69,12 @@ export default (props) => {
             color={'primary'}
             id="outlined-search"
             variant="outlined"
+            onKeyUp={onSetTerm}
             onKeyPress={onChange}
             labelWidth={125}
             endAdornment={
               <InputAdornment position="end">
-                <IconButton type="submit" aria-label="search" onClick={()=>clickHandler(term)} >
+                <IconButton type="submit" aria-label="search" onClick={()=>clickHandler()} >
                   <SearchIcon />
                 </IconButton>
               </InputAdornment>
