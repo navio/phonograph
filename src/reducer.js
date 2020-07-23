@@ -172,5 +172,13 @@ export const reducer = (state, action) => {
         return {...state, playlist:[]};
       case 'resetState':
         return defaultState;
+      case 'drawer':{
+        const {status, drawerContent } = action.payload;
+        if(!status){
+          return {...state, drawer: false}
+        }
+        console.log('ra',drawerContent);
+        return {...state, drawer: true, drawerContent };
+      }
     }
   }

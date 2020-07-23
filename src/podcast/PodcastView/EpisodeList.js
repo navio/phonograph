@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
@@ -28,10 +28,12 @@ import MoreVertIcon from "@material-ui/icons/MoreVert";
 import QueuePlayNextIcon from "@material-ui/icons/QueuePlayNext";
 import AddToQueueIcon from "@material-ui/icons/AddToQueue";
 import DoneOutlineIcon from "@material-ui/icons/DoneOutline";
-import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
+import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 
 import MuiAlert from "@material-ui/lab/Alert";
 import Snackbar from "@material-ui/core/Snackbar";
+
+import { AppContext } from "../../App";
 
 const DOMPurify = createDOMPurify(window);
 const { sanitize } = DOMPurify;
@@ -105,11 +107,10 @@ const EpisodeListDescription = (props) => {
             <IsAvaliable url={episode.enclosures[0].url} />
           </Typography>
           <Typography variant="overline" component="div">
-          
             {(completed || total > 97) && (
               <CheckCircleOutlineIcon color="primary" fontSize="small" />
-            )}{' '}{episodeDate(episode.created)}
-            
+            )}{" "}
+            {episodeDate(episode.created)}
             {total && (
               <Chip
                 style={{ marginLeft: "10px" }}
@@ -119,7 +120,6 @@ const EpisodeListDescription = (props) => {
                 className={classes.inProgress}
               />
             )}
-
             {episode.episodeType && episode.episodeType !== "full" && (
               <Chip
                 style={{ marginLeft: "10px" }}
@@ -167,6 +167,7 @@ const EpisodeList = (props) => {
   const [currentEpisode, setCurrentEpisode] = useState(null);
   const [message, setMessage] = useState(null);
   // console.log('heree',podcast);
+  const { dispatch } = useContext(AppContext);
 
   useEffect(() => {
     window && window.scrollTo && window.scrollTo(0, 0);
@@ -214,56 +215,9 @@ const EpisodeList = (props) => {
       </IconButton>
     );
   };
+
   const closeMessage = () => setMessage(null);
-  const EpisodeDrawer = ({ open, onClose, onOpen }) => (
-    <SwipeableDrawer
-      anchor={"bottom"}
-      onClose={onClose}
-      onOpen={onOpen}
-      open={open}
-    >
-      <List component="nav">
-        <ListItem
-          button
-          onClick={() => {
-            openDrawer(false);
-            playNext(currentEpisode);
-            setMessage("Queued to play next");
-          }}
-        >
-          <ListItemIcon>
-            <QueuePlayNextIcon />
-          </ListItemIcon>
-          <ListItemText primary={"Play Next"} />
-        </ListItem>
-        <ListItem
-          button
-          onClick={() => {
-            openDrawer(false);
-            playLast(currentEpisode);
-            setMessage("Added to queue");
-          }}
-        >
-          <ListItemIcon>
-            <AddToQueueIcon />
-          </ListItemIcon>
-          <ListItemText primary={"Add to Queue"} />
-        </ListItem>
-        <ListItem
-          button
-          onClick={() => {
-            openDrawer(false);
-            completeEpisode(currentEpisode);
-          }}
-        >
-          <ListItemIcon>
-            <DoneOutlineIcon color="primary" />
-          </ListItemIcon>
-          <ListItemText primary={"Mark as Played"} />
-        </ListItem>
-      </List>
-    </SwipeableDrawer>
-  );
+
   function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
   }
@@ -283,14 +237,6 @@ const EpisodeList = (props) => {
         <Alert severity="success">{message}</Alert>
       </Snackbar>
       <Description handleClose={handleClose} open={open} />
-      <EpisodeDrawer
-        onClose={() => {
-          openDrawer(false);
-          setCurrentEpisode(null);
-        }}
-        onOpen={() => openDrawer(true)}
-        open={drawer}
-      />
       <Consumer>
         {(state) => (
           <div className={classes.root}>
@@ -307,7 +253,6 @@ const EpisodeList = (props) => {
                               ? classes.selected
                               : null
                           }
-                          // button
                         >
                           <ListItemIcon>
                             <IconButton
@@ -319,17 +264,22 @@ const EpisodeList = (props) => {
                             >
                               {props.playing === episode.guid &&
                               props.status !== "paused" ? (
-                                <PauseIcon fontSize="large" className={classes.playIcon} />
+                                <PauseIcon
+                                  fontSize="large"
+                                  className={classes.playIcon}
+                                />
                               ) : (
-                                <PlayArrowIcon fontSize="large" className={classes.playIcon} />
+                                <PlayArrowIcon
+                                  fontSize="large"
+                                  className={classes.playIcon}
+                                />
                               )}
                             </IconButton>
                           </ListItemIcon>
                           <EpisodeListDescription
                             classes={classes}
                             onClick={() => {
-                              // console.log(episode);
-                              // saveOffline(episode.enclosures[0].url)
+
                               setOpen({
                                 description: episode.description,
                                 title: episode.title,
@@ -342,8 +292,34 @@ const EpisodeList = (props) => {
                             <IconButton
                               edge="end"
                               onClick={() => {
-                                openDrawer(true);
-                                setCurrentEpisode(episode.guid);
+                                dispatch({
+                                  type: "drawer",
+                                  payload: {
+                                    drawerContent: {
+                                      typeContent: "list",
+                                      content: [
+                                        {
+                                          label: "Play Next",
+                                          fn: () => {
+                                            setMessage("Queued to play next");
+                                            playNext(episode.guid);
+                                          },
+                                        },
+                                        { label: "Add to queue",
+                                        fn: () => {
+                                          setMessage("Added to queue");
+                                          playLast(episode.guid);
+                                        } },
+                                        { label: "Mark as Played",
+                                          fn: () => {
+                                            completeEpisode(episode.guid);
+                                          }  
+                                        },
+                                      ],
+                                    },
+                                    status: true,
+                                  },
+                                });
                               }}
                             >
                               <MoreVertIcon />

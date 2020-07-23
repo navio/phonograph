@@ -5,6 +5,7 @@ import theme from "./theme";
 import { reducer, initialState } from "./reducer";
 import audioqueue from "audioqueue";
 import LoadingSVG from "./core/Loading";
+import Drawer from './core/Drawer';
 
 // Router
 import { Route, Redirect, useHistory, Switch } from "react-router-dom";
@@ -226,6 +227,7 @@ const App = ({}) => {
           src={playerProxy+state.media}
           poster={state.podcastImage || ""}
         />
+        <Drawer />
       </AppContext.Provider>
     </ThemeProvider>
   );
