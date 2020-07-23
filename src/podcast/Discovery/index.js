@@ -72,9 +72,6 @@ const styles = (theme) => ({
     alignItems: "center",
     justifyContent: "center",
   },
-  listItem: {
-    display: "inline-grid",
-  },
   inputRoot: {
     color: "inherit",
   },
@@ -209,9 +206,6 @@ class Discover extends Component {
               />
 
               <ListItemText
-                classes={{
-                  root: classes.listItem,
-                }}
                 primaryTypographyProps={{
                   noWrap: true,
                   elementtype: "span",

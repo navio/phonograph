@@ -54,8 +54,8 @@ export const styles = (theme) => ({
     position: "fixed",
     zIndex: 1,
     bottom: 0,
-    right: "1em",
-    bottom: "12em",
+    right: "8%",
+    bottom: "15%",
     margin: "0 auto",
   },
   empty: {
