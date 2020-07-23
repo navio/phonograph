@@ -22,12 +22,8 @@ import { Consumer } from "../../App.js";
 import PS from "podcastsuite";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import { completeEpisodeHistory as markAsFinished } from "../../reducer";
-import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 
-import QueuePlayNextIcon from "@material-ui/icons/QueuePlayNext";
-import AddToQueueIcon from "@material-ui/icons/AddToQueue";
-import DoneOutlineIcon from "@material-ui/icons/DoneOutline";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 
 import MuiAlert from "@material-ui/lab/Alert";
@@ -91,9 +87,6 @@ const EpisodeListDescription = (props) => {
   const { currentTime, duration, completed } = props.history || {};
   const total =
     currentTime && duration ? Math.round((currentTime * 100) / duration) : null;
-  // if (total) {
-  //   return <div onClick={() => completeEpisode(guid)}>{total}%</div>;
-  // }
   return (
     <ListItemText
       // {...props}
@@ -300,12 +293,14 @@ const EpisodeList = (props) => {
                                       content: [
                                         {
                                           label: "Play Next",
+                                          icon: "addnext",
                                           fn: () => {
                                             setMessage("Queued to play next");
                                             playNext(episode.guid);
                                           },
                                         },
                                         { label: "Add to queue",
+                                        icon: "queue",
                                         fn: () => {
                                           setMessage("Added to queue");
                                           playLast(episode.guid);
@@ -315,6 +310,11 @@ const EpisodeList = (props) => {
                                             completeEpisode(episode.guid);
                                           }  
                                         },
+                                        {
+                                          label: "See Description",
+                                          icon: "description",
+                                          fn: () => setOpen({title: episode.title ,description: episode.description})
+                                        }
                                       ],
                                     },
                                     status: true,
@@ -336,7 +336,6 @@ const EpisodeList = (props) => {
                     );
                   })}
                 </List>
-
                 {episodes.length > episodeList.length && (
                   <List align="center">
                     <Button

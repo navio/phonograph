@@ -175,9 +175,8 @@ export const reducer = (state, action) => {
       case 'drawer':{
         const {status, drawerContent } = action.payload;
         if(!status){
-          return {...state, drawer: false}
+          return {...state, drawer: false }
         }
-        console.log('ra',drawerContent);
         return {...state, drawer: true, drawerContent };
       }
     }
