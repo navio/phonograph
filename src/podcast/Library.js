@@ -34,7 +34,7 @@ export const styles = (theme) => ({
   },
   relativeContainer: {
     // position: "relative",
-    // backgroundColor: 'red'
+    backgroundColor: theme.palette.secondary.light
   },
   addIcon: {
     width: "3em",
@@ -67,6 +67,24 @@ export const styles = (theme) => ({
   appHeader: {
     WebkitAppRegion: 'drag',
   },
+  a0:{
+    backgroundColor: theme.palette.primary.light,
+  },
+  a1:{
+    backgroundColor: theme.palette.primary.main,
+  },
+  a2:{
+    backgroundColor: theme.palette.primary.dark,
+  },
+  a3:{
+    backgroundColor: theme.palette.secondary.light,
+  },
+  a4:{
+    backgroundColor: theme.palette.secondary.main,
+  },
+  a5:{
+    backgroundColor: theme.palette.secondary.dark,
+  }
 });
 
 const LibraryView = (props) => {
@@ -96,7 +114,7 @@ const LibraryView = (props) => {
             <Grid container spacing={0} direction={"row"}>
               {podcasts.length > 0 ?
                 podcasts.map(
-                  (podcast) =>
+                  (podcast, ins) =>
                     podcast &&
                     podcast.domain && 
                       <Grid item xs={3} sm={2} md={1}  key={podcast.domain} >
@@ -104,7 +122,7 @@ const LibraryView = (props) => {
                           raised={true}
                           classes={{ root: classes.card }}                
                         >
-                          <div className={classes.relativeContainer}>
+                          <div className={classes['a'+ ( ins % 6 ) ]}>
                             {/* <CardContent className={classes.cardContent}>
                               {podcast.title}
                             </CardContent> */}
