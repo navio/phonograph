@@ -29,19 +29,19 @@ export const styles = (theme) => ({
     width: "100%",
   },
   cardContent: {
-    position: "absolute",
+    // position: "absolute",
     width: 0,
   },
   relativeContainer: {
-    position: "relative",
+    // position: "relative",
+    // backgroundColor: 'red'
   },
   addIcon: {
     width: "3em",
     height: "3em",
   },
   card: {
-    height: "100%",
-    width: "100%",
+    // backgroundColor: 'red'
   },
   progress: {
     margin: theme.spacing(2),
@@ -55,7 +55,7 @@ export const styles = (theme) => ({
     zIndex: 1,
     bottom: 0,
     right: "8%",
-    bottom: "15%",
+    bottom: "18%",
     margin: "0 auto",
   },
   empty: {
@@ -105,9 +105,9 @@ const LibraryView = (props) => {
                           classes={{ root: classes.card }}                
                         >
                           <div className={classes.relativeContainer}>
-                            <CardContent className={classes.cardContent}>
+                            {/* <CardContent className={classes.cardContent}>
                               {podcast.title}
-                            </CardContent>
+                            </CardContent> */}
                             <CardMedia tabIndex="1"
                               onClick={processClick}
                               domain={podcast.domain}
