@@ -11,7 +11,7 @@ import PauseIcon from "@material-ui/icons/Pause";
 import SkipNextIcon from "@material-ui/icons/Forward30";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import { Grid, Card, Hidden, Paper } from "@material-ui/core";
-import CloseIcon from "@material-ui/icons/Close";
+import CloseIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { AppContext } from "../App.js";
