@@ -87,6 +87,8 @@ export const styles = (theme) => ({
   }
 });
 
+const randomColor = (min, max) => Math.floor((Math.random() * max) + min);
+
 const LibraryView = (props) => {
   const { classes, actionAfterSelectPodcast, history } = props;
   const {state , dispatch, debug } = useContext(AppContext);
@@ -114,7 +116,7 @@ const LibraryView = (props) => {
             <Grid container spacing={0} direction={"row"}>
               {podcasts.length > 0 ?
                 podcasts.map(
-                  (podcast, ins) =>
+                  (podcast) =>
                     podcast &&
                     podcast.domain && 
                       <Grid item xs={3} sm={2} md={1}  key={podcast.domain} >
@@ -122,7 +124,7 @@ const LibraryView = (props) => {
                           raised={true}
                           classes={{ root: classes.card }}                
                         >
-                          <div className={classes['a'+ ( ins % 6 ) ]}>
+                          <div className={classes['a'+ randomColor(0,6) ]}>
                             {/* <CardContent className={classes.cardContent}>
                               {podcast.title}
                             </CardContent> */}
