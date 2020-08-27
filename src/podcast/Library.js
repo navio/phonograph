@@ -29,19 +29,19 @@ export const styles = (theme) => ({
     width: "100%",
   },
   cardContent: {
-    position: "absolute",
+    // position: "absolute",
     width: 0,
   },
   relativeContainer: {
-    position: "relative",
+    // position: "relative",
+    backgroundColor: theme.palette.secondary.light
   },
   addIcon: {
     width: "3em",
     height: "3em",
   },
   card: {
-    height: "100%",
-    width: "100%",
+    // backgroundColor: 'red'
   },
   progress: {
     margin: theme.spacing(2),
@@ -55,7 +55,7 @@ export const styles = (theme) => ({
     zIndex: 1,
     bottom: 0,
     right: "8%",
-    bottom: "15%",
+    bottom: "18%",
     margin: "0 auto",
   },
   empty: {
@@ -67,6 +67,24 @@ export const styles = (theme) => ({
   appHeader: {
     WebkitAppRegion: 'drag',
   },
+  a0:{
+    backgroundColor: theme.palette.primary.light,
+  },
+  a1:{
+    backgroundColor: theme.palette.primary.main,
+  },
+  a2:{
+    backgroundColor: theme.palette.primary.dark,
+  },
+  a3:{
+    backgroundColor: theme.palette.secondary.light,
+  },
+  a4:{
+    backgroundColor: theme.palette.secondary.main,
+  },
+  a5:{
+    backgroundColor: theme.palette.secondary.dark,
+  }
 });
 
 const LibraryView = (props) => {
@@ -96,7 +114,7 @@ const LibraryView = (props) => {
             <Grid container spacing={0} direction={"row"}>
               {podcasts.length > 0 ?
                 podcasts.map(
-                  (podcast) =>
+                  (podcast, ins) =>
                     podcast &&
                     podcast.domain && 
                       <Grid item xs={3} sm={2} md={1}  key={podcast.domain} >
@@ -104,10 +122,10 @@ const LibraryView = (props) => {
                           raised={true}
                           classes={{ root: classes.card }}                
                         >
-                          <div className={classes.relativeContainer}>
-                            <CardContent className={classes.cardContent}>
+                          <div className={classes['a'+ ( ins % 6 ) ]}>
+                            {/* <CardContent className={classes.cardContent}>
                               {podcast.title}
-                            </CardContent>
+                            </CardContent> */}
                             <CardMedia tabIndex="1"
                               onClick={processClick}
                               domain={podcast.domain}
