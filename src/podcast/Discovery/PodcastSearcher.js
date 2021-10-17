@@ -5,7 +5,7 @@ export default class PodcastSearcher {
   constructor(API) {
     let currentRequest = null;
     this.API = API;
-    this.prodProxy = !DEBUG ? '/rss-full/'  : '' ;
+    this.prodProxy = !DEBUG ? '/rss-full/?term='  : '' ;
   }
 
   querySearch(pattern, term){
