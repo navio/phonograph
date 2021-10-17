@@ -20,7 +20,6 @@ export const handler = async (event, context, callback) => {
     }
   }catch(err){
     console.error(err);
-    
     throw new Error('here');
   }
 }
