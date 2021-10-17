@@ -6,7 +6,7 @@
 
 [[redirects]]
   from = "/rss-full/*"
-  to="/.netlify/functions/findCast?=term=:splat"
+  to="/.netlify/functions/findCast?term=:splat"
   status=200
 
 [[redirects]]
