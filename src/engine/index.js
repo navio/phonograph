@@ -9,8 +9,8 @@ const PROXY = DEBUG ?  {
   "https:": `//${window.location.host}/rss-full/?term=https://`,
   "http:": `//${window.location.host}/rss-full/?term=http://`,
 } : {
-  "https:": `//${window.location.host}/rss-full/https://`,
-  "http:": `//${window.location.host}/rss-full/http://`,
+  "https:": `//${window.location.host}/rss-full/?term=https://`,
+  "http:": `//${window.location.host}/rss-full/?term=http://`,
 }
 
 export const checkIfNewPodcastInURL = function () {;
