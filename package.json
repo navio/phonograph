@@ -18,7 +18,7 @@
     "encoding": "^0.1.12",
     "idb-keyval": "^3.2.0",
     "netlify-lambda": "^1.6.3",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^3.1.1",
     "podcastsuite": "1.1.9",
     "prop-types": "^15.7.2",
     "randomcolor": "^0.5.4",
