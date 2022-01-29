@@ -133,7 +133,7 @@ const LibraryView = (props) => {
                               domain={podcast.domain}
                               title={podcast.title}
                               className={classes.podcastMedia}
-                              image={(cachedRoute+podcast.image)}
+                              image={(podcast.image)}
                             />
                           </div>
                         </Card>
