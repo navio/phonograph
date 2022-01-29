@@ -41,7 +41,7 @@ export default class PodcastSearcher {
   }
 
   apple(term) {
-    return this.querySearch("`https://podcast-search.navio.workers.dev/term=${term}`", term);
+    return this.querySearch("`https://podcast-search.navio.workers.dev/?term=${term}`", term);
   }
 
 
