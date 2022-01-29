@@ -184,7 +184,7 @@ export default (props) => {
       }
     } else {
 
-      const proxy = !debug ? '/media/' : '';
+      const proxy = !debug ? '' : '';
       console.log('loading new audio', player);
 
       player.setAttribute("src", proxy+episode.media);
