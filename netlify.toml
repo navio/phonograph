@@ -51,6 +51,12 @@
   status=200
 
 [[redirects]]
+  from="/search/*"
+  to="https://podcast-search.navio.workers.dev/*"
+  status=200
+  force = true
+
+[[redirects]]
   from="/ln/*"
   to="https://listen-api.listennotes.com/api/v2/:splat"
   status=200
@@ -63,3 +69,5 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+
