@@ -1,26 +1,26 @@
 import React, { useContext, useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
-import { Slider, Box } from "@material-ui/core";
+import withStyles from '@mui/styles/withStyles';
+import { Slider, Box } from "@mui/material";
 import { useHistory } from "react-router-dom";
-import IconButton from "@material-ui/core/IconButton";
-import Typography from "@material-ui/core/Typography";
-import SkipPreviousIcon from "@material-ui/icons/Replay10";
-import PlayArrowIcon from "@material-ui/icons/PlayArrow";
-import PauseIcon from "@material-ui/icons/Pause";
-import SkipNextIcon from "@material-ui/icons/Forward30";
-import LinearProgress from "@material-ui/core/LinearProgress";
-import { Grid, Card, Hidden, Paper } from "@material-ui/core";
-import CloseIcon from '@material-ui/icons/ExpandMore';
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+import SkipPreviousIcon from "@mui/icons-material/Replay10";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import PauseIcon from "@mui/icons-material/Pause";
+import SkipNextIcon from "@mui/icons-material/Forward30";
+import LinearProgress from "@mui/material/LinearProgress";
+import { Grid, Card, Hidden, Paper } from "@mui/material";
+import CloseIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { AppContext } from "../App.js";
 
 import SpeedControl from "./SpeedControl";
 import SleepTimer from "./SleepTimer";
-// import SpeedIcon from '@material-ui/icons/Speed';
-// import ToggleButton from '@material-ui/lab/ToggleButton';
-// import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
+// import SpeedIcon from '@mui/icons-material/Speed';
+// import ToggleButton from '@mui/lab/ToggleButton';
+// import ToggleButtonGroup from '@mui/lab/ToggleButtonGroup';
 
 import { PODCASTVIEW } from "../constants";
 
@@ -225,7 +225,7 @@ const MediaControlCard = (props) => {
         {open && (
           <Grid container direction="row-reverse">
             <Grid item style={{ padding: ".5rem" }}>
-              <IconButton onClick={() => { saveStorage(!open); setOpen(false); }}>
+              <IconButton onClick={() => { saveStorage(!open); setOpen(false); }} size="large">
                 <CloseIcon />
               </IconButton>
             </Grid>
@@ -238,7 +238,7 @@ const MediaControlCard = (props) => {
                 container
                 container
                 direction="row"
-                justify="center"
+                justifyContent="center"
                 alignItems="center"
               >
                 <Grid item xs={7} sm={6} md={4} lg={3}>
@@ -282,7 +282,7 @@ const MediaControlCard = (props) => {
               <Grid
                 container
                 direction="row"
-                justify={open ? "space-around" : "space-between"}
+                justifyContent={open ? "space-around" : "space-between"}
                 alignItems="center"
                 className={classes.player}
               >
@@ -307,7 +307,7 @@ const MediaControlCard = (props) => {
                         aria-label="Play/pause"
                         onClick={() => props.handler()}
                         data-guid={state.playing}
-                      >
+                        size="large">
                         {state.playing === (episodeInfo && episodeInfo.guid) &&
                         state.status !== "paused" ? (
                           <PauseIcon className={classes.playClosed} />
@@ -347,7 +347,7 @@ const MediaControlCard = (props) => {
                       xs={1}
                       style={{ paddingRight: ".14rem" }}
                     >
-                      <IconButton onClick={() => setOpen(true)}>
+                      <IconButton onClick={() => setOpen(true)} size="large">
                         <ExpandLessIcon />
                       </IconButton>
                     </Grid>
@@ -369,7 +369,7 @@ const MediaControlCard = (props) => {
                         style={{ padding: "0" }}
                         aria-label="Previous"
                         onClick={props.rewind}
-                      >
+                        size="large">
                         {theme.direction === "rtl" ? (
                           <SkipNextIcon className={classes.controlIcon} />
                         ) : (
@@ -383,7 +383,7 @@ const MediaControlCard = (props) => {
                         aria-label="Play/pause"
                         onClick={() => props.handler()}
                         data-guid={state.playing}
-                      >
+                        size="large">
                         {state.playing === (episodeInfo && episodeInfo.guid) &&
                         state.status !== "paused" ? (
                           <PauseIcon className={classes.playIcon} />
@@ -403,7 +403,7 @@ const MediaControlCard = (props) => {
                         style={{ padding: "0" }}
                         aria-label="Next"
                         onClick={props.forward}
-                      >
+                        size="large">
                         {theme.direction === "rtl" ? (
                           <SkipPreviousIcon className={classes.controlIcon} />
                         ) : (
@@ -416,7 +416,7 @@ const MediaControlCard = (props) => {
                     <Grid
                       container
                       direction="row"
-                      justify="space-evenly"
+                      justifyContent="space-evenly"
                       alignItems="center"
                     >
                       {showSpeed && (

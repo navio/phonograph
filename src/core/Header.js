@@ -1,12 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-// import Button from '@material-ui/core/Button';
-import IconButton from "@material-ui/core/IconButton";
-import MenuIcon from "@material-ui/icons/Menu";
+import withStyles from '@mui/styles/withStyles';
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+// import Button from '@mui/material/Button';
+import IconButton from "@mui/material/IconButton";
+import MenuIcon from "@mui/icons-material/Menu";
 
 const styles = {
   root: {
@@ -36,7 +36,7 @@ function NavigationApp(props) {
               className={classes.menuButton}
               color="inherit"
               aria-label="Menu"
-            >
+              size="large">
               <MenuIcon />
             </IconButton>
             <Typography

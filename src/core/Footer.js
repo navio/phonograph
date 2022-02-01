@@ -1,14 +1,14 @@
 import React, { useContext, useEffect } from "react";
-import { withStyles } from "@material-ui/core/styles";
-import BottomNavigation from "@material-ui/core/BottomNavigation";
-import Badge from "@material-ui/core/Badge";
-import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
+import withStyles from '@mui/styles/withStyles';
+import BottomNavigation from "@mui/material/BottomNavigation";
+import Badge from "@mui/material/Badge";
+import BottomNavigationAction from "@mui/material/BottomNavigationAction";
 import PropTypes from "prop-types";
-import Favorite from "@material-ui/icons/Bookmark"; //Headsert
-import DiscoverIcon from "@material-ui/icons/FilterDrama";
-import Settings from "@material-ui/icons/Settings";
-import Playlist from "@material-ui/icons/PlaylistPlay";
-import Paper from "@material-ui/core/Paper";
+import Favorite from "@mui/icons-material/Bookmark"; //Headsert
+import DiscoverIcon from "@mui/icons-material/FilterDrama";
+import Settings from "@mui/icons-material/Settings";
+import Playlist from "@mui/icons-material/PlaylistPlay";
+import Paper from "@mui/material/Paper";
 import { withRouter } from "react-router-dom";
 import { LIBVIEW, DISCOVERVIEW, SETTINGSVIEW, PLAYLIST } from "../constants";
 

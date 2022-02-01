@@ -52,11 +52,11 @@ const certificate = fs.readFileSync(cert);
 const credentials = {key: privateKey, cert: certificate};
 
 https.createServer(credentials, app)
-.listen(1234, () => console.log("Running!"));
+.listen(1235, () => console.log("Running!"));
 
 http.createServer(function (req, res) {
     res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
     res.end();
-  }).listen(4234);
+  }).listen(4235);
 
   

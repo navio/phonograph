@@ -9,7 +9,7 @@ import Loading from '../../core/Loading';
 import EpisodeList from "./EpisodeList";
 import PodcastHeader from "./PodcastHeader";
 import PodcastEngine from "podcastsuite";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
 
 const commonRules = (originalUrl) => {
   if (!originalUrl) return;

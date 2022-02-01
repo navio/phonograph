@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import Grid from "@material-ui/core/Grid";
-import OutlinedInput from '@material-ui/core/OutlinedInput';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import FormControl from '@material-ui/core/FormControl';
+import Grid from "@mui/material/Grid";
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputAdornment from '@mui/material/InputAdornment';
+import FormControl from '@mui/material/FormControl';
 
-import IconButton from '@material-ui/core/IconButton';
-import SearchIcon from '@material-ui/icons/Search';
-import InputLabel from '@material-ui/core/InputLabel';
+import IconButton from '@mui/material/IconButton';
+import SearchIcon from '@mui/icons-material/Search';
+import InputLabel from '@mui/material/InputLabel';
 
-import Chip from "@material-ui/core/Chip";
+import Chip from "@mui/material/Chip";
 
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 
 export const useStyles = makeStyles((theme) => ({
   root: {
@@ -52,12 +52,12 @@ export default (props) => {
     }
   }
 
-  return (<> 
+  return <> 
     <Grid
       style={{ paddingBottom: '.5rem' }}
       container
       direction="row"
-      justify="center"
+      justifyContent="center"
       alignItems="center"
     >
       <Grid xs={12} md={8}
@@ -73,7 +73,11 @@ export default (props) => {
             labelWidth={125}
             endAdornment={
               <InputAdornment position="end">
-                <IconButton type="submit" aria-label="search" onClick={()=>clickHandler()} >
+                <IconButton
+                  type="submit"
+                  aria-label="search"
+                  onClick={()=>clickHandler()}
+                  size="large">
                   <SearchIcon />
                 </IconButton>
               </InputAdornment>
@@ -88,6 +92,5 @@ export default (props) => {
           label={key} key={key} variant={'outlined'} onClick={() => action(key)} color={"primary"} />)
       }
     </div>
-    </>
-  );
+    </>;
 }

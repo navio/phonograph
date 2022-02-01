@@ -1,6 +1,5 @@
-import { createMuiTheme } from "@material-ui/core/styles";
-import deepOrange from "@material-ui/core/colors/deepOrange";
-import blue from "@material-ui/core/colors/blue";
+import { createTheme, adaptV4Theme } from "@mui/material/styles";
+import { deepOrange, blue } from '@mui/material/colors';
 
 const os =
   window.matchMedia &&
@@ -12,20 +11,20 @@ const base = {
   },
 };
 
-const light = createMuiTheme({ ...base, ...{
+const light = createTheme(adaptV4Theme({ ...base, ...{
   palette: {
-    type: "light",
+    mode: "light",
     primary: blue,
     secondary: deepOrange,
   },
-}});
+}}));
 
-const dark = createMuiTheme({ ...base, ...{
+const dark = createTheme(adaptV4Theme({ ...base, ...{
   palette: {
-    type: "dark",
+    mode: "dark",
     primary: blue,
     secondary: deepOrange,
   },
-}});
+}}));
 
 export default { dark, light, os };

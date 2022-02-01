@@ -1,8 +1,10 @@
 import React from "react";
-import TextField from "@material-ui/core/TextField";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import TextField from "@mui/material/TextField";
+import Autocomplete from '@mui/material/Autocomplete';
 import SearchEngine from "./PodcastSearcher";
-import { fade, withStyles } from "@material-ui/core/styles";
+import { alpha } from "@mui/material/styles";
+
+import withStyles from '@mui/styles/withStyles';
 
 const engine = new SearchEngine("/ln/");
 
@@ -11,9 +13,9 @@ const StyledField = withStyles((theme) => ({
     position: "relative",
     borderRadius: theme.shape.borderRadius,
     outline: theme.palette.common.white, 
-    backgroundColor: fade(theme.palette.common.white, 0.35),
+    backgroundColor: alpha(theme.palette.common.white, 0.35),
     "&:hover": {
-      backgroundColor: fade(theme.palette.common.white, 0.25),
+      backgroundColor: alpha(theme.palette.common.white, 0.25),
     },
     marginLeft: 0,
     width: "100%",

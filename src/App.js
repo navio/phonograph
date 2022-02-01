@@ -1,6 +1,6 @@
 import React, { useRef, Suspense, useReducer, useEffect } from "react";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import { ThemeProvider } from "@material-ui/core/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import { ThemeProvider, StyledEngineProvider } from "@mui/material/styles";
 import theme from "./theme";
 import { reducer, initialState } from "./reducer";
 import audioqueue from "audioqueue";
@@ -130,106 +130,108 @@ const App = ({}) => {
   }
 
   return (
-    <ThemeProvider theme={finalTheme}>
-      <AppContext.Provider
-        value={{ state, dispatch, engine, debug, worker, player: player.current }}
-      >
-        <CssBaseline />
+    <StyledEngineProvider injectFirst>
+      <ThemeProvider theme={finalTheme}>
+        <AppContext.Provider
+          value={{ state, dispatch, engine, debug, worker, player: player.current }}
+        >
+          <CssBaseline />
 
-        <Suspense fallback={<></>}>
-          {player.current && (
-            <MediaControl
-              player={player.current}
-              handler={mediaFunctions.playButton}
-              forward={mediaFunctions.forward30Seconds}
-              rewind={mediaFunctions.rewind10Seconds}
-              seek={mediaFunctions.seek}
+          <Suspense fallback={<></>}>
+            {player.current && (
+              <MediaControl
+                player={player.current}
+                handler={mediaFunctions.playButton}
+                forward={mediaFunctions.forward30Seconds}
+                rewind={mediaFunctions.rewind10Seconds}
+                seek={mediaFunctions.seek}
+              />
+            )}
+          </Suspense>
+
+          <Switch>
+            <Route
+              exact
+              path={[LIBVIEW]}
+              render={({ history }) => {
+                return (
+                  <Suspense fallback={<Loading />}>
+                    <Library
+                      history={history}
+                      addPodcastHandler={() => history.push(DISCOVERVIEW)} //{this.askForPodcast}
+                      actionAfterSelectPodcast={() => history.push(PODCASTVIEW)}
+                    />
+                  </Suspense>
+                );
+              }}
             />
-          )}
-        </Suspense>
 
-        <Switch>
-          <Route
-            exact
-            path={[LIBVIEW]}
-            render={({ history }) => {
-              return (
+            <Route
+              path={[PODCASTVIEW, `${PODCASTVIEW}/:podcastname`]}
+              render={({ history }) => (
                 <Suspense fallback={<Loading />}>
-                  <Library
+                  <PodcastView history={history} />
+                </Suspense>
+              )}
+            />
+
+            <Route
+              path={PLAYLIST}
+              exact
+              render={() => (
+                <Suspense fallback={<Loading />}>
+                  <Playlist />
+                </Suspense>
+              )}
+            />
+
+            <Route
+              exact
+              path={[DISCOVERVIEW, ROOT]}
+              render={({ history }) => (
+                <Suspense fallback={<Loading />}>
+                  <Discover
                     history={history}
-                    addPodcastHandler={() => history.push(DISCOVERVIEW)} //{this.askForPodcast}
-                    actionAfterSelectPodcast={() => history.push(PODCASTVIEW)}
+                    addPodcastHandler={loadPodcast}
+                    actionAfterClick={() => history.push(PODCASTVIEW)}
                   />
                 </Suspense>
-              );
-            }}
+              )}
+            />
+
+            <Route
+              path={SETTINGSVIEW}
+              exact
+              render={() => (
+                <Suspense fallback={<Loading />}>
+                  <Settings podcasts={state.podcasts} />
+                </Suspense>
+              )}
+            />
+            <Route>
+              <Redirect to={DISCOVERVIEW} />
+            </Route>
+          </Switch>
+
+          {state.episodeInfo && <Underground />}
+
+          <Suspense fallback={<Loading />}>
+            <Footer path={location.pathname} />
+          </Suspense>
+
+          <audio
+            preload="metadata"
+            autoPlay={state.status !== "paused"}
+            ref={player}
+            preload="auto"
+            title={title || ""}
+            src={playerProxy+state.media}
+            poster={state.podcastImage || ""}
           />
-
-          <Route
-            path={[PODCASTVIEW, `${PODCASTVIEW}/:podcastname`]}
-            render={({ history }) => (
-              <Suspense fallback={<Loading />}>
-                <PodcastView history={history} />
-              </Suspense>
-            )}
-          />
-
-          <Route
-            path={PLAYLIST}
-            exact
-            render={() => (
-              <Suspense fallback={<Loading />}>
-                <Playlist />
-              </Suspense>
-            )}
-          />
-
-          <Route
-            exact
-            path={[DISCOVERVIEW, ROOT]}
-            render={({ history }) => (
-              <Suspense fallback={<Loading />}>
-                <Discover
-                  history={history}
-                  addPodcastHandler={loadPodcast}
-                  actionAfterClick={() => history.push(PODCASTVIEW)}
-                />
-              </Suspense>
-            )}
-          />
-
-          <Route
-            path={SETTINGSVIEW}
-            exact
-            render={() => (
-              <Suspense fallback={<Loading />}>
-                <Settings podcasts={state.podcasts} />
-              </Suspense>
-            )}
-          />
-          <Route>
-            <Redirect to={DISCOVERVIEW} />
-          </Route>
-        </Switch>
-
-        {state.episodeInfo && <Underground />}
-
-        <Suspense fallback={<Loading />}>
-          <Footer path={location.pathname} />
-        </Suspense>
-
-        <audio
-          preload="metadata"
-          autoPlay={state.status !== "paused"}
-          ref={player}
-          preload="auto"
-          title={title || ""}
-          src={playerProxy+state.media}
-          poster={state.podcastImage || ""}
-        />
-        <Drawer />
-      </AppContext.Provider>
-    </ThemeProvider>
+          <Drawer />
+        </AppContext.Provider>
+      </ThemeProvider>
+    </StyledEngineProvider>
   );
 };
 

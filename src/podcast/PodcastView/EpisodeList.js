@@ -1,33 +1,33 @@
 import React, { useEffect, useState, useContext } from "react";
 import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import Divider from "@material-ui/core/Divider";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import Dialog from "@material-ui/core/Dialog";
-import PlayArrowIcon from "@material-ui/icons/PlayArrow";
-import PauseIcon from "@material-ui/icons/Pause";
-import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import DialogContent from "@material-ui/core/DialogContent";
+import withStyles from '@mui/styles/withStyles';
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Divider from "@mui/material/Divider";
+import DialogTitle from "@mui/material/DialogTitle";
+import Dialog from "@mui/material/Dialog";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import PauseIcon from "@mui/icons-material/Pause";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
+import DialogContent from "@mui/material/DialogContent";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { Chip, IconButton } from "@material-ui/core";
+import { Chip, IconButton } from "@mui/material";
 import createDOMPurify from "dompurify";
 import { Consumer } from "../../App.js";
 import PS from "podcastsuite";
-import CheckCircleIcon from "@material-ui/icons/CheckCircle";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { completeEpisodeHistory as markAsFinished } from "../../reducer";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 
-import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 
-import MuiAlert from "@material-ui/lab/Alert";
-import Snackbar from "@material-ui/core/Snackbar";
+import MuiAlert from '@mui/material/Alert';
+import Snackbar from "@mui/material/Snackbar";
 
 import { AppContext } from "../../App";
 
@@ -190,7 +190,7 @@ const EpisodeList = (props) => {
     const { currentTime, duration, completed } = episodeData;
     if (completed)
       return (
-        <IconButton>
+        <IconButton size="large">
           <CheckCircleIcon style={{ color: "lightgreen" }} />
         </IconButton>
       );
@@ -203,7 +203,7 @@ const EpisodeList = (props) => {
       return <div onClick={() => completeEpisode(guid)}>{total}%</div>;
     }
     return (
-      <IconButton onClick={() => completeEpisode(guid)}>
+      <IconButton onClick={() => completeEpisode(guid)} size="large">
         <CheckCircleOutlineIcon />
       </IconButton>
     );
@@ -219,148 +219,146 @@ const EpisodeList = (props) => {
     // console.log("getting new history");
     getHistory(props.current);
   }, [fresh, props.shouldRefresh]);
-  return (
-    <>
-      <Snackbar
-        open={message}
-        onClose={closeMessage}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        autoHideDuration={4000}
-      >
-        <Alert severity="success">{message}</Alert>
-      </Snackbar>
-      <Description handleClose={handleClose} open={open} />
-      <Consumer>
-        {(state) => (
-          <div className={classes.root}>
-            {episodeList ? (
-              <>
-                <List>
-                  {episodeList.map((episode, id) => {
-                    const episodeData = episodeHistory[episode.guid] || {};
-                    return (
-                      <div key={episode.guid}>
-                        <ListItem
-                          className={
-                            state.playing === episode.guid
-                              ? classes.selected
-                              : null
-                          }
-                        >
-                          <ListItemIcon>
-                            <IconButton
-                              onClick={props.handler(
-                                episode.guid,
-                                whenToStart(episodeData),
-                                podcast
-                              )}
-                            >
-                              {props.playing === episode.guid &&
-                              props.status !== "paused" ? (
-                                <PauseIcon
-                                  fontSize="large"
-                                  className={classes.playIcon}
-                                />
-                              ) : (
-                                <PlayArrowIcon
-                                  fontSize="large"
-                                  className={classes.playIcon}
-                                />
-                              )}
-                            </IconButton>
-                          </ListItemIcon>
-                          <EpisodeListDescription
-                            classes={classes}
-                            onClick={() => {
+  return <>
+    <Snackbar
+      open={message}
+      onClose={closeMessage}
+      anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      autoHideDuration={4000}
+    >
+      <Alert severity="success">{message}</Alert>
+    </Snackbar>
+    <Description handleClose={handleClose} open={open} />
+    <Consumer>
+      {(state) => (
+        <div className={classes.root}>
+          {episodeList ? (
+            <>
+              <List>
+                {episodeList.map((episode, id) => {
+                  const episodeData = episodeHistory[episode.guid] || {};
+                  return (
+                    <div key={episode.guid}>
+                      <ListItem
+                        className={
+                          state.playing === episode.guid
+                            ? classes.selected
+                            : null
+                        }
+                      >
+                        <ListItemIcon>
+                          <IconButton
+                            onClick={props.handler(
+                              episode.guid,
+                              whenToStart(episodeData),
+                              podcast
+                            )}
+                            size="large">
+                            {props.playing === episode.guid &&
+                            props.status !== "paused" ? (
+                              <PauseIcon
+                                fontSize="large"
+                                className={classes.playIcon}
+                              />
+                            ) : (
+                              <PlayArrowIcon
+                                fontSize="large"
+                                className={classes.playIcon}
+                              />
+                            )}
+                          </IconButton>
+                        </ListItemIcon>
+                        <EpisodeListDescription
+                          classes={classes}
+                          onClick={() => {
 
-                              setOpen({
-                                description: episode.description,
-                                title: episode.title,
+                            setOpen({
+                              description: episode.description,
+                              title: episode.title,
+                            });
+                          }}
+                          history={episodeData}
+                          episode={episode}
+                        />
+                        <ListItemIcon>
+                          <IconButton
+                            edge="end"
+                            onClick={() => {
+                              dispatch({
+                                type: "drawer",
+                                payload: {
+                                  drawerContent: {
+                                    typeContent: "list",
+                                    content: [
+                                      {
+                                        label: "Play Next",
+                                        icon: "addnext",
+                                        fn: () => {
+                                          setMessage("Queued to play next");
+                                          playNext(episode.guid);
+                                        },
+                                      },
+                                      { label: "Add to queue",
+                                      icon: "queue",
+                                      fn: () => {
+                                        setMessage("Added to queue");
+                                        playLast(episode.guid);
+                                      } },
+                                      { label: "Mark as Played",
+                                        fn: () => {
+                                          completeEpisode(episode.guid);
+                                        }  
+                                      },
+                                      {
+                                        label: "See Description",
+                                        icon: "description",
+                                        fn: () => setOpen({title: episode.title ,description: episode.description})
+                                      }
+                                    ],
+                                  },
+                                  status: true,
+                                },
                               });
                             }}
-                            history={episodeData}
-                            episode={episode}
-                          />
-                          <ListItemIcon>
-                            <IconButton
-                              edge="end"
-                              onClick={() => {
-                                dispatch({
-                                  type: "drawer",
-                                  payload: {
-                                    drawerContent: {
-                                      typeContent: "list",
-                                      content: [
-                                        {
-                                          label: "Play Next",
-                                          icon: "addnext",
-                                          fn: () => {
-                                            setMessage("Queued to play next");
-                                            playNext(episode.guid);
-                                          },
-                                        },
-                                        { label: "Add to queue",
-                                        icon: "queue",
-                                        fn: () => {
-                                          setMessage("Added to queue");
-                                          playLast(episode.guid);
-                                        } },
-                                        { label: "Mark as Played",
-                                          fn: () => {
-                                            completeEpisode(episode.guid);
-                                          }  
-                                        },
-                                        {
-                                          label: "See Description",
-                                          icon: "description",
-                                          fn: () => setOpen({title: episode.title ,description: episode.description})
-                                        }
-                                      ],
-                                    },
-                                    status: true,
-                                  },
-                                });
-                              }}
-                            >
-                              <MoreVertIcon />
-                            </IconButton>
+                            size="large">
+                            <MoreVertIcon />
+                          </IconButton>
 
-                            {/* <ShowProgress
-                              guid={episode.guid}
-                              episodeData={episodeData}
-                            /> */}
-                          </ListItemIcon>
-                        </ListItem>
-                        <Divider />
-                      </div>
-                    );
-                  })}
+                          {/* <ShowProgress
+                            guid={episode.guid}
+                            episodeData={episodeData}
+                          /> */}
+                        </ListItemIcon>
+                      </ListItem>
+                      <Divider />
+                    </div>
+                  );
+                })}
+              </List>
+              {episodes.length > episodeList.length && (
+                <List align="center">
+                  <Button
+                    onClick={() => setAmount(amount + 1)}
+                    variant="outlined"
+                    style={{ width: "80%" }}
+                    size="large"
+                    color="primary"
+                  >
+                    {" "}
+                    Load More Episodes{" "}
+                  </Button>
                 </List>
-                {episodes.length > episodeList.length && (
-                  <List align="center">
-                    <Button
-                      onClick={() => setAmount(amount + 1)}
-                      variant="outlined"
-                      style={{ width: "80%" }}
-                      size="large"
-                      color="primary"
-                    >
-                      {" "}
-                      Load More Episodes{" "}
-                    </Button>
-                  </List>
-                )}
-              </>
-            ) : (
-              <div className={classes.progressContainer}>
-                <CircularProgress className={classes.progress} />
-              </div>
-            )}
-          </div>
-        )}
-      </Consumer>
-    </>
-  );
+              )}
+            </>
+          ) : (
+            <div className={classes.progressContainer}>
+              <CircularProgress className={classes.progress} />
+            </div>
+          )}
+        </div>
+      )}
+    </Consumer>
+  </>;
 };
 
 EpisodeList.propTypes = {

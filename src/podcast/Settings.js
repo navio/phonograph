@@ -1,32 +1,32 @@
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
 import React, { useContext } from "react";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import { withStyles } from "@material-ui/core/styles";
-import Divider from "@material-ui/core/Divider";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
-import IconButton from "@material-ui/core/IconButton";
-import DeleteIcon from "@material-ui/icons/Delete";
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent"
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import Typography from "@material-ui/core/Typography";
-import ExpansionPanel from "@material-ui/core/ExpansionPanel";
-import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
-import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
-import { FormControlLabel, Button } from '@material-ui/core';
-import Switch from '@material-ui/core/Switch';
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import withStyles from '@mui/styles/withStyles';
+import Divider from "@mui/material/Divider";
+import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
+import IconButton from "@mui/material/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent"
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Typography from "@mui/material/Typography";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import { FormControlLabel, Button } from '@mui/material';
+import Switch from '@mui/material/Switch';
 import PodcastEngine from "podcastsuite";
 import { AppContext } from '../App';
 import {version} from '../../package.json';
 
-import ToggleButton from '@material-ui/lab/ToggleButton';
-import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
-import BrightnessLowIcon from '@material-ui/icons/WbSunny';
-import BrightnessHighIcon from '@material-ui/icons/NightsStay';
+import BrightnessLowIcon from '@mui/icons-material/WbSunny';
+import BrightnessHighIcon from '@mui/icons-material/NightsStay';
 
 import { initializeLibrary } from '../engine/index'
 
@@ -72,103 +72,101 @@ const Settings = (props) => {
   }
   const { podcasts } = state;
 
-  return (
-    <>
-      <AppBar className={classes.appHeader} position="static">
-        <Toolbar variant="dense">
-          <Typography variant="h6">Settings</Typography>
-        </Toolbar>
-      </AppBar>
-      <Card>
-        <CardContent>
-        <Typography variant={'h5'}>Configurations</Typography>
-        Version: {version}
-        
-      </CardContent>
-      </Card>
+  return <>
+    <AppBar className={classes.appHeader} position="static">
+      <Toolbar variant="dense">
+        <Typography variant="h6">Settings</Typography>
+      </Toolbar>
+    </AppBar>
+    <Card>
+      <CardContent>
+      <Typography variant={'h5'}>Configurations</Typography>
+      Version: {version}
+      
+    </CardContent>
+    </Card>
 
-      <Card>
-        <CardContent>
-          <Typography variant={'h6'} gutterBottom >Theme Selector</Typography>
-          <ToggleButtonGroup
-            value={state.theme}
-            exclusive
-            onChange={themeSwitcher}
-            aria-label="text alignment"
+    <Card>
+      <CardContent>
+        <Typography variant={'h6'} gutterBottom >Theme Selector</Typography>
+        <ToggleButtonGroup
+          value={state.theme}
+          exclusive
+          onChange={themeSwitcher}
+          aria-label="text alignment"
+        >
+          <ToggleButton value={'light'} aria-label="White">
+            <BrightnessLowIcon />
+          </ToggleButton>
+          <ToggleButton value={'dark'} aria-label="Black">
+            <BrightnessHighIcon />
+          </ToggleButton>
+          <ToggleButton value={'os'} aria-label="right aligned">
+            OS
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </CardContent>
+    </Card>
+    <Card >
+      
+        <Accordion >
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel1a-content"
+            id="panel1a-header"
           >
-            <ToggleButton value={'light'} aria-label="White">
-              <BrightnessLowIcon />
-            </ToggleButton>
-            <ToggleButton value={'dark'} aria-label="Black">
-              <BrightnessHighIcon />
-            </ToggleButton>
-            <ToggleButton value={'os'} aria-label="right aligned">
-              OS
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </CardContent>
-      </Card>
-      <Card >
-        
-          <ExpansionPanel >
-            <ExpansionPanelSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel1a-content"
-              id="panel1a-header"
-            >
-               <Typography variant="h6" gutterBottom > Data </Typography>
-            </ExpansionPanelSummary>
-            <ExpansionPanelDetails>
-              <List style={{ width: '100%' }}>
-                <Divider />
-                {podcasts &&
-                  podcasts.map((podcast) => (
-                    <div key={podcast.domain}>
-                      <ListItem>
-                        <ListItemText
-                          secondary={
-                            <Typography component="span" variant="subtitle1">
-                              {podcast.title} <br />
-                              <Typography component="span" variant="caption">
-                                {new Date(podcast.created).toLocaleString()}
-                              </Typography>
+             <Typography variant="h6" gutterBottom > Data </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <List style={{ width: '100%' }}>
+              <Divider />
+              {podcasts &&
+                podcasts.map((podcast) => (
+                  <div key={podcast.domain}>
+                    <ListItem>
+                      <ListItemText
+                        secondary={
+                          <Typography component="span" variant="subtitle1">
+                            {podcast.title} <br />
+                            <Typography component="span" variant="caption">
+                              {new Date(podcast.created).toLocaleString()}
                             </Typography>
-                          }
-                        />
-                        <ListItemSecondaryAction>
-                          <IconButton
-                            aria-label="Delete"
-                            onClick={eraseThisPodcast(
-                              podcast.domain
-                            )}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </ListItemSecondaryAction>
-                      </ListItem>
-                      <Divider />
-                    </div>
-                  ))}
-              </List>
-            </ExpansionPanelDetails>
-          </ExpansionPanel>
-        
-      </Card>
-      <Card variant="outlined">
-        {/* <CardHeader title="Data" /> */}
-        <CardContent>
-          <Button variant="outlined" color="primary" onClick={clearState} > Reset State </Button>
-          <Button variant="outlined" color="primary" onClick={reloadCasts} >Reload Saved Podcasts </Button>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardContent align="center">
-          <Typography variant="h5">Phonograph</Typography>
-          <Typography>is developed with ❤️ in Hoboken, NJ</Typography>
-        </CardContent>
-      </Card>
-    </>
-  );
+                          </Typography>
+                        }
+                      />
+                      <ListItemSecondaryAction>
+                        <IconButton
+                          aria-label="Delete"
+                          onClick={eraseThisPodcast(
+                            podcast.domain
+                          )}
+                          size="large">
+                          <DeleteIcon />
+                        </IconButton>
+                      </ListItemSecondaryAction>
+                    </ListItem>
+                    <Divider />
+                  </div>
+                ))}
+            </List>
+          </AccordionDetails>
+        </Accordion>
+      
+    </Card>
+    <Card variant="outlined">
+      {/* <CardHeader title="Data" /> */}
+      <CardContent>
+        <Button variant="outlined" color="primary" onClick={clearState} > Reset State </Button>
+        <Button variant="outlined" color="primary" onClick={reloadCasts} >Reload Saved Podcasts </Button>
+      </CardContent>
+    </Card>
+    <Card>
+      <CardContent align="center">
+        <Typography variant="h5">Phonograph</Typography>
+        <Typography>is developed with ❤️ in Hoboken, NJ</Typography>
+      </CardContent>
+    </Card>
+  </>;
 };
 
 export default withStyles(styles)(Settings);

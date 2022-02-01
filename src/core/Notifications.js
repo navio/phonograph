@@ -1,17 +1,16 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Button from "@material-ui/core/Button";
-import Snackbar from "@material-ui/core/Snackbar";
-import IconButton from "@material-ui/core/IconButton";
-import CheckCircleIcon from "@material-ui/icons/CheckCircle";
-import ErrorIcon from "@material-ui/icons/Error";
-import InfoIcon from "@material-ui/icons/Info";
-import WarningIcon from "@material-ui/icons/Warning";
-import CloseIcon from "@material-ui/icons/Close";
-import { withStyles } from "@material-ui/core/styles";
+import Button from "@mui/material/Button";
+import Snackbar from "@mui/material/Snackbar";
+import IconButton from "@mui/material/IconButton";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ErrorIcon from "@mui/icons-material/Error";
+import InfoIcon from "@mui/icons-material/Info";
+import WarningIcon from "@mui/icons-material/Warning";
+import CloseIcon from "@mui/icons-material/Close";
+import withStyles from '@mui/styles/withStyles';
 
-import green from "@material-ui/core/colors/green";
-import amber from "@material-ui/core/colors/amber";
+import { green, amber } from '@mui/material/colors';
 
 const variantIcon = {
   success: CheckCircleIcon,
@@ -94,7 +93,7 @@ class Notifications extends Component {
             aria-label="Close"
             color="inherit"
             onClick={this.handleClose}
-          >
+            size="large">
             <CloseIcon />
           </IconButton>,
         ]}
