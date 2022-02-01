@@ -219,7 +219,7 @@ const EpisodeList = (props) => {
     // console.log("getting new history");
     getHistory(props.current);
   }, [fresh, props.shouldRefresh]);
-  return <>
+  return <div>
     <Snackbar
       open={message}
       onClose={closeMessage}
@@ -358,7 +358,7 @@ const EpisodeList = (props) => {
         </div>
       )}
     </Consumer>
-  </>;
+  </div>;
 };
 
 EpisodeList.propTypes = {

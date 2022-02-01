@@ -131,7 +131,7 @@ function PodcastHeader(props) {
     <Consumer>
       {(data) => {
         const state = props.podcast;
-        return <>
+        return <div>
           <Snackbar
             open={open}
             onClose={handleClose}
@@ -185,11 +185,11 @@ function PodcastHeader(props) {
                         style={{ color: "#fff" }}
                         size="small"
                         className={classes.addToLibrary}
-                        // onClick={share(
-                        //   "Phonograph",
-                        //   state.title,
-                        //   `${document.location.origin}/podcast/${makeMeAHash(state.domain)}`
-                        // )}
+                        onClick={share(
+                          "Phonograph",
+                          state.title,
+                          `${document.location.origin}/podcast/${makeMeAHash(state.domain)}`
+                        )}
                       >
                         <ShareIcon />
                       </IconButton>
@@ -259,7 +259,7 @@ function PodcastHeader(props) {
               </Typography>
             </Grid>
           </Grid>
-        </>;
+        </div>;
       }}
     </Consumer>
   );
