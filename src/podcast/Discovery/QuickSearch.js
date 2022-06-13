@@ -10,23 +10,23 @@ const StyledField = withStyles((theme) => ({
   root: {
     position: "relative",
     borderRadius: theme.shape.borderRadius,
-    outline: theme.palette.common.white, 
+    outline: theme.palette.common.white,
     backgroundColor: fade(theme.palette.common.white, 0.35),
     "&:hover": {
       backgroundColor: fade(theme.palette.common.white, 0.25),
     },
     marginLeft: 0,
     width: "100%",
-  }
+  },
 }))(TextField);
 
 export default ({ onChange }) => {
-  const [options, setOptions] = React.useState(['']);
+  const [options, setOptions] = React.useState([""]);
   const [term, setTerm] = React.useState("");
   const def = () => null;
 
   React.useEffect(() => {
-    if(term.lenght > 3){
+    if (term.length > 3) {
       engine.listennotes(term).then((data) => {
         const { podcasts } = data;
         setOptions(podcasts);
@@ -42,11 +42,11 @@ export default ({ onChange }) => {
       getOptionLabel={(option) => option.title_original}
       renderOption={(option, key) => (
         <div width={"100%"} value={option.id} key={key}>
-           <img
-                            style={{ width: "2em", paddingRight:".2em" }}
-                            alt={option.title_original}
-                            src={option.thumbnail}
-                          />
+          <img
+            style={{ width: "2em", paddingRight: ".2em" }}
+            alt={option.title_original}
+            src={option.thumbnail}
+          />
           {option.title_original}
         </div>
       )}
