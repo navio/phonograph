@@ -54,7 +54,7 @@ typings/
 
 # Yarn Integrity file
 .yarn-integrity
-
+.parcel-cache
 # dotenv environment variables file
 .env
 functions

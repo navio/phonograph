@@ -43,7 +43,7 @@ export const getPopularPodcasts = function (query=null) {
          }
         data
         .then(({podcasts, name }) => {
-            const cleanedCasts = podcasts.map((podcast, num) => {
+            const cleanedCasts = podcasts?.map((podcast, num) => {
                 const {
                     title,
                     domain,

@@ -67,7 +67,7 @@ const Underground = () => (
 // Pausing for load or refresh
 initialState["status"] = "paused";
 
-const worker = new Worker('./serviceworker/worker.js')
+const worker = new Worker(new URL('./serviceworker/worker.js', import.meta.url), {type: 'module'})
 
 
 const App = ({}) => {
