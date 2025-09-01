@@ -1,8 +1,6 @@
 const path = require('path');
 const fs = require('fs');
 
-
-
 const readDir = (dir) => {
   const directoryPath = path.join(__dirname, dir);
   return new Promise((acc) => fs.readdir(directoryPath, (err, files) => acc(files)));

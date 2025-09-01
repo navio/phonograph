@@ -24,3 +24,5 @@ export const useOnline = ({ onOffline, onOnline }) => {
     online,
   };
 };
+
+export default useOnline;

@@ -2,7 +2,7 @@
   base    = "/"
   publish = "/dist"
   command = "yarn; yarn build"
-  functions = "functions/"
+  functions = "lambda/"
 
 [[redirects]]
   from = "/rss-full/*"
@@ -14,9 +14,7 @@
   to = ":splat"
   status = 200
   force = true
-  [headers.values]
-    Cache-Control = "public, max-age=604800"
-    Expires = "Mon Jul 31 2023 22:40:30 GMT-0400"
+  headers = { Cache-Control = "public, max-age=604800", Expires = "Mon Jul 31 2023 22:40:30 GMT-0400" }
 
 [[redirects]]
   from = "/ignoreme/*"
@@ -61,9 +59,7 @@
   to="https://listen-api.listennotes.com/api/v2/:splat"
   status=200
   force = true
-  [redirects.headers]
-    X-From = "Gramophone"
-    X-ListenAPI-Key = "ebbd0481aa1b4acc8949a9ffeedf4d7b"
+  headers = { X-From = "Gramophone", X-ListenAPI-Key = "ebbd0481aa1b4acc8949a9ffeedf4d7b" }
 
 [[redirects]]
   from = "/*"
