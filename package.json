@@ -48,6 +48,8 @@
     "public": "/public/"
   },
   "devDependencies": {
+    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
+    "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
     "@vitejs/plugin-react": "^5.0.2",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "concurrently": "^9.2.1",

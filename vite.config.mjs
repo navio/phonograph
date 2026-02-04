@@ -1,5 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill'
+import { NodeModulesPolyfillPlugin } from '@esbuild-plugins/node-modules-polyfill'
 
 export default defineConfig({
   plugins: [react()],
@@ -12,7 +14,14 @@ export default defineConfig({
     esbuildOptions: {
       loader: {
         '.js': 'jsx'
-      }
+      },
+      plugins: [
+        NodeGlobalsPolyfillPlugin({
+          process: true,
+          buffer: true,
+        }),
+        NodeModulesPolyfillPlugin()
+      ]
     }
   },
   server: {
@@ -42,6 +51,11 @@ export default defineConfig({
             proxyReq.setHeader('X-From', 'Gramophone-DEV');
           });
         }
+      },
+      '/search': {
+        target: 'https://itunes.apple.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/search/, '/search')
       }
     }
   },
@@ -58,6 +72,7 @@ export default defineConfig({
     }
   },
   define: {
-    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+    global: 'globalThis',
   }
 })

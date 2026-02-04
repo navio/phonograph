@@ -53,7 +53,6 @@ export const styles = (theme) => ({
   addMorebutton: {
     position: "fixed",
     zIndex: 1,
-    bottom: 0,
     right: "8%",
     bottom: "18%",
     margin: "0 auto",
