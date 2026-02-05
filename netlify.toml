@@ -4,6 +4,9 @@
   command = "yarn; yarn build"
   functions = "lambda/"
 
+[build.environment]
+  NODE_VERSION = "20.19.0"
+
 [[redirects]]
   from = "/rss-full/*"
   to="/.netlify/functions/findCast?term=:splat"
@@ -65,5 +68,4 @@
   from = "/*"
   to = "/index.html"
   status = 200
-
 
