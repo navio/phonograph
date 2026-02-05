@@ -31,6 +31,7 @@ import {
 } from "./engine";
 
 import attachEvents from "./engine/events";
+import WorkerClass from './serviceworker/worker.js?worker';
 
 export const AppContext = React.createContext();
 export const Consumer = AppContext.Consumer;
@@ -67,7 +68,7 @@ const Underground = () => (
 // Pausing for load or refresh
 initialState["status"] = "paused";
 
-const worker = new Worker('./serviceworker/worker.js')
+const worker = new WorkerClass()
 
 
 const App = ({}) => {
@@ -219,10 +220,9 @@ const App = ({}) => {
         </Suspense>
 
         <audio
-          preload="metadata"
+          preload="auto"
           autoPlay={state.status !== "paused"}
           ref={player}
-          preload="auto"
           title={title || ""}
           src={playerProxy+state.media}
           poster={state.podcastImage || ""}

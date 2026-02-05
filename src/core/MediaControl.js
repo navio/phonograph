@@ -134,7 +134,6 @@ const styles = (theme) => ({
     zIndex: 50,
     height: "100%",
     top: "0px",
-    zIndex: 2,
   },
 });
 
@@ -235,7 +234,6 @@ const MediaControlCard = (props) => {
           <div className={classes.card}>
             {open && (
               <Grid
-                container
                 container
                 direction="row"
                 justify="center"

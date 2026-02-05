@@ -57,7 +57,7 @@ export const recordEpisode = async (feed, episode, currentTime, duration) => {
   //console.log('record')
   const inMemory = await db.get(feed);
   const current = inMemory || {};
-  current[episode] = { completed: false, currentTime, duration, duration };
+  current[episode] = { completed: false, currentTime, duration };
   return await db.set(feed,current);
 }
 
@@ -98,7 +98,6 @@ const defaultState = {
     playing: null,
     loaded: 0,
     played: 0,
-    status: null,
     audioOrigin:"",
     loading: false,
 

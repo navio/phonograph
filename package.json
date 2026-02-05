@@ -17,7 +17,6 @@
     "dompurify": "^2.0.10",
     "encoding": "^0.1.12",
     "idb-keyval": "^3.2.0",
-    "netlify-lambda": "^1.6.3",
     "node-fetch": "^2.6.0",
     "podcastsuite": "1.1.9",
     "prop-types": "^15.7.2",
@@ -34,14 +33,14 @@
     "last 1 Chrome versions"
   ],
   "scripts": {
-    "start": "parcel public/index.html",
-    "build": "yarn getter && parcel build public/index.html && yarn SEO && yarn sw; yarn lambda:build",
-    "serve": "parcel serve public/index.html",
+    "start": "vite",
+    "build": "yarn getter && vite build && yarn SEO && yarn sw && yarn lambda:build",
+    "serve": "vite preview",
     "SEO": "cp ./public/robots.txt ./dist/robots.txt",
-    "bundle": "parcel build public/index.html",
-    "lambda:build": "npx netlify-lambda build ./lambda",
-    "lambda:serve": "npx netlify-lambda serve ./lambda",
-    "dev": "yarn getter && node proxy && yarn lambda:serve",
+    "bundle": "vite build",
+    "lambda:build": "netlify functions:build --src ./lambda",
+    "lambda:serve": "netlify functions:serve",
+    "dev": "yarn getter && concurrently \"yarn lambda:serve\" \"vite\"",
     "getter": "bash ./filegetter.sh",
     "sw": "node swGenerator.js"
   },
@@ -49,11 +48,16 @@
     "public": "/public/"
   },
   "devDependencies": {
+    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
+    "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
+    "@vitejs/plugin-react": "^5.0.2",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "concurrently": "^9.2.1",
     "cz-conventional-changelog": "3.2.0",
     "express": "^4.17.1",
     "http-proxy-middleware": "^1.0.3",
-    "parcel-bundler": "^1.12.4"
+    "netlify-cli": "^23.4.3",
+    "vite": "^5.0.0"
   },
   "config": {
     "commitizen": {
