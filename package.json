@@ -27,7 +27,7 @@
     "react-router-dom": "^5.1.2",
     "smallfetch": "^1.0.8",
     "xml2js": "^0.4.22",
-    "zustand": "^5.0.11"
+    "zustand": "^4.5.5"
   },
   "private": true,
   "browserslist": [
