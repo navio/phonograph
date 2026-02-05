@@ -109,7 +109,7 @@ const Header = ({ searchHandler, classes }) => (
 );
 
 const getFinalURL = async (url) => {
-  const URL = `${window.location.origin}/api/findFinal/?term=${url}`;
+  const URL = `${window.location.origin}/api/findFinal/?term=${encodeURIComponent(url)}`;
   try {
     const data = await fetch(URL);
     const result = await data.json();
@@ -117,7 +117,7 @@ const getFinalURL = async (url) => {
     return result.url;
   } catch (error) {
     new Error(error);
-    return URL;
+    return url;
   }
 };
 
