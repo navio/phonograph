@@ -15,6 +15,7 @@ import DialogContent from "@mui/material/DialogContent";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Chip, IconButton } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import createDOMPurify from "dompurify";
 import { Consumer } from "../../App.js";
 import PS from "podcastsuite";
@@ -28,6 +29,7 @@ import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 
 import { AppContext } from "../../App";
+import { getContrastText, toRGBA } from "../../core/podcastPalette";
 
 const DOMPurify = createDOMPurify(window);
 const { sanitize } = DOMPurify;
@@ -76,6 +78,7 @@ const IsAvaliable = (url) => {
 const EpisodeListDescription = (props) => {
   const episode = props.episode;
   const { currentTime, duration, completed } = props.history || {};
+  const { palette, textColor, subText, accent } = props;
   const total =
     currentTime && duration ? Math.round((currentTime * 100) / duration) : null;
   return (
@@ -84,15 +87,17 @@ const EpisodeListDescription = (props) => {
       primary={
         <>
           {episode.season && (
-            <Typography color={"secondary"}>Season {episode.season}</Typography>
+            <Typography sx={{ color: accent }}>
+              Season {episode.season}
+            </Typography>
           )}
-          <Typography component="div" variant="subtitle1" noWrap>
+          <Typography component="div" variant="subtitle1" noWrap sx={{ color: textColor }}>
             {clearText(episode.title)}{" "}
             <IsAvaliable url={episode.enclosures[0].url} />
           </Typography>
-          <Typography variant="overline" component="div">
+          <Typography variant="overline" component="div" sx={{ color: subText }}>
             {(completed || total > 97) && (
-              <CheckCircleOutlineIcon color="primary" fontSize="small" />
+              <CheckCircleOutlineIcon sx={{ color: accent }} fontSize="small" />
             )}{" "}
             {episodeDate(episode.created)}
             {total && (
@@ -101,7 +106,10 @@ const EpisodeListDescription = (props) => {
                 variant="outlined"
                 size="small"
                 label={`Progress: ${total}%`}
-                color="primary"
+                sx={{
+                  borderColor: accent,
+                  color: textColor,
+                }}
               />
             )}
             {episode.episodeType && episode.episodeType !== "full" && (
@@ -110,7 +118,10 @@ const EpisodeListDescription = (props) => {
                 variant="outlined"
                 size="small"
                 label={episode.episodeType}
-                color="secondary"
+                sx={{
+                  borderColor: accent,
+                  color: textColor,
+                }}
               />
             )}
           </Typography>
@@ -152,6 +163,20 @@ const EpisodeList = (props) => {
   const [message, setMessage] = useState(null);
   // console.log('heree',podcast);
   const { dispatch } = useContext(AppContext);
+  const theme = useTheme();
+  const palette = props.palette;
+  const textColor = palette
+    ? getContrastText(palette.primary, "#111111", "#ffffff")
+    : theme.palette.text.primary;
+  const subText = palette
+    ? getContrastText(palette.secondary, "rgba(0,0,0,0.65)", "rgba(255,255,255,0.7)")
+    : theme.palette.text.secondary;
+  const accent = palette
+    ? toRGBA(palette.accent, 0.95)
+    : theme.palette.secondary.main;
+  const listBackground = palette
+    ? `linear-gradient(180deg, ${toRGBA(palette.primary, 0.08)} 0%, ${toRGBA(palette.secondary, 0.18)} 100%)`
+    : theme.palette.background.default;
 
   useEffect(() => {
     window && window.scrollTo && window.scrollTo(0, 0);
@@ -221,16 +246,20 @@ const EpisodeList = (props) => {
       <Description handleClose={handleClose} open={open} />
       <Consumer>
         {(state) => (
-          <div>
+          <div style={{ background: listBackground }}>
             {episodeList ? (
               <>
-                <List>
+                <List sx={{ background: "transparent" }}>
                   {episodeList.map((episode, id) => {
                     const episodeData = episodeHistory[episode.guid] || {};
                     return (
                       <div key={episode.guid}>
                         <ListItem
                           selected={state.playing === episode.guid}
+                          sx={{
+                            backgroundColor: palette ? toRGBA(palette.primary, 0.12) : "transparent",
+                            color: textColor,
+                          }}
                         >
                           <ListItemIcon>
                             <IconButton
@@ -239,15 +268,18 @@ const EpisodeList = (props) => {
                                 whenToStart(episodeData),
                                 podcast
                               )}
+                              sx={{ color: accent }}
                             >
                               {props.playing === episode.guid &&
                               props.status !== "paused" ? (
                                 <PauseIcon
                                   fontSize="large"
+                                  sx={{ color: accent }}
                                 />
                               ) : (
                                 <PlayArrowIcon
                                   fontSize="large"
+                                  sx={{ color: accent }}
                                 />
                               )}
                             </IconButton>
@@ -262,6 +294,10 @@ const EpisodeList = (props) => {
                             }}
                             history={episodeData}
                             episode={episode}
+                            palette={palette}
+                            textColor={textColor}
+                            subText={subText}
+                            accent={accent}
                           />
                           <ListItemIcon>
                             <IconButton
@@ -303,8 +339,9 @@ const EpisodeList = (props) => {
                                   },
                                 });
                               }}
+                              sx={{ color: textColor }}
                             >
-                              <MoreVertIcon />
+                              <MoreVertIcon sx={{ color: textColor }} />
                             </IconButton>
 
                             {/* <ShowProgress
@@ -313,7 +350,7 @@ const EpisodeList = (props) => {
                             /> */}
                           </ListItemIcon>
                         </ListItem>
-                        <Divider />
+                        <Divider sx={{ borderColor: toRGBA(palette?.primary, 0.2) }} />
                       </div>
                     );
                   })}
@@ -325,7 +362,10 @@ const EpisodeList = (props) => {
                       variant="outlined"
                       style={{ width: "80%" }}
                       size="large"
-                      color="primary"
+                      sx={{
+                        borderColor: accent,
+                        color: textColor,
+                      }}
                     >
                       {" "}
                       Load More Episodes{" "}

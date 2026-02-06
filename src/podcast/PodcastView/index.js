@@ -3,6 +3,7 @@ import { AppContext } from '../../App';
 import useOnline from '../../engine/useOnline';
 import { PODCASTVIEW, DISCOVERY } from '../../constants';
 import { recordEpisode as saveEpisodeState } from '../../reducer'
+import { getImagePalette } from "../../core/podcastPalette";
 
 import Loading from '../../core/Loading';
 
@@ -40,6 +41,7 @@ export default (props) => {
   const [podcast, setPodcast] = useState({});
   const [error, setError] = useState({});
   const [shouldRefresh, setToRefresh] = useState(Date.now());
+  const [palette, setPalette] = useState(null);
 
   const podcastURL = commonRules(bringAPodcast || global.current);
 
@@ -265,12 +267,27 @@ export default (props) => {
     getPodcast()
   }, []);
 
+  useEffect(() => {
+    if (!podcast.image) {
+      setPalette(null);
+      return;
+    }
+    let active = true;
+    getImagePalette(podcast.image).then((colors) => {
+      if (active) setPalette(colors);
+    });
+    return () => {
+      active = false;
+    };
+  }, [podcast.image]);
+
   return podcast.domain ? <>
     <PodcastHeader
       savePodcast={savePodcast}
       podcast={podcast}
       removePodcast={removePodcast}
       inLibrary={isPodcastInLibrary}
+      palette={palette}
     />
     <EpisodeList
       episodes={podcast.items}
@@ -282,6 +299,7 @@ export default (props) => {
       playing={global.playing}
       current={global.current}
       shouldRefresh={shouldRefresh}
+      palette={palette}
     />
   </>
     : <Typography align='center' style={{ paddingTop: '20%' }} letterSpacing={6} variant="h4">

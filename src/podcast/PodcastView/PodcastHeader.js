@@ -1,16 +1,10 @@
 import React from "react";
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  AppBar,
   Box,
   Button,
-  CardMedia,
   Grid,
   IconButton,
   Snackbar,
-  Toolbar,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -18,7 +12,6 @@ import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Favorite from "@mui/icons-material/Bookmark";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ShareIcon from "@mui/icons-material/ShareOutlined";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Alert from "@mui/material/Alert";
@@ -26,6 +19,7 @@ import Alert from "@mui/material/Alert";
 import { clearText } from "./EpisodeList";
 import { Consumer } from "../../App.js";
 import { useHistory } from "react-router-dom";
+import { getContrastText, toRGBA } from "../../core/podcastPalette";
 
 const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 const prod = DEBUG ? '' : ''
@@ -82,6 +76,16 @@ function PodcastHeader(props) {
     <Consumer>
       {(data) => {
         const state = props.podcast;
+        const { palette } = props;
+        const textColor = palette
+          ? getContrastText(palette.primary, "#111111", "#ffffff")
+          : theme.palette.common.white;
+        const subText = palette
+          ? getContrastText(palette.secondary, "rgba(0,0,0,0.65)", "rgba(255,255,255,0.75)")
+          : theme.palette.common.white;
+        const overlay = palette
+          ? `linear-gradient(180deg, ${toRGBA(palette.primary, 0.15)} 0%, ${toRGBA(palette.primary, 0.6)} 55%, ${toRGBA(palette.primary, 0.92)} 100%)`
+          : "linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.85) 100%)";
         return (
           <>
             <Snackbar
@@ -94,26 +98,40 @@ function PodcastHeader(props) {
                 {message}
               </Alert>
             </Snackbar>
-            <AppBar sx={{ WebkitAppRegion: "drag" }} position="static">
-              <Toolbar variant="dense">
-                <Grid container spacing={2}>
+            <Box
+              sx={{
+                minHeight: "100vh",
+                position: "relative",
+                backgroundImage: state.image ? `url(${prod + state.image})` : "none",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+            >
+              <Box
+                sx={{
+                  position: "absolute",
+                  inset: 0,
+                  background: overlay,
+                }}
+              />
+              <Box sx={{ position: "relative", zIndex: 1, height: "100%" }}>
+                <Grid container sx={{ px: { xs: 2, md: 4 }, pt: 2 }}>
                   <Grid item xs={6}>
-                    <Typography variant="h6">
-                      <IconButton
-                        size="small"
-                        aria-label="back"
-                        onClick={backHandler}
-                      >
-                        <ArrowBackIcon style={{ color: "#fff" }} />
-                      </IconButton>
-                    </Typography>
+                    <IconButton
+                      size="small"
+                      aria-label="back"
+                      onClick={backHandler}
+                      sx={{ color: textColor }}
+                    >
+                      <ArrowBackIcon />
+                    </IconButton>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={6} sx={{ textAlign: "right" }}>
                     {isInLibrary ? (
                       <Tooltip title="Remove from library" placement="bottom">
                         <IconButton
                           size="small"
-                          sx={{ color: "#fff", float: "right" }}
+                          sx={{ color: textColor }}
                           onClick={removePodcast}
                           aria-label="Remove from Library"
                         >
@@ -121,20 +139,20 @@ function PodcastHeader(props) {
                         </IconButton>
                       </Tooltip>
                     ) : (
-                        <Tooltip title="Add to Library" placement="bottom">
-                          <IconButton
-                            size="small"
-                            sx={{ color: "#fff", float: "right" }}
-                            onClick={saveThisPodcastToLibrary}
-                          >
-                            <BookmarkBorderIcon />
-                          </IconButton>
-                        </Tooltip>
-                      )}
+                      <Tooltip title="Add to Library" placement="bottom">
+                        <IconButton
+                          size="small"
+                          sx={{ color: textColor }}
+                          onClick={saveThisPodcastToLibrary}
+                        >
+                          <BookmarkBorderIcon />
+                        </IconButton>
+                      </Tooltip>
+                    )}
                     {shareLink && (
                       <Tooltip title="Share Podcast" placement="bottom">
                         <IconButton
-                          sx={{ color: "#fff", float: "right" }}
+                          sx={{ color: textColor }}
                           size="small"
                           onClick={share(
                             "Phonograph",
@@ -148,94 +166,56 @@ function PodcastHeader(props) {
                     )}
                   </Grid>
                 </Grid>
-              </Toolbar>
-            </AppBar>
-            <Grid sx={{ paddingBottom: "1em" }} container>
-              <Grid item xs={12} md={4}>
-                {state.image && (
-                  <>
-                    {showDesktop ? (
-                      <CardMedia
-                        sx={{ margin: 1, padding: 5, height: "20em" }}
-                        image={prod + state.image}
-                        title={`${state.title} cover`}
-                      />
-                    ) : (
-                      <CardMedia
-                        sx={{ height: "20em" }}
-                        image={state.image}
-                        title={`${state.title} cover`}
-                      />
-                    )}
-                  </>
-                )}
-              </Grid>
-              <Grid item sm={12} md={8}>
-                <Box sx={{ mb: "1rem" }}>
-                  {showDesktop ? (
-                    <>
-                    <Typography
-                      sx={{
-                        marginTop: 0.375,
-                        whiteSpace: "pre-wrap",
-                        marginLeft: 1.25,
-                        paddingRight: "1em",
-                        lineClamp: 2,
-                      }}
-                      variant="h4"
-                      noWrap
-                    >
-                      {state.title}
+
+                <Box
+                  sx={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    px: { xs: 2, md: 4 },
+                    pb: { xs: 3, md: 5 },
+                  }}
+                >
+                  <Typography
+                    variant={showDesktop ? "h3" : "h4"}
+                    sx={{ color: textColor, fontWeight: 700 }}
+                  >
+                    {state.title}
+                  </Typography>
+                  {state.author && (
+                    <Typography variant="subtitle1" sx={{ color: subText, mt: 0.5 }}>
+                      {state.author}
                     </Typography>
+                  )}
+                  {state.description && (
                     <Typography
-                      align={"justify"}
-                      sx={{
-                        maxHeight: "14vh",
-                        marginTop: "1em",
-                        overflow: "hidden",
-                        marginLeft: ".5em",
-                        paddingRight: "1em",
-                      }}
-                      color="textSecondary"
+                      variant="body1"
+                      sx={{ color: subText, mt: 1, maxWidth: "60ch" }}
                     >
                       {clearText(state.description)}
                     </Typography>
-                    </>
-                  ) : (
-                    <Accordion>
-                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography
-                          sx={{
-                            marginTop: 0.375,
-                            whiteSpace: "pre-wrap",
-                            marginLeft: 1.25,
-                            paddingRight: "1em",
-                            lineClamp: 2,
-                          }}
-                          variant="h6"
-                          noWrap
-                        >
-                          {state.title}
-                        </Typography>
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        {clearText(state.description)}
-                      </AccordionDetails>
-                    </Accordion>
                   )}
+                  <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: 2 }}>
+                    {!isInLibrary && (
+                      <Button
+                        onClick={saveThisPodcastToLibrary}
+                        variant="contained"
+                        sx={{
+                          backgroundColor: palette ? toRGBA(palette.accent, 0.95) : theme.palette.primary.main,
+                          color: getContrastText(palette?.accent, "#111111", "#ffffff"),
+                        }}
+                      >
+                        Subscribe
+                      </Button>
+                    )}
+                    <Typography sx={{ color: subText }}>
+                      <b>Episodes:</b> {state.items.length}
+                    </Typography>
+                  </Box>
                 </Box>
-              </Grid>
-              <Grid item xs={12} sx={{ pt: 2, textAlign: "right" }}>
-                {!isInLibrary &&
-                  <Button onClick={saveThisPodcastToLibrary}
-                    style={{ marginRight: '1rem' }} variant="outlined" color="secondary" >Subscribe</Button>}
-              </Grid>
-              <Grid item xs={12}>
-                <Typography sx={{ marginLeft: ".5rem" }}>
-                  <b>Episodes:</b> {state.items.length}
-                </Typography>
-              </Grid>
-            </Grid>
+              </Box>
+            </Box>
           </>
         );
       }}
