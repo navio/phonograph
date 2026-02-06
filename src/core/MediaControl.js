@@ -1,141 +1,23 @@
 import React, { useContext, useState, useEffect } from "react";
-import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
-import { Slider, Box } from "@material-ui/core";
+import { Slider, Box } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { useHistory } from "react-router-dom";
-import IconButton from "@material-ui/core/IconButton";
-import Typography from "@material-ui/core/Typography";
-import SkipPreviousIcon from "@material-ui/icons/Replay10";
-import PlayArrowIcon from "@material-ui/icons/PlayArrow";
-import PauseIcon from "@material-ui/icons/Pause";
-import SkipNextIcon from "@material-ui/icons/Forward30";
-import LinearProgress from "@material-ui/core/LinearProgress";
-import { Grid, Card, Hidden, Paper } from "@material-ui/core";
-import CloseIcon from '@material-ui/icons/ExpandMore';
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+import SkipPreviousIcon from "@mui/icons-material/Replay10";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import PauseIcon from "@mui/icons-material/Pause";
+import SkipNextIcon from "@mui/icons-material/Forward30";
+import LinearProgress from "@mui/material/LinearProgress";
+import { Grid, Card } from "@mui/material";
+import CloseIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { AppContext } from "../App.js";
 
 import SpeedControl from "./SpeedControl";
 import SleepTimer from "./SleepTimer";
-// import SpeedIcon from '@material-ui/icons/Speed';
-// import ToggleButton from '@material-ui/lab/ToggleButton';
-// import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
-
 import { PODCASTVIEW } from "../constants";
-
-const styles = (theme) => ({
-  card: {},
-  details: {
-    flexDirection: "column",
-  },
-  content: {
-    flex: "1 0 auto",
-  },
-  cover: {
-    width: 151,
-    height: 151,
-    margin: "30px",
-  },
-  controls: {
-    //paddingTop: '2rem'
-    paddingTop: theme.spacing(2),
-  },
-  left: {
-    padding: 0,
-  },
-  right: {
-    padding: 0,
-  },
-  line: {
-    position: "absolute",
-    top: "8px",
-    width: "100%",
-  },
-  progress: {
-    position: "absolute",
-    top: "7px",
-    width: "100%",
-  },
-  trackAfter: {
-    display: "none",
-  },
-  center: {
-    textAlign: "center",
-    padding: 0,
-  },
-  playClosed: {
-    width: "3rem",
-    maxHeight: "3rem",
-    minHeight: "2rem",
-  },
-  playIcon: {
-    height: 70,
-    width: 70,
-  },
-  controlIcon: {
-    top: "100%",
-    position: "absolute",
-    height: 40,
-    width: 40,
-    // color: theme.palette.secondary.main
-  },
-  player: {
-    // paddingLeft: 20,
-    // paddingRight: 20,
-  },
-  undeground: {
-    display: "block",
-    height: "3.5rem",
-    width: "100%",
-  },
-  classNameProp: {
-    position: "absolute",
-  },
-  container: {
-    position: "relative",
-    top: "-.5rem",
-  },
-
-  podcastImage: {
-    width: "100%",
-    display: "block",
-    margin: "0 auto",
-    paddingBottom: "5vh",
-  },
-  podcastImageClosed: {
-    display: "block",
-    maxWidth: "5rem",
-    width: "3rem",
-  },
-  title: {
-    padding: "10px 5px",
-    color: theme.palette.text.primary,
-  },
-  subtitle: {
-    margin: "0 1em 1rem",
-    height: "rem",
-    display: "block",
-    overflow: "hidden",
-  },
-  rootClosed: {
-    bottom: "3.50rem",
-    width: "100%",
-    borderTop: `1px solid ${theme.palette.secondary.main}`,
-    backgroundColor: theme.palette.background.paper,
-    position: "fixed",
-    zIndex: 2,
-  },
-  root: {
-    borderTop: `1px solid ${theme.palette.secondary.main}`,
-    position: "fixed",
-    width: "100%",
-    backgroundColor: theme.palette.background.paper,
-    zIndex: 50,
-    height: "100%",
-    top: "0px",
-  },
-});
 
 const toMinutes = (totalTime, currentTime) => {
   totalTime = Math.floor(totalTime - currentTime);
@@ -160,7 +42,8 @@ const convertMinsToHrsMins = (mins) => {
 const MediaControlCard = (props) => {
   const { state, dispatch } = useContext(AppContext);
   const [open, setOpen] = useState(null);
-  const { classes, theme } = props;
+  const theme = useTheme();
+  const showExpand = useMediaQuery(theme.breakpoints.up("sm"));
   const history = useHistory();
 
   const [showSpeed, setShowSpeed] = useState(true);
@@ -219,11 +102,30 @@ const MediaControlCard = (props) => {
     <>
       <Card
         variant="outlined"
-        className={open ? classes.root : classes.rootClosed}
+        sx={(theme) =>
+          open
+            ? {
+                borderTop: `1px solid ${theme.palette.secondary.main}`,
+                position: "fixed",
+                width: "100%",
+                backgroundColor: theme.palette.background.paper,
+                zIndex: 50,
+                height: "100%",
+                top: 0,
+              }
+            : {
+                bottom: "3.50rem",
+                width: "100%",
+                borderTop: `1px solid ${theme.palette.secondary.main}`,
+                backgroundColor: theme.palette.background.paper,
+                position: "fixed",
+                zIndex: 2,
+              }
+        }
       >
         {open && (
           <Grid container direction="row-reverse">
-            <Grid item style={{ padding: ".5rem" }}>
+            <Grid item sx={{ padding: ".5rem" }}>
               <IconButton onClick={() => { saveStorage(!open); setOpen(false); }}>
                 <CloseIcon />
               </IconButton>
@@ -231,28 +133,36 @@ const MediaControlCard = (props) => {
           </Grid>
         )}
         {state.episodeInfo && (
-          <div className={classes.card}>
+          <div>
             {open && (
               <Grid
                 container
                 direction="row"
-                justify="center"
+                justifyContent="center"
                 alignItems="center"
               >
                 <Grid item xs={7} sm={6} md={4} lg={3}>
                   <img
-                    className={classes.podcastImage}
+                    style={{
+                      width: "100%",
+                      display: "block",
+                      margin: "0 auto",
+                      paddingBottom: "5vh",
+                    }}
                     src={state.podcastImage}
                   />
                 </Grid>
               </Grid>
             )}
-            <div className={classes.details}>
+            <div style={{ display: "flex", flexDirection: "column" }}>
               {open && (
                 <Typography
                   onClick={toOrigin(state.audioOrigin)}
                   align={"center"}
-                  className={classes.title}
+                  sx={(theme) => ({
+                    padding: "10px 5px",
+                    color: theme.palette.text.primary,
+                  })}
                   variant="h6"
                   noWrap
                 >
@@ -270,7 +180,12 @@ const MediaControlCard = (props) => {
                 <Typography
                   variant="subtitle1"
                   align="center"
-                  className={classes.subtitle}
+                  sx={{
+                    margin: "0 1em 1rem",
+                    height: "rem",
+                    display: "block",
+                    overflow: "hidden",
+                  }}
                   gutterBottom
                 >
                   {episodeInfo.subtitle}
@@ -280,27 +195,29 @@ const MediaControlCard = (props) => {
               <Grid
                 container
                 direction="row"
-                justify={open ? "space-around" : "space-between"}
+                justifyContent={open ? "space-around" : "space-between"}
                 alignItems="center"
-                className={classes.player}
               >
                 {!open && (
                   <>
                     {
                       <Grid
                         item
-                        align="left"
-                        style={{ paddingLeft: ".14rem" }}
+                        sx={{ textAlign: "left", paddingLeft: ".14rem" }}
                         xs={1}
                       >
                         <img
                           onClick={() => setOpen(true)}
-                          className={classes.podcastImageClosed}
+                          style={{
+                            display: "block",
+                            maxWidth: "5rem",
+                            width: "3rem",
+                          }}
                           src={state.podcastImage}
                         />
                       </Grid>
                     }
-                    <Grid item align="center" xs={1}>
+                    <Grid item xs={1} sx={{ textAlign: "center" }}>
                       <IconButton
                         aria-label="Play/pause"
                         onClick={() => props.handler()}
@@ -308,60 +225,63 @@ const MediaControlCard = (props) => {
                       >
                         {state.playing === (episodeInfo && episodeInfo.guid) &&
                         state.status !== "paused" ? (
-                          <PauseIcon className={classes.playClosed} />
+                          <PauseIcon
+                            sx={{
+                              width: "3rem",
+                              maxHeight: "3rem",
+                              minHeight: "2rem",
+                            }}
+                          />
                         ) : (
-                          <PlayArrowIcon className={classes.playClosed} />
+                          <PlayArrowIcon
+                            sx={{
+                              width: "3rem",
+                              maxHeight: "3rem",
+                              minHeight: "2rem",
+                            }}
+                          />
                         )}
                       </IconButton>
                     </Grid>
                   </>
                 )}
-                <Grid align="center" item xs={2} md={1}>
+                <Grid item xs={2} md={1} sx={{ textAlign: "center" }}>
                   <span>{toMin(state.currentTime)}</span>
                 </Grid>
-                <Grid className={classes.container} item xs={5} md={6}>
+                <Grid item xs={5} md={6} sx={{ position: "relative", top: "-.5rem" }}>
                   <LinearProgress
-                    className={classes.progress}
+                    sx={{ position: "absolute", top: "7px", width: "100%" }}
                     variant="buffer"
                     value={state.played}
                     valueBuffer={state.loaded}
                   />
                   <Slider
-                    style={{ padding: "0px" }}
-                    className={classes.line}
+                    sx={{ padding: 0, position: "absolute", top: "8px", width: "100%" }}
                     value={state.played}
                     aria-labelledby="audio"
                     onChange={props.seek}
                   />
                 </Grid>
-                <Grid align="center" item xs={2} md={1}>
+                <Grid item xs={2} md={1} sx={{ textAlign: "center" }}>
                   <span>{toMinutes(state.duration, state.currentTime)}</span>
                 </Grid>
-                {!open && (
-                  <Hidden only={"xs"}>
-                    <Grid
-                      align="right"
-                      item
-                      xs={1}
-                      style={{ paddingRight: ".14rem" }}
-                    >
-                      <IconButton onClick={() => setOpen(true)}>
-                        <ExpandLessIcon />
-                      </IconButton>
-                    </Grid>
-                  </Hidden>
+                {!open && showExpand && (
+                  <Grid item xs={1} sx={{ textAlign: "right", paddingRight: ".14rem" }}>
+                    <IconButton onClick={() => setOpen(true)}>
+                      <ExpandLessIcon />
+                    </IconButton>
+                  </Grid>
                 )}
               </Grid>
 
               {open && (
                 <>
-                  <Grid container className={classes.controls}>
+                  <Grid container sx={{ pt: 2 }}>
                     <Grid
                       item
                       xs={3}
                       sm={4}
-                      align={open ? "right" : "center"}
-                      className={classes.right}
+                      sx={{ textAlign: open ? "right" : "center", padding: 0 }}
                     >
                       <IconButton
                         style={{ padding: "0" }}
@@ -369,13 +289,27 @@ const MediaControlCard = (props) => {
                         onClick={props.rewind}
                       >
                         {theme.direction === "rtl" ? (
-                          <SkipNextIcon className={classes.controlIcon} />
+                          <SkipNextIcon
+                            sx={{
+                              top: "100%",
+                              position: "absolute",
+                              height: 40,
+                              width: 40,
+                            }}
+                          />
                         ) : (
-                          <SkipPreviousIcon className={classes.controlIcon} />
+                          <SkipPreviousIcon
+                            sx={{
+                              top: "100%",
+                              position: "absolute",
+                              height: 40,
+                              width: 40,
+                            }}
+                          />
                         )}
                       </IconButton>
                     </Grid>
-                    <Grid item xs={6} sm={4} className={classes.center}>
+                    <Grid item xs={6} sm={4} sx={{ textAlign: "center", padding: 0 }}>
                       <IconButton
                         style={{ padding: "0" }}
                         aria-label="Play/pause"
@@ -384,9 +318,9 @@ const MediaControlCard = (props) => {
                       >
                         {state.playing === (episodeInfo && episodeInfo.guid) &&
                         state.status !== "paused" ? (
-                          <PauseIcon className={classes.playIcon} />
+                          <PauseIcon sx={{ height: 70, width: 70 }} />
                         ) : (
-                          <PlayArrowIcon className={classes.playIcon} />
+                          <PlayArrowIcon sx={{ height: 70, width: 70 }} />
                         )}
                       </IconButton>
                     </Grid>
@@ -394,8 +328,7 @@ const MediaControlCard = (props) => {
                       item
                       xs={3}
                       sm={4}
-                      align={open ? "left" : "center"}
-                      className={classes.left}
+                      sx={{ textAlign: open ? "left" : "center", padding: 0 }}
                     >
                       <IconButton
                         style={{ padding: "0" }}
@@ -403,9 +336,23 @@ const MediaControlCard = (props) => {
                         onClick={props.forward}
                       >
                         {theme.direction === "rtl" ? (
-                          <SkipPreviousIcon className={classes.controlIcon} />
+                          <SkipPreviousIcon
+                            sx={{
+                              top: "100%",
+                              position: "absolute",
+                              height: 40,
+                              width: 40,
+                            }}
+                          />
                         ) : (
-                          <SkipNextIcon className={classes.controlIcon} />
+                          <SkipNextIcon
+                            sx={{
+                              top: "100%",
+                              position: "absolute",
+                              height: 40,
+                              width: 40,
+                            }}
+                          />
                         )}
                       </IconButton>
                     </Grid>
@@ -414,16 +361,16 @@ const MediaControlCard = (props) => {
                     <Grid
                       container
                       direction="row"
-                      justify="space-evenly"
+                      justifyContent="space-evenly"
                       alignItems="center"
                     >
                       {showSpeed && (
-                        <Grid item align="center">
+                        <Grid item sx={{ textAlign: "center" }}>
                           <SpeedControl fontSize="large" onClick={setShowTimer} />
                         </Grid>
                       )}
                       {showTimer && (
-                        <Grid item align="center">
+                        <Grid item sx={{ textAlign: "center" }}>
                           <SleepTimer fontSize="large" onClick={setShowSpeed} />
                         </Grid>
                       )}
@@ -445,9 +392,4 @@ const MediaControlCard = (props) => {
   );
 };
 
-MediaControlCard.propTypes = {
-  classes: PropTypes.object.isRequired,
-  theme: PropTypes.object.isRequired,
-};
-
-export default withStyles(styles, { withTheme: true })(MediaControlCard);
+export default MediaControlCard;

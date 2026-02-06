@@ -1,50 +1,33 @@
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
 import React, { useContext } from "react";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import { withStyles } from "@material-ui/core/styles";
-import Divider from "@material-ui/core/Divider";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
-import IconButton from "@material-ui/core/IconButton";
-import DeleteIcon from "@material-ui/icons/Delete";
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent"
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import Typography from "@material-ui/core/Typography";
-import ExpansionPanel from "@material-ui/core/ExpansionPanel";
-import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
-import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
-import { FormControlLabel, Button } from '@material-ui/core';
-import Switch from '@material-ui/core/Switch';
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import Typography from "@mui/material/Typography";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import { Button } from "@mui/material";
 import PodcastEngine from "podcastsuite";
 import { AppContext } from '../App';
 import {version} from '../../package.json';
 
-import ToggleButton from '@material-ui/lab/ToggleButton';
-import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 
-import BrightnessLowIcon from '@material-ui/icons/WbSunny';
-import BrightnessHighIcon from '@material-ui/icons/NightsStay';
+import BrightnessLowIcon from "@mui/icons-material/WbSunny";
+import BrightnessHighIcon from "@mui/icons-material/NightsStay";
 
 import { initializeLibrary } from '../engine/index'
 
-const styles = (theme) => ({
-  root: {
-    width: "100%",
-    maxWidth: 360,
-    backgroundColor: theme.palette.background.paper,
-  },
-  appHeader: {
-    WebkitAppRegion: 'drag',
-  },
-});
-
-
-
 const Settings = (props) => {
-  const { classes } = props;
   const { state, dispatch, engine } = useContext(AppContext)
 
   const themeSwitcher = (ev, input) => {
@@ -74,7 +57,7 @@ const Settings = (props) => {
 
   return (
     <>
-      <AppBar className={classes.appHeader} position="static">
+      <AppBar sx={{ WebkitAppRegion: "drag" }} position="static">
         <Toolbar variant="dense">
           <Typography variant="h6">Settings</Typography>
         </Toolbar>
@@ -110,21 +93,30 @@ const Settings = (props) => {
       </Card>
       <Card >
         
-          <ExpansionPanel >
-            <ExpansionPanelSummary
+          <Accordion>
+            <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel1a-content"
               id="panel1a-header"
             >
                <Typography variant="h6" gutterBottom > Data </Typography>
-            </ExpansionPanelSummary>
-            <ExpansionPanelDetails>
+            </AccordionSummary>
+            <AccordionDetails>
               <List style={{ width: '100%' }}>
                 <Divider />
                 {podcasts &&
                   podcasts.map((podcast) => (
                     <div key={podcast.domain}>
-                      <ListItem>
+                      <ListItem
+                        secondaryAction={
+                          <IconButton
+                            aria-label="Delete"
+                            onClick={eraseThisPodcast(podcast.domain)}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        }
+                      >
                         <ListItemText
                           secondary={
                             <Typography component="span" variant="subtitle1">
@@ -135,23 +127,13 @@ const Settings = (props) => {
                             </Typography>
                           }
                         />
-                        <ListItemSecondaryAction>
-                          <IconButton
-                            aria-label="Delete"
-                            onClick={eraseThisPodcast(
-                              podcast.domain
-                            )}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </ListItemSecondaryAction>
                       </ListItem>
                       <Divider />
                     </div>
                   ))}
               </List>
-            </ExpansionPanelDetails>
-          </ExpansionPanel>
+            </AccordionDetails>
+          </Accordion>
         
       </Card>
       <Card variant="outlined">
@@ -162,7 +144,7 @@ const Settings = (props) => {
         </CardContent>
       </Card>
       <Card>
-        <CardContent align="center">
+        <CardContent sx={{ textAlign: "center" }}>
           <Typography variant="h5">Phonograph</Typography>
           <Typography>is developed with ❤️ in Hoboken, NJ</Typography>
         </CardContent>
@@ -171,4 +153,4 @@ const Settings = (props) => {
   );
 };
 
-export default withStyles(styles)(Settings);
+export default Settings;

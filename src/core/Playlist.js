@@ -1,40 +1,22 @@
 import React, { useContext } from "react";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import Grid from "@material-ui/core/Grid";
-import Button from "@material-ui/core/Button";
-import IconButton from "@material-ui/core/IconButton";
-import Box from "@material-ui/core/Box";
-import Typography from "@material-ui/core/Typography";
-import { withStyles, fade } from "@material-ui/core/styles";
-import RemoveCircleOutlineIcon from "@material-ui/icons/RemoveCircleOutline";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Grid from "@mui/material/Grid";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import phono from "../../public/phono.svg";
 import {
   List,
   ListItem,
   ListItemText,
-  ListItemSecondaryAction,
   Paper,
-} from "@material-ui/core";
+} from "@mui/material";
 import { AppContext } from "../App.js";
 
-const styles = (theme) => ({
-  images: {
-    width: "2rem",
-    marginRight: "1rem",
-  },
-  appHeader: {
-    WebkitAppRegion: "drag",
-  },
-  empty: {
-    display: "block",
-    width: "100%",
-    marginTop: "18%",
-    color: theme.palette.text.secondary,
-  },
-});
-
-const Playlist = ({ classes }) => {
+const Playlist = () => {
   const { state, dispatch } = useContext(AppContext);
   const removeFromList = (episode) => () => {
     dispatch({ type: "removeFromPlayList", episode });
@@ -44,7 +26,7 @@ const Playlist = ({ classes }) => {
   };
   return (
     <>
-      <AppBar className={classes.appHeader} position="static">
+      <AppBar sx={{ WebkitAppRegion: "drag" }} position="static">
         <Toolbar variant="dense">
           <Typography variant="h6">Playlist</Typography>
         </Toolbar>
@@ -55,7 +37,7 @@ const Playlist = ({ classes }) => {
             <Grid
               container
               direction="row"
-              justify="space-between"
+              justifyContent="space-between"
               alignItems="center"
             >
               <Grid item>
@@ -75,9 +57,16 @@ const Playlist = ({ classes }) => {
           <List>
             <Paper variant="outlined">
               {state.playlist.map((mediaElement, key) => (
-                <ListItem key={key}>
+                <ListItem
+                  key={key}
+                  secondaryAction={
+                    <IconButton onClick={removeFromList(key)}>
+                      <RemoveCircleOutlineIcon />
+                    </IconButton>
+                  }
+                >
                   <img
-                    className={classes.images}
+                    style={{ width: "2rem", marginRight: "1rem" }}
                     src={mediaElement.podcastImage}
                   />
                   <ListItemText>
@@ -88,18 +77,22 @@ const Playlist = ({ classes }) => {
                       {mediaElement.episodeInfo.author}
                     </Typography>
                   </ListItemText>
-                  <ListItemSecondaryAction>
-                    <IconButton onClick={removeFromList(key)}>
-                      <RemoveCircleOutlineIcon />
-                    </IconButton>
-                  </ListItemSecondaryAction>
                 </ListItem>
               ))}
             </Paper>
           </List>
         </>
       ) : (
-        <Typography className={classes.empty} align="center" variant="h5">
+        <Typography
+          sx={(theme) => ({
+            display: "block",
+            width: "100%",
+            marginTop: "18%",
+            color: theme.palette.text.secondary,
+          })}
+          align="center"
+          variant="h5"
+        >
           <img width={"85rem"} src={phono} />
           <br />
           Playlist is empty.
@@ -109,4 +102,4 @@ const Playlist = ({ classes }) => {
   );
 };
 
-export default withStyles(styles)(Playlist);
+export default Playlist;

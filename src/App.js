@@ -1,6 +1,6 @@
 import React, { useRef, Suspense, useEffect } from "react";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import { ThemeProvider } from "@material-ui/core/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme";
 import audioqueue from "audioqueue";
 import LoadingSVG from "./core/Loading";

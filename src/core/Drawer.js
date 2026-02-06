@@ -1,15 +1,16 @@
 import React, { useContext } from "react";
-import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
-import ListItem from "@material-ui/core/ListItem";
-import List from "@material-ui/core/List";
-import ListItemText from "@material-ui/core/ListItemText";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
+import SwipeableDrawer from "@mui/material/SwipeableDrawer";
+import ListItem from "@mui/material/ListItem";
+import List from "@mui/material/List";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemButton from "@mui/material/ListItemButton";
 import { AppContext } from "../App.js";
 
-import QueuePlayNextIcon from "@material-ui/icons/QueuePlayNext";
-import AddToQueueIcon from "@material-ui/icons/AddToQueue";
-import DoneOutlineIcon from "@material-ui/icons/DoneOutline";
-import DescriptionIcon from '@material-ui/icons/Description';
+import QueuePlayNextIcon from "@mui/icons-material/QueuePlayNext";
+import AddToQueueIcon from "@mui/icons-material/AddToQueue";
+import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
+import DescriptionIcon from "@mui/icons-material/Description";
 
 export default () => {
   const { dispatch, state } = useContext(AppContext);
@@ -38,29 +39,33 @@ export default () => {
   const ListDrawer = ({ elements }) => {
     return elements.map((element, _) => (
       <List component="nav" key={_}>
-        <ListItem
-          button
-          onClick={() => {
-            if (element.event) {
-              // Support both forms:
-              // - event is an action object: { type, ... }
-              // - event is a string type + optional payload
-              if (typeof element.event === "string") {
-                dispatch({ type: element.event, ...(element.payload ? { payload: element.payload } : {}) });
-              } else {
-                dispatch(element.event);
+        <ListItem disablePadding>
+          <ListItemButton
+            onClick={() => {
+              if (element.event) {
+                // Support both forms:
+                // - event is an action object: { type, ... }
+                // - event is a string type + optional payload
+                if (typeof element.event === "string") {
+                  dispatch({
+                    type: element.event,
+                    ...(element.payload ? { payload: element.payload } : {}),
+                  });
+                } else {
+                  dispatch(element.event);
+                }
               }
-            }
-            if (element.fn) {
-              element.fn();
-            }
-            onCloseDrawer();
-          }}
-        >
-            <ListItemIcon>
-              <IconRendered icons={element.icon} />
-            </ListItemIcon> 
-          <ListItemText primary={element.label} />
+              if (element.fn) {
+                element.fn();
+              }
+              onCloseDrawer();
+            }}
+          >
+              <ListItemIcon>
+                <IconRendered icons={element.icon} />
+              </ListItemIcon> 
+            <ListItemText primary={element.label} />
+          </ListItemButton>
         </ListItem>
       </List>
     ));

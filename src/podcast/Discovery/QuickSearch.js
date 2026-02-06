@@ -1,24 +1,22 @@
 import React from "react";
-import TextField from "@material-ui/core/TextField";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
 import SearchEngine from "./PodcastSearcher";
-import { fade, withStyles } from "@material-ui/core/styles";
+import { alpha, styled } from "@mui/material/styles";
 
 const engine = new SearchEngine("/ln/");
 
-const StyledField = withStyles((theme) => ({
-  root: {
-    position: "relative",
-    borderRadius: theme.shape.borderRadius,
-    outline: theme.palette.common.white,
-    backgroundColor: fade(theme.palette.common.white, 0.35),
-    "&:hover": {
-      backgroundColor: fade(theme.palette.common.white, 0.25),
-    },
-    marginLeft: 0,
-    width: "100%",
+const StyledField = styled(TextField)(({ theme }) => ({
+  position: "relative",
+  borderRadius: theme.shape.borderRadius,
+  outline: theme.palette.common.white,
+  backgroundColor: alpha(theme.palette.common.white, 0.35),
+  "&:hover": {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
   },
-}))(TextField);
+  marginLeft: 0,
+  width: "100%",
+}));
 
 export default ({ onChange }) => {
   const [options, setOptions] = React.useState([""]);
@@ -40,15 +38,15 @@ export default ({ onChange }) => {
       popupIcon={<></>}
       onChange={onChange}
       getOptionLabel={(option) => option.title_original}
-      renderOption={(option, key) => (
-        <div width={"100%"} value={option.id} key={key}>
+      renderOption={(props, option) => (
+        <li {...props} key={option.id} value={option.id}>
           <img
             style={{ width: "2em", paddingRight: ".2em" }}
             alt={option.title_original}
             src={option.thumbnail}
           />
           {option.title_original}
-        </div>
+        </li>
       )}
       renderInput={(params) => {
         return (

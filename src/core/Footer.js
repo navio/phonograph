@@ -1,47 +1,33 @@
 import React, { useContext, useEffect } from "react";
-import { withStyles } from "@material-ui/core/styles";
-import BottomNavigation from "@material-ui/core/BottomNavigation";
-import Badge from "@material-ui/core/Badge";
-import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
-import PropTypes from "prop-types";
-import Favorite from "@material-ui/icons/Bookmark"; //Headsert
-import DiscoverIcon from "@material-ui/icons/FilterDrama";
-import Settings from "@material-ui/icons/Settings";
-import Playlist from "@material-ui/icons/PlaylistPlay";
-import Paper from "@material-ui/core/Paper";
-import { withRouter } from "react-router-dom";
+import { styled } from "@mui/material/styles";
+import BottomNavigation from "@mui/material/BottomNavigation";
+import Badge from "@mui/material/Badge";
+import BottomNavigationAction from "@mui/material/BottomNavigationAction";
+import Favorite from "@mui/icons-material/Bookmark"; //Headsert
+import DiscoverIcon from "@mui/icons-material/FilterDrama";
+import Settings from "@mui/icons-material/Settings";
+import Playlist from "@mui/icons-material/PlaylistPlay";
+import Paper from "@mui/material/Paper";
+import { useHistory, useLocation } from "react-router-dom";
 import { LIBVIEW, DISCOVERVIEW, SETTINGSVIEW, PLAYLIST } from "../constants";
 
 import { AppContext } from "../App.js";
 
-const styles = {
-  root: {
-    position: "fixed",
-    bottom: 0,
-    width: "100%",
-    borderTop: "1px solid rgba(0, 0, 0, 0.12)",
+const StyledBottomNavigationAction = styled(BottomNavigationAction)({
+  "& .MuiBottomNavigationAction-label": {
+    fontSize: ".8rem",
   },
-  underground: {
-    height: 48,
-    width: "100%",
+  "&.Mui-selected .MuiBottomNavigationAction-label": {
+    fontSize: ".8rem",
   },
-};
-const StyledBottomNavigationAction = withStyles((theme) => ({
-  label: {
-    fontSize: '.8rem',
-  },
-  selected: {
-    fontSize: '.8rem !important',
-  },
-}))(BottomNavigationAction);
+});
 
-const StyledBadge = withStyles((theme) => ({
-  badge: {
+const StyledBadge = styled(Badge)({
+  "& .MuiBadge-badge": {
     right: -3,
     top: 5,
-
   },
-}))(Badge);
+});
 
 const hotkeys = (redirects) => {
   document.body.addEventListener('keyup',(ev)=> {
@@ -71,7 +57,9 @@ const hotkeys = (redirects) => {
   })
 };
 
-const SimpleBottomNavigation = ({ history, classes, location }) => {
+const SimpleBottomNavigation = () => {
+  const history = useHistory();
+  const location = useLocation();
   const handleRedirect = (url) => {
     return () => history.push(url);
   };
@@ -83,8 +71,25 @@ const SimpleBottomNavigation = ({ history, classes, location }) => {
     location.pathname.length > 2 ? location.pathname : DISCOVERVIEW;
   return (
     <div>
-      <Paper className={classes.root} elevation={4}>
-        <BottomNavigation value={selected} showLabels className={classes.root}>
+      <Paper
+        sx={{
+          position: "fixed",
+          bottom: 0,
+          width: "100%",
+          borderTop: "1px solid rgba(0, 0, 0, 0.12)",
+        }}
+        elevation={4}
+      >
+        <BottomNavigation
+          value={selected}
+          showLabels
+          sx={{
+            position: "fixed",
+            bottom: 0,
+            width: "100%",
+            borderTop: "1px solid rgba(0, 0, 0, 0.12)",
+          }}
+        >
           <StyledBottomNavigationAction
             label="Favorites"
             value={LIBVIEW}
@@ -115,13 +120,9 @@ const SimpleBottomNavigation = ({ history, classes, location }) => {
           />
         </BottomNavigation>
       </Paper>
-      <div className={classes.underground} />
+      <div style={{ height: 48, width: "100%" }} />
     </div>
   );
 };
 
-SimpleBottomNavigation.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
-
-export default withStyles(styles)(withRouter(SimpleBottomNavigation));
+export default SimpleBottomNavigation;
