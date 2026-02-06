@@ -12,6 +12,7 @@ const DEFAULT_THEME = {
   text: "rgb(15,15,15)",
   subText: "rgb(70,70,70)",
 };
+const MIN_TEXT_CONTRAST = 7;
 
 const isLightColor = (color = DEFAULT_COLOR) => {
   const [red, green, blue] = color;
@@ -102,7 +103,7 @@ const ensureText = (background, colors = []) => {
     BLACK,
   ]);
   const ratio = contrastRatio(candidate, background);
-  if (ratio < 4.5) {
+  if (ratio < MIN_TEXT_CONTRAST) {
     return bestTextColor(background, [BLACK, WHITE]);
   }
   return candidate;
@@ -111,11 +112,21 @@ const ensureText = (background, colors = []) => {
 export const buildThemeFromPalette = (palette) => {
   if (!palette || !palette.colors || palette.colors.length === 0) return DEFAULT_THEME;
   const colors = palette.colors || [];
-  const primaryBase = ensureBackground(palette.primary, colors);
-  const secondaryBase = ensureBackground(palette.secondary, colors);
-  const accentBase = ensureAccent(palette.accent, primaryBase, colors);
-  const text = ensureText(primaryBase, colors);
-  const subText = mix(text, primaryBase, 0.35);
+  let primaryBase = ensureBackground(palette.primary, colors);
+  let secondaryBase = ensureBackground(palette.secondary, colors);
+  let accentBase = ensureAccent(palette.accent, primaryBase, colors);
+  let text = ensureText(primaryBase, colors);
+  let subText = mix(text, primaryBase, 0.25);
+
+  // If contrast is still low, bias the background away from the text.
+  if (contrastRatio(text, primaryBase) < MIN_TEXT_CONTRAST) {
+    const target = luminance(text) > 0.5 ? BLACK : WHITE;
+    primaryBase = mix(primaryBase, target, 0.35);
+    secondaryBase = mix(secondaryBase, target, 0.2);
+    accentBase = ensureAccent(accentBase, primaryBase, colors);
+    text = ensureText(primaryBase, colors);
+    subText = mix(text, primaryBase, 0.25);
+  }
 
   return {
     primary: toRGBA(primaryBase, 0.92),
