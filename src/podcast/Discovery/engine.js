@@ -5,23 +5,53 @@ const SFP = new PodcastSearcher(API);
 
 
 export const searchForPodcasts = function (search) {
+    const normalizeApple = (data = {}) => {
+        const { results = [] } = data;
+        return results
+            .filter((podcast) => podcast && podcast.feedUrl)
+            .map((podcast) => {
+                const { feedUrl, artistName, artworkUrl100, trackName, genres } = podcast;
+                return {
+                    title: trackName,
+                    rss: feedUrl,
+                    publisher: artistName,
+                    thumbnail: artworkUrl100,
+                    tag: genres
+                };
+            });
+    };
+
+    const normalizeListenNotes = (data = {}) => {
+        const { results = [] } = data;
+        return results
+            .filter((podcast) => podcast && podcast.rss)
+            .map((podcast) => {
+                const { rss, publisher_original, title_original, thumbnail, genre_ids } = podcast;
+                return {
+                    title: title_original,
+                    rss,
+                    publisher: publisher_original,
+                    thumbnail,
+                    tag: genre_ids
+                };
+            });
+    };
+
     return new Promise(function (acc) {
-        SFP.apple(search)
+        const term = encodeURIComponent(search || "");
+        SFP.apple(term)
             .then((data) => {
-                const {results} = data;
-                const podcasts = results.map(podcast => {
-                    const { feedUrl, artistName, artworkUrl100, trackName, genres } = podcast;
-                    return {
-                        title: trackName,
-                        rss: feedUrl,
-                        publisher: artistName,
-                        thumbnail: artworkUrl100,
-                        tag: genres
-                    };
-                });
-                return acc(podcasts)
+                const podcasts = normalizeApple(data);
+                if (podcasts.length > 0) return acc(podcasts);
+                return SFP.search(term)
+                    .then((lnData) => acc(normalizeListenNotes(lnData)))
+                    .catch(() => acc([]));
             })
-            .catch(console.error);
+            .catch(() => {
+                SFP.search(term)
+                    .then((lnData) => acc(normalizeListenNotes(lnData)))
+                    .catch(() => acc([]));
+            });
     });
 };
 
