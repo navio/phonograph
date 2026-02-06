@@ -150,6 +150,8 @@ export const getInitialState = () => {
 
 export const initialState = getInitialState();
 
+// Legacy reducer function - kept for reference only.
+// Active state management now uses Zustand store (see src/store/appStore.js)
 export const reducer = (state, action) => {
     switch(action.type){
       case 'updatePodcasts':
@@ -183,7 +185,8 @@ export const reducer = (state, action) => {
       case 'audioUpdate':
         updateMediaSessionState(action.payload.status);
         if(action.payload && (action.payload.status === 'paused')){
-          recordEpisode(state.audioOrigin,state.episodeInfo.guid,state.currentTime, state.duration);
+          const guid = state.episodeInfo && state.episodeInfo.guid;
+          recordEpisode(state.audioOrigin, guid, state.currentTime, state.duration);
           return { ...state, ...action.payload, refresh: Date.now() }
         }else {
           return { ...state, ...action.payload}
@@ -198,7 +201,7 @@ export const reducer = (state, action) => {
       case 'resetState':
         return defaultState;
       case 'drawer':{
-        const {status, drawerContent } = action.payload;
+        const {status, drawerContent } = (action.payload || {});
         if(!status){
           return {...state, drawer: false }
         }
