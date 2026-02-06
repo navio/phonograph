@@ -42,7 +42,14 @@ export default () => {
           button
           onClick={() => {
             if (element.event) {
-              dispatch(element.event, element.payload);
+              // Support both forms:
+              // - event is an action object: { type, ... }
+              // - event is a string type + optional payload
+              if (typeof element.event === "string") {
+                dispatch({ type: element.event, ...(element.payload ? { payload: element.payload } : {}) });
+              } else {
+                dispatch(element.event);
+              }
             }
             if (element.fn) {
               element.fn();

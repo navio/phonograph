@@ -1,11 +1,12 @@
-import React, { useRef, Suspense, useReducer, useEffect } from "react";
+import React, { useRef, Suspense, useEffect } from "react";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { ThemeProvider } from "@material-ui/core/styles";
 import theme from "./theme";
-import { reducer, initialState } from "./reducer";
 import audioqueue from "audioqueue";
 import LoadingSVG from "./core/Loading";
 import Drawer from './core/Drawer';
+
+import { useAppStore } from "./store/appStore";
 
 // Router
 import { Route, Redirect, useHistory, Switch } from "react-router-dom";
@@ -66,15 +67,15 @@ const Underground = () => (
 );
 
 // Pausing for load or refresh
-initialState["status"] = "paused";
-
 const worker = new WorkerClass()
 
 
 const App = ({}) => {
   const player = useRef(null);
 
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const state = useAppStore((s) => s.state);
+  const dispatch = useAppStore((s) => s.dispatch);
+
   const mediaFunctions = playerFunctions(player, dispatch, state);
   const history = useHistory();
 

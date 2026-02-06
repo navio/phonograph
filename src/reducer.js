@@ -62,17 +62,18 @@ export const recordEpisode = async (feed, episode, currentTime, duration) => {
 }
 
 export const updateMediaSessionState = (value) => {
-  if ('mediaSession' in navigator) {
+  if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
     navigator.mediaSession.playbackState = value;
   }
 }
 
 export const checkIfMediaSessionLodaded = (state) =>{
-  if ('mediaSession' in navigator && navigator.mediaSession.metadata === null) {
+  if (typeof navigator !== 'undefined' && 'mediaSession' in navigator && navigator.mediaSession.metadata === null) {
     const { episodeInfo, podcastAuthor, podcastImage, title } = state;
     const { title: episodeTitle } = episodeInfo;
 
 
+    if (typeof MediaMetadata === 'undefined') return;
     navigator.mediaSession.metadata = new MediaMetadata({
       title: episodeTitle,
       artist: podcastAuthor,
@@ -89,9 +90,9 @@ export const checkIfMediaSessionLodaded = (state) =>{
   }
 }
 
-const defaultState = {
+export const defaultState = {
     podcasts: [],
-    theme: true,  
+    theme: true,
     current: null,
 
     status: null,
@@ -113,16 +114,41 @@ const defaultState = {
     refresh: Date.now()
   };
 
-  const initialState = JSON.parse(localStorage.getItem('state') || false ) || defaultState;
+const safeReadLocalStorage = (key) => {
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) return null;
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
 
-// cleanup legacy
-delete initialState['items'];
-delete initialState['description'];
-delete initialState['image'];
-delete initialState['link'];
-delete initialState['created'];
+export const getInitialState = () => {
+  const raw = safeReadLocalStorage('state');
+  let state = defaultState;
+  if (raw) {
+    try {
+      state = JSON.parse(raw) || defaultState;
+    } catch {
+      state = defaultState;
+    }
+  }
 
-export { initialState };
+  // cleanup legacy
+  const cleaned = { ...state };
+  delete cleaned['items'];
+  delete cleaned['description'];
+  delete cleaned['image'];
+  delete cleaned['link'];
+  delete cleaned['created'];
+
+  // Pausing for load or refresh (matches previous behavior in App.js)
+  cleaned.status = cleaned.status || 'paused';
+
+  return cleaned;
+}
+
+export const initialState = getInitialState();
 
 export const reducer = (state, action) => {
     switch(action.type){
