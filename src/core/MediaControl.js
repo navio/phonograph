@@ -21,7 +21,7 @@ import { PODCASTVIEW } from "../constants";
 import {
   getImagePalette,
   toRGBA,
-  getContrastText,
+  buildThemeFromPalette,
 } from "./podcastPalette";
 
 const toMinutes = (totalTime, currentTime) => {
@@ -99,13 +99,13 @@ const MediaControlCard = (props) => {
       };
     }
 
-    const primary = toRGBA(palette.primary, 0.96);
-    const secondary = toRGBA(palette.secondary, 0.7);
-    const accent = toRGBA(palette.accent, 0.95);
-    const text = getContrastText(palette.primary);
-    const subText = getContrastText(palette.secondary, "rgba(0,0,0,0.65)", "rgba(255,255,255,0.8)");
-
-    return { primary, secondary, accent, text, subText };
+    return buildThemeFromPalette(palette) || {
+      primary: theme.palette.background.paper,
+      secondary: theme.palette.background.default,
+      accent: theme.palette.secondary.main,
+      text: theme.palette.text.primary,
+      subText: theme.palette.text.secondary,
+    };
   }, [palette, theme.palette.background.default, theme.palette.background.paper, theme.palette.secondary.main, theme.palette.text.primary, theme.palette.text.secondary]);
 
   useEffect(() => {

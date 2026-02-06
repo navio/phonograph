@@ -19,7 +19,7 @@ import Alert from "@mui/material/Alert";
 import { clearText } from "./EpisodeList";
 import { Consumer } from "../../App.js";
 import { useHistory } from "react-router-dom";
-import { getContrastText, toRGBA } from "../../core/podcastPalette";
+import { buildThemeFromPalette, toRGBA } from "../../core/podcastPalette";
 
 const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 const prod = DEBUG ? '' : ''
@@ -77,12 +77,9 @@ function PodcastHeader(props) {
       {(data) => {
         const state = props.podcast;
         const { palette } = props;
-        const textColor = palette
-          ? getContrastText(palette.primary, "#111111", "#ffffff")
-          : theme.palette.common.white;
-        const subText = palette
-          ? getContrastText(palette.secondary, "rgba(0,0,0,0.65)", "rgba(255,255,255,0.75)")
-          : theme.palette.common.white;
+        const themeColors = palette ? buildThemeFromPalette(palette) : null;
+        const textColor = themeColors?.text || theme.palette.common.white;
+        const subText = themeColors?.subText || theme.palette.common.white;
         const overlay = palette
           ? showDesktop
             ? `linear-gradient(180deg, ${toRGBA(palette.primary, 0.05)} 0%, ${toRGBA(palette.primary, 0.45)} 55%, ${toRGBA(palette.primary, 0.95)} 100%)`
@@ -206,10 +203,10 @@ function PodcastHeader(props) {
                         <Button
                           onClick={saveThisPodcastToLibrary}
                           variant="contained"
-                          sx={{
-                            backgroundColor: palette ? toRGBA(palette.accent, 0.95) : theme.palette.primary.main,
-                            color: getContrastText(palette?.accent, "#111111", "#ffffff"),
-                          }}
+                        sx={{
+                          backgroundColor: themeColors?.accent || theme.palette.primary.main,
+                          color: textColor,
+                        }}
                         >
                           Subscribe
                         </Button>
@@ -228,7 +225,7 @@ function PodcastHeader(props) {
                 pt: { xs: 3, md: 2 },
                 pb: { xs: 2, md: 3 },
                 background: palette
-                  ? `linear-gradient(180deg, ${toRGBA(palette.primary, 0.9)} 0%, ${toRGBA(palette.secondary, 0.2)} 100%)`
+                  ? `linear-gradient(180deg, ${themeColors?.primary} 0%, ${toRGBA(palette.secondary, 0.2)} 100%)`
                   : theme.palette.background.default,
               }}
             >
@@ -257,8 +254,8 @@ function PodcastHeader(props) {
                     onClick={saveThisPodcastToLibrary}
                     variant="contained"
                     sx={{
-                      backgroundColor: palette ? toRGBA(palette.accent, 0.95) : theme.palette.primary.main,
-                      color: getContrastText(palette?.accent, "#111111", "#ffffff"),
+                      backgroundColor: themeColors?.accent || theme.palette.primary.main,
+                      color: textColor,
                     }}
                   >
                     Subscribe

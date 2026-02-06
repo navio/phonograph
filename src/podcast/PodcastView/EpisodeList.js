@@ -29,7 +29,7 @@ import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 
 import { AppContext } from "../../App";
-import { getContrastText, toRGBA } from "../../core/podcastPalette";
+import { buildThemeFromPalette, toRGBA } from "../../core/podcastPalette";
 
 const DOMPurify = createDOMPurify(window);
 const { sanitize } = DOMPurify;
@@ -165,17 +165,12 @@ const EpisodeList = (props) => {
   const { dispatch } = useContext(AppContext);
   const theme = useTheme();
   const palette = props.palette;
-  const textColor = palette
-    ? getContrastText(palette.primary, "#111111", "#ffffff")
-    : theme.palette.text.primary;
-  const subText = palette
-    ? getContrastText(palette.secondary, "rgba(0,0,0,0.65)", "rgba(255,255,255,0.7)")
-    : theme.palette.text.secondary;
-  const accent = palette
-    ? toRGBA(palette.accent, 0.95)
-    : theme.palette.secondary.main;
+  const themeColors = palette ? buildThemeFromPalette(palette) : null;
+  const textColor = themeColors?.text || theme.palette.text.primary;
+  const subText = themeColors?.subText || theme.palette.text.secondary;
+  const accent = themeColors?.accent || theme.palette.secondary.main;
   const listBackground = palette
-    ? `linear-gradient(180deg, ${toRGBA(palette.primary, 0.08)} 0%, ${toRGBA(palette.secondary, 0.18)} 100%)`
+    ? `linear-gradient(180deg, ${themeColors?.primary || toRGBA(palette.primary, 0.08)} 0%, ${themeColors?.secondary || toRGBA(palette.secondary, 0.18)} 100%)`
     : theme.palette.background.default;
 
   useEffect(() => {
