@@ -96,6 +96,9 @@ const ensureAccent = (accent, background, colors = []) => {
 };
 
 const ensureText = (background, colors = []) => {
+  if (luminance(background) > 0.85) {
+    return mix(pickDarkest(colors), BLACK, 0.1);
+  }
   const candidate = bestTextColor(background, [
     mix(pickLightest(colors), WHITE, 0.1),
     mix(pickDarkest(colors), BLACK, 0.15),
