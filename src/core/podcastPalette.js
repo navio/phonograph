@@ -5,6 +5,13 @@ const thief = new ColorThief();
 const DEFAULT_COLOR = [32, 32, 32];
 const WHITE = [255, 255, 255];
 const BLACK = [12, 12, 12];
+const DEFAULT_THEME = {
+  primary: "rgba(255,255,255,0.95)",
+  secondary: "rgba(245,245,245,0.7)",
+  accent: "rgba(20,20,20,0.95)",
+  text: "rgb(15,15,15)",
+  subText: "rgb(70,70,70)",
+};
 
 const isLightColor = (color = DEFAULT_COLOR) => {
   const [red, green, blue] = color;
@@ -40,6 +47,20 @@ const luminance = (color = DEFAULT_COLOR) => {
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 };
 
+const contrastRatio = (a, b) => {
+  const l1 = luminance(a);
+  const l2 = luminance(b);
+  const [bright, dark] = l1 >= l2 ? [l1, l2] : [l2, l1];
+  return (bright + 0.05) / (dark + 0.05);
+};
+
+const bestTextColor = (background, candidates) =>
+  candidates.reduce((best, current) =>
+    contrastRatio(current, background) > contrastRatio(best, background)
+      ? current
+      : best
+  , candidates[0] || BLACK);
+
 const pickDarkest = (colors = []) =>
   colors.reduce((darkest, current) =>
     luminance(current) < luminance(darkest) ? current : darkest
@@ -74,15 +95,21 @@ const ensureAccent = (accent, background, colors = []) => {
 };
 
 const ensureText = (background, colors = []) => {
-  const bgLum = luminance(background);
-  if (bgLum > 0.55) {
-    return mix(pickDarkest(colors), BLACK, 0.15);
+  const candidate = bestTextColor(background, [
+    mix(pickLightest(colors), WHITE, 0.1),
+    mix(pickDarkest(colors), BLACK, 0.15),
+    WHITE,
+    BLACK,
+  ]);
+  const ratio = contrastRatio(candidate, background);
+  if (ratio < 4.5) {
+    return bestTextColor(background, [BLACK, WHITE]);
   }
-  return mix(pickLightest(colors), WHITE, 0.1);
+  return candidate;
 };
 
 export const buildThemeFromPalette = (palette) => {
-  if (!palette) return null;
+  if (!palette || !palette.colors || palette.colors.length === 0) return DEFAULT_THEME;
   const colors = palette.colors || [];
   const primaryBase = ensureBackground(palette.primary, colors);
   const secondaryBase = ensureBackground(palette.secondary, colors);
