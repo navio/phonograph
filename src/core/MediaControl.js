@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useMemo } from "react";
 import { Slider, Box } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -18,6 +18,11 @@ import { AppContext } from "../App.js";
 import SpeedControl from "./SpeedControl";
 import SleepTimer from "./SleepTimer";
 import { PODCASTVIEW } from "../constants";
+import {
+  getImagePalette,
+  toRGBA,
+  getContrastText,
+} from "./podcastPalette";
 
 const toMinutes = (totalTime, currentTime) => {
   totalTime = Math.floor(totalTime - currentTime);
@@ -48,6 +53,7 @@ const MediaControlCard = (props) => {
 
   const [showSpeed, setShowSpeed] = useState(true);
   const [showTimer, setShowTimer] = useState(true);
+  const [palette, setPalette] = useState(null);
 
   const saveStorage = (value) => {
     console.log(value);
@@ -71,6 +77,36 @@ const MediaControlCard = (props) => {
   };
 
   const { episodeInfo = {}, media, playing } = state;
+
+  useEffect(() => {
+    let active = true;
+    getImagePalette(state.podcastImage).then((colors) => {
+      if (active) setPalette(colors);
+    });
+    return () => {
+      active = false;
+    };
+  }, [state.podcastImage]);
+
+  const paletteStyles = useMemo(() => {
+    if (!palette) {
+      return {
+        primary: theme.palette.background.paper,
+        secondary: theme.palette.background.default,
+        accent: theme.palette.secondary.main,
+        text: theme.palette.text.primary,
+        subText: theme.palette.text.secondary,
+      };
+    }
+
+    const primary = toRGBA(palette.primary, 0.96);
+    const secondary = toRGBA(palette.secondary, 0.7);
+    const accent = toRGBA(palette.accent, 0.95);
+    const text = getContrastText(palette.primary);
+    const subText = getContrastText(palette.secondary, "rgba(0,0,0,0.65)", "rgba(255,255,255,0.8)");
+
+    return { primary, secondary, accent, text, subText };
+  }, [palette, theme.palette.background.default, theme.palette.background.paper, theme.palette.secondary.main, theme.palette.text.primary, theme.palette.text.secondary]);
 
   useEffect(() => {
     const overflow = "overflow: hidden;";
@@ -105,10 +141,10 @@ const MediaControlCard = (props) => {
         sx={(theme) =>
           open
             ? {
-                borderTop: `1px solid ${theme.palette.secondary.main}`,
+                borderTop: `1px solid ${paletteStyles.accent}`,
                 position: "fixed",
                 width: "100%",
-                backgroundColor: theme.palette.background.paper,
+                background: `linear-gradient(165deg, ${paletteStyles.primary} 0%, ${paletteStyles.secondary} 100%)`,
                 zIndex: 50,
                 height: "100%",
                 top: 0,
@@ -116,7 +152,7 @@ const MediaControlCard = (props) => {
             : {
                 bottom: "3.50rem",
                 width: "100%",
-                borderTop: `1px solid ${theme.palette.secondary.main}`,
+                borderTop: `1px solid ${paletteStyles.accent}`,
                 backgroundColor: theme.palette.background.paper,
                 position: "fixed",
                 zIndex: 2,
@@ -125,8 +161,11 @@ const MediaControlCard = (props) => {
       >
         {open && (
           <Grid container direction="row-reverse">
-            <Grid item sx={{ padding: ".5rem" }}>
-              <IconButton onClick={() => { saveStorage(!open); setOpen(false); }}>
+          <Grid item sx={{ padding: ".5rem" }}>
+              <IconButton
+                onClick={() => { saveStorage(!open); setOpen(false); }}
+                sx={{ color: paletteStyles.text }}
+              >
                 <CloseIcon />
               </IconButton>
             </Grid>
@@ -161,7 +200,7 @@ const MediaControlCard = (props) => {
                   align={"center"}
                   sx={(theme) => ({
                     padding: "10px 5px",
-                    color: theme.palette.text.primary,
+                    color: paletteStyles.text,
                   })}
                   variant="h6"
                   noWrap
@@ -171,7 +210,7 @@ const MediaControlCard = (props) => {
               )}
 
               {open && state.podcastAuthor && (
-                <Typography variant="body2" align="center" gutterBottom>
+                <Typography variant="body2" align="center" gutterBottom sx={{ color: paletteStyles.subText }}>
                   {state.podcastAuthor}
                 </Typography>
               )}
@@ -185,6 +224,7 @@ const MediaControlCard = (props) => {
                     height: "rem",
                     display: "block",
                     overflow: "hidden",
+                    color: paletteStyles.subText,
                   }}
                   gutterBottom
                 >
@@ -222,6 +262,7 @@ const MediaControlCard = (props) => {
                         aria-label="Play/pause"
                         onClick={() => props.handler()}
                         data-guid={state.playing}
+                        sx={{ color: open ? paletteStyles.text : "inherit" }}
                       >
                         {state.playing === (episodeInfo && episodeInfo.guid) &&
                         state.status !== "paused" ? (
@@ -230,6 +271,7 @@ const MediaControlCard = (props) => {
                               width: "3rem",
                               maxHeight: "3rem",
                               minHeight: "2rem",
+                              color: open ? paletteStyles.text : "inherit",
                             }}
                           />
                         ) : (
@@ -238,6 +280,7 @@ const MediaControlCard = (props) => {
                               width: "3rem",
                               maxHeight: "3rem",
                               minHeight: "2rem",
+                              color: open ? paletteStyles.text : "inherit",
                             }}
                           />
                         )}
@@ -246,28 +289,46 @@ const MediaControlCard = (props) => {
                   </>
                 )}
                 <Grid item xs={2} md={1} sx={{ textAlign: "center" }}>
-                  <span>{toMin(state.currentTime)}</span>
+                  <span style={{ color: open ? paletteStyles.subText : undefined }}>
+                    {toMin(state.currentTime)}
+                  </span>
                 </Grid>
                 <Grid item xs={5} md={6} sx={{ position: "relative", top: "-.5rem" }}>
                   <LinearProgress
-                    sx={{ position: "absolute", top: "7px", width: "100%" }}
+                    sx={{
+                      position: "absolute",
+                      top: "7px",
+                      width: "100%",
+                      backgroundColor: open ? toRGBA(palette?.secondary, 0.35) : undefined,
+                      "& .MuiLinearProgress-bar": {
+                        backgroundColor: paletteStyles.accent,
+                      },
+                    }}
                     variant="buffer"
                     value={state.played}
                     valueBuffer={state.loaded}
                   />
                   <Slider
-                    sx={{ padding: 0, position: "absolute", top: "8px", width: "100%" }}
+                    sx={{
+                      padding: 0,
+                      position: "absolute",
+                      top: "8px",
+                      width: "100%",
+                      color: paletteStyles.accent,
+                    }}
                     value={state.played}
                     aria-labelledby="audio"
                     onChange={props.seek}
                   />
                 </Grid>
                 <Grid item xs={2} md={1} sx={{ textAlign: "center" }}>
-                  <span>{toMinutes(state.duration, state.currentTime)}</span>
+                  <span style={{ color: open ? paletteStyles.subText : undefined }}>
+                    {toMinutes(state.duration, state.currentTime)}
+                  </span>
                 </Grid>
                 {!open && showExpand && (
                   <Grid item xs={1} sx={{ textAlign: "right", paddingRight: ".14rem" }}>
-                    <IconButton onClick={() => setOpen(true)}>
+                    <IconButton onClick={() => setOpen(true)} sx={{ color: open ? paletteStyles.text : "inherit" }}>
                       <ExpandLessIcon />
                     </IconButton>
                   </Grid>
@@ -287,6 +348,7 @@ const MediaControlCard = (props) => {
                         style={{ padding: "0" }}
                         aria-label="Previous"
                         onClick={props.rewind}
+                        sx={{ color: paletteStyles.text }}
                       >
                         {theme.direction === "rtl" ? (
                           <SkipNextIcon
@@ -295,6 +357,7 @@ const MediaControlCard = (props) => {
                               position: "absolute",
                               height: 40,
                               width: 40,
+                              color: paletteStyles.text,
                             }}
                           />
                         ) : (
@@ -304,6 +367,7 @@ const MediaControlCard = (props) => {
                               position: "absolute",
                               height: 40,
                               width: 40,
+                              color: paletteStyles.text,
                             }}
                           />
                         )}
@@ -315,12 +379,13 @@ const MediaControlCard = (props) => {
                         aria-label="Play/pause"
                         onClick={() => props.handler()}
                         data-guid={state.playing}
+                        sx={{ color: paletteStyles.text }}
                       >
                         {state.playing === (episodeInfo && episodeInfo.guid) &&
                         state.status !== "paused" ? (
-                          <PauseIcon sx={{ height: 70, width: 70 }} />
+                          <PauseIcon sx={{ height: 86, width: 86, color: paletteStyles.text }} />
                         ) : (
-                          <PlayArrowIcon sx={{ height: 70, width: 70 }} />
+                          <PlayArrowIcon sx={{ height: 86, width: 86, color: paletteStyles.text }} />
                         )}
                       </IconButton>
                     </Grid>
@@ -334,6 +399,7 @@ const MediaControlCard = (props) => {
                         style={{ padding: "0" }}
                         aria-label="Next"
                         onClick={props.forward}
+                        sx={{ color: paletteStyles.text }}
                       >
                         {theme.direction === "rtl" ? (
                           <SkipPreviousIcon
@@ -342,6 +408,7 @@ const MediaControlCard = (props) => {
                               position: "absolute",
                               height: 40,
                               width: 40,
+                              color: paletteStyles.text,
                             }}
                           />
                         ) : (
@@ -351,6 +418,7 @@ const MediaControlCard = (props) => {
                               position: "absolute",
                               height: 40,
                               width: 40,
+                              color: paletteStyles.text,
                             }}
                           />
                         )}

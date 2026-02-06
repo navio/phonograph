@@ -12,6 +12,7 @@
     "@mui/icons-material": "^6.1.10",
     "@mui/material": "^6.1.10",
     "audioqueue": "^1.1.1",
+    "colorthief": "^2.4.0",
     "dayjs": "^1.8.23",
     "dompurify": "^2.0.10",
     "encoding": "^0.1.12",
