@@ -1,21 +1,9 @@
 import React, {useState, useEffect} from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Chip from "@material-ui/core/Chip";
-
-export const useStyles = makeStyles((theme) => ({
-  root: {
-    display: "flex",
-    justifyContent: "center",
-    flexWrap: "wrap",
-    "& > *": {
-      margin: theme.spacing(0.5),
-    },
-  },
-}));
+import Chip from "@mui/material/Chip";
+import Box from "@mui/material/Box";
 
 
 export default ({getPopularPodcasts, selected}) => {
-  const classes = useStyles();
   const [genres, setGenres] = useState([]);
 
   const getCategories = () => {
@@ -33,7 +21,16 @@ export default ({getPopularPodcasts, selected}) => {
     getCategories()
   },[])
   return (
-    <div className={classes.root}>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        flexWrap: "wrap",
+        "& > *": {
+          m: 0.5,
+        },
+      }}
+    >
       {genres && genres.sort((a,b)=> {
         if(a.name < b.name) { return -1; }
         if(a.name > b.name) { return 1; }
@@ -42,9 +39,9 @@ export default ({getPopularPodcasts, selected}) => {
         <Chip key={id} 
               onClick={()=>getPopularPodcasts(genre.id)} 
               label={genre.name} 
-              variant={ (selected === genre.id) ? 'default' : 'outlined'} 
+              variant={ (selected === genre.id) ? 'filled' : 'outlined'} 
               color={ genre.name === "Top" ? "secondary" : "primary" } />
       ))}
-    </div>
+    </Box>
   );
 }

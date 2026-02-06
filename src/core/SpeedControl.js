@@ -1,8 +1,8 @@
 import React, { useContext, useState, useEffect } from "react";
-import ToggleButton from '@material-ui/lab/ToggleButton';
-import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
-import SpeedIcon from '@material-ui/icons/Speed';
-import IconButton from "@material-ui/core/IconButton";
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import SpeedIcon from "@mui/icons-material/Speed";
+import IconButton from "@mui/material/IconButton";
 
 
 import { AppContext } from "../App.js";
@@ -41,4 +41,3 @@ export default ({onClick}) => {
     </>);
 
 };
-

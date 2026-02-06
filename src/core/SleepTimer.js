@@ -1,8 +1,8 @@
 import React, { useContext, useState, useRef } from "react";
-import ToggleButton from '@material-ui/lab/ToggleButton';
-import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
-import IconButton from "@material-ui/core/IconButton";
-import NightsStayIcon from '@material-ui/icons/NightsStay';
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import IconButton from "@mui/material/IconButton";
+import NightsStayIcon from "@mui/icons-material/NightsStay";
 
 
 import { AppContext } from "../App.js";
@@ -97,4 +97,3 @@ export default ({onClick}) => {
     </>);
 
 };
-

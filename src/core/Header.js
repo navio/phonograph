@@ -1,39 +1,26 @@
 import React from "react";
-import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-// import Button from '@material-ui/core/Button';
-import IconButton from "@material-ui/core/IconButton";
-import MenuIcon from "@material-ui/icons/Menu";
-
-const styles = {
-  root: {
-    position: "fixed",
-    top: 0,
-    width: "100%",
-    margin: 0,
-    zIndex: 4000,
-  },
-  menuButton: {
-    marginLeft: -12,
-    marginRight: 20,
-  },
-  behindButton: {
-    paddingTop: 62,
-  },
-};
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import MenuIcon from "@mui/icons-material/Menu";
 
 function NavigationApp(props) {
-  const { classes } = props;
   return (
     <div>
-      <div className={classes.root}>
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          width: "100%",
+          margin: 0,
+          zIndex: 4000,
+        }}
+      >
         <AppBar position="static">
           <Toolbar>
             <IconButton
-              className={classes.menuButton}
+              sx={{ marginLeft: -1.5, marginRight: 2.5 }}
               color="inherit"
               aria-label="Menu"
             >
@@ -42,7 +29,6 @@ function NavigationApp(props) {
             <Typography
               variant="h2"
               color="inherit"
-              className={classes.flex}
             >
               Podcast
             </Typography>
@@ -50,13 +36,9 @@ function NavigationApp(props) {
           </Toolbar>
         </AppBar>
       </div>
-      <div className={classes.behindButton}></div>
+      <div style={{ paddingTop: 62 }}></div>
     </div>
   );
 }
 
-NavigationApp.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
-
-export default withStyles(styles)(NavigationApp);
+export default NavigationApp;

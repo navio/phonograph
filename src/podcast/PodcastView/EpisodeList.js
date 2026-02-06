@@ -1,33 +1,31 @@
 import React, { useEffect, useState, useContext } from "react";
-import PropTypes from "prop-types";
-import { withStyles } from "@material-ui/core/styles";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import Divider from "@material-ui/core/Divider";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import Dialog from "@material-ui/core/Dialog";
-import PlayArrowIcon from "@material-ui/icons/PlayArrow";
-import PauseIcon from "@material-ui/icons/Pause";
-import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import DialogContent from "@material-ui/core/DialogContent";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Divider from "@mui/material/Divider";
+import DialogTitle from "@mui/material/DialogTitle";
+import Dialog from "@mui/material/Dialog";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import PauseIcon from "@mui/icons-material/Pause";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
+import DialogContent from "@mui/material/DialogContent";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { Chip, IconButton } from "@material-ui/core";
+import { Chip, IconButton } from "@mui/material";
 import createDOMPurify from "dompurify";
 import { Consumer } from "../../App.js";
 import PS from "podcastsuite";
-import CheckCircleIcon from "@material-ui/icons/CheckCircle";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { completeEpisodeHistory as markAsFinished } from "../../reducer";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 
-import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 
-import MuiAlert from "@material-ui/lab/Alert";
-import Snackbar from "@material-ui/core/Snackbar";
+import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
 
 import { AppContext } from "../../App";
 
@@ -40,12 +38,6 @@ export const clearText = (html) => {
   tmp.innerHTML = html;
   return tmp.textContent || tmp.innerText;
 };
-
-export const styles = (theme) => ({
-  inProgress: {
-    color: theme.palette.primary.main,
-  },
-});
 
 dayjs.extend(relativeTime);
 const today = dayjs();
@@ -83,7 +75,6 @@ const IsAvaliable = (url) => {
 
 const EpisodeListDescription = (props) => {
   const episode = props.episode;
-  const classes = props.classes;
   const { currentTime, duration, completed } = props.history || {};
   const total =
     currentTime && duration ? Math.round((currentTime * 100) / duration) : null;
@@ -110,7 +101,7 @@ const EpisodeListDescription = (props) => {
                 variant="outlined"
                 size="small"
                 label={`Progress: ${total}%`}
-                className={classes.inProgress}
+                color="primary"
               />
             )}
             {episode.episodeType && episode.episodeType !== "full" && (
@@ -154,7 +145,7 @@ const EpisodeList = (props) => {
   const [open, setOpen] = React.useState(null);
   const [amount, setAmount] = React.useState(1);
   const [fresh, reFresh] = React.useState(Date.now());
-  const { classes, episodes, podcast, playNext, playLast } = props;
+  const { episodes, podcast, playNext, playLast } = props;
   const episodeList = episodes.slice(0, 20 * amount);
   const [drawer, openDrawer] = useState(false);
   const [currentEpisode, setCurrentEpisode] = useState(null);
@@ -211,10 +202,6 @@ const EpisodeList = (props) => {
 
   const closeMessage = () => setMessage(null);
 
-  function Alert(props) {
-    return <MuiAlert elevation={6} variant="filled" {...props} />;
-  }
-
   useEffect(() => {
     // console.log("getting new history");
     getHistory(props.current);
@@ -227,12 +214,14 @@ const EpisodeList = (props) => {
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         autoHideDuration={4000}
       >
-        <Alert severity="success">{message}</Alert>
+        <Alert elevation={6} variant="filled" severity="success">
+          {message}
+        </Alert>
       </Snackbar>
       <Description handleClose={handleClose} open={open} />
       <Consumer>
         {(state) => (
-          <div className={classes.root}>
+          <div>
             {episodeList ? (
               <>
                 <List>
@@ -241,11 +230,7 @@ const EpisodeList = (props) => {
                     return (
                       <div key={episode.guid}>
                         <ListItem
-                          className={
-                            state.playing === episode.guid
-                              ? classes.selected
-                              : null
-                          }
+                          selected={state.playing === episode.guid}
                         >
                           <ListItemIcon>
                             <IconButton
@@ -259,18 +244,15 @@ const EpisodeList = (props) => {
                               props.status !== "paused" ? (
                                 <PauseIcon
                                   fontSize="large"
-                                  className={classes.playIcon}
                                 />
                               ) : (
                                 <PlayArrowIcon
                                   fontSize="large"
-                                  className={classes.playIcon}
                                 />
                               )}
                             </IconButton>
                           </ListItemIcon>
                           <EpisodeListDescription
-                            classes={classes}
                             onClick={() => {
 
                               setOpen({
@@ -337,7 +319,7 @@ const EpisodeList = (props) => {
                   })}
                 </List>
                 {episodes.length > episodeList.length && (
-                  <List align="center">
+                  <List sx={{ textAlign: "center" }}>
                     <Button
                       onClick={() => setAmount(amount + 1)}
                       variant="outlined"
@@ -352,8 +334,8 @@ const EpisodeList = (props) => {
                 )}
               </>
             ) : (
-              <div className={classes.progressContainer}>
-                <CircularProgress className={classes.progress} />
+              <div>
+                <CircularProgress />
               </div>
             )}
           </div>
@@ -362,9 +344,4 @@ const EpisodeList = (props) => {
     </>
   );
 };
-
-EpisodeList.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
-
-export default withStyles(styles)(EpisodeList);
+export default EpisodeList;
