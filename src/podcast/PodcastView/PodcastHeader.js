@@ -84,8 +84,12 @@ function PodcastHeader(props) {
           ? getContrastText(palette.secondary, "rgba(0,0,0,0.65)", "rgba(255,255,255,0.75)")
           : theme.palette.common.white;
         const overlay = palette
-          ? `linear-gradient(180deg, ${toRGBA(palette.primary, 0.15)} 0%, ${toRGBA(palette.primary, 0.6)} 55%, ${toRGBA(palette.primary, 0.92)} 100%)`
-          : "linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.85) 100%)";
+          ? showDesktop
+            ? `linear-gradient(180deg, ${toRGBA(palette.primary, 0.05)} 0%, ${toRGBA(palette.primary, 0.45)} 55%, ${toRGBA(palette.primary, 0.95)} 100%)`
+            : `linear-gradient(180deg, ${toRGBA(palette.primary, 0.15)} 0%, ${toRGBA(palette.primary, 0.6)} 55%, ${toRGBA(palette.primary, 0.92)} 100%)`
+          : showDesktop
+            ? "linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.65) 100%)"
+            : "linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.85) 100%)";
         return (
           <>
             <Snackbar
@@ -100,7 +104,7 @@ function PodcastHeader(props) {
             </Snackbar>
             <Box
               sx={{
-                minHeight: "100vh",
+                minHeight: showDesktop ? "15vh" : "100vh",
                 position: "relative",
                 backgroundImage: state.image ? `url(${prod + state.image})` : "none",
                 backgroundSize: "cover",
@@ -167,53 +171,102 @@ function PodcastHeader(props) {
                   </Grid>
                 </Grid>
 
-                <Box
-                  sx={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    px: { xs: 2, md: 4 },
-                    pb: { xs: 3, md: 5 },
-                  }}
-                >
-                  <Typography
-                    variant={showDesktop ? "h3" : "h4"}
-                    sx={{ color: textColor, fontWeight: 700 }}
+                {!showDesktop && (
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      px: { xs: 2, md: 4 },
+                      pb: { xs: 3, md: 5 },
+                    }}
                   >
-                    {state.title}
-                  </Typography>
-                  {state.author && (
-                    <Typography variant="subtitle1" sx={{ color: subText, mt: 0.5 }}>
-                      {state.author}
-                    </Typography>
-                  )}
-                  {state.description && (
                     <Typography
-                      variant="body1"
-                      sx={{ color: subText, mt: 1, maxWidth: "60ch" }}
+                      variant="h4"
+                      sx={{ color: textColor, fontWeight: 700 }}
                     >
-                      {clearText(state.description)}
+                      {state.title}
                     </Typography>
-                  )}
-                  <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: 2 }}>
-                    {!isInLibrary && (
-                      <Button
-                        onClick={saveThisPodcastToLibrary}
-                        variant="contained"
-                        sx={{
-                          backgroundColor: palette ? toRGBA(palette.accent, 0.95) : theme.palette.primary.main,
-                          color: getContrastText(palette?.accent, "#111111", "#ffffff"),
-                        }}
-                      >
-                        Subscribe
-                      </Button>
+                    {state.author && (
+                      <Typography variant="subtitle1" sx={{ color: subText, mt: 0.5 }}>
+                        {state.author}
+                      </Typography>
                     )}
-                    <Typography sx={{ color: subText }}>
-                      <b>Episodes:</b> {state.items.length}
-                    </Typography>
+                    {state.description && (
+                      <Typography
+                        variant="body1"
+                        sx={{ color: subText, mt: 1, maxWidth: "60ch" }}
+                      >
+                        {clearText(state.description)}
+                      </Typography>
+                    )}
+                    <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: 2 }}>
+                      {!isInLibrary && (
+                        <Button
+                          onClick={saveThisPodcastToLibrary}
+                          variant="contained"
+                          sx={{
+                            backgroundColor: palette ? toRGBA(palette.accent, 0.95) : theme.palette.primary.main,
+                            color: getContrastText(palette?.accent, "#111111", "#ffffff"),
+                          }}
+                        >
+                          Subscribe
+                        </Button>
+                      )}
+                      <Typography sx={{ color: subText }}>
+                        <b>Episodes:</b> {state.items.length}
+                      </Typography>
+                    </Box>
                   </Box>
-                </Box>
+                )}
+              </Box>
+            </Box>
+            <Box
+              sx={{
+                px: { xs: 2, md: 4 },
+                pt: { xs: 3, md: 2 },
+                pb: { xs: 2, md: 3 },
+                background: palette
+                  ? `linear-gradient(180deg, ${toRGBA(palette.primary, 0.9)} 0%, ${toRGBA(palette.secondary, 0.2)} 100%)`
+                  : theme.palette.background.default,
+              }}
+            >
+              <Typography
+                variant={showDesktop ? "h3" : "h4"}
+                sx={{ color: textColor, fontWeight: 700 }}
+              >
+                {state.title}
+              </Typography>
+              {state.author && (
+                <Typography variant="subtitle1" sx={{ color: subText, mt: 0.5 }}>
+                  {state.author}
+                </Typography>
+              )}
+              {state.description && (
+                <Typography
+                  variant="body1"
+                  sx={{ color: subText, mt: 1, maxWidth: "65ch" }}
+                >
+                  {clearText(state.description)}
+                </Typography>
+              )}
+              <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: 2 }}>
+                {!isInLibrary && (
+                  <Button
+                    onClick={saveThisPodcastToLibrary}
+                    variant="contained"
+                    sx={{
+                      backgroundColor: palette ? toRGBA(palette.accent, 0.95) : theme.palette.primary.main,
+                      color: getContrastText(palette?.accent, "#111111", "#ffffff"),
+                    }}
+                  >
+                    Subscribe
+                  </Button>
+                )}
+                <Typography sx={{ color: subText }}>
+                  <b>Episodes:</b> {state.items.length}
+                </Typography>
               </Box>
             </Box>
           </>
