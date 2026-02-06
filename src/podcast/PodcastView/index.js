@@ -35,7 +35,7 @@ export default (props) => {
     }
   }
 
-  const { state: global, debug, engine, dispatch, player } = useContext(AppContext);
+  const { state: global, debug, engine, dispatch, player, playerRef } = useContext(AppContext);
   // console.log('ar',global, engine, player)
   const [podcast, setPodcast] = useState({});
   const [error, setError] = useState({});
@@ -164,19 +164,25 @@ export default (props) => {
 
   const playButton = (guid, currentTime, podcast) => (ev) => {
     const episode = episodes.current.get(guid);
+    const audio = playerRef?.current || player;
+
+    if (!audio) {
+      console.warn("Audio element not ready yet.");
+      return;
+    }
 
     if (global.playing === guid) {
       if (global.status === "paused") {
-        player.play().then(() => {
+        audio.play().then(() => {
           if (currentTime) {
-            player.currentTime = currentTime;
+            audio.currentTime = currentTime;
           }
         })
         updateMediaSessionState('playing');
         dispatch({ type: 'playingStatus', status: "playing" });
         recordEpisode(global)
       } else {
-        player.pause().then(
+        audio.pause().then(
           () => recordEpisode(global)
         );
         dispatch({ type: 'playingStatus', status: "paused" });
@@ -185,9 +191,9 @@ export default (props) => {
     } else {
 
       const proxy = !debug ? '' : '';
-      console.log('loading new audio', player);
+      console.log('loading new audio', audio);
 
-      player.setAttribute("src", proxy+episode.media);
+      audio.setAttribute("src", proxy+episode.media);
 
       const payload = {
         audioOrigin: podcastURL,
@@ -239,7 +245,7 @@ export default (props) => {
 
       if (currentTime) {
         console.log('setting time', currentTime)
-        player.currentTime = currentTime;
+        audio.currentTime = currentTime;
       }
 
       recordEpisode(global);

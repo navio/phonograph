@@ -7,22 +7,27 @@ import IconButton from "@mui/material/IconButton";
 
 import { AppContext } from "../App.js";
 
-export default ({onClick}) => {
+export default ({onClick, color}) => {
     
-    const { player } = useContext(AppContext);
-    const [speed, setSpeed] = useState(player.playbackRate);
+    const { player, playerRef } = useContext(AppContext);
+    const audio = playerRef?.current || player;
+    const [speed, setSpeed] = useState(audio?.playbackRate || 1.0);
     const [visible, setVisible] = useState(false)
     const changeSpeed = (newSpeed) =>{
         onClick(val => !val) 
-        if (newSpeed ){
+        if (newSpeed && audio){
             setSpeed(newSpeed);
-            player.playbackRate = newSpeed;
+            audio.playbackRate = newSpeed;
         }
         setVisible(false);
     }
 
     return (<>
-        <IconButton onClick={() => { setVisible((val) => !val); onClick(val => !val); } }>
+        <IconButton
+            onClick={() => { setVisible((val) => !val); onClick(val => !val); } }
+            disabled={!audio}
+            sx={{ color }}
+        >
         { speed !== 1.0 ? `${speed}x ` : <SpeedIcon /> } 
         </IconButton>
         <br />
@@ -34,7 +39,12 @@ export default ({onClick}) => {
             aria-label="text alignment"
         >
             {[1.0, 1.2, 1.5, 1.7, 2.0].map((speed) =>
-                <ToggleButton key={speed} value={speed} aria-label="left aligned">
+                <ToggleButton
+                    key={speed}
+                    value={speed}
+                    aria-label="left aligned"
+                    sx={{ color }}
+                >
                     {Number(speed).toFixed(1)}
                 </ToggleButton>)}
         </ToggleButtonGroup>}

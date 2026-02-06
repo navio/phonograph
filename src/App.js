@@ -134,7 +134,15 @@ const App = ({}) => {
   return (
     <ThemeProvider theme={finalTheme}>
       <AppContext.Provider
-        value={{ state, dispatch, engine, debug, worker, player: player.current }}
+        value={{
+          state,
+          dispatch,
+          engine,
+          debug,
+          worker,
+          player: player.current,
+          playerRef: player,
+        }}
       >
         <CssBaseline />
 

@@ -144,7 +144,7 @@ const MediaControlCard = (props) => {
                 borderTop: `1px solid ${paletteStyles.accent}`,
                 position: "fixed",
                 width: "100%",
-                background: `linear-gradient(165deg, ${paletteStyles.primary} 0%, ${paletteStyles.secondary} 100%)`,
+                background: `linear-gradient(160deg, ${paletteStyles.primary} 0%, ${paletteStyles.secondary} 100%)`,
                 zIndex: 50,
                 height: "100%",
                 top: 0,
@@ -153,7 +153,7 @@ const MediaControlCard = (props) => {
                 bottom: "3.50rem",
                 width: "100%",
                 borderTop: `1px solid ${paletteStyles.accent}`,
-                backgroundColor: theme.palette.background.paper,
+                background: `linear-gradient(160deg, ${toRGBA(palette?.primary, 0.9)} 0%, ${toRGBA(palette?.secondary, 0.6)} 100%)`,
                 position: "fixed",
                 zIndex: 2,
               }
@@ -187,6 +187,9 @@ const MediaControlCard = (props) => {
                       display: "block",
                       margin: "0 auto",
                       paddingBottom: "5vh",
+                      borderRadius: "16px",
+                      boxShadow: `0 24px 60px ${toRGBA(palette?.primary, 0.35)}`,
+                      maxWidth: "460px",
                     }}
                     src={state.podcastImage}
                   />
@@ -258,38 +261,38 @@ const MediaControlCard = (props) => {
                       </Grid>
                     }
                     <Grid item xs={1} sx={{ textAlign: "center" }}>
-                      <IconButton
-                        aria-label="Play/pause"
-                        onClick={() => props.handler()}
-                        data-guid={state.playing}
-                        sx={{ color: open ? paletteStyles.text : "inherit" }}
-                      >
-                        {state.playing === (episodeInfo && episodeInfo.guid) &&
-                        state.status !== "paused" ? (
-                          <PauseIcon
-                            sx={{
-                              width: "3rem",
-                              maxHeight: "3rem",
-                              minHeight: "2rem",
-                              color: open ? paletteStyles.text : "inherit",
-                            }}
-                          />
-                        ) : (
-                          <PlayArrowIcon
-                            sx={{
-                              width: "3rem",
-                              maxHeight: "3rem",
-                              minHeight: "2rem",
-                              color: open ? paletteStyles.text : "inherit",
-                            }}
-                          />
-                        )}
-                      </IconButton>
+                  <IconButton
+                    aria-label="Play/pause"
+                    onClick={() => props.handler()}
+                    data-guid={state.playing}
+                    sx={{ color: paletteStyles.text }}
+                  >
+                    {state.playing === (episodeInfo && episodeInfo.guid) &&
+                    state.status !== "paused" ? (
+                      <PauseIcon
+                        sx={{
+                          width: "3rem",
+                          maxHeight: "3rem",
+                          minHeight: "2rem",
+                          color: paletteStyles.text,
+                        }}
+                      />
+                    ) : (
+                      <PlayArrowIcon
+                        sx={{
+                          width: "3rem",
+                          maxHeight: "3rem",
+                          minHeight: "2rem",
+                          color: paletteStyles.text,
+                        }}
+                      />
+                    )}
+                  </IconButton>
                     </Grid>
                   </>
                 )}
                 <Grid item xs={2} md={1} sx={{ textAlign: "center" }}>
-                  <span style={{ color: open ? paletteStyles.subText : undefined }}>
+                  <span style={{ color: paletteStyles.subText }}>
                     {toMin(state.currentTime)}
                   </span>
                 </Grid>
@@ -322,13 +325,13 @@ const MediaControlCard = (props) => {
                   />
                 </Grid>
                 <Grid item xs={2} md={1} sx={{ textAlign: "center" }}>
-                  <span style={{ color: open ? paletteStyles.subText : undefined }}>
+                  <span style={{ color: paletteStyles.subText }}>
                     {toMinutes(state.duration, state.currentTime)}
                   </span>
                 </Grid>
                 {!open && showExpand && (
                   <Grid item xs={1} sx={{ textAlign: "right", paddingRight: ".14rem" }}>
-                    <IconButton onClick={() => setOpen(true)} sx={{ color: open ? paletteStyles.text : "inherit" }}>
+                    <IconButton onClick={() => setOpen(true)} sx={{ color: paletteStyles.text }}>
                       <ExpandLessIcon />
                     </IconButton>
                   </Grid>
@@ -434,12 +437,20 @@ const MediaControlCard = (props) => {
                     >
                       {showSpeed && (
                         <Grid item sx={{ textAlign: "center" }}>
-                          <SpeedControl fontSize="large" onClick={setShowTimer} />
+                          <SpeedControl
+                            fontSize="large"
+                            onClick={setShowTimer}
+                            color={paletteStyles.text}
+                          />
                         </Grid>
                       )}
                       {showTimer && (
                         <Grid item sx={{ textAlign: "center" }}>
-                          <SleepTimer fontSize="large" onClick={setShowSpeed} />
+                          <SleepTimer
+                            fontSize="large"
+                            onClick={setShowSpeed}
+                            color={paletteStyles.text}
+                          />
                         </Grid>
                       )}
                       {/* <Grid item>
