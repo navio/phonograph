@@ -20,9 +20,10 @@ const convertMinsToHrsMins = (mins) => {
     return `${h}:${m}`;
 };
 
-export default ({onClick}) => {
+export default ({onClick, color}) => {
 
-    const { player } = useContext(AppContext);
+    const { player, playerRef } = useContext(AppContext);
+    const audio = playerRef?.current || player;
 
     const [timeto, setTimeto] = useState(null);
     const [visible, setVisible] = useState(false);
@@ -44,7 +45,8 @@ export default ({onClick}) => {
                 clearInterval(intervalId);
             }
 
-            player.play();
+            if (!audio) return;
+            audio.play();
             const toMs = 1000 * 60 * time;
             setTimeLeft(toMs);
 
@@ -58,9 +60,9 @@ export default ({onClick}) => {
                 setTimeLeft(null);
                 setVisible(false);
 
-                player.pause();
+                audio.pause();
             }, toMs);
-            player.addEventListener('pause',() => {
+            audio.addEventListener('pause',() => {
                 clearTimeout(window.timerId);
                 clearInterval(window.intervalId);
                 setTimeto(null);
@@ -77,7 +79,11 @@ export default ({onClick}) => {
     }
 
     return (<>
-        <IconButton onClick={() => { setVisible(val => !val); onClick(val => !val) }}>
+        <IconButton
+            onClick={() => { setVisible(val => !val); onClick(val => !val) }}
+            disabled={!audio}
+            sx={{ color }}
+        >
             <NightsStayIcon />
             {timeLeft && toMin(timeLeft / 1000)}
         </IconButton>
@@ -90,7 +96,12 @@ export default ({onClick}) => {
             aria-label="text alignment"
         >
             {[1, 5, 15, 30, 45, 60].map((time) =>
-                <ToggleButton key={time} value={time} aria-label="left aligned">
+                <ToggleButton
+                    key={time}
+                    value={time}
+                    aria-label="left aligned"
+                    sx={{ color }}
+                >
                     {time}
                 </ToggleButton>)}
         </ToggleButtonGroup>}

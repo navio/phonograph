@@ -3,6 +3,7 @@ import { AppContext } from '../../App';
 import useOnline from '../../engine/useOnline';
 import { PODCASTVIEW, DISCOVERY } from '../../constants';
 import { recordEpisode as saveEpisodeState } from '../../reducer'
+import { getImagePalette } from "../../core/podcastPalette";
 
 import Loading from '../../core/Loading';
 
@@ -35,11 +36,12 @@ export default (props) => {
     }
   }
 
-  const { state: global, debug, engine, dispatch, player } = useContext(AppContext);
+  const { state: global, debug, engine, dispatch, player, playerRef } = useContext(AppContext);
   // console.log('ar',global, engine, player)
   const [podcast, setPodcast] = useState({});
   const [error, setError] = useState({});
   const [shouldRefresh, setToRefresh] = useState(Date.now());
+  const [palette, setPalette] = useState(null);
 
   const podcastURL = commonRules(bringAPodcast || global.current);
 
@@ -164,19 +166,25 @@ export default (props) => {
 
   const playButton = (guid, currentTime, podcast) => (ev) => {
     const episode = episodes.current.get(guid);
+    const audio = playerRef?.current || player;
+
+    if (!audio) {
+      console.warn("Audio element not ready yet.");
+      return;
+    }
 
     if (global.playing === guid) {
       if (global.status === "paused") {
-        player.play().then(() => {
+        audio.play().then(() => {
           if (currentTime) {
-            player.currentTime = currentTime;
+            audio.currentTime = currentTime;
           }
         })
         updateMediaSessionState('playing');
         dispatch({ type: 'playingStatus', status: "playing" });
         recordEpisode(global)
       } else {
-        player.pause().then(
+        audio.pause().then(
           () => recordEpisode(global)
         );
         dispatch({ type: 'playingStatus', status: "paused" });
@@ -185,9 +193,9 @@ export default (props) => {
     } else {
 
       const proxy = !debug ? '' : '';
-      console.log('loading new audio', player);
+      console.log('loading new audio', audio);
 
-      player.setAttribute("src", proxy+episode.media);
+      audio.setAttribute("src", proxy+episode.media);
 
       const payload = {
         audioOrigin: podcastURL,
@@ -239,7 +247,7 @@ export default (props) => {
 
       if (currentTime) {
         console.log('setting time', currentTime)
-        player.currentTime = currentTime;
+        audio.currentTime = currentTime;
       }
 
       recordEpisode(global);
@@ -259,12 +267,27 @@ export default (props) => {
     getPodcast()
   }, []);
 
+  useEffect(() => {
+    if (!podcast.image) {
+      setPalette(null);
+      return;
+    }
+    let active = true;
+    getImagePalette(podcast.image).then((colors) => {
+      if (active) setPalette(colors);
+    });
+    return () => {
+      active = false;
+    };
+  }, [podcast.image]);
+
   return podcast.domain ? <>
     <PodcastHeader
       savePodcast={savePodcast}
       podcast={podcast}
       removePodcast={removePodcast}
       inLibrary={isPodcastInLibrary}
+      palette={palette}
     />
     <EpisodeList
       episodes={podcast.items}
@@ -276,6 +299,7 @@ export default (props) => {
       playing={global.playing}
       current={global.current}
       shouldRefresh={shouldRefresh}
+      palette={palette}
     />
   </>
     : <Typography align='center' style={{ paddingTop: '20%' }} letterSpacing={6} variant="h4">
