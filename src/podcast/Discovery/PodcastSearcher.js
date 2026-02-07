@@ -17,7 +17,17 @@ export default class PodcastSearcher {
       'User-Agent': 'podcastsuite',
       'Accept': 'application/json',
     }
-    const response = fetch(api, { headers, signal }).then(results => results.json());
+    const response = fetch(api, { headers, signal }).then(async (results) => {
+      const text = await results.text();
+      if (!results.ok || !text) {
+        return {};
+      }
+      try {
+        return JSON.parse(text);
+      } catch (error) {
+        return {};
+      }
+    });
     return response;
   }
 
@@ -41,7 +51,7 @@ export default class PodcastSearcher {
   }
 
   apple(term) {
-    return this.querySearch("`/search/?term=${term}`", term);
+    return this.querySearch("`/api/appleSearch?term=${term}`", term);
   }
 
 
