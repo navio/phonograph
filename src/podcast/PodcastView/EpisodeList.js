@@ -34,13 +34,31 @@ import { buildThemeFromPalette, toRGBA } from "../../core/podcastPalette";
 const DOMPurify = createDOMPurify(window);
 const { sanitize } = DOMPurify;
 const db = PS.createDatabase("history", "podcasts");
-const MIN_ICON_CONTRAST = 3;
+const MIN_ICON_CONTRAST = 4.5;
 
-const parseRGB = (value) => {
+const parseColor = (value) => {
   if (!value || typeof value !== "string") return null;
-  const match = value.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+  if (value === "transparent") {
+    return { rgb: [0, 0, 0], alpha: 0 };
+  }
+  const hexMatch = value.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+  if (hexMatch) {
+    const hex = hexMatch[1];
+    const full = hex.length === 3
+      ? hex.split("").map((c) => c + c).join("")
+      : hex;
+    const int = parseInt(full, 16);
+    return {
+      rgb: [(int >> 16) & 255, (int >> 8) & 255, int & 255],
+      alpha: 1,
+    };
+  }
+  const match = value.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([0-9.]+))?\)/i);
   if (!match) return null;
-  return [Number(match[1]), Number(match[2]), Number(match[3])];
+  return {
+    rgb: [Number(match[1]), Number(match[2]), Number(match[3])],
+    alpha: match[4] !== undefined ? Number(match[4]) : 1,
+  };
 };
 
 const luminance = (color) => {
@@ -59,14 +77,32 @@ const contrastRatio = (a, b) => {
   return (bright + 0.05) / (dark + 0.05);
 };
 
-const ensureIconContrast = (background, preferred, fallback) => {
-  const bg = parseRGB(background);
-  const pref = parseRGB(preferred);
-  const alt = parseRGB(fallback);
-  if (!bg || !pref) return preferred || fallback;
-  if (contrastRatio(bg, pref) >= MIN_ICON_CONTRAST) return preferred;
-  if (alt && contrastRatio(bg, alt) >= MIN_ICON_CONTRAST) return fallback;
-  return preferred || fallback;
+const blendColors = (foreground, background) => {
+  if (!foreground) return background?.rgb || null;
+  if (!background) return foreground.rgb || null;
+  const fg = foreground.rgb;
+  const bg = background.rgb;
+  const alpha = foreground.alpha;
+  if (alpha >= 1) return fg;
+  const inv = 1 - alpha;
+  return [
+    Math.round(fg[0] * alpha + bg[0] * inv),
+    Math.round(fg[1] * alpha + bg[1] * inv),
+    Math.round(fg[2] * alpha + bg[2] * inv),
+  ];
+};
+
+const ensureIconContrast = (backgroundRGB, preferred, fallback) => {
+  const pref = parseColor(preferred)?.rgb;
+  const alt = parseColor(fallback)?.rgb;
+  if (!backgroundRGB || !pref) return preferred || fallback;
+  if (contrastRatio(backgroundRGB, pref) >= MIN_ICON_CONTRAST) return preferred;
+  if (alt && contrastRatio(backgroundRGB, alt) >= MIN_ICON_CONTRAST) return fallback;
+  const black = [0, 0, 0];
+  const white = [255, 255, 255];
+  return contrastRatio(backgroundRGB, black) >= contrastRatio(backgroundRGB, white)
+    ? "rgb(0,0,0)"
+    : "rgb(255,255,255)";
 };
 
 export const clearText = (html) => {
@@ -207,9 +243,13 @@ const EpisodeList = (props) => {
   const listBackground = palette
     ? themeColors?.secondary || toRGBA(palette.secondary, 0.18)
     : theme.palette.background.default;
-  const contrastBackground =
-    itemBackground === "transparent" ? listBackground : itemBackground;
-  const accent = ensureIconContrast(contrastBackground, accentBase, textColor);
+  const baseBackground = theme.palette.background.default;
+  const baseColor = parseColor(baseBackground);
+  const listColor = parseColor(listBackground);
+  const itemColor = parseColor(itemBackground);
+  const listEffective = blendColors(listColor, baseColor) || baseColor?.rgb;
+  const itemEffective = blendColors(itemColor, { rgb: listEffective, alpha: 1 }) || listEffective;
+  const accent = ensureIconContrast(itemEffective, accentBase, textColor);
 
   useEffect(() => {
     window && window.scrollTo && window.scrollTo(0, 0);
