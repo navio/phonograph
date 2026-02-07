@@ -34,6 +34,89 @@ import { buildThemeFromPalette, toRGBA } from "../../core/podcastPalette";
 const DOMPurify = createDOMPurify(window);
 const { sanitize } = DOMPurify;
 const db = PS.createDatabase("history", "podcasts");
+const MIN_ICON_CONTRAST = 4.5;
+
+const parseColor = (value) => {
+  if (!value || typeof value !== "string") return null;
+  if (value === "transparent") {
+    return { rgb: [0, 0, 0], alpha: 0 };
+  }
+  const hexMatch = value.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+  if (hexMatch) {
+    const hex = hexMatch[1];
+    const full = hex.length === 3
+      ? hex.split("").map((c) => c + c).join("")
+      : hex;
+    const int = parseInt(full, 16);
+    return {
+      rgb: [(int >> 16) & 255, (int >> 8) & 255, int & 255],
+      alpha: 1,
+    };
+  }
+  const match = value.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([0-9.]+))?\)/i);
+  if (!match) return null;
+  return {
+    rgb: [Number(match[1]), Number(match[2]), Number(match[3])],
+    alpha: match[4] !== undefined ? Number(match[4]) : 1,
+  };
+};
+
+const luminance = (color) => {
+  const [r, g, b] = color.map((c) => {
+    const v = c / 255;
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+
+const contrastRatio = (a, b) => {
+  if (!a || !b) return 0;
+  const l1 = luminance(a);
+  const l2 = luminance(b);
+  const [bright, dark] = l1 >= l2 ? [l1, l2] : [l2, l1];
+  return (bright + 0.05) / (dark + 0.05);
+};
+
+const pickHighContrast = (backgroundRGB) => {
+  const black = [0, 0, 0];
+  const white = [255, 255, 255];
+  return contrastRatio(backgroundRGB, black) >= contrastRatio(backgroundRGB, white)
+    ? { color: "rgb(0,0,0)", alt: "rgb(255,255,255)" }
+    : { color: "rgb(255,255,255)", alt: "rgb(0,0,0)" };
+};
+
+const blendColors = (foreground, background) => {
+  if (!foreground) return background?.rgb || null;
+  if (!background) return foreground.rgb || null;
+  const fg = foreground.rgb;
+  const bg = background.rgb;
+  const alpha = foreground.alpha;
+  if (alpha >= 1) return fg;
+  const inv = 1 - alpha;
+  return [
+    Math.round(fg[0] * alpha + bg[0] * inv),
+    Math.round(fg[1] * alpha + bg[1] * inv),
+    Math.round(fg[2] * alpha + bg[2] * inv),
+  ];
+};
+
+const resolveIconStyles = (backgroundRGB, preferred, fallback) => {
+  const pref = parseColor(preferred)?.rgb;
+  const alt = parseColor(fallback)?.rgb;
+  if (!backgroundRGB || !pref) return { color: preferred || fallback };
+  if (contrastRatio(backgroundRGB, pref) >= MIN_ICON_CONTRAST) {
+    return { color: preferred };
+  }
+  if (alt && contrastRatio(backgroundRGB, alt) >= MIN_ICON_CONTRAST) {
+    return { color: fallback };
+  }
+  const fallbackColors = pickHighContrast(backgroundRGB);
+  return {
+    color: fallbackColors.color,
+    backgroundColor: fallbackColors.alt,
+    borderColor: fallbackColors.color,
+  };
+};
 
 export const clearText = (html) => {
   let tmp = document.createElement("div");
@@ -166,12 +249,32 @@ const EpisodeList = (props) => {
   const theme = useTheme();
   const palette = props.palette;
   const themeColors = palette ? buildThemeFromPalette(palette) : null;
-  const textColor = themeColors?.text || theme.palette.text.primary;
-  const subText = themeColors?.subText || theme.palette.text.secondary;
-  const accent = themeColors?.accent || theme.palette.secondary.main;
-  const listBackground = palette
+  const hasPalette = !!themeColors;
+  const fallbackText = "rgb(0,0,0)";
+  const fallbackSubText = "rgb(30,30,30)";
+  const fallbackBackground = "rgb(255,255,255)";
+  const textColor = hasPalette ? themeColors?.text : fallbackText;
+  const subText = hasPalette ? themeColors?.subText : fallbackSubText;
+  const accentBase = hasPalette ? themeColors?.accent : fallbackText;
+  const itemBackground = hasPalette ? toRGBA(palette.primary, 0.12) : "transparent";
+  const listBackground = hasPalette
     ? themeColors?.secondary || toRGBA(palette.secondary, 0.18)
-    : theme.palette.background.default;
+    : fallbackBackground;
+  const baseBackground = hasPalette ? theme.palette.background.default : fallbackBackground;
+  const baseColor = parseColor(baseBackground);
+  const listColor = parseColor(listBackground);
+  const itemColor = parseColor(itemBackground);
+  const listEffective = blendColors(listColor, baseColor) || baseColor?.rgb;
+  const itemEffective = blendColors(itemColor, { rgb: listEffective, alpha: 1 }) || listEffective;
+  const iconStyles = resolveIconStyles(itemEffective, accentBase, textColor);
+  const iconButtonSx = {
+    color: iconStyles.color,
+    backgroundColor: iconStyles.backgroundColor || "transparent",
+    border: iconStyles.borderColor ? `1px solid ${iconStyles.borderColor}` : "none",
+    "&:hover": {
+      backgroundColor: iconStyles.backgroundColor || "transparent",
+    },
+  };
 
   useEffect(() => {
     window && window.scrollTo && window.scrollTo(0, 0);
@@ -252,7 +355,7 @@ const EpisodeList = (props) => {
                         <ListItem
                           selected={state.playing === episode.guid}
                           sx={{
-                            backgroundColor: palette ? toRGBA(palette.primary, 0.12) : "transparent",
+                            backgroundColor: itemBackground,
                             color: textColor,
                           }}
                         >
@@ -263,18 +366,18 @@ const EpisodeList = (props) => {
                                 whenToStart(episodeData),
                                 podcast
                               )}
-                              sx={{ color: accent }}
+                              sx={iconButtonSx}
                             >
                               {props.playing === episode.guid &&
                               props.status !== "paused" ? (
                                 <PauseIcon
                                   fontSize="large"
-                                  sx={{ color: accent }}
+                                  sx={{ color: iconStyles.color }}
                                 />
                               ) : (
                                 <PlayArrowIcon
                                   fontSize="large"
-                                  sx={{ color: accent }}
+                                  sx={{ color: iconStyles.color }}
                                 />
                               )}
                             </IconButton>
@@ -292,7 +395,7 @@ const EpisodeList = (props) => {
                             palette={palette}
                             textColor={textColor}
                             subText={subText}
-                            accent={accent}
+                            accent={iconStyles.color}
                           />
                           <ListItemIcon>
                             <IconButton
@@ -358,7 +461,7 @@ const EpisodeList = (props) => {
                       style={{ width: "80%" }}
                       size="large"
                       sx={{
-                        borderColor: accent,
+                        borderColor: iconStyles.color,
                         color: textColor,
                       }}
                     >
