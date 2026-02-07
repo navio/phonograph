@@ -1,10 +1,12 @@
 import React from "react";
 import {
+  AppBar,
   Box,
   Button,
   Grid,
   IconButton,
   Snackbar,
+  Toolbar,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -97,6 +99,68 @@ function PodcastHeader(props) {
                 {message}
               </Alert>
             </Snackbar>
+            <AppBar
+              position="sticky"
+              sx={{
+                backgroundColor: theme.palette.primary.main,
+                color: theme.palette.primary.contrastText,
+                zIndex: theme.zIndex.appBar + 1,
+              }}
+            >
+              <Toolbar variant="dense">
+                <Grid container alignItems="center">
+                  <Grid item xs={6}>
+                    <IconButton
+                      size="small"
+                      aria-label="back"
+                      onClick={backHandler}
+                      sx={{ color: theme.palette.primary.contrastText }}
+                    >
+                      <ArrowBackIcon />
+                    </IconButton>
+                  </Grid>
+                  <Grid item xs={6} sx={{ textAlign: "right" }}>
+                    {isInLibrary ? (
+                      <Tooltip title="Remove from library" placement="bottom">
+                        <IconButton
+                          size="small"
+                          sx={{ color: theme.palette.primary.contrastText }}
+                          onClick={removePodcast}
+                          aria-label="Remove from Library"
+                        >
+                          <Favorite />
+                        </IconButton>
+                      </Tooltip>
+                    ) : (
+                      <Tooltip title="Add to Library" placement="bottom">
+                        <IconButton
+                          size="small"
+                          sx={{ color: theme.palette.primary.contrastText }}
+                          onClick={saveThisPodcastToLibrary}
+                        >
+                          <BookmarkBorderIcon />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                    {shareLink && (
+                      <Tooltip title="Share Podcast" placement="bottom">
+                        <IconButton
+                          sx={{ color: theme.palette.primary.contrastText }}
+                          size="small"
+                          onClick={share(
+                            "Phonograph",
+                            state.title,
+                            `${document.location.origin}/podcast/${makeMeAHash(state.domain)}`
+                          )}
+                        >
+                          <ShareIcon />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                  </Grid>
+                </Grid>
+              </Toolbar>
+            </AppBar>
             <Box
               sx={{
                 minHeight: {
@@ -118,58 +182,6 @@ function PodcastHeader(props) {
                 }}
               />
               <Box sx={{ position: "relative", zIndex: 1, height: "100%" }}>
-                <Grid container sx={{ px: { xs: 2, md: 4 }, pt: 2 }}>
-                  <Grid item xs={6}>
-                    <IconButton
-                      size="small"
-                      aria-label="back"
-                      onClick={backHandler}
-                      sx={{ color: textColor }}
-                    >
-                      <ArrowBackIcon />
-                    </IconButton>
-                  </Grid>
-                  <Grid item xs={6} sx={{ textAlign: "right" }}>
-                    {isInLibrary ? (
-                      <Tooltip title="Remove from library" placement="bottom">
-                        <IconButton
-                          size="small"
-                          sx={{ color: textColor }}
-                          onClick={removePodcast}
-                          aria-label="Remove from Library"
-                        >
-                          <Favorite />
-                        </IconButton>
-                      </Tooltip>
-                    ) : (
-                      <Tooltip title="Add to Library" placement="bottom">
-                        <IconButton
-                          size="small"
-                          sx={{ color: textColor }}
-                          onClick={saveThisPodcastToLibrary}
-                        >
-                          <BookmarkBorderIcon />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                    {shareLink && (
-                      <Tooltip title="Share Podcast" placement="bottom">
-                        <IconButton
-                          sx={{ color: textColor }}
-                          size="small"
-                          onClick={share(
-                            "Phonograph",
-                            state.title,
-                            `${document.location.origin}/podcast/${makeMeAHash(state.domain)}`
-                          )}
-                        >
-                          <ShareIcon />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                  </Grid>
-                </Grid>
-
                 {!showDesktop && null}
               </Box>
             </Box>
