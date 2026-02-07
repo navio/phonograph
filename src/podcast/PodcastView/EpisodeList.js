@@ -34,6 +34,40 @@ import { buildThemeFromPalette } from "../../core/podcastPalette";
 const DOMPurify = createDOMPurify(window);
 const { sanitize } = DOMPurify;
 const db = PS.createDatabase("history", "podcasts");
+const MIN_ICON_CONTRAST = 3;
+
+const parseRGB = (value) => {
+  if (!value || typeof value !== "string") return null;
+  const match = value.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+  if (!match) return null;
+  return [Number(match[1]), Number(match[2]), Number(match[3])];
+};
+
+const luminance = (color) => {
+  const [r, g, b] = color.map((c) => {
+    const v = c / 255;
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+
+const contrastRatio = (a, b) => {
+  if (!a || !b) return 0;
+  const l1 = luminance(a);
+  const l2 = luminance(b);
+  const [bright, dark] = l1 >= l2 ? [l1, l2] : [l2, l1];
+  return (bright + 0.05) / (dark + 0.05);
+};
+
+const ensureIconContrast = (background, preferred, fallback) => {
+  const bg = parseRGB(background);
+  const pref = parseRGB(preferred);
+  const alt = parseRGB(fallback);
+  if (!bg || !pref) return preferred || fallback;
+  if (contrastRatio(bg, pref) >= MIN_ICON_CONTRAST) return preferred;
+  if (alt && contrastRatio(bg, alt) >= MIN_ICON_CONTRAST) return fallback;
+  return preferred || fallback;
+};
 
 export const clearText = (html) => {
   let tmp = document.createElement("div");
@@ -168,7 +202,11 @@ const EpisodeList = (props) => {
   const themeColors = palette ? buildThemeFromPalette(palette) : null;
   const textColor = themeColors?.text || theme.palette.text.primary;
   const subText = themeColors?.subText || theme.palette.text.secondary;
-  const accent = themeColors?.accent || theme.palette.secondary.main;
+  const accentBase = themeColors?.accent || theme.palette.secondary.main;
+  const itemBackground = palette
+    ? themeColors?.primary || theme.palette.background.paper
+    : "transparent";
+  const accent = ensureIconContrast(itemBackground, accentBase, textColor);
   const listBackground = palette
     ? themeColors?.secondary || theme.palette.background.default
     : theme.palette.background.default;
@@ -252,9 +290,7 @@ const EpisodeList = (props) => {
                         <ListItem
                           selected={state.playing === episode.guid}
                           sx={{
-                            backgroundColor: palette
-                              ? themeColors?.primary || theme.palette.background.paper
-                              : "transparent",
+                            backgroundColor: itemBackground,
                             color: textColor,
                           }}
                         >
