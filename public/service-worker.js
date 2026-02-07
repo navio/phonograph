@@ -1,6 +1,7 @@
-const version = 1.10;
-const CACHE = 'phonograph-core-' + version;
-const CACHERUNTIME = 'phonograph-runtime-' + version;
+const buildVersion = "__SW_VERSION__";
+const version = buildVersion === "__SW_VERSION__" ? "dev" : buildVersion;
+const CACHE = "phonograph-core-" + version;
+const CACHERUNTIME = "phonograph-runtime-" + version;
 
 
 
@@ -10,13 +11,18 @@ self.addEventListener('install', function (event){
     .then(function (cache) {
       return cache.addAll([]);
     })
-    .then(self.skipWaiting())
+    .then(() => self.skipWaiting())
   );
 });
 
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});
 
 self.addEventListener('activate', event => {
-  const currentCaches = [CACHE];
+  const currentCaches = [CACHE, CACHERUNTIME];
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return cacheNames.filter(cacheName => !currentCaches.includes(cacheName));
@@ -99,7 +105,7 @@ function fetchTask(event) {
   
   const checkPath = (url) => {
     return !!localURLs.find((current) => {
-      const origin = `${self.origin}/${current}`
+      const origin = `${self.location.origin}/${current}`
       return (url.indexOf(origin) > -1)
     })
   } 
