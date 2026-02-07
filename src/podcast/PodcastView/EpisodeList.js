@@ -29,7 +29,7 @@ import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 
 import { AppContext } from "../../App";
-import { buildThemeFromPalette, toRGBA } from "../../core/podcastPalette";
+import { buildThemeFromPalette } from "../../core/podcastPalette";
 
 const DOMPurify = createDOMPurify(window);
 const { sanitize } = DOMPurify;
@@ -170,7 +170,7 @@ const EpisodeList = (props) => {
   const subText = themeColors?.subText || theme.palette.text.secondary;
   const accent = themeColors?.accent || theme.palette.secondary.main;
   const listBackground = palette
-    ? themeColors?.secondary || toRGBA(palette.secondary, 0.18)
+    ? themeColors?.secondary || theme.palette.background.default
     : theme.palette.background.default;
 
   useEffect(() => {
@@ -252,7 +252,9 @@ const EpisodeList = (props) => {
                         <ListItem
                           selected={state.playing === episode.guid}
                           sx={{
-                            backgroundColor: palette ? toRGBA(palette.primary, 0.12) : "transparent",
+                            backgroundColor: palette
+                              ? themeColors?.primary || theme.palette.background.paper
+                              : "transparent",
                             color: textColor,
                           }}
                         >
@@ -345,7 +347,11 @@ const EpisodeList = (props) => {
                             /> */}
                           </ListItemIcon>
                         </ListItem>
-                        <Divider sx={{ borderColor: toRGBA(palette?.primary, 0.2) }} />
+                        <Divider
+                          sx={{
+                            borderColor: themeColors?.secondary || theme.palette.divider,
+                          }}
+                        />
                       </div>
                     );
                   })}

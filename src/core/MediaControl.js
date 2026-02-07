@@ -302,9 +302,13 @@ const MediaControlCard = (props) => {
                       position: "absolute",
                       top: "7px",
                       width: "100%",
-                      backgroundColor: open ? toRGBA(palette?.secondary, 0.35) : undefined,
+                      backgroundColor: open ? paletteStyles.secondary : undefined,
                       "& .MuiLinearProgress-bar": {
                         backgroundColor: paletteStyles.accent,
+                      },
+                      "& .MuiLinearProgress-dashed": {
+                        backgroundImage: "none",
+                        backgroundColor: paletteStyles.secondary,
                       },
                     }}
                     variant="buffer"

@@ -21,7 +21,7 @@ import Alert from "@mui/material/Alert";
 import { clearText } from "./EpisodeList";
 import { Consumer } from "../../App.js";
 import { useHistory } from "react-router-dom";
-import { buildThemeFromPalette, toRGBA } from "../../core/podcastPalette";
+import { buildThemeFromPalette } from "../../core/podcastPalette";
 
 const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 const prod = DEBUG ? '' : ''
@@ -83,10 +83,8 @@ function PodcastHeader(props) {
         const textColor = themeColors?.text || theme.palette.common.white;
         const subText = themeColors?.subText || theme.palette.common.white;
         const overlay = palette
-          ? toRGBA(palette.primary, showDesktop ? 0.6 : 0.8)
-          : showDesktop
-            ? "rgba(0,0,0,0.55)"
-            : "rgba(0,0,0,0.75)";
+          ? themeColors?.primary
+          : theme.palette.background.default;
         return (
           <>
             <Snackbar
@@ -169,7 +167,11 @@ function PodcastHeader(props) {
                   md: "15vh",
                 },
                 position: "relative",
-                backgroundImage: state.image ? `url(${prod + state.image})` : "none",
+                backgroundImage: palette
+                  ? "none"
+                  : state.image
+                    ? `url(${prod + state.image})`
+                    : "none",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }}
