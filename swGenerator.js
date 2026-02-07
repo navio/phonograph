@@ -26,16 +26,19 @@ const readFile = (file) => {
 }
 
 
-const found = ['/', '/library', '/discover', '/settings', '/podcast'];
-readDir('dist')
+const found = ["/", "/library", "/discover", "/settings", "/podcast"];
+readDir("dist")
 .then(files => files.forEach((file) => found.push(`/${file}`)))
 .then(()=> {
 
-  readFile('/dist/service-worker.js')
+  readFile("/dist/service-worker.js")
   .then( data => { 
-    const readyToWrite = data.replace("addAll([])",`addAll(${JSON.stringify(found)})`);
-    
-    writeFile("/dist/service-worker.js", readyToWrite)
+    const buildVersion = String(Date.now());
+    const readyToWrite = data
+      .replace("addAll([])", `addAll(${JSON.stringify(found)})`)
+      .replace("__SW_VERSION__", buildVersion);
+
+    writeFile("/dist/service-worker.js", readyToWrite);
 
 
   })
