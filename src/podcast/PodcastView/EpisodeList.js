@@ -249,14 +249,18 @@ const EpisodeList = (props) => {
   const theme = useTheme();
   const palette = props.palette;
   const themeColors = palette ? buildThemeFromPalette(palette) : null;
-  const textColor = themeColors?.text || theme.palette.text.primary;
-  const subText = themeColors?.subText || theme.palette.text.secondary;
-  const accentBase = themeColors?.accent || theme.palette.secondary.main;
-  const itemBackground = palette ? toRGBA(palette.primary, 0.12) : "transparent";
-  const listBackground = palette
+  const hasPalette = !!themeColors;
+  const fallbackText = "rgb(0,0,0)";
+  const fallbackSubText = "rgb(30,30,30)";
+  const fallbackBackground = "rgb(255,255,255)";
+  const textColor = hasPalette ? themeColors?.text : fallbackText;
+  const subText = hasPalette ? themeColors?.subText : fallbackSubText;
+  const accentBase = hasPalette ? themeColors?.accent : fallbackText;
+  const itemBackground = hasPalette ? toRGBA(palette.primary, 0.12) : "transparent";
+  const listBackground = hasPalette
     ? themeColors?.secondary || toRGBA(palette.secondary, 0.18)
-    : theme.palette.background.default;
-  const baseBackground = theme.palette.background.default;
+    : fallbackBackground;
+  const baseBackground = hasPalette ? theme.palette.background.default : fallbackBackground;
   const baseColor = parseColor(baseBackground);
   const listColor = parseColor(listBackground);
   const itemColor = parseColor(itemBackground);
