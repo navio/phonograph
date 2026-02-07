@@ -170,7 +170,7 @@ const EpisodeList = (props) => {
   const subText = themeColors?.subText || theme.palette.text.secondary;
   const accent = themeColors?.accent || theme.palette.secondary.main;
   const listBackground = palette
-    ? `linear-gradient(180deg, ${themeColors?.primary || toRGBA(palette.primary, 0.08)} 0%, ${themeColors?.secondary || toRGBA(palette.secondary, 0.18)} 100%)`
+    ? themeColors?.secondary || toRGBA(palette.secondary, 0.18)
     : theme.palette.background.default;
 
   useEffect(() => {

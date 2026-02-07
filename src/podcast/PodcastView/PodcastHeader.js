@@ -81,12 +81,10 @@ function PodcastHeader(props) {
         const textColor = themeColors?.text || theme.palette.common.white;
         const subText = themeColors?.subText || theme.palette.common.white;
         const overlay = palette
-          ? showDesktop
-            ? `linear-gradient(180deg, ${toRGBA(palette.primary, 0.05)} 0%, ${toRGBA(palette.primary, 0.45)} 55%, ${toRGBA(palette.primary, 0.95)} 100%)`
-            : `linear-gradient(180deg, ${toRGBA(palette.primary, 0.15)} 0%, ${toRGBA(palette.primary, 0.6)} 55%, ${toRGBA(palette.primary, 0.92)} 100%)`
+          ? toRGBA(palette.primary, showDesktop ? 0.6 : 0.8)
           : showDesktop
-            ? "linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.65) 100%)"
-            : "linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.85) 100%)";
+            ? "rgba(0,0,0,0.55)"
+            : "rgba(0,0,0,0.75)";
         return (
           <>
             <Snackbar
@@ -181,7 +179,7 @@ function PodcastHeader(props) {
                 pt: { xs: 3, md: 2 },
                 pb: { xs: 2, md: 3 },
                 background: palette
-                  ? `linear-gradient(180deg, ${themeColors?.primary} 0%, ${toRGBA(palette.secondary, 0.2)} 100%)`
+                  ? themeColors?.primary
                   : theme.palette.background.default,
               }}
             >
