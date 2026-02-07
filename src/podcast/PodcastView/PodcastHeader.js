@@ -101,7 +101,11 @@ function PodcastHeader(props) {
             </Snackbar>
             <Box
               sx={{
-                minHeight: showDesktop ? "15vh" : "100vh",
+                minHeight: {
+                  xs: "20vh",
+                  sm: "20vh",
+                  md: "15vh",
+                },
                 position: "relative",
                 backgroundImage: state.image ? `url(${prod + state.image})` : "none",
                 backgroundSize: "cover",
@@ -168,55 +172,7 @@ function PodcastHeader(props) {
                   </Grid>
                 </Grid>
 
-                {!showDesktop && (
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      px: { xs: 2, md: 4 },
-                      pb: { xs: 3, md: 5 },
-                    }}
-                  >
-                    <Typography
-                      variant="h4"
-                      sx={{ color: textColor, fontWeight: 700 }}
-                    >
-                      {state.title}
-                    </Typography>
-                    {state.author && (
-                      <Typography variant="subtitle1" sx={{ color: subText, mt: 0.5 }}>
-                        {state.author}
-                      </Typography>
-                    )}
-                    {state.description && (
-                      <Typography
-                        variant="body1"
-                        sx={{ color: subText, mt: 1, maxWidth: "60ch" }}
-                      >
-                        {clearText(state.description)}
-                      </Typography>
-                    )}
-                    <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: 2 }}>
-                      {!isInLibrary && (
-                        <Button
-                          onClick={saveThisPodcastToLibrary}
-                          variant="contained"
-                        sx={{
-                          backgroundColor: themeColors?.accent || theme.palette.primary.main,
-                          color: textColor,
-                        }}
-                        >
-                          Subscribe
-                        </Button>
-                      )}
-                      <Typography sx={{ color: subText }}>
-                        <b>Episodes:</b> {state.items.length}
-                      </Typography>
-                    </Box>
-                  </Box>
-                )}
+                {!showDesktop && null}
               </Box>
             </Box>
             <Box
