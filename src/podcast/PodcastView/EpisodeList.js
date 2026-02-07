@@ -77,6 +77,14 @@ const contrastRatio = (a, b) => {
   return (bright + 0.05) / (dark + 0.05);
 };
 
+const pickHighContrast = (backgroundRGB) => {
+  const black = [0, 0, 0];
+  const white = [255, 255, 255];
+  return contrastRatio(backgroundRGB, black) >= contrastRatio(backgroundRGB, white)
+    ? { color: "rgb(0,0,0)", alt: "rgb(255,255,255)" }
+    : { color: "rgb(255,255,255)", alt: "rgb(0,0,0)" };
+};
+
 const blendColors = (foreground, background) => {
   if (!foreground) return background?.rgb || null;
   if (!background) return foreground.rgb || null;
@@ -92,17 +100,22 @@ const blendColors = (foreground, background) => {
   ];
 };
 
-const ensureIconContrast = (backgroundRGB, preferred, fallback) => {
+const resolveIconStyles = (backgroundRGB, preferred, fallback) => {
   const pref = parseColor(preferred)?.rgb;
   const alt = parseColor(fallback)?.rgb;
-  if (!backgroundRGB || !pref) return preferred || fallback;
-  if (contrastRatio(backgroundRGB, pref) >= MIN_ICON_CONTRAST) return preferred;
-  if (alt && contrastRatio(backgroundRGB, alt) >= MIN_ICON_CONTRAST) return fallback;
-  const black = [0, 0, 0];
-  const white = [255, 255, 255];
-  return contrastRatio(backgroundRGB, black) >= contrastRatio(backgroundRGB, white)
-    ? "rgb(0,0,0)"
-    : "rgb(255,255,255)";
+  if (!backgroundRGB || !pref) return { color: preferred || fallback };
+  if (contrastRatio(backgroundRGB, pref) >= MIN_ICON_CONTRAST) {
+    return { color: preferred };
+  }
+  if (alt && contrastRatio(backgroundRGB, alt) >= MIN_ICON_CONTRAST) {
+    return { color: fallback };
+  }
+  const fallbackColors = pickHighContrast(backgroundRGB);
+  return {
+    color: fallbackColors.color,
+    backgroundColor: fallbackColors.alt,
+    borderColor: fallbackColors.color,
+  };
 };
 
 export const clearText = (html) => {
@@ -249,7 +262,15 @@ const EpisodeList = (props) => {
   const itemColor = parseColor(itemBackground);
   const listEffective = blendColors(listColor, baseColor) || baseColor?.rgb;
   const itemEffective = blendColors(itemColor, { rgb: listEffective, alpha: 1 }) || listEffective;
-  const accent = ensureIconContrast(itemEffective, accentBase, textColor);
+  const iconStyles = resolveIconStyles(itemEffective, accentBase, textColor);
+  const iconButtonSx = {
+    color: iconStyles.color,
+    backgroundColor: iconStyles.backgroundColor || "transparent",
+    border: iconStyles.borderColor ? `1px solid ${iconStyles.borderColor}` : "none",
+    "&:hover": {
+      backgroundColor: iconStyles.backgroundColor || "transparent",
+    },
+  };
 
   useEffect(() => {
     window && window.scrollTo && window.scrollTo(0, 0);
@@ -341,18 +362,18 @@ const EpisodeList = (props) => {
                                 whenToStart(episodeData),
                                 podcast
                               )}
-                              sx={{ color: accent }}
+                              sx={iconButtonSx}
                             >
                               {props.playing === episode.guid &&
                               props.status !== "paused" ? (
                                 <PauseIcon
                                   fontSize="large"
-                                  sx={{ color: accent }}
+                                  sx={{ color: iconStyles.color }}
                                 />
                               ) : (
                                 <PlayArrowIcon
                                   fontSize="large"
-                                  sx={{ color: accent }}
+                                  sx={{ color: iconStyles.color }}
                                 />
                               )}
                             </IconButton>
@@ -370,7 +391,7 @@ const EpisodeList = (props) => {
                             palette={palette}
                             textColor={textColor}
                             subText={subText}
-                            accent={accent}
+                            accent={iconStyles.color}
                           />
                           <ListItemIcon>
                             <IconButton
@@ -436,7 +457,7 @@ const EpisodeList = (props) => {
                       style={{ width: "80%" }}
                       size="large"
                       sx={{
-                        borderColor: accent,
+                        borderColor: iconStyles.color,
                         color: textColor,
                       }}
                     >
