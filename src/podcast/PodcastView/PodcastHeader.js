@@ -182,7 +182,111 @@ function PodcastHeader(props) {
                 }}
               />
               <Box sx={{ position: "relative", zIndex: 1, height: "100%" }}>
+<<<<<<< HEAD
                 {!showDesktop && null}
+=======
+                <Grid container sx={{ px: { xs: 2, md: 4 }, pt: 2 }}>
+                  <Grid item xs={6}>
+                    <IconButton
+                      size="small"
+                      aria-label="back"
+                      onClick={backHandler}
+                      sx={{ color: textColor }}
+                    >
+                      <ArrowBackIcon />
+                    </IconButton>
+                  </Grid>
+                  <Grid item xs={6} sx={{ textAlign: "right" }}>
+                    {isInLibrary ? (
+                      <Tooltip title="Remove from library" placement="bottom">
+                        <IconButton
+                          size="small"
+                          sx={{ color: textColor }}
+                          onClick={removePodcast}
+                          aria-label="Remove from Library"
+                        >
+                          <Favorite />
+                        </IconButton>
+                      </Tooltip>
+                    ) : (
+                      <Tooltip title="Add to Library" placement="bottom">
+                        <IconButton
+                          size="small"
+                          sx={{ color: textColor }}
+                          onClick={saveThisPodcastToLibrary}
+                        >
+                          <BookmarkBorderIcon />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                    {shareLink && (
+                      <Tooltip title="Share Podcast" placement="bottom">
+                        <IconButton
+                          sx={{ color: textColor }}
+                          size="small"
+                          onClick={share(
+                            "Phonograph",
+                            state.title,
+                            `${document.location.origin}/podcast/${makeMeAHash(state.domain)}`
+                          )}
+                        >
+                          <ShareIcon />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                  </Grid>
+                </Grid>
+
+                {!showDesktop && (
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      px: { xs: 2, md: 4 },
+                      pb: { xs: 3, md: 5 },
+                    }}
+                  >
+                    <Typography
+                      variant="h4"
+                      sx={{ color: textColor, fontWeight: 700 }}
+                    >
+                      {state.title}
+                    </Typography>
+                    {state.author && (
+                      <Typography variant="subtitle1" sx={{ color: subText, mt: 0.5 }}>
+                        {state.author}
+                      </Typography>
+                    )}
+                    {state.description && (
+                      <Typography
+                        variant="body1"
+                        sx={{ color: subText, mt: 1, maxWidth: "60ch" }}
+                      >
+                        {clearText(state.description)}
+                      </Typography>
+                    )}
+                    <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: 2 }}>
+                      {!isInLibrary && (
+                        <Button
+                          onClick={saveThisPodcastToLibrary}
+                          variant="contained"
+                        sx={{
+                          backgroundColor: themeColors?.accent || theme.palette.primary.main,
+                          color: themeColors?.accentText || textColor,
+                        }}
+                        >
+                          Subscribe
+                        </Button>
+                      )}
+                      <Typography sx={{ color: subText }}>
+                        <b>Episodes:</b> {state.items.length}
+                      </Typography>
+                    </Box>
+                  </Box>
+                )}
+>>>>>>> b54054c (Fix palette contrast: opaque theme outputs + accentText for buttons)
               </Box>
             </Box>
             <Box
@@ -191,7 +295,11 @@ function PodcastHeader(props) {
                 pt: { xs: 3, md: 2 },
                 pb: { xs: 2, md: 3 },
                 background: palette
+<<<<<<< HEAD
                   ? themeColors?.primary
+=======
+                  ? `linear-gradient(180deg, ${themeColors?.primary} 0%, ${themeColors?.secondary} 100%)`
+>>>>>>> b54054c (Fix palette contrast: opaque theme outputs + accentText for buttons)
                   : theme.palette.background.default,
               }}
             >
@@ -221,7 +329,7 @@ function PodcastHeader(props) {
                     variant="contained"
                     sx={{
                       backgroundColor: themeColors?.accent || theme.palette.primary.main,
-                      color: textColor,
+                      color: themeColors?.accentText || textColor,
                     }}
                   >
                     Subscribe
