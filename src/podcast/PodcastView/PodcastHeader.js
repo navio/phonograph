@@ -205,7 +205,7 @@ function PodcastHeader(props) {
                           variant="contained"
                         sx={{
                           backgroundColor: themeColors?.accent || theme.palette.primary.main,
-                          color: textColor,
+                          color: themeColors?.accentText || textColor,
                         }}
                         >
                           Subscribe
@@ -225,7 +225,7 @@ function PodcastHeader(props) {
                 pt: { xs: 3, md: 2 },
                 pb: { xs: 2, md: 3 },
                 background: palette
-                  ? `linear-gradient(180deg, ${themeColors?.primary} 0%, ${toRGBA(palette.secondary, 0.2)} 100%)`
+                  ? `linear-gradient(180deg, ${themeColors?.primary} 0%, ${themeColors?.secondary} 100%)`
                   : theme.palette.background.default,
               }}
             >
@@ -255,7 +255,7 @@ function PodcastHeader(props) {
                     variant="contained"
                     sx={{
                       backgroundColor: themeColors?.accent || theme.palette.primary.main,
-                      color: textColor,
+                      color: themeColors?.accentText || textColor,
                     }}
                   >
                     Subscribe
