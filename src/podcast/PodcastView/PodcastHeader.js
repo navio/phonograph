@@ -221,7 +221,7 @@ function PodcastHeader(props) {
                     variant="contained"
                     sx={{
                       backgroundColor: themeColors?.accent || theme.palette.primary.main,
-                      color: textColor,
+                      color: themeColors?.accentText || textColor,
                     }}
                   >
                     Subscribe

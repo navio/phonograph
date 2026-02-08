@@ -6,9 +6,10 @@ const DEFAULT_COLOR = [32, 32, 32];
 const WHITE = [255, 255, 255];
 const BLACK = [12, 12, 12];
 const DEFAULT_THEME = {
-  primary: "rgba(255,255,255,0.95)",
-  secondary: "rgba(245,245,245,0.7)",
-  accent: "rgba(20,20,20,0.95)",
+  primary: "rgb(255,255,255)",
+  secondary: "rgb(245,245,245)",
+  accent: "rgb(20,20,20)",
+  accentText: "rgb(255,255,255)",
   text: "rgb(15,15,15)",
   subText: "rgb(70,70,70)",
 };
@@ -131,10 +132,13 @@ export const buildThemeFromPalette = (palette) => {
     subText = mix(text, primaryBase, 0.25);
   }
 
+  const accentText = bestTextColor(accentBase, [BLACK, WHITE]);
+
   return {
-    primary: toRGBA(primaryBase, 0.92),
-    secondary: toRGBA(secondaryBase, 0.65),
-    accent: toRGBA(accentBase, 0.95),
+    primary: toRGB(primaryBase),
+    secondary: toRGB(secondaryBase),
+    accent: toRGB(accentBase),
+    accentText: toRGB(accentText),
     text: toRGB(text),
     subText: toRGB(subText),
   };
