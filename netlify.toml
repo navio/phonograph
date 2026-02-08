@@ -53,7 +53,7 @@
 
 [[redirects]]
   from="/search/*"
-  to="https://podcast-search.navio.workers.dev/*"
+  to="/.netlify/functions/appleSearch"
   status=200
   force = true
 
@@ -68,4 +68,3 @@
   from = "/*"
   to = "/index.html"
   status = 200
-

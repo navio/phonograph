@@ -144,7 +144,7 @@ const MediaControlCard = (props) => {
                 borderTop: `1px solid ${paletteStyles.accent}`,
                 position: "fixed",
                 width: "100%",
-                background: `linear-gradient(160deg, ${paletteStyles.primary} 0%, ${paletteStyles.secondary} 100%)`,
+                backgroundColor: paletteStyles.primary,
                 zIndex: 50,
                 height: "100%",
                 top: 0,
@@ -153,7 +153,7 @@ const MediaControlCard = (props) => {
                 bottom: "3.50rem",
                 width: "100%",
                 borderTop: `1px solid ${paletteStyles.accent}`,
-                background: `linear-gradient(160deg, ${toRGBA(palette?.primary, 0.9)} 0%, ${toRGBA(palette?.secondary, 0.6)} 100%)`,
+                backgroundColor: paletteStyles.primary,
                 position: "fixed",
                 zIndex: 2,
               }
