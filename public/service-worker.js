@@ -10,13 +10,13 @@ self.addEventListener('install', function (event){
     .then(function (cache) {
       return cache.addAll([]);
     })
-    .then(self.skipWaiting())
+    .then(() => self.skipWaiting())
   );
 });
 
 
 self.addEventListener('activate', event => {
-  const currentCaches = [CACHE];
+  const currentCaches = [CACHE, CACHERUNTIME];
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return cacheNames.filter(cacheName => !currentCaches.includes(cacheName));
@@ -38,6 +38,7 @@ self.addEventListener("fetch", function (evt) {
 function fetchTask(event) {
 
     const {request} = event;
+    const isNavigate = request.mode === 'navigate';
     const path = checkPath(request.url) ? new Request(self.origin) : request;
 
     event.respondWith(
@@ -46,7 +47,7 @@ function fetchTask(event) {
           return cachedResponse;
         }
         return caches.open(CACHERUNTIME)
-              .then(function(cache) { 
+              .then(function(cache) {
                 return fetch(path).then(response => {
                   if (!response.ok) {
                     return response;
@@ -57,6 +58,11 @@ function fetchTask(event) {
                   });
                 });
               });
+      }).catch(() => {
+        if (isNavigate) {
+          return caches.match(new Request(self.origin));
+        }
+        return Response.error();
       })
     )
 
