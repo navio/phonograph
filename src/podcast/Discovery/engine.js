@@ -96,10 +96,10 @@ export const getPopularPodcasts = async function (query=null) {
                 init: query || 0,
                 name
             };
-            memory = response;
+            if (!query) memory = response;
             return response;
         } catch (error) {
             console.error("getPopularPodcasts failed:", error);
-            return { top: [], loading: false, init: query || 0, name: null };
+            return { top: [], loading: false, init: query || 0, name: null, error: true };
         }
     };

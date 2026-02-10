@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -7,11 +7,14 @@ import Toolbar from "@mui/material/Toolbar";
 import CircularProgress from "@mui/material/CircularProgress";
 import Typography from "@mui/material/Typography";
 import Backdrop from "@mui/material/Backdrop";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemButton from "@mui/material/ListItemButton";
 import Search from "./Search";
+import Geners from "./Geners";
 import Loading from '../../core/Loading';
 
 import { getPopularPodcasts, searchForPodcasts } from './engine';
@@ -80,7 +83,7 @@ const GridRender = ({ casts, getClickHandler }) => {
           </ListItem>
         </List>
       </Grid>
-    )) : <Typography align='center' style={{paddingTop: '20%' }} letterSpacing={6} variant="h4"> <Loading /> </Typography>  }
+    )) : null }
 </Grid>
 };
 
@@ -95,13 +98,24 @@ const Discover = ({ addPodcastHandler, actionAfterClick }) => {
     top: null,
     results: '',
     name: null,
+    trendingLoading: true,
+    trendingError: false,
   });
 
-  useEffect(() => {
-    getPopularPodcasts().then((response) => {
-      setState((prev) => ({ ...prev, ...response }));
+  const loadTrending = useCallback((genreId = null) => {
+    setState((prev) => ({ ...prev, trendingLoading: true, trendingError: false }));
+    getPopularPodcasts(genreId).then((response) => {
+      if (response.error) {
+        setState((prev) => ({ ...prev, trendingLoading: false, trendingError: true, init: genreId || 0 }));
+      } else {
+        setState((prev) => ({ ...prev, ...response, trendingLoading: false, trendingError: false }));
+      }
     });
   }, []);
+
+  useEffect(() => {
+    loadTrending();
+  }, [loadTrending]);
 
   const updatePodcasts = ({ podcasts, value }) => {
     if (podcasts.length < 1) {
@@ -135,21 +149,50 @@ const Discover = ({ addPodcastHandler, actionAfterClick }) => {
       .catch(console.error);
   };
 
-  const { podcasts, top, results } = state;
+  const genreHandler = (genreId) => {
+    loadTrending(genreId || null);
+  };
+
+  const { podcasts, top, results, trendingLoading, trendingError } = state;
   const casts = podcasts.length > 0 ? podcasts : top;
+  const isShowingSearch = podcasts.length > 0;
+  const sectionLabel = isShowingSearch ? "Results" : (state.name || "Trending");
+
+  const renderContent = () => {
+    if (results === 'empty') {
+      return <Typography variant={'h6'}>No results were found.</Typography>;
+    }
+    if (isShowingSearch) {
+      return <GridRender casts={casts} getClickHandler={getClickHandler} />;
+    }
+    if (trendingLoading) {
+      return (
+        <Typography align='center' style={{ paddingTop: '20%' }} letterSpacing={6} variant="h4">
+          <Loading />
+        </Typography>
+      );
+    }
+    if (trendingError) {
+      return (
+        <Box sx={{ textAlign: 'center', py: 4 }}>
+          <Typography variant="body1" gutterBottom>Failed to load trending podcasts.</Typography>
+          <Button variant="outlined" onClick={() => loadTrending(state.init || null)}>Retry</Button>
+        </Box>
+      );
+    }
+    return <GridRender casts={casts} getClickHandler={getClickHandler} />;
+  };
 
   return <>
         <Header searchHandler={searchHandler} />
         <Card>
           <CardContent>
           <Search handleChange={searchForPodcasts} updatePodcasts={updatePodcasts} />
+          <Geners getPopularPodcasts={genreHandler} selected={state.init} />
           <Typography variant={"h6"} >
-              { results !== 'empty' &&  ( podcasts.length > 0  ? `Results` : "Trending" )}
+              { results !== 'empty' && sectionLabel }
           </Typography>
-          { results === 'empty' ?
-            <Typography variant={'h6'}>No results were found.</Typography>  :
-            <GridRender casts={casts} getClickHandler={getClickHandler} />
-          }
+          { renderContent() }
           </CardContent>
         </Card>
         <Backdrop
