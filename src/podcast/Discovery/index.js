@@ -25,7 +25,6 @@ const Header = ({ searchHandler }) => (
           <Typography variant="h6">Discover</Typography>
         </Grid>
         <Grid item md={4} xs={12}>
-          {/* <QuickSearch onChange={searchHandler} /> */}
         </Grid>
       </Toolbar>
     </Grid>
@@ -40,7 +39,7 @@ const getFinalURL = async (url) => {
 
     return result.url;
   } catch (error) {
-    new Error(error);
+    console.error("getFinalURL failed, falling back to original URL:", error);
     return url;
   }
 };

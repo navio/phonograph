@@ -1,7 +1,7 @@
 import React, { useRef, useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../App';
 import useOnline from '../../engine/useOnline';
-import { PODCASTVIEW, DISCOVERY } from '../../constants';
+import { PODCASTVIEW, DISCOVERVIEW } from '../../constants';
 import { recordEpisode as saveEpisodeState } from '../../reducer'
 import { getImagePalette } from "../../core/podcastPalette";
 
@@ -77,7 +77,7 @@ export default (props) => {
     } catch (error) {
       console.log(error);
       setError({ error, message: `There was a problem loading the podcast.` })
-      setTimeout(() => props.history.push(DISCOVERY), 3000);
+      setTimeout(() => props.history.push(DISCOVERVIEW), 3000);
     }
   }
 

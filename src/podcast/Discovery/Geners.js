@@ -9,9 +9,8 @@ export default ({getPopularPodcasts, selected}) => {
   const getCategories = () => {
     import("./genres.json")
             .then((response) => {
-                const {
-                  genres
-                } = response;
+                const data = response.default || response;
+                const { genres = [] } = data;
                 return genres;
             })
             .then( data => setGenres([{id: 0, name: "Top", parent_id: null}, ...data]))
