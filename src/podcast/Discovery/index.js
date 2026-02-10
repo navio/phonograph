@@ -150,6 +150,9 @@ const Discover = ({ addPodcastHandler, actionAfterClick }) => {
   };
 
   const genreHandler = (genreId) => {
+    // Selecting a category should switch the screen back to "Trending" mode
+    // (otherwise previous search results keep showing and it looks like nothing happened).
+    setState((prev) => ({ ...prev, podcasts: [], results: '', term: '' }));
     loadTrending(genreId || null);
   };
 
