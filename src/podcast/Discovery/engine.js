@@ -65,7 +65,11 @@ export const getPopularPodcasts = async function (query=null) {
         try {
             const params = new URLSearchParams({ page: '1', region: 'us' });
             if (query) params.set('genre_id', query);
-            const data = await fetch(`/ln/best_podcasts?${params}`).then(x => x.json());
+            const resp = await fetch(`/ln/best_podcasts?${params}`);
+            if (!resp.ok) {
+                throw new Error(`Listen Notes best_podcasts failed: ${resp.status}`);
+            }
+            const data = await resp.json();
             const { podcasts = [], name } = data;
             const cleanedCasts = podcasts.map((podcast, num) => {
                 const {
@@ -100,6 +104,6 @@ export const getPopularPodcasts = async function (query=null) {
             return response;
         } catch (error) {
             console.error("getPopularPodcasts failed:", error);
-            return { top: [], loading: false, init: query || 0, name: null, error: true };
+            return { top: [], loading: false, init: query || 0, name: null, error: true, errorMessage: String(error?.message || error) };
         }
     };

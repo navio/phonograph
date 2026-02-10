@@ -179,6 +179,11 @@ const Discover = ({ addPodcastHandler, actionAfterClick }) => {
       return (
         <Box sx={{ textAlign: 'center', py: 4 }}>
           <Typography variant="body1" gutterBottom>Failed to load trending podcasts.</Typography>
+          {state.errorMessage ? (
+            <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 2 }}>
+              {state.errorMessage}
+            </Typography>
+          ) : null}
           <Button variant="outlined" onClick={() => loadTrending(state.init || null)}>Retry</Button>
         </Box>
       );
