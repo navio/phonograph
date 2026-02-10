@@ -4,7 +4,7 @@ const API = "/ln/";
 const SFP = new PodcastSearcher(API);
 
 
-export const searchForPodcasts = function (search) {
+export const searchForPodcasts = async function (search) {
     const normalizeApple = (data = {}) => {
         const { results = [] } = data;
         return results
@@ -37,22 +37,20 @@ export const searchForPodcasts = function (search) {
             });
     };
 
-    return new Promise(function (acc) {
-        const term = encodeURIComponent(search || "");
-        SFP.apple(term)
-            .then((data) => {
-                const podcasts = normalizeApple(data);
-                if (podcasts.length > 0) return acc(podcasts);
-                return SFP.search(term)
-                    .then((lnData) => acc(normalizeListenNotes(lnData)))
-                    .catch(() => acc([]));
-            })
-            .catch(() => {
-                SFP.search(term)
-                    .then((lnData) => acc(normalizeListenNotes(lnData)))
-                    .catch(() => acc([]));
-            });
-    });
+    const term = encodeURIComponent(search || "");
+    try {
+        const data = await SFP.apple(term);
+        const podcasts = normalizeApple(data);
+        if (podcasts.length > 0) return podcasts;
+    } catch {
+        // Apple search failed, fall through to Listen Notes
+    }
+    try {
+        const lnData = await SFP.search(term);
+        return normalizeListenNotes(lnData);
+    } catch {
+        return [];
+    }
 };
 
 const URI = 'https://www.listennotes.com/c/r/';
@@ -64,42 +62,44 @@ export const getPopularPodcasts = async function (query=null) {
         if( memory && memory.top && query === null  ){
             return memory;
         }
-        let data;
-        if(query){
-            data = fetch(`/ln/best_podcasts?genre_id=${query}&page=1&region=us`).then(x=> x.json())
-        } else {
-            data = import("./top.json");
-         }
-        const {podcasts, name } = await data;
-        const cleanedCasts = podcasts.map((podcast, num) => {
-            const {
-                title,
-                domain,
-                thumbnail,
-                description,
-                id,
-                total_episodes: episodes,
-                earliest_pub_date_ms: startDate,
-                publisher,
-            } = podcast;
-            const rss = `${URI}${id}`;
-            return {
-                title: `${num + 1}. ${title}`,
-                thumbnail,
-                domain,
-                description,
-                rss,
-                episodes,
-                startDate,
-                publisher,
+        try {
+            const params = new URLSearchParams({ page: '1', region: 'us' });
+            if (query) params.set('genre_id', query);
+            const data = await fetch(`/ln/best_podcasts?${params}`).then(x => x.json());
+            const { podcasts = [], name } = data;
+            const cleanedCasts = podcasts.map((podcast, num) => {
+                const {
+                    title,
+                    domain,
+                    thumbnail,
+                    description,
+                    id,
+                    total_episodes: episodes,
+                    earliest_pub_date_ms: startDate,
+                    publisher,
+                } = podcast;
+                const rss = `${URI}${id}`;
+                return {
+                    title: `${num + 1}. ${title}`,
+                    thumbnail,
+                    domain,
+                    description,
+                    rss,
+                    episodes,
+                    startDate,
+                    publisher,
+                };
+            });
+            const response = {
+                top: cleanedCasts,
+                loading: false,
+                init: query || 0,
+                name
             };
-        });
-        const response = {
-            top: cleanedCasts,
-            loading: false,
-            init: query || 0,
-            name
-        };
-        memory = response;
-        return response;
+            memory = response;
+            return response;
+        } catch (error) {
+            console.error("getPopularPodcasts failed:", error);
+            return { top: [], loading: false, init: query || 0, name: null };
+        }
     };
