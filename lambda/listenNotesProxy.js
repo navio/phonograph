@@ -11,11 +11,13 @@ const json = (statusCode, bodyObj) => ({
 });
 
 export const handler = async (event) => {
-  const apiKey = process.env.LISTEN_NOTES_API_KEY;
+  // Support both names:
+  // - LISTEN_NOTES_API_KEY (preferred)
+  // - LISTENNOTES (legacy)
+  const apiKey = process.env.LISTEN_NOTES_API_KEY || process.env.LISTENNOTES;
   if (!apiKey) {
-    // This must be configured in Netlify environment variables (incl. Deploy Previews)
     return json(500, {
-      error: "Missing LISTEN_NOTES_API_KEY env var on the server.",
+      error: "Missing Listen Notes API key env var. Set LISTEN_NOTES_API_KEY (preferred) or LISTENNOTES.",
     });
   }
 
