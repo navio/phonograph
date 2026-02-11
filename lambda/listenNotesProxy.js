@@ -21,12 +21,30 @@ export const handler = async (event) => {
     });
   }
 
-  // When called via redirect:
-  //   /ln/<splat> -> /.netlify/functions/listenNotesProxy/<splat>
-  // event.path includes the full function path; extract the remainder.
-  const prefix = "/.netlify/functions/listenNotesProxy/";
+  // When called via redirect, Netlify may preserve the original request path in `event.path`.
+  // Support both:
+  //   /ln/<splat>
+  //   /.netlify/functions/listenNotesProxy/<splat>
   const rawPath = event.path || "";
-  const remainder = rawPath.startsWith(prefix) ? rawPath.slice(prefix.length) : "";
+  const prefixes = [
+    "/.netlify/functions/listenNotesProxy/",
+    "/.netlify/functions/listenNotesProxy",
+    "/ln/",
+    "/ln",
+  ];
+
+  let remainder = rawPath;
+  for (const p of prefixes) {
+    if (remainder.startsWith(p)) {
+      remainder = remainder.slice(p.length);
+      break;
+    }
+  }
+  remainder = remainder.replace(/^\/+/, "");
+
+  if (!remainder) {
+    return json(400, { error: `Missing Listen Notes path splat for request path: ${rawPath}` });
+  }
 
   const url = new URL(remainder, LISTEN_NOTES_BASE);
 
