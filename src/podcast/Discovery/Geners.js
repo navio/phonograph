@@ -1,46 +1,48 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Chip from "@mui/material/Chip";
 import Box from "@mui/material/Box";
 
+const TOP = { id: 0, name: "Top", parent_id: null };
 
-export default ({getPopularPodcasts, selected}) => {
+export default ({ getPopularPodcasts, selected }) => {
   const [genres, setGenres] = useState([]);
 
-  const getCategories = () => {
+  useEffect(() => {
     import("./genres.json")
-            .then((response) => {
-                const data = response.default || response;
-                const { genres = [] } = data;
-                return genres;
-            })
-            .then( data => setGenres([{id: 0, name: "Top", parent_id: null}, ...data]))
-  }
+      .then((response) => response.default || response)
+      .then((data) => {
+        const { genres = [] } = data || {};
+        setGenres(genres);
+      });
+  }, []);
 
-  useEffect(()=> {
-    getCategories()
-  },[])
+  const sortedGenres = useMemo(() => {
+    const rest = [...(genres || [])].sort((a, b) => (a?.name || "").localeCompare(b?.name || ""));
+    // Always keep Top first.
+    return [TOP, ...rest.filter((g) => g && g.id !== 0)];
+  }, [genres]);
+
   return (
     <Box
       sx={{
         display: "flex",
         justifyContent: "center",
         flexWrap: "wrap",
+        width: "100%",
         "& > *": {
           m: 0.5,
         },
       }}
     >
-      {genres && genres.sort((a,b)=> {
-        if(a.name < b.name) { return -1; }
-        if(a.name > b.name) { return 1; }
-        return 0;
-      }).map((genre, id) => (
-        <Chip key={id} 
-              onClick={()=>getPopularPodcasts(genre.id)} 
-              label={genre.name} 
-              variant={ (selected === genre.id) ? 'filled' : 'outlined'} 
-              color={ genre.name === "Top" ? "secondary" : "primary" } />
+      {sortedGenres.map((genre) => (
+        <Chip
+          key={genre.id}
+          onClick={() => getPopularPodcasts(genre.id)}
+          label={genre.name}
+          variant={selected === genre.id ? "filled" : "outlined"}
+          color={genre.id === 0 ? "secondary" : "primary"}
+        />
       ))}
     </Box>
   );
-}
+};

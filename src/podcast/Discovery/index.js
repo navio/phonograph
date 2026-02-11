@@ -195,9 +195,14 @@ const Discover = ({ addPodcastHandler, actionAfterClick }) => {
         <Header searchHandler={searchHandler} />
         <Card>
           <CardContent>
-          <Search handleChange={searchForPodcasts} updatePodcasts={updatePodcasts} />
-          <Geners getPopularPodcasts={genreHandler} selected={state.init} />
-          <Typography variant={"h6"} >
+          <Box sx={{ maxWidth: 760, mx: 'auto', px: 1 }}>
+            <Search handleChange={searchForPodcasts} updatePodcasts={updatePodcasts} />
+            <Box sx={{ pb: 1 }}>
+              <Geners getPopularPodcasts={genreHandler} selected={state.init} />
+            </Box>
+          </Box>
+
+          <Typography variant={"h6"} sx={{ mt: 2, mb: 1 }}>
               { results !== 'empty' && sectionLabel }
           </Typography>
           { renderContent() }
