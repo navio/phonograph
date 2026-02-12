@@ -3,9 +3,9 @@ export default () => {
     // Use the window load event to keep the page load performant
     window.addEventListener('load', () => {
       navigator.serviceWorker
-        .register("/service-worker.js", {registrationStrategy: 'registerImmediately'})
+        .register("/service-worker.js")
         .then(() => console.log("SW Registered"))
-        .catch(() => console.error("failed to register service worker!"));
+        .catch((err) => console.error("failed to register service worker!", err));
     });
   }
 }
