@@ -1,108 +1,100 @@
-const version = 1.10;
-const CACHE = 'phonograph-core-' + version;
-const CACHERUNTIME = 'phonograph-runtime-' + version;
+const VERSION = "1.10";
+const CORE_CACHE = "phonograph-core-" + VERSION;
+const RUNTIME_CACHE = "phonograph-runtime-" + VERSION;
 
-
-
-self.addEventListener('install', function (event){
+self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE)
-    .then(function (cache) {
-      return cache.addAll([]);
-    })
-    .then(self.skipWaiting())
-  );
-});
-
-
-self.addEventListener('activate', event => {
-  const currentCaches = [CACHE];
-  event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return cacheNames.filter(cacheName => !currentCaches.includes(cacheName));
-    }).then(cachesToDelete => {
-      return Promise.all(cachesToDelete.map(cacheToDelete => {
-        return caches.delete(cacheToDelete);
-      }));
-    }).then(() => self.clients.claim())
-  );
-});
-
-
-self.addEventListener("fetch", function (evt) {
-  if (evt.request.method === 'GET' && !ignoreMe(evt.request.url) ) {
-    fetchTask(evt);
-  }
-});
-
-function fetchTask(event) {
-
-    const {request} = event;
-    const path = checkPath(request.url) ? new Request(self.origin) : request;
-
-    event.respondWith(
-      caches.match(path).then(cachedResponse => {
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-        return caches.open(CACHERUNTIME)
-              .then(function(cache) { 
-                return fetch(path).then(response => {
-                  if (!response.ok) {
-                    return response;
-                  }
-                  return cache.put(path, response.clone())
-                  .then(() => {
-                    return response;
-                  });
-                });
-              });
+    caches
+      .open(CORE_CACHE)
+      .then((cache) => {
+        // Populated by swGenerator.js at build time.
+        return cache.addAll([]);
       })
-    )
+      .then(() => self.skipWaiting())
+  );
+});
 
+self.addEventListener("activate", (event) => {
+  const keep = new Set([CORE_CACHE, RUNTIME_CACHE]);
+  event.waitUntil(
+    caches
+      .keys()
+      .then((names) => {
+        return Promise.all(
+          names.map((name) => {
+            if (keep.has(name)) return null;
+            return caches.delete(name);
+          })
+        );
+      })
+      .then(() => self.clients.claim())
+  );
+});
+
+const shouldIgnore = (url) => {
+  // Only same-origin requests reach here.
+  const pathname = url.pathname;
+  if (pathname.startsWith("/api/")) return true;
+  if (pathname.startsWith("/rss-full/")) return true;
+  if (pathname.startsWith("/raw/")) return true;
+  if (pathname.startsWith("/lhead/")) return true;
+  if (pathname.startsWith("/podcasts/")) return true;
+  if (pathname.startsWith("/search/")) return true;
+  if (pathname.startsWith("/ln/")) return true;
+  if (pathname.startsWith("/image/")) return true;
+  if (pathname.startsWith("/media/")) return true;
+  if (pathname.startsWith("/ignoreme/")) return true;
+  return false;
+};
+
+const isNavigationRequest = (request) => {
+  if (request.mode === "navigate") return true;
+  const accept = request.headers.get("accept") || "";
+  return accept.includes("text/html");
+};
+
+self.addEventListener("fetch", (event) => {
+  const { request } = event;
+
+  if (request.method !== "GET") return;
+
+  // iOS Safari relies heavily on Range requests for media.
+  // Cache API matching ignores headers, so caching a partial response can break playback.
+  if (request.headers.has("range")) return;
+
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+  if (shouldIgnore(url)) return;
+
+  if (isNavigationRequest(request)) {
+    event.respondWith(
+      caches.match("/index.html").then((cached) => {
+        return cached || fetch("/index.html");
+      })
+    );
+    return;
   }
 
+  event.respondWith(
+    caches.match(request).then((cached) => {
+      if (cached) return cached;
 
-  const ignoreMe = (url) => {
-    if(url.indexOf('itunes.apple.com') > -1 ){
-      return true;
-    }
-  
-    if (url.indexOf('chrome-extension') > -1) {
-      return true;
-    }
-    
-    if (url.indexOf('/api/') > -1) {
-      return true;
-    }
-    
-    if (url.indexOf('/rss-full/') > -1) {
-      return true;
-    }
-    
-    if (url.indexOf('/ln/') > -1) {
-      return true;
-    }
-  
-    if (url.indexOf('wss://') > -1) {
-      return true;
-    }
-  
-    if (url.indexOf('/ignoreme/') > -1) {
-      return true;
-    }
-  
-    return false;
-  }
+      return fetch(request)
+        .then((response) => {
+          if (!response || !response.ok) return response;
 
-  const localURLs = ['library', 'podcast', 'podcast/', 'discover', 'settings' ];
-  
-  const checkPath = (url) => {
-    return !!localURLs.find((current) => {
-      const origin = `${self.origin}/${current}`
-      return (url.indexOf(origin) > -1)
+          const copy = response.clone();
+          caches
+            .open(RUNTIME_CACHE)
+            .then((cache) => cache.put(request, copy))
+            .catch(() => {});
+
+          return response;
+        })
+        .catch(() => cached);
     })
-  } 
+  );
+});
   
   // const shouldUpdate = (url) => {
   //   if (url.indexOf('.png') > -1) {
