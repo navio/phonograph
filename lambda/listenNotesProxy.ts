@@ -74,5 +74,3 @@ export const handler: Handler = async (event) => {
 };
 
 export default handler;
-
-export default handler;
