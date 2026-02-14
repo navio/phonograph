@@ -5,16 +5,8 @@ import { NodeModulesPolyfillPlugin } from '@esbuild-plugins/node-modules-polyfil
 
 export default defineConfig({
   plugins: [react()],
-  esbuild: {
-    loader: 'jsx',
-    include: /src\/.*\.js$/,
-    exclude: []
-  },
   optimizeDeps: {
     esbuildOptions: {
-      loader: {
-        '.js': 'jsx'
-      },
       plugins: [
         NodeGlobalsPolyfillPlugin({
           process: true,
