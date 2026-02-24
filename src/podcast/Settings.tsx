@@ -1,6 +1,6 @@
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import React, { useContext } from "react";
+import React, { useContext, useRef, useState } from "react";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
@@ -14,6 +14,10 @@ import Typography from "@mui/material/Typography";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import LinearProgress from "@mui/material/LinearProgress";
+
 import { Button } from "@mui/material";
 import PodcastEngine from "podcastsuite";
 import { AppContext } from "../App";
@@ -25,11 +29,26 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 
 import BrightnessLowIcon from "@mui/icons-material/WbSunny";
 import BrightnessHighIcon from "@mui/icons-material/NightsStay";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
+import DownloadIcon from "@mui/icons-material/Download";
 
 import { initializeLibrary } from "../engine";
+import { buildOpml, parseOpml } from "./opml";
 
 const Settings: React.FC = () => {
   const { state, dispatch, engine } = useContext(AppContext) as AppContextValue;
+
+  const [notice, setNotice] = useState<{ open: boolean; message: string; severity: "success" | "info" | "warning" | "error" }>(
+    {
+      open: false,
+      message: "",
+      severity: "info",
+    }
+  );
+
+  const [isImporting, setIsImporting] = useState(false);
+  const [importProgress, setImportProgress] = useState<{ done: number; total: number } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const themeSwitcher = (_ev: React.MouseEvent<HTMLElement>, input: string | null) => {
     if (!input) return;
@@ -51,6 +70,97 @@ const Settings: React.FC = () => {
     await (PodcastEngine as any).db.del(podcast);
   };
 
+  const exportOpml = () => {
+    const feeds = (state.podcasts || [])
+      .map((p: any) => ({
+        url: (p.url || p.domain || "").toString(),
+        title: p.title?.toString?.() || undefined,
+      }))
+      .filter((f) => !!f.url);
+
+    const opml = buildOpml(feeds, { title: "Phonograph Subscriptions" });
+
+    const blob = new Blob([opml], { type: "text/x-opml" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `phonograph-subscriptions-${new Date().toISOString().slice(0, 10)}.opml`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    URL.revokeObjectURL(url);
+
+    setNotice({ open: true, message: `Exported ${feeds.length} podcasts to OPML.`, severity: "success" });
+  };
+
+  const importOpmlFile = async (file: File) => {
+    setIsImporting(true);
+    setImportProgress(null);
+
+    try {
+      const text = await file.text();
+      const { feeds } = parseOpml(text);
+
+      const existing = new Set(
+        (state.podcasts || []).map((p: any) => (p.url || p.domain || "").toString())
+      );
+
+      const toImport = feeds.filter((f) => f.url && !existing.has(f.url));
+
+      if (toImport.length === 0) {
+        setNotice({ open: true, message: "No new podcasts found to import.", severity: "info" });
+        return;
+      }
+
+      setImportProgress({ done: 0, total: toImport.length });
+
+      const failures: Array<{ url: string; error?: unknown }> = [];
+      let done = 0;
+
+      for (const feed of toImport) {
+        try {
+          await (engine as any).getPodcast(feed.url, { save: true });
+        } catch (err) {
+          failures.push({ url: feed.url, error: err });
+        } finally {
+          done += 1;
+          setImportProgress({ done, total: toImport.length });
+        }
+      }
+
+      await initializeLibrary(engine as any, dispatch);
+
+      if (failures.length === 0) {
+        setNotice({ open: true, message: `Imported ${toImport.length} podcasts from OPML.`, severity: "success" });
+      } else {
+        setNotice({
+          open: true,
+          message: `Imported ${toImport.length - failures.length}/${toImport.length} podcasts. ${failures.length} failed (check your connection or feed URLs).`,
+          severity: "warning",
+        });
+      }
+    } catch (err: any) {
+      setNotice({ open: true, message: err?.message || "Failed to import OPML.", severity: "error" });
+    } finally {
+      setIsImporting(false);
+      setTimeout(() => setImportProgress(null), 500);
+    }
+  };
+
+  const openFilePicker = () => {
+    if (isImporting) return;
+    fileInputRef.current?.click();
+  };
+
+  const onFileChange: React.ChangeEventHandler<HTMLInputElement> = async (ev) => {
+    const file = ev.target.files?.[0];
+    ev.target.value = ""; // allow re-importing the same file
+    if (!file) return;
+    await importOpmlFile(file);
+  };
+
   const { podcasts } = state;
 
   return (
@@ -60,6 +170,7 @@ const Settings: React.FC = () => {
           <Typography variant="h6">Settings</Typography>
         </Toolbar>
       </AppBar>
+
       <Card>
         <CardContent>
           <Typography variant={"h5"}>Configurations</Typography>
@@ -85,6 +196,56 @@ const Settings: React.FC = () => {
           </ToggleButtonGroup>
         </CardContent>
       </Card>
+
+      <Card variant="outlined">
+        <CardContent>
+          <Typography variant={"h6"} gutterBottom>
+            Import / Export (OPML)
+          </Typography>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept={".opml,application/xml,text/xml,text/x-opml"}
+            onChange={onFileChange}
+            style={{ display: "none" }}
+          />
+
+          <Button
+            variant="outlined"
+            color="primary"
+            startIcon={<DownloadIcon />}
+            onClick={exportOpml}
+            disabled={isImporting}
+            sx={{ mr: 1 }}
+          >
+            Export OPML
+          </Button>
+
+          <Button
+            variant="outlined"
+            color="primary"
+            startIcon={<UploadFileIcon />}
+            onClick={openFilePicker}
+            disabled={isImporting}
+          >
+            Import OPML
+          </Button>
+
+          {importProgress ? (
+            <div style={{ marginTop: 12 }}>
+              <Typography variant="caption">
+                Importing {importProgress.done}/{importProgress.total}…
+              </Typography>
+              <LinearProgress
+                variant="determinate"
+                value={(importProgress.done / Math.max(1, importProgress.total)) * 100}
+              />
+            </div>
+          ) : null}
+        </CardContent>
+      </Card>
+
       <Card>
         <Accordion>
           <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
@@ -123,22 +284,35 @@ const Settings: React.FC = () => {
           </AccordionDetails>
         </Accordion>
       </Card>
+
       <Card variant="outlined">
         <CardContent>
-          <Button variant="outlined" color="primary" onClick={clearState}>
+          <Button variant="outlined" color="primary" onClick={clearState} disabled={isImporting}>
             Reset State
           </Button>
-          <Button variant="outlined" color="primary" onClick={reloadCasts}>
+          <Button variant="outlined" color="primary" onClick={reloadCasts} disabled={isImporting}>
             Reload Saved Podcasts
           </Button>
         </CardContent>
       </Card>
+
       <Card>
         <CardContent sx={{ textAlign: "center" }}>
           <Typography variant="h5">Phonograph</Typography>
           <Typography>is developed with ❤️ in Hoboken, NJ</Typography>
         </CardContent>
       </Card>
+
+      <Snackbar
+        open={notice.open}
+        autoHideDuration={4000}
+        onClose={() => setNotice((n) => ({ ...n, open: false }))}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert onClose={() => setNotice((n) => ({ ...n, open: false }))} severity={notice.severity} variant="filled">
+          {notice.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 };
