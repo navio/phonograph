@@ -1,37 +1,143 @@
-import React, { useContext } from "react";
+import React, { useContext, useMemo, useRef, useEffect, useState } from "react";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
-import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import AddIcon from "@mui/icons-material/Add";
 import Fab from "@mui/material/Fab";
 import { useTheme } from "@mui/material/styles";
+import Box from "@mui/material/Box";
+import CardActionArea from "@mui/material/CardActionArea";
+import Skeleton from "@mui/material/Skeleton";
 
 import { AppContext } from "../App";
 import { AppContextValue, PodcastEntry } from "../types/app";
 import phono from "../../public/phono.svg";
-
-const randomColor = (min: number, max: number) => Math.floor(Math.random() * max + min);
 
 interface LibraryProps {
   addPodcastHandler: () => void;
   actionAfterSelectPodcast: () => void;
 }
 
+const hashToIndex = (input: string, modulo: number) => {
+  let hash = 0;
+  for (let i = 0; i < input.length; i += 1) {
+    hash = (hash * 31 + input.charCodeAt(i)) | 0;
+  }
+  const n = Math.abs(hash);
+  return modulo === 0 ? 0 : n % modulo;
+};
+
+const PodcastCover: React.FC<{ src?: string; alt: string; bgColor: string }> = ({ src, alt, bgColor }) => {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [inView, setInView] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [errored, setErrored] = useState(false);
+
+  useEffect(() => {
+    // If IntersectionObserver is not available, load immediately.
+    if (typeof IntersectionObserver === "undefined") {
+      setInView(true);
+      return;
+    }
+
+    const el = ref.current;
+    if (!el) return;
+
+    const obs = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry?.isIntersecting) {
+          setInView(true);
+          obs.disconnect();
+        }
+      },
+      {
+        root: null,
+        // Start loading slightly before it scrolls into view.
+        rootMargin: "200px",
+        threshold: 0.01,
+      }
+    );
+
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  const finalSrc = !errored && src ? src : phono;
+
+  return (
+    <Box
+      ref={ref}
+      sx={{
+        position: "relative",
+        pt: "100%",
+        bgcolor: bgColor,
+        overflow: "hidden",
+      }}
+    >
+      {inView ? (
+        <Box
+          component="img"
+          src={finalSrc}
+          alt={alt}
+          loading="lazy"
+          decoding="async"
+          // @ts-ignore fetchPriority is supported by modern Chromium-based browsers
+          fetchPriority="low"
+          onLoad={() => setLoaded(true)}
+          onError={() => {
+            setErrored(true);
+            setLoaded(true);
+          }}
+          sx={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+          }}
+        />
+      ) : null}
+
+      {!loaded ? (
+        <Skeleton
+          variant="rectangular"
+          sx={{
+            position: "absolute",
+            inset: 0,
+          }}
+        />
+      ) : null}
+    </Box>
+  );
+};
+
 const LibraryView: React.FC<LibraryProps> = ({ addPodcastHandler, actionAfterSelectPodcast }) => {
   const theme = useTheme();
   const { state, dispatch } = useContext(AppContext) as AppContextValue;
-  const podcasts = state.podcasts as PodcastEntry[];
-  const colorSwatches = [
-    theme.palette.primary.light,
-    theme.palette.primary.main,
-    theme.palette.primary.dark,
-    theme.palette.secondary.light,
-    theme.palette.secondary.main,
-    theme.palette.secondary.dark,
-  ];
+  const podcasts = (state.podcasts as PodcastEntry[]) || [];
+
+  const colorSwatches = useMemo(
+    () => [
+      theme.palette.primary.light,
+      theme.palette.primary.main,
+      theme.palette.primary.dark,
+      theme.palette.secondary.light,
+      theme.palette.secondary.main,
+      theme.palette.secondary.dark,
+    ],
+    [
+      theme.palette.primary.light,
+      theme.palette.primary.main,
+      theme.palette.primary.dark,
+      theme.palette.secondary.light,
+      theme.palette.secondary.main,
+      theme.palette.secondary.dark,
+    ]
+  );
 
   const processClick = (domain: string) => {
     dispatch({ type: "loadPodcast", payload: domain });
@@ -45,6 +151,7 @@ const LibraryView: React.FC<LibraryProps> = ({ addPodcastHandler, actionAfterSel
           <Typography variant="h6">Library</Typography>
         </Toolbar>
       </AppBar>
+
       <Fab
         color="secondary"
         aria-label="add"
@@ -59,31 +166,26 @@ const LibraryView: React.FC<LibraryProps> = ({ addPodcastHandler, actionAfterSel
       >
         <AddIcon />
       </Fab>
+
       <Grid container spacing={0} direction={"row"}>
         {podcasts.length > 0 ? (
-          podcasts.map(
-            (podcast) =>
-              podcast &&
-              podcast.domain && (
-                <Grid item xs={3} sm={2} md={1} key={podcast.domain || podcast.feed || podcast.title || Math.random()}>
-                  <Card raised={true}>
-                    <div style={{ backgroundColor: colorSwatches[randomColor(0, 6)] }}>
-                      <CardMedia
-                        tabIndex={1}
-                        onClick={() => processClick(podcast.domain as string)}
-                        title={podcast.title}
-                        sx={{
-                          paddingTop: "100%",
-                          position: "relative",
-                          cursor: "pointer",
-                        }}
-                        image={podcast.image || undefined}
-                      />
-                    </div>
+          podcasts
+            .filter((p) => !!p?.domain)
+            .map((podcast) => {
+              const domain = podcast.domain as string;
+              const bgColor = colorSwatches[hashToIndex(domain, colorSwatches.length)];
+              const title = (podcast.title as string) || "Podcast";
+
+              return (
+                <Grid item xs={3} sm={2} md={1} key={domain}>
+                  <Card raised>
+                    <CardActionArea onClick={() => processClick(domain)}>
+                      <PodcastCover src={(podcast.image as string) || undefined} alt={title} bgColor={bgColor} />
+                    </CardActionArea>
                   </Card>
                 </Grid>
-              )
-          )
+              );
+            })
         ) : (
           <Typography
             sx={{
