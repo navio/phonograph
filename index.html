@@ -54,6 +54,21 @@
       You need to enable JavaScript to run this app.
     </noscript>
     <div id="root"></div>
+    <script>
+      (function () {
+        var root = document.getElementById("root");
+        if (root && !root.innerHTML) {
+          root.innerHTML = "<div style=\"padding:16px;font-family:Arial, sans-serif;\">Loading...\</div>";
+        }
+        window.addEventListener("error", function (event) {
+          var message = (event && (event.error && event.error.stack)) || event.message || String(event);
+          var pre = document.createElement("pre");
+          pre.style.cssText = "white-space: pre-wrap; color: #b00020; padding: 16px;";
+          pre.textContent = "Phonograph startup error:\n" + message;
+          document.body.appendChild(pre);
+        });
+      })();
+    </script>
     <script type="module" src="/src/index.tsx"></script>
   </body>
 </html>

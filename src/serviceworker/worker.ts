@@ -1,8 +1,14 @@
 import PodcastEngine from "podcastsuite";
 
 const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
+const IS_DESKTOP = process.env.PLATFORM === "desktop";
 
-const proxy = DEBUG
+const proxy = IS_DESKTOP
+  ? {
+      "https:": "https://",
+      "http:": "http://",
+    }
+  : DEBUG
   ? {
       "https:": `//${location.host}/rss-full/?term=https://`,
       "http:": `//${location.host}/rss-full/?term=http://`,

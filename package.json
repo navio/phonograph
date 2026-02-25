@@ -15,6 +15,7 @@
     "colorthief": "^2.4.0",
     "dayjs": "^1.8.23",
     "dompurify": "^2.0.10",
+    "electrobun": "^0.0.1",
     "encoding": "^0.1.12",
     "idb-keyval": "^3.2.0",
     "node-fetch": "^2.6.0",
@@ -35,6 +36,10 @@
   "scripts": {
     "start": "vite",
     "build": "yarn getter && vite build && yarn SEO && yarn sw && yarn lambda:build",
+    "start:desktop": "bunx vite build --mode desktop && electrobun build && electrobun dev",
+    "desktop:rebuild": "bunx vite build --mode desktop && rm -rf build/dev && electrobun build && electrobun dev",
+    "build:desktop": "electrobun build --env=stable",
+    "build:desktop:canary": "electrobun build --env=canary",
     "serve": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
@@ -69,6 +74,7 @@
     "netlify-cli": "^23.4.3",
     "typescript": "^5.9.3",
     "vite": "^5.0.0",
+    "vite-plugin-node-polyfills": "^0.25.0",
     "vitest": "^4.0.18"
   },
   "config": {

@@ -16,10 +16,12 @@ import {
   SETTINGSVIEW,
 } from "./constants";
 import playerFunctions from "./engine/player";
-import { getPodcastEngine, checkIfNewPodcastInURL } from "./engine";
+import { getPodcastEngine, checkIfNewPodcastInURL, initializeLibrary } from "./engine";
 import attachEvents from "./engine/events";
 import WorkerClass from "./serviceworker/worker?worker";
 import { AppContextValue } from "./types/app";
+
+const IS_DESKTOP = process.env.PLATFORM === "desktop";
 
 export const AppContext = React.createContext<AppContextValue | null>(null);
 export const Consumer = AppContext.Consumer;
@@ -43,7 +45,7 @@ const Loading = () => (
 
 const Underground = () => <div style={{ display: "block", height: "5.35rem" }}>.</div>;
 
-const worker = new WorkerClass();
+const worker = IS_DESKTOP ? null : new WorkerClass();
 
 const App: React.FC = () => {
   const player = useRef<HTMLAudioElement | null>(null);
@@ -68,7 +70,11 @@ const App: React.FC = () => {
   const engine = getPodcastEngine(Boolean(shouldInit));
 
   useEffect(() => {
-    worker.postMessage({ action: "update" });
+    if (worker) {
+      worker.postMessage({ action: "update" });
+    } else {
+      initializeLibrary(engine, dispatch);
+    }
   }, []);
 
   useEffect(() => {
@@ -161,42 +167,34 @@ const App: React.FC = () => {
             path={[DISCOVERVIEW, ROOT]}
             render={({ history }) => (
               <Suspense fallback={<Loading />}>
-                <Discover
-                  addPodcastHandler={loadPodcast}
-                  actionAfterClick={() => history.push(PODCASTVIEW)}
-                />
-            </Suspense>
-          )}
-        />
+                <Discover addPodcastHandler={loadPodcast} actionAfterClick={() => history.push(PODCASTVIEW)} />
+              </Suspense>
+            )}
+          />
 
-        <Route
-          path={SETTINGSVIEW}
-          exact
-          render={() => (
-            <Suspense fallback={<Loading />}>
-              <Settings />
-            </Suspense>
-          )}
-        />
-          <Route>
-            <Redirect to={DISCOVERVIEW} />
-          </Route>
+          <Route
+            path={SETTINGSVIEW}
+            exact
+            render={() => (
+              <Suspense fallback={<Loading />}>
+                <Settings />
+              </Suspense>
+            )}
+          />
+
+          <Route
+            path={ROOT}
+            render={() => (
+              <Suspense fallback={<Loading />}>
+                <Redirect to={DISCOVERVIEW} />
+              </Suspense>
+            )}
+          />
         </Switch>
 
-        {state.episodeInfo && <Underground />}
-
-        <Suspense fallback={<Loading />}>
-          <Footer />
-        </Suspense>
-
-        <audio
-          preload="auto"
-          autoPlay={state.status !== "paused"}
-          ref={player}
-          title={title}
-          src={playerProxy + state.media}
-        />
         <Drawer />
+        <Underground />
+        <Footer title={title} player={player} playerProxy={playerProxy} />
       </AppContext.Provider>
     </ThemeProvider>
   );

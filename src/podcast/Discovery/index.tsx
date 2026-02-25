@@ -118,15 +118,28 @@ const Discover: React.FC<DiscoverProps> = ({ addPodcastHandler, actionAfterClick
     name: null,
     trendingLoading: true,
     trendingError: false,
+    errorMessage: null,
   });
 
   const loadTrending = useCallback((genreId: number | null = null) => {
     setState((prev) => ({ ...prev, trendingLoading: true, trendingError: false }));
     getPopularPodcasts(genreId).then((response: PopularPodcastsResponse) => {
       if (response.error) {
-        setState((prev) => ({ ...prev, trendingLoading: false, trendingError: true, init: genreId || 0 }));
+        setState((prev) => ({
+          ...prev,
+          trendingLoading: false,
+          trendingError: true,
+          init: genreId || 0,
+          errorMessage: response.errorMessage || "Failed to load trending podcasts.",
+        }));
       } else {
-        setState((prev) => ({ ...prev, ...response, trendingLoading: false, trendingError: false }));
+        setState((prev) => ({
+          ...prev,
+          ...response,
+          trendingLoading: false,
+          trendingError: false,
+          errorMessage: null,
+        }));
       }
     });
   }, []);
