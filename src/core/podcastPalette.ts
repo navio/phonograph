@@ -43,6 +43,8 @@ const DEFAULT_THEME: PaletteTheme = {
 };
 // WCAG AA contrast ratio for normal text is 4.5:1
 const MIN_TEXT_CONTRAST = 4.5;
+// WCAG non-text contrast (icons, UI controls) is 3:1
+const MIN_UI_CONTRAST = 3;
 
 const isLightColor = (color: RGB = DEFAULT_COLOR) => {
   const [red, green, blue] = color;
@@ -131,6 +133,21 @@ const ensureAccent = (accent: RGB, background: RGB, colors: RGB[] = []) => {
   return accent;
 };
 
+const ensureUiColor = (foreground: RGB, background: RGB, colors: RGB[] = []) => {
+  // Icons and controls need 3:1 contrast.
+  if (contrastRatio(foreground, background) >= MIN_UI_CONTRAST) return foreground;
+
+  // Try palette extremes first, then fall back to pure black/white.
+  const candidates: RGB[] = [
+    pickDarkest(colors),
+    pickLightest(colors),
+    BLACK,
+    WHITE,
+  ].filter(Boolean) as RGB[];
+
+  return bestTextColor(background, candidates);
+};
+
 const ensureText = (background: RGB, colors: RGB[] = []) => {
   if (luminance(background) > 0.85) {
     return mix(pickDarkest(colors), BLACK, 0.1);
@@ -171,12 +188,14 @@ export const buildThemeFromPalette = (palette: Palette | null): PaletteTheme => 
   let primaryBase = ensureBackground(palette.primary, colors);
   let secondaryBase = ensureBackground(palette.secondary, colors);
   let accentBase = ensureAccent(palette.accent, primaryBase, colors);
+  accentBase = ensureUiColor(accentBase, primaryBase, colors);
 
   let text = ensureText(primaryBase, colors);
   let subText = ensureSubText(text, primaryBase, MIN_TEXT_CONTRAST);
 
   let secondaryText = ensureText(secondaryBase, colors);
   let secondarySubText = ensureSubText(secondaryText, secondaryBase, MIN_TEXT_CONTRAST);
+  let secondaryAccentBase = ensureUiColor(accentBase, secondaryBase, colors);
 
   // If contrast is still low, bias the background away from the text.
   if (contrastRatio(text, primaryBase) < MIN_TEXT_CONTRAST) {
@@ -184,18 +203,26 @@ export const buildThemeFromPalette = (palette: Palette | null): PaletteTheme => 
     primaryBase = mix(primaryBase, target, 0.35);
     secondaryBase = mix(secondaryBase, target, 0.2);
     accentBase = ensureAccent(accentBase, primaryBase, colors);
+    accentBase = ensureUiColor(accentBase, primaryBase, colors);
 
     text = ensureText(primaryBase, colors);
     subText = ensureSubText(text, primaryBase, MIN_TEXT_CONTRAST);
 
     secondaryText = ensureText(secondaryBase, colors);
     secondarySubText = ensureSubText(secondaryText, secondaryBase, MIN_TEXT_CONTRAST);
+    secondaryAccentBase = ensureUiColor(accentBase, secondaryBase, colors);
   }
 
   const accentText = bestTextColor(accentBase, [BLACK, WHITE]);
+  const secondaryAccentText = bestTextColor(secondaryAccentBase, [BLACK, WHITE]);
 
   // Fallback (option C): if we still can't guarantee contrast, use safe defaults.
-  if (contrastRatio(text, primaryBase) < MIN_TEXT_CONTRAST || contrastRatio(secondaryText, secondaryBase) < MIN_TEXT_CONTRAST) {
+  if (
+    contrastRatio(text, primaryBase) < MIN_TEXT_CONTRAST ||
+    contrastRatio(secondaryText, secondaryBase) < MIN_TEXT_CONTRAST ||
+    contrastRatio(accentBase, primaryBase) < MIN_UI_CONTRAST ||
+    contrastRatio(secondaryAccentBase, secondaryBase) < MIN_UI_CONTRAST
+  ) {
     return DEFAULT_THEME;
   }
 
@@ -209,8 +236,8 @@ export const buildThemeFromPalette = (palette: Palette | null): PaletteTheme => 
 
     secondaryText: toRGB(secondaryText),
     secondarySubText: toRGB(secondarySubText),
-    secondaryAccent: toRGB(accentBase),
-    secondaryAccentText: toRGB(accentText),
+    secondaryAccent: toRGB(secondaryAccentBase),
+    secondaryAccentText: toRGB(secondaryAccentText),
   };
 };
 

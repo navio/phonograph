@@ -273,19 +273,19 @@ const EpisodeList = (props) => {
                                 whenToStart(episodeData),
                                 podcast
                               )}
-                              sx={{ color: accent }}
+                              sx={{
+                                color: accent,
+                                // Ensure icon remains visible even when accent is close to the background
+                                backgroundColor: palette ? toRGBA(palette.primary, 0.14) : "transparent",
+                                "&:hover": {
+                                  backgroundColor: palette ? toRGBA(palette.primary, 0.22) : undefined,
+                                },
+                              }}
                             >
-                              {props.playing === episode.guid &&
-                              props.status !== "paused" ? (
-                                <PauseIcon
-                                  fontSize="large"
-                                  sx={{ color: accent }}
-                                />
+                              {props.playing === episode.guid && props.status !== "paused" ? (
+                                <PauseIcon fontSize="large" sx={{ color: accent }} />
                               ) : (
-                                <PlayArrowIcon
-                                  fontSize="large"
-                                  sx={{ color: accent }}
-                                />
+                                <PlayArrowIcon fontSize="large" sx={{ color: accent }} />
                               )}
                             </IconButton>
                           </ListItemIcon>
@@ -344,9 +344,15 @@ const EpisodeList = (props) => {
                                   },
                                 });
                               }}
-                              sx={{ color: textColor }}
+                              sx={{
+                                color: accent,
+                                backgroundColor: palette ? toRGBA(palette.primary, 0.08) : "transparent",
+                                "&:hover": {
+                                  backgroundColor: palette ? toRGBA(palette.primary, 0.16) : undefined,
+                                },
+                              }}
                             >
-                              <MoreVertIcon sx={{ color: textColor }} />
+                              <MoreVertIcon sx={{ color: accent }} />
                             </IconButton>
 
                             {/* <ShowProgress
