@@ -167,12 +167,21 @@ const EpisodeList = (props) => {
   const theme = useTheme();
   const palette = props.palette;
   const themeColors = palette ? buildThemeFromPalette(palette) : null;
-  const textColor = themeColors?.text || theme.palette.text.primary;
-  const subText = themeColors?.subText || theme.palette.text.secondary;
-  const accent = themeColors?.accent || theme.palette.secondary.main;
+
+  // The episode list sits on a secondary surface; use tokens derived for that surface.
   const listBackground = palette
     ? themeColors?.secondary || toRGBA(palette.secondary, 0.18)
     : theme.palette.background.default;
+
+  const textColor = palette
+    ? themeColors?.secondaryText || themeColors?.text || theme.palette.text.primary
+    : theme.palette.text.primary;
+  const subText = palette
+    ? themeColors?.secondarySubText || themeColors?.subText || theme.palette.text.secondary
+    : theme.palette.text.secondary;
+  const accent = palette
+    ? themeColors?.secondaryAccent || themeColors?.accent || theme.palette.secondary.main
+    : theme.palette.secondary.main;
 
   useEffect(() => {
     window && window.scrollTo && window.scrollTo(0, 0);

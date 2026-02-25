@@ -16,6 +16,12 @@ export interface PaletteTheme {
   accentText: string;
   text: string;
   subText: string;
+
+  /** Optional: derived tokens for secondary surfaces (eg episode list background). */
+  secondaryText?: string;
+  secondarySubText?: string;
+  secondaryAccent?: string;
+  secondaryAccentText?: string;
 }
 
 const paletteCache = new Map<string, Palette | null>();
@@ -30,8 +36,13 @@ const DEFAULT_THEME: PaletteTheme = {
   accentText: "rgb(255,255,255)",
   text: "rgb(15,15,15)",
   subText: "rgb(70,70,70)",
+  secondaryText: "rgb(15,15,15)",
+  secondarySubText: "rgb(70,70,70)",
+  secondaryAccent: "rgb(20,20,20)",
+  secondaryAccentText: "rgb(255,255,255)",
 };
-const MIN_TEXT_CONTRAST = 7;
+// WCAG AA contrast ratio for normal text is 4.5:1
+const MIN_TEXT_CONTRAST = 4.5;
 
 const isLightColor = (color: RGB = DEFAULT_COLOR) => {
   const [red, green, blue] = color;
@@ -137,14 +148,35 @@ const ensureText = (background: RGB, colors: RGB[] = []) => {
   return candidate;
 };
 
+const ensureSubText = (text: RGB, background: RGB, minContrast = MIN_TEXT_CONTRAST) => {
+  // Start by blending toward the background for a "secondary" feel,
+  // but never drop below contrast requirements.
+  let amount = 0.25;
+  let candidate = mix(text, background, amount);
+
+  while (contrastRatio(candidate, background) < minContrast && amount > 0) {
+    amount = clamp(amount - 0.05, 0, 1);
+    candidate = mix(text, background, amount);
+  }
+
+  // Worst case: keep same as primary text.
+  if (contrastRatio(candidate, background) < minContrast) return text;
+  return candidate;
+};
+
 export const buildThemeFromPalette = (palette: Palette | null): PaletteTheme => {
   if (!palette || !palette.colors || palette.colors.length === 0) return DEFAULT_THEME;
   const colors = palette.colors || [];
+
   let primaryBase = ensureBackground(palette.primary, colors);
   let secondaryBase = ensureBackground(palette.secondary, colors);
   let accentBase = ensureAccent(palette.accent, primaryBase, colors);
+
   let text = ensureText(primaryBase, colors);
-  let subText = mix(text, primaryBase, 0.25);
+  let subText = ensureSubText(text, primaryBase, MIN_TEXT_CONTRAST);
+
+  let secondaryText = ensureText(secondaryBase, colors);
+  let secondarySubText = ensureSubText(secondaryText, secondaryBase, MIN_TEXT_CONTRAST);
 
   // If contrast is still low, bias the background away from the text.
   if (contrastRatio(text, primaryBase) < MIN_TEXT_CONTRAST) {
@@ -152,11 +184,20 @@ export const buildThemeFromPalette = (palette: Palette | null): PaletteTheme => 
     primaryBase = mix(primaryBase, target, 0.35);
     secondaryBase = mix(secondaryBase, target, 0.2);
     accentBase = ensureAccent(accentBase, primaryBase, colors);
+
     text = ensureText(primaryBase, colors);
-    subText = mix(text, primaryBase, 0.25);
+    subText = ensureSubText(text, primaryBase, MIN_TEXT_CONTRAST);
+
+    secondaryText = ensureText(secondaryBase, colors);
+    secondarySubText = ensureSubText(secondaryText, secondaryBase, MIN_TEXT_CONTRAST);
   }
 
   const accentText = bestTextColor(accentBase, [BLACK, WHITE]);
+
+  // Fallback (option C): if we still can't guarantee contrast, use safe defaults.
+  if (contrastRatio(text, primaryBase) < MIN_TEXT_CONTRAST || contrastRatio(secondaryText, secondaryBase) < MIN_TEXT_CONTRAST) {
+    return DEFAULT_THEME;
+  }
 
   return {
     primary: toRGB(primaryBase),
@@ -165,6 +206,11 @@ export const buildThemeFromPalette = (palette: Palette | null): PaletteTheme => 
     accentText: toRGB(accentText),
     text: toRGB(text),
     subText: toRGB(subText),
+
+    secondaryText: toRGB(secondaryText),
+    secondarySubText: toRGB(secondarySubText),
+    secondaryAccent: toRGB(accentBase),
+    secondaryAccentText: toRGB(accentText),
   };
 };
 
