@@ -33,6 +33,13 @@ function PodcastHeader(props) {
   const showDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const [open, setOpen] = React.useState(false);
   const [message, setMessage] = React.useState("");
+  const [descExpanded, setDescExpanded] = React.useState(false);
+
+  React.useEffect(() => {
+    // Reset when switching podcasts
+    setDescExpanded(false);
+  }, [props?.podcast?.domain, props?.podcast?.title]);
+
   let history = useHistory();
   const isInLibrary = inLibrary()
   const saveThisPodcastToLibrary = (ev) => {
@@ -207,14 +214,55 @@ function PodcastHeader(props) {
                   {state.author}
                 </Typography>
               )}
-              {state.description && (
-                <Typography
-                  variant="body1"
-                  sx={{ color: subText, mt: 1, maxWidth: "65ch" }}
-                >
-                  {clearText(state.description)}
-                </Typography>
-              )}
+              {state.description && (() => {
+                const description = clearText(state.description);
+                const isLong = description.length > 160;
+
+                return (
+                  <Box sx={{ mt: 1, maxWidth: "65ch" }}>
+                    <Typography
+                      variant="body1"
+                      sx={
+                        showDesktop
+                          ? { color: subText }
+                          : {
+                              color: subText,
+                              overflow: "hidden",
+                              display: descExpanded ? "block" : "-webkit-box",
+                              WebkitBoxOrient: "vertical",
+                              WebkitLineClamp: descExpanded ? "unset" : 2,
+                            }
+                      }
+                    >
+                      {description}
+                    </Typography>
+
+                    {!showDesktop && isLong && (
+                      <Button
+                        size="small"
+                        variant="text"
+                        onClick={() => setDescExpanded((v) => !v)}
+                        aria-expanded={descExpanded}
+                        sx={{
+                          mt: 0.5,
+                          px: 0,
+                          minWidth: 0,
+                          textTransform: "none",
+                          fontWeight: 700,
+                          color: themeColors?.accentText || textColor,
+                          backgroundColor: "transparent",
+                          "&:hover": {
+                            backgroundColor: "transparent",
+                            textDecoration: "underline",
+                          },
+                        }}
+                      >
+                        {descExpanded ? "Less" : "More"}
+                      </Button>
+                    )}
+                  </Box>
+                );
+              })()}
               <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: 2 }}>
                 {!isInLibrary && (
                   <Button
