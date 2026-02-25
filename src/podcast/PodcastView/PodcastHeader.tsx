@@ -88,8 +88,11 @@ function PodcastHeader(props) {
         const state = props.podcast;
         const { palette } = props;
         const themeColors = palette ? buildThemeFromPalette(palette) : null;
-        const textColor = themeColors?.text || theme.palette.common.white;
-        const subText = themeColors?.subText || theme.palette.common.white;
+
+        // If we don't have a palette/themeColors (eg CORS/image failure),
+        // fall back to the app theme text colors (not white-on-white).
+        const textColor = themeColors?.text || theme.palette.text.primary;
+        const subText = themeColors?.subText || theme.palette.text.secondary;
         const overlay = palette
           ? toRGBA(palette.primary, showDesktop ? 0.6 : 0.8)
           : showDesktop
