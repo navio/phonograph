@@ -47,6 +47,33 @@ export const handler: Handler = async (event) => {
     if (typeof v === "string") url.searchParams.set(k, v);
   }
 
+  const cacheHeadersForPath = (pathname: string) => {
+    // Default: do not cache.
+    // Only cache endpoints that are effectively static and safe.
+    // CDN caches will key by full URL (including query params).
+    const week = 60 * 60 * 24 * 7;
+    const day = 60 * 60 * 24;
+
+    if (pathname === "/genres") {
+      const ttl = week * 4; // ~30 days
+      return {
+        // short browser cache, long CDN cache
+        "Cache-Control": `public, max-age=300`,
+        "Netlify-CDN-Cache-Control": `public, s-maxage=${ttl}, stale-while-revalidate=${day}`,
+      };
+    }
+
+    if (pathname === "/best_podcasts") {
+      const ttl = week;
+      return {
+        "Cache-Control": `public, max-age=300`,
+        "Netlify-CDN-Cache-Control": `public, s-maxage=${ttl}, stale-while-revalidate=${day}`,
+      };
+    }
+
+    return { "Cache-Control": "no-store" };
+  };
+
   try {
     const response = await fetch(url.toString(), {
       method: "GET",
@@ -59,11 +86,15 @@ export const handler: Handler = async (event) => {
     });
 
     const text = await response.text();
+
+    // Only cache successful responses.
+    const cacheHeaders = response.ok ? cacheHeadersForPath(url.pathname) : { "Cache-Control": "no-store" };
+
     return {
       statusCode: response.status,
       headers: {
         "Content-Type": "application/json; charset=utf-8",
-        "Cache-Control": "no-store",
+        ...cacheHeaders,
       },
       body: text || "{}",
     };
