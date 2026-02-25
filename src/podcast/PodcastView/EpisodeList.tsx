@@ -98,7 +98,7 @@ const EpisodeListDescription = (props) => {
           </Typography>
           <Typography variant="overline" component="div" sx={{ color: subText }}>
             {(completed || total > 97) && (
-              <CheckCircleOutlineIcon sx={{ color: accent }} fontSize="small" />
+              <CheckCircleOutlineIcon sx={{ color: textColor }} fontSize="small" />
             )}{" "}
             {episodeDate(episode.created)}
             {total && (
@@ -167,12 +167,24 @@ const EpisodeList = (props) => {
   const theme = useTheme();
   const palette = props.palette;
   const themeColors = palette ? buildThemeFromPalette(palette) : null;
-  const textColor = themeColors?.text || theme.palette.text.primary;
-  const subText = themeColors?.subText || theme.palette.text.secondary;
-  const accent = themeColors?.accent || theme.palette.secondary.main;
+
+  // The episode list sits on a secondary surface; use tokens derived for that surface.
   const listBackground = palette
     ? themeColors?.secondary || toRGBA(palette.secondary, 0.18)
     : theme.palette.background.default;
+
+  const textColor = palette
+    ? themeColors?.secondaryText || themeColors?.text || theme.palette.text.primary
+    : theme.palette.text.primary;
+  const subText = palette
+    ? themeColors?.secondarySubText || themeColors?.subText || theme.palette.text.secondary
+    : theme.palette.text.secondary;
+  const accent = palette
+    ? themeColors?.secondaryAccent || themeColors?.accent || theme.palette.secondary.main
+    : theme.palette.secondary.main;
+
+  // For icon buttons on the list rows, prioritize legibility.
+  const iconColor = textColor;
 
   useEffect(() => {
     window && window.scrollTo && window.scrollTo(0, 0);
@@ -215,8 +227,8 @@ const EpisodeList = (props) => {
       return <div onClick={() => completeEpisode(guid)}>{total}%</div>;
     }
     return (
-      <IconButton onClick={() => completeEpisode(guid)}>
-        <CheckCircleOutlineIcon />
+      <IconButton onClick={() => completeEpisode(guid)} sx={{ color: iconColor }}>
+        <CheckCircleOutlineIcon sx={{ color: iconColor }} />
       </IconButton>
     );
   };
@@ -264,19 +276,19 @@ const EpisodeList = (props) => {
                                 whenToStart(episodeData),
                                 podcast
                               )}
-                              sx={{ color: accent }}
+                              sx={{
+                                color: iconColor,
+                                // Give the button a subtle surface so it stays visible on pale themes
+                                backgroundColor: palette ? toRGBA(palette.primary, 0.18) : "transparent",
+                                "&:hover": {
+                                  backgroundColor: palette ? toRGBA(palette.primary, 0.26) : undefined,
+                                },
+                              }}
                             >
-                              {props.playing === episode.guid &&
-                              props.status !== "paused" ? (
-                                <PauseIcon
-                                  fontSize="large"
-                                  sx={{ color: accent }}
-                                />
+                              {props.playing === episode.guid && props.status !== "paused" ? (
+                                <PauseIcon fontSize="large" sx={{ color: iconColor }} />
                               ) : (
-                                <PlayArrowIcon
-                                  fontSize="large"
-                                  sx={{ color: accent }}
-                                />
+                                <PlayArrowIcon fontSize="large" sx={{ color: iconColor }} />
                               )}
                             </IconButton>
                           </ListItemIcon>
@@ -335,9 +347,15 @@ const EpisodeList = (props) => {
                                   },
                                 });
                               }}
-                              sx={{ color: textColor }}
+                              sx={{
+                                color: iconColor,
+                                backgroundColor: palette ? toRGBA(palette.primary, 0.08) : "transparent",
+                                "&:hover": {
+                                  backgroundColor: palette ? toRGBA(palette.primary, 0.16) : undefined,
+                                },
+                              }}
                             >
-                              <MoreVertIcon sx={{ color: textColor }} />
+                              <MoreVertIcon sx={{ color: iconColor }} />
                             </IconButton>
 
                             {/* <ShowProgress
