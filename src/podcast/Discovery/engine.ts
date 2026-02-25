@@ -1,4 +1,5 @@
 import PodcastSearcher, { PodcastSearchResponse } from "./PodcastSearcher";
+import { fetchListenNotes } from "../../platform/api";
 
 export interface PodcastSearchResult {
   title: string;
@@ -17,8 +18,7 @@ export interface PopularPodcastsResponse {
   errorMessage?: string;
 }
 
-const API = "/ln/";
-const SFP = new PodcastSearcher(API);
+const SFP = new PodcastSearcher();
 
 export const searchForPodcasts = async function (search?: string): Promise<PodcastSearchResult[]> {
   const normalizeApple = (data: PodcastSearchResponse = {} as PodcastSearchResponse): PodcastSearchResult[] => {
@@ -53,7 +53,7 @@ export const searchForPodcasts = async function (search?: string): Promise<Podca
       });
   };
 
-  const term = encodeURIComponent(search || "");
+  const term = search || "";
   try {
     const data = await SFP.apple(term);
     const podcasts = normalizeApple(data);
@@ -82,13 +82,9 @@ export const getPopularPodcasts = async function (query: number | null = null): 
     return memory;
   }
   try {
-    const params = new URLSearchParams({ page: "1", region: "us" });
-    if (query !== null) params.set("genre_id", String(query));
-    const resp = await fetch(`/ln/best_podcasts?${params}`);
-    if (!resp.ok) {
-      throw new Error(`Listen Notes best_podcasts failed: ${resp.status}`);
-    }
-    const data = await resp.json();
+    const params: Record<string, string> = { page: "1", region: "us" };
+    if (query !== null) params.genre_id = String(query);
+    const data = await fetchListenNotes("best_podcasts", params);
     const { podcasts = [], name } = data;
     const cleanedCasts: PodcastSearchResult[] = podcasts.map((podcast: any, num: number) => {
       const {
