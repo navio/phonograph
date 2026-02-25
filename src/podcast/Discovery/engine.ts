@@ -1,4 +1,5 @@
 import PodcastSearcher, { PodcastSearchResponse } from "./PodcastSearcher";
+import { bestPodcastsCacheKey, getCachedBestPodcasts, setCachedBestPodcasts } from "./popularCache";
 
 export interface PodcastSearchResult {
   title: string;
@@ -81,9 +82,19 @@ export const getPopularPodcasts = async function (query: number | null = null): 
   if (memory && memory.top.length > 0 && query === null) {
     return memory;
   }
+
+  const params = new URLSearchParams({ page: "1", region: "us" });
+  if (query !== null) params.set("genre_id", String(query));
+
+  // Local (IndexedDB) cache: 1 week TTL.
+  // We still keep the in-memory cache above for the common "Trending" (null query) path.
+  const cacheKey = bestPodcastsCacheKey(query, { region: "us", page: "1" });
+  const cached = await getCachedBestPodcasts(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
   try {
-    const params = new URLSearchParams({ page: "1", region: "us" });
-    if (query !== null) params.set("genre_id", String(query));
     const resp = await fetch(`/ln/best_podcasts?${params}`);
     if (!resp.ok) {
       throw new Error(`Listen Notes best_podcasts failed: ${resp.status}`);
@@ -91,16 +102,7 @@ export const getPopularPodcasts = async function (query: number | null = null): 
     const data = await resp.json();
     const { podcasts = [], name } = data;
     const cleanedCasts: PodcastSearchResult[] = podcasts.map((podcast: any, num: number) => {
-      const {
-        title,
-        domain,
-        thumbnail,
-        description,
-        id,
-        total_episodes: episodes,
-        earliest_pub_date_ms: startDate,
-        publisher,
-      } = podcast;
+      const { title, domain, thumbnail, description, id, total_episodes: episodes, earliest_pub_date_ms: startDate, publisher } = podcast;
       const rss = `${URI}${id}`;
       return {
         title: `${num + 1}. ${title}`,
@@ -113,6 +115,7 @@ export const getPopularPodcasts = async function (query: number | null = null): 
         publisher,
       } as PodcastSearchResult;
     });
+
     const initValue = query !== null ? Number(query) : 0;
     const response: PopularPodcastsResponse = {
       top: cleanedCasts,
@@ -120,7 +123,13 @@ export const getPopularPodcasts = async function (query: number | null = null): 
       init: Number.isFinite(initValue) ? initValue : 0,
       name,
     };
+
+    // Keep existing in-memory optimization for the default view.
     if (!query) memory = response;
+
+    // Persist weekly cache for both default and per-genre calls.
+    await setCachedBestPodcasts(cacheKey, response);
+
     return response;
   } catch (error: any) {
     console.error("getPopularPodcasts failed:", error);
