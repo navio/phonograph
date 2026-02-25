@@ -98,7 +98,7 @@ const EpisodeListDescription = (props) => {
           </Typography>
           <Typography variant="overline" component="div" sx={{ color: subText }}>
             {(completed || total > 97) && (
-              <CheckCircleOutlineIcon sx={{ color: accent }} fontSize="small" />
+              <CheckCircleOutlineIcon sx={{ color: textColor }} fontSize="small" />
             )}{" "}
             {episodeDate(episode.created)}
             {total && (
@@ -183,6 +183,9 @@ const EpisodeList = (props) => {
     ? themeColors?.secondaryAccent || themeColors?.accent || theme.palette.secondary.main
     : theme.palette.secondary.main;
 
+  // For icon buttons on the list rows, prioritize legibility.
+  const iconColor = textColor;
+
   useEffect(() => {
     window && window.scrollTo && window.scrollTo(0, 0);
   }, []);
@@ -224,8 +227,8 @@ const EpisodeList = (props) => {
       return <div onClick={() => completeEpisode(guid)}>{total}%</div>;
     }
     return (
-      <IconButton onClick={() => completeEpisode(guid)}>
-        <CheckCircleOutlineIcon />
+      <IconButton onClick={() => completeEpisode(guid)} sx={{ color: iconColor }}>
+        <CheckCircleOutlineIcon sx={{ color: iconColor }} />
       </IconButton>
     );
   };
@@ -274,18 +277,18 @@ const EpisodeList = (props) => {
                                 podcast
                               )}
                               sx={{
-                                color: accent,
-                                // Ensure icon remains visible even when accent is close to the background
-                                backgroundColor: palette ? toRGBA(palette.primary, 0.14) : "transparent",
+                                color: iconColor,
+                                // Give the button a subtle surface so it stays visible on pale themes
+                                backgroundColor: palette ? toRGBA(palette.primary, 0.18) : "transparent",
                                 "&:hover": {
-                                  backgroundColor: palette ? toRGBA(palette.primary, 0.22) : undefined,
+                                  backgroundColor: palette ? toRGBA(palette.primary, 0.26) : undefined,
                                 },
                               }}
                             >
                               {props.playing === episode.guid && props.status !== "paused" ? (
-                                <PauseIcon fontSize="large" sx={{ color: accent }} />
+                                <PauseIcon fontSize="large" sx={{ color: iconColor }} />
                               ) : (
-                                <PlayArrowIcon fontSize="large" sx={{ color: accent }} />
+                                <PlayArrowIcon fontSize="large" sx={{ color: iconColor }} />
                               )}
                             </IconButton>
                           </ListItemIcon>
@@ -345,14 +348,14 @@ const EpisodeList = (props) => {
                                 });
                               }}
                               sx={{
-                                color: accent,
+                                color: iconColor,
                                 backgroundColor: palette ? toRGBA(palette.primary, 0.08) : "transparent",
                                 "&:hover": {
                                   backgroundColor: palette ? toRGBA(palette.primary, 0.16) : undefined,
                                 },
                               }}
                             >
-                              <MoreVertIcon sx={{ color: accent }} />
+                              <MoreVertIcon sx={{ color: iconColor }} />
                             </IconButton>
 
                             {/* <ShowProgress
