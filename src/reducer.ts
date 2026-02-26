@@ -147,11 +147,11 @@ export const getInitialState = (): AppState => {
   }
 
   const cleaned: AppState = { ...state };
-  delete (cleaned as Record<string, unknown])["items"];
-  delete (cleaned as Record<string, unknown])["description"];
-  delete (cleaned as Record<string, unknown])["image"];
-  delete (cleaned as Record<string, unknown])["link"];
-  delete (cleaned as Record<string, unknown])["created"];
+  delete (cleaned as Record<string, unknown>)["items"];
+  delete (cleaned as Record<string, unknown>)["description"];
+  delete (cleaned as Record<string, unknown>)["image"];
+  delete (cleaned as Record<string, unknown>)["link"];
+  delete (cleaned as Record<string, unknown>)["created"];
 
   cleaned.status = cleaned.status || "paused";
 
