@@ -36,9 +36,14 @@ export interface PlaylistItem {
   [key: string]: unknown;
 }
 
+export type ThemeName = "default" | "nord" | "dracula" | "highContrast";
+
 export interface AppState {
   podcasts: PodcastEntry[];
+  // theme historically stored mode (boolean | "dark" | "light" | "os") kept for compatibility
   theme: boolean | "dark" | "light" | "os";
+  // selected theme name (palette set)
+  themeName?: ThemeName;
   current: string | null;
 
   status: "playing" | "paused" | null;
@@ -72,6 +77,7 @@ export type AppAction =
   | { type: "initLibrary"; podcasts: PodcastEntry[] }
   | { type: "loadPodcast"; payload: string }
   | { type: "setDark"; payload: boolean | "dark" | "light" | "os" }
+  | { type: "setThemeName"; payload: ThemeName }
   | { type: "playingStatus"; status: "playing" | "paused" }
   | { type: "updateCurrent"; payload: string }
   | { type: "addNext"; payload: PlaylistItem }

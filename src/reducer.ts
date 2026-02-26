@@ -104,6 +104,7 @@ export const checkIfMediaSessionLodaded = (state: AppState) => {
 export const defaultState: AppState = {
   podcasts: [],
   theme: true,
+  themeName: "default",
   current: null,
 
   status: null,
@@ -146,11 +147,11 @@ export const getInitialState = (): AppState => {
   }
 
   const cleaned: AppState = { ...state };
-  delete (cleaned as Record<string, unknown>)["items"];
-  delete (cleaned as Record<string, unknown>)["description"];
-  delete (cleaned as Record<string, unknown>)["image"];
-  delete (cleaned as Record<string, unknown>)["link"];
-  delete (cleaned as Record<string, unknown>)["created"];
+  delete (cleaned as Record<string, unknown])["items"];
+  delete (cleaned as Record<string, unknown])["description"];
+  delete (cleaned as Record<string, unknown])["image"];
+  delete (cleaned as Record<string, unknown])["link"];
+  delete (cleaned as Record<string, unknown])["created"];
 
   cleaned.status = cleaned.status || "paused";
 
@@ -168,6 +169,8 @@ export const reducer = (state: AppState, action: AppAction): AppState => {
       return { ...state, current: action.payload };
     case "setDark":
       return { ...state, theme: action.payload };
+    case "setThemeName":
+      return { ...state, themeName: action.payload };
     case "playingStatus": {
       const { status } = action;
       updateMediaSessionState(status);
