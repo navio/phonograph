@@ -16,6 +16,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import Search from "./Search";
 import Geners from "./Geners";
 import Loading from "../../core/Loading";
+import HeroCarousel from "./HeroCarousel";
 
 import {
   getPopularPodcasts,
@@ -165,6 +166,9 @@ const Discover: React.FC<DiscoverProps> = ({ addPodcastHandler, actionAfterClick
   const isShowingSearch = podcasts.length > 0;
   const sectionLabel = isShowingSearch ? "Results" : state.name || "Trending";
 
+  // Show a top-hero carousel when we're not searching and we have at least 3 trending items
+  const showHero = !isShowingSearch && !trendingLoading && !trendingError && top && top.length >= 3;
+
   const renderContent = () => {
     if (results === "empty") {
       return <Typography variant={"h6"}>No results were found.</Typography>;
@@ -202,6 +206,7 @@ const Discover: React.FC<DiscoverProps> = ({ addPodcastHandler, actionAfterClick
   return (
     <>
       <Header />
+      {showHero ? <HeroCarousel items={top!} onItemClick={(rss) => getClickHandler(rss)()} /> : null}
       <Card>
         <CardContent>
           <Box sx={{ maxWidth: 760, mx: "auto", px: 1 }}>
