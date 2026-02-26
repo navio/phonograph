@@ -107,6 +107,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
         return set({ state: { ...current, drawer: true, drawerContent } });
       }
 
+      case "setPodcastViewEnabled":
+        return set({ state: { ...current, podcastViewEnabled: action.payload } });
+
       default:
         return set({ state: current });
     }

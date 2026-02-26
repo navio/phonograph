@@ -89,13 +89,29 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
 
   useEffect(() => {
     let active = true;
+
+    // Respect the global toggle: if podcast view theming is disabled, don't compute palettes.
+    if (state.podcastViewEnabled === false) {
+      setPalette(null);
+      return () => {
+        active = false;
+      };
+    }
+
+    if (!state.podcastImage) {
+      setPalette(null);
+      return () => {
+        active = false;
+      };
+    }
+
     getImagePalette(state.podcastImage).then((colors) => {
       if (active) setPalette(colors);
     });
     return () => {
       active = false;
     };
-  }, [state.podcastImage]);
+  }, [state.podcastImage, state.podcastViewEnabled]);
 
   const paletteStyles: PaletteTheme = useMemo(() => {
     if (!palette) {
@@ -260,232 +276,57 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
                 </Typography>
               )}
 
-              <Grid
-                container
-                direction="row"
-                justifyContent={open ? "space-around" : "space-between"}
-                alignItems="center"
-              >
-                {!open && (
-                  <>
-                    {
-                      <Grid
-                        item
-                        sx={{ textAlign: "left", paddingLeft: ".14rem" }}
-                        xs={1}
-                      >
-                        <img
-                          onClick={() => setOpen(true)}
-                          style={{
-                            display: "block",
-                            maxWidth: "5rem",
-                            width: "3rem",
-                          }}
-                          src={state.podcastImage}
-                        />
-                      </Grid>
-                    }
-                    <Grid item xs={1} sx={{ textAlign: "center" }}>
-                  <IconButton
-                    aria-label="Play/pause"
-                    onClick={() => props.handler()}
-                    data-guid={state.playing}
-                    sx={{ color: paletteStyles.text }}
-                  >
-                    {state.playing === (episodeInfo && episodeInfo.guid) &&
-                    state.status !== "paused" ? (
-                      <PauseIcon
-                        sx={{
-                          width: "3rem",
-                          maxHeight: "3rem",
-                          minHeight: "2rem",
-                          color: paletteStyles.text,
-                        }}
+              <div style={{ padding: "1rem" }}>
+                <Grid container spacing={2} alignItems="center" justifyContent="center">
+                  <Grid item xs={12} md={9}>
+                    <div style={{ padding: "1rem 0" }}>
+                      <Slider
+                        value={typeof state.currentTime === "number" ? state.currentTime : 0}
+                        max={typeof state.duration === "number" ? Math.round(state.duration) : 1}
+                        onChange={props.seek}
                       />
-                    ) : (
-                      <PlayArrowIcon
-                        sx={{
-                          width: "3rem",
-                          maxHeight: "3rem",
-                          minHeight: "2rem",
-                          color: paletteStyles.text,
-                        }}
-                      />
-                    )}
-                  </IconButton>
-                    </Grid>
-                  </>
-                )}
-                 <Grid item xs={2} md={1} sx={{ textAlign: "center" }}>
-                  <span style={{ color: paletteStyles.subText }}>
-                    {toMin(state.currentTime)}
-                  </span>
-                </Grid>
-                <Grid item xs={5} md={6} sx={{ position: "relative", top: "-.5rem" }}>
-                  <LinearProgress
-                    sx={{
-                      position: "absolute",
-                      top: "7px",
-                      width: "100%",
-                      backgroundColor: open ? toRGBA(palette?.secondary, 0.35) : undefined,
-                      "& .MuiLinearProgress-bar": {
-                        backgroundColor: paletteStyles.accent,
-                      },
-                    }}
-                    variant="buffer"
-                    value={played}
-                    valueBuffer={loaded}
-                  />
-                  <Slider
-                    sx={{
-                      padding: 0,
-                      position: "absolute",
-                      top: "8px",
-                      width: "100%",
-                      color: paletteStyles.accent,
-                    }}
-                    value={played}
-                    aria-labelledby="audio"
-                    onChange={(event, value) => props.seek(event as Event, value)}
-                  />
-                 </Grid>
-                <Grid item xs={2} md={1} sx={{ textAlign: "center" }}>
-                  <span style={{ color: paletteStyles.subText }}>
-                    {toMinutes(state.duration, state.currentTime)}
-                  </span>
-                </Grid>
-                {!open && showExpand && (
-                  <Grid item xs={1} sx={{ textAlign: "right", paddingRight: ".14rem" }}>
-                    <IconButton onClick={() => setOpen(true)} sx={{ color: paletteStyles.text }}>
-                      <ExpandLessIcon />
-                    </IconButton>
-                  </Grid>
-                )}
-              </Grid>
 
-              {open && (
-                <>
-                  <Grid container sx={{ pt: 2 }}>
-                    <Grid
-                      item
-                      xs={3}
-                      sm={4}
-                      sx={{ textAlign: open ? "right" : "center", padding: 0 }}
-                    >
-                      <IconButton
-                        style={{ padding: "0" }}
-                        aria-label="Previous"
-                        onClick={props.rewind}
-                        sx={{ color: paletteStyles.text }}
-                      >
-                        {theme.direction === "rtl" ? (
-                          <SkipNextIcon
-                            sx={{
-                              top: "100%",
-                              position: "absolute",
-                              height: 40,
-                              width: 40,
-                              color: paletteStyles.text,
-                            }}
-                          />
-                        ) : (
-                          <SkipPreviousIcon
-                            sx={{
-                              top: "100%",
-                              position: "absolute",
-                              height: 40,
-                              width: 40,
-                              color: paletteStyles.text,
-                            }}
-                          />
-                        )}
-                      </IconButton>
-                    </Grid>
-                    <Grid item xs={6} sm={4} sx={{ textAlign: "center", padding: 0 }}>
-                      <IconButton
-                        style={{ padding: "0" }}
-                        aria-label="Play/pause"
-                        onClick={() => props.handler()}
-                        data-guid={state.playing}
-                        sx={{ color: paletteStyles.text }}
-                      >
-                        {state.playing === (episodeInfo && episodeInfo.guid) &&
-                        state.status !== "paused" ? (
-                          <PauseIcon sx={{ height: 86, width: 86, color: paletteStyles.text }} />
-                        ) : (
-                          <PlayArrowIcon sx={{ height: 86, width: 86, color: paletteStyles.text }} />
-                        )}
-                      </IconButton>
-                    </Grid>
-                    <Grid
-                      item
-                      xs={3}
-                      sm={4}
-                      sx={{ textAlign: open ? "left" : "center", padding: 0 }}
-                    >
-                      <IconButton
-                        style={{ padding: "0" }}
-                        aria-label="Next"
-                        onClick={props.forward}
-                        sx={{ color: paletteStyles.text }}
-                      >
-                        {theme.direction === "rtl" ? (
-                          <SkipPreviousIcon
-                            sx={{
-                              top: "100%",
-                              position: "absolute",
-                              height: 40,
-                              width: 40,
-                              color: paletteStyles.text,
-                            }}
-                          />
-                        ) : (
-                          <SkipNextIcon
-                            sx={{
-                              top: "100%",
-                              position: "absolute",
-                              height: 40,
-                              width: 40,
-                              color: paletteStyles.text,
-                            }}
-                          />
-                        )}
-                      </IconButton>
-                    </Grid>
+                      <div style={{ display: "flex", justifyContent: "space-between" }}>
+                        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                          <IconButton onClick={props.rewind} sx={{ color: paletteStyles.text }}>
+                            <SkipPreviousIcon />
+                          </IconButton>
+                          <IconButton onClick={props.handler} sx={{ color: paletteStyles.text }}>
+                            {state.status === "paused" ? <PlayArrowIcon /> : <PauseIcon />}
+                          </IconButton>
+                          <IconButton onClick={props.forward} sx={{ color: paletteStyles.text }}>
+                            <SkipNextIcon />
+                          </IconButton>
+
+                          <Typography sx={{ color: paletteStyles.text }}>{toMin(state.played)}</Typography>
+                        </div>
+
+                        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                          <div style={{ textAlign: "right" }}>
+                            <Typography sx={{ color: paletteStyles.subText }} variant="caption">
+                              {toMinutes(state.duration, state.currentTime)}
+                            </Typography>
+                            <Typography sx={{ color: paletteStyles.subText }} variant="caption">
+                              {toMin(state.currentTime)}
+                            </Typography>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </Grid>
-                  <Box m={2}>
-                    <Grid
-                      container
-                      direction="row"
-                      justifyContent="space-evenly"
-                      alignItems="center"
-                    >
-                      {showSpeed && (
-                        <Grid item sx={{ textAlign: "center" }}>
-                          <SpeedControl onClick={setShowTimer} color={paletteStyles.text} />
-                        </Grid>
-                      )}
-                      {showTimer && (
-                        <Grid item sx={{ textAlign: "center" }}>
-                          <SleepTimer onClick={setShowSpeed} color={paletteStyles.text} />
-                        </Grid>
-                      )}
-                      {/* <Grid item>
-                        <IconButton><MoreVertIcon /></IconButton>
-                      </Grid> */}
-                    </Grid>
-                  </Box>
-                </>
-              )}
+                  <Grid item xs={6} md={3}>
+                    <div style={{ display: "flex", justifyContent: "center" }}>
+                      <SpeedControl />
+                    </div>
+                  </Grid>
+                </Grid>
+              </div>
             </div>
           </div>
         )}
       </Card>
-      {/* {episodeInfo && <div id={'under'} className={classes.undeground}>-</div>} */}
     </>
-  ) : (
-    <></>
-  );
+  ) : null;
 };
 
 export default MediaControlCard;

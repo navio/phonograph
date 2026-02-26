@@ -87,17 +87,20 @@ function PodcastHeader(props) {
       {(data) => {
         const state = props.podcast;
         const { palette } = props;
-        const themeColors = palette ? buildThemeFromPalette(palette) : null;
+        const enabled = data?.state?.podcastViewEnabled !== false;
+        const themeColors = enabled && palette ? buildThemeFromPalette(palette) : null;
 
         // If we don't have a palette/themeColors (eg CORS/image failure),
         // fall back to the app theme text colors (not white-on-white).
         const textColor = themeColors?.text || theme.palette.text.primary;
         const subText = themeColors?.subText || theme.palette.text.secondary;
-        const overlay = palette
-          ? toRGBA(palette.primary, showDesktop ? 0.6 : 0.8)
-          : showDesktop
-            ? "rgba(0,0,0,0.55)"
-            : "rgba(0,0,0,0.75)";
+        const overlay = enabled
+          ? palette
+            ? toRGBA(palette.primary, showDesktop ? 0.6 : 0.8)
+            : showDesktop
+              ? "rgba(0,0,0,0.55)"
+              : "rgba(0,0,0,0.75)"
+          : theme.palette.background.default;
         return (
           <>
             <Snackbar
@@ -180,7 +183,7 @@ function PodcastHeader(props) {
                   md: "15vh",
                 },
                 position: "relative",
-                backgroundImage: state.image ? `url(${prod + state.image})` : "none",
+                backgroundImage: enabled && state.image ? `url(${prod + state.image})` : "none",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }}
@@ -201,7 +204,7 @@ function PodcastHeader(props) {
                 px: { xs: 2, md: 4 },
                 pt: { xs: 3, md: 2 },
                 pb: { xs: 2, md: 3 },
-                background: palette
+                background: enabled && palette
                   ? themeColors?.primary
                   : theme.palette.background.default,
               }}

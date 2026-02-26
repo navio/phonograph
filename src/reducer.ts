@@ -23,7 +23,7 @@ export const completeEpisodeHistory = async (
 
 export const completeEpisode = (state: AppState): AppState => {
   const { playlist } = state;
-  const { player } = window;
+  const { player } = window as any;
   if (playlist && playlist.length > 0) {
     const nextEpisode = playlist.shift() as PlaylistItem;
     player.src = nextEpisode.media;
@@ -124,6 +124,9 @@ export const defaultState: AppState = {
   currentTime: null,
   media: "",
   refresh: Date.now(),
+
+  // new toggle defaults to enabled
+  podcastViewEnabled: true,
 };
 
 const safeReadLocalStorage = (key: string): string | null => {
@@ -219,6 +222,8 @@ export const reducer = (state: AppState, action: AppAction): AppState => {
       }
       return { ...state, drawer: true, drawerContent };
     }
+    case "setPodcastViewEnabled":
+      return { ...state, podcastViewEnabled: action.payload };
     default:
       return state;
   }

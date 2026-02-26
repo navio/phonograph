@@ -35,6 +35,9 @@ import DownloadIcon from "@mui/icons-material/Download";
 import { initializeLibrary } from "../engine";
 import { buildOpml, parseOpml } from "./opml";
 
+import Switch from "@mui/material/Switch";
+import FormControlLabel from "@mui/material/FormControlLabel";
+
 const Settings: React.FC = () => {
   const { state, dispatch, engine } = useContext(AppContext) as AppContextValue;
 
@@ -216,6 +219,25 @@ const Settings: React.FC = () => {
               <ToggleButton value={"highContrast"}>High Contrast</ToggleButton>
             </ToggleButtonGroup>
           </div>
+
+          <div style={{ marginTop: 12 }}>
+            <Typography variant="subtitle1" gutterBottom>
+              Podcast View
+            </Typography>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={state.podcastViewEnabled !== false}
+                  onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
+                    dispatch({ type: "setPodcastViewEnabled", payload: ev.target.checked })
+                  }
+                  name="podcastViewEnabled"
+                  color="primary"
+                />
+              }
+              label={"Use podcast artwork theming"}
+            />
+          </div>
         </CardContent>
       </Card>
 
@@ -257,6 +279,7 @@ const Settings: React.FC = () => {
           {importProgress ? (
             <div style={{ marginTop: 12 }}>
               <Typography variant="caption">
+                Importing {importProgress.done}/{importProgress.total}…
                 Importing {importProgress.done}/{importProgress.total}…
               </Typography>
               <LinearProgress

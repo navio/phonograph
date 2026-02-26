@@ -252,6 +252,12 @@ const PodcastView: React.FC<{ history: { push: (path: string) => void } }> = (pr
   }, []);
 
   useEffect(() => {
+    // If the user has disabled podcast view, don't compute or use palettes.
+    if (global.podcastViewEnabled === false) {
+      setPalette(null);
+      return;
+    }
+
     if (!podcast.image) {
       setPalette(null);
       return;
@@ -263,7 +269,7 @@ const PodcastView: React.FC<{ history: { push: (path: string) => void } }> = (pr
     return () => {
       active = false;
     };
-  }, [podcast.image]);
+  }, [podcast.image, global.podcastViewEnabled]);
 
   return podcast.domain ? (
     <>
@@ -272,7 +278,7 @@ const PodcastView: React.FC<{ history: { push: (path: string) => void } }> = (pr
         podcast={podcast}
         removePodcast={removePodcast}
         inLibrary={isPodcastInLibrary}
-        palette={palette}
+        palette={global.podcastViewEnabled === false ? null : palette}
       />
       <EpisodeList
         episodes={podcast.items || []}
@@ -284,7 +290,7 @@ const PodcastView: React.FC<{ history: { push: (path: string) => void } }> = (pr
         playing={global.playing as any}
         current={global.current as any}
         shouldRefresh={shouldRefresh}
-        palette={palette}
+        palette={global.podcastViewEnabled === false ? null : palette}
       />
     </>
   ) : (
