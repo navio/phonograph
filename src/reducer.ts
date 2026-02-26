@@ -104,6 +104,7 @@ export const checkIfMediaSessionLodaded = (state: AppState) => {
 export const defaultState: AppState = {
   podcasts: [],
   theme: true,
+  themeName: "default",
   current: null,
 
   status: null,
@@ -168,6 +169,8 @@ export const reducer = (state: AppState, action: AppAction): AppState => {
       return { ...state, current: action.payload };
     case "setDark":
       return { ...state, theme: action.payload };
+    case "setThemeName":
+      return { ...state, themeName: action.payload };
     case "playingStatus": {
       const { status } = action;
       updateMediaSessionState(status);

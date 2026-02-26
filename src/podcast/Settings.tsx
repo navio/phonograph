@@ -55,6 +55,11 @@ const Settings: React.FC = () => {
     dispatch({ type: "setDark", payload: input as AppContextValue["state"]["theme"] });
   };
 
+  const themeNameSwitcher = (_ev: React.MouseEvent<HTMLElement>, input: string | null) => {
+    if (!input) return;
+    dispatch({ type: "setThemeName", payload: input as any });
+  };
+
   const clearState = async () => {
     await dispatch({ type: "resetState" });
     await initializeLibrary(engine as any, dispatch);
@@ -194,6 +199,23 @@ const Settings: React.FC = () => {
               OS
             </ToggleButton>
           </ToggleButtonGroup>
+
+          <div style={{ marginTop: 12 }}>
+            <Typography variant="subtitle1" gutterBottom>
+              Theme Palette
+            </Typography>
+            <ToggleButtonGroup
+              value={state.themeName || "default"}
+              exclusive
+              onChange={themeNameSwitcher}
+              aria-label="theme palette selector"
+            >
+              <ToggleButton value={"default"}>Default</ToggleButton>
+              <ToggleButton value={"nord"}>Nord</ToggleButton>
+              <ToggleButton value={"dracula"}>Dracula</ToggleButton>
+              <ToggleButton value={"highContrast"}>High Contrast</ToggleButton>
+            </ToggleButtonGroup>
+          </div>
         </CardContent>
       </Card>
 

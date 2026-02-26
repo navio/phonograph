@@ -36,6 +36,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
       case "setDark":
         return set({ state: { ...current, theme: action.payload } });
 
+      case "setThemeName":
+        return set({ state: { ...current, themeName: action.payload } });
+
       case "playingStatus": {
         const { status } = action;
         updateMediaSessionState(status);

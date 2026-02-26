@@ -3,7 +3,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 import { Route, Redirect, useHistory, Switch } from "react-router-dom";
 
-import theme from "./theme";
+import createAppTheme, { prefersDark } from "./theme";
 import LoadingSVG from "./core/Loading";
 import Drawer from "./core/Drawer";
 import { useAppStore } from "./store/appStore";
@@ -83,18 +83,10 @@ const App: React.FC = () => {
 
   const title = state.episodeInfo?.title || "";
 
-  let finalTheme;
-  switch (state.theme) {
-    case "dark":
-      finalTheme = theme.dark;
-      break;
-    case "light":
-      finalTheme = theme.light;
-      break;
-    case "os":
-    default:
-      finalTheme = theme.os ? theme.dark : theme.light;
-  }
+  const systemPrefersDark = prefersDark();
+  const resolvedMode = state.theme === "light" ? "light" : state.theme === "dark" ? "dark" : systemPrefersDark ? "dark" : "light";
+  const resolvedName = (state.themeName as string) || "default";
+  const finalTheme = createAppTheme(resolvedName as any, resolvedMode as any);
 
   return (
     <ThemeProvider theme={finalTheme}>
