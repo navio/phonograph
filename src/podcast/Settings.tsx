@@ -235,7 +235,7 @@ const Settings: React.FC = () => {
                   color="primary"
                 />
               }
-              label={"Use podcast artwork theming"}
+              label={"Enable Podcast View"}
             />
           </div>
         </CardContent>
@@ -279,7 +279,6 @@ const Settings: React.FC = () => {
           {importProgress ? (
             <div style={{ marginTop: 12 }}>
               <Typography variant="caption">
-                Importing {importProgress.done}/{importProgress.total}…
                 Importing {importProgress.done}/{importProgress.total}…
               </Typography>
               <LinearProgress
