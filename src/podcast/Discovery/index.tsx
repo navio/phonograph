@@ -9,6 +9,7 @@ import Typography from "@mui/material/Typography";
 import Backdrop from "@mui/material/Backdrop";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
@@ -206,15 +207,13 @@ const Discover: React.FC<DiscoverProps> = ({ addPodcastHandler, actionAfterClick
   return (
     <>
       <Header />
-      {showHero ? <HeroCarousel items={top!} onItemClick={(rss) => getClickHandler(rss)()} /> : null}
       <Card>
         <CardContent>
-          <Box sx={{ maxWidth: 760, mx: "auto", px: 1 }}>
+          <Stack spacing={2} sx={{ maxWidth: 760, mx: "auto", px: 1, pb: 1 }}>
             <Search<PodcastSearchResult> handleChange={searchForPodcasts} updatePodcasts={updatePodcasts} />
-            <Box sx={{ pb: 1 }}>
-              <Geners getPopularPodcasts={genreHandler} selected={state.init} />
-            </Box>
-          </Box>
+            {showHero ? <HeroCarousel items={top!} onItemClick={(rss) => getClickHandler(rss)()} /> : null}
+            <Geners getPopularPodcasts={genreHandler} selected={state.init} />
+          </Stack>
 
           <Typography variant={"h6"} sx={{ mt: 2, mb: 1 }}>
             {results !== "empty" && sectionLabel}
