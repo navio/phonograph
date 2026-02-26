@@ -9,6 +9,7 @@ import Typography from "@mui/material/Typography";
 import Backdrop from "@mui/material/Backdrop";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
@@ -16,6 +17,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import Search from "./Search";
 import Geners from "./Geners";
 import Loading from "../../core/Loading";
+import HeroCarousel from "./HeroCarousel";
 
 import {
   getPopularPodcasts,
@@ -165,6 +167,9 @@ const Discover: React.FC<DiscoverProps> = ({ addPodcastHandler, actionAfterClick
   const isShowingSearch = podcasts.length > 0;
   const sectionLabel = isShowingSearch ? "Results" : state.name || "Trending";
 
+  // Show a top-hero carousel when we're not searching and we have at least 3 trending items
+  const showHero = !isShowingSearch && !trendingLoading && !trendingError && top && top.length >= 3;
+
   const renderContent = () => {
     if (results === "empty") {
       return <Typography variant={"h6"}>No results were found.</Typography>;
@@ -204,12 +209,11 @@ const Discover: React.FC<DiscoverProps> = ({ addPodcastHandler, actionAfterClick
       <Header />
       <Card>
         <CardContent>
-          <Box sx={{ maxWidth: 760, mx: "auto", px: 1 }}>
+          <Stack spacing={2} sx={{ maxWidth: 760, mx: "auto", px: 1, pb: 1 }}>
             <Search<PodcastSearchResult> handleChange={searchForPodcasts} updatePodcasts={updatePodcasts} />
-            <Box sx={{ pb: 1 }}>
-              <Geners getPopularPodcasts={genreHandler} selected={state.init} />
-            </Box>
-          </Box>
+            {showHero ? <HeroCarousel items={top!} onItemClick={(rss) => getClickHandler(rss)()} /> : null}
+            <Geners getPopularPodcasts={genreHandler} selected={state.init} />
+          </Stack>
 
           <Typography variant={"h6"} sx={{ mt: 2, mb: 1 }}>
             {results !== "empty" && sectionLabel}
