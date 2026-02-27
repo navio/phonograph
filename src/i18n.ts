@@ -13,7 +13,52 @@ import it from "./locales/it/translation.json";
 import ptBR from "./locales/pt-BR/translation.json";
 import zhCN from "./locales/zh-CN/translation.json";
 
-i18n.use(LanguageDetector).use(initReactI18next).init({
+const LanguageDetectorPlugin: any = (LanguageDetector as any)?.default ?? LanguageDetector;
+
+const updateHtmlLangDir = (lng?: string) => {
+  if (typeof document === "undefined") return;
+
+  const html = document.documentElement;
+  if (!html) return;
+
+  const language = lng || i18n.resolvedLanguage || i18n.language || "en";
+
+  let dir = "ltr";
+  try {
+    dir = i18n.dir(language) || "ltr";
+  } catch {
+    dir = "ltr";
+  }
+
+  try {
+    html.lang = language;
+    html.dir = dir;
+  } catch {
+    // ignore if not in a browser environment
+  }
+};
+
+let domListenersAttached = false;
+const attachDomListenersOnce = () => {
+  if (domListenersAttached) return;
+  domListenersAttached = true;
+
+  // Initialize direction based on detected language and keep it in sync.
+  updateHtmlLangDir();
+  i18n.on("languageChanged", updateHtmlLangDir);
+};
+
+if (typeof document !== "undefined") {
+  // Wait for i18n initialization before touching i18n.dir() / language.
+  i18n.on("initialized", attachDomListenersOnce);
+
+  // Hot-reload / re-import safety.
+  if (i18n.isInitialized) {
+    attachDomListenersOnce();
+  }
+}
+
+i18n.use(LanguageDetectorPlugin).use(initReactI18next).init({
   resources: {
     ar: { translation: ar },
     de: { translation: de },
@@ -39,27 +84,5 @@ i18n.use(LanguageDetector).use(initReactI18next).init({
     escapeValue: false, // react already safes from xss
   },
 });
-
-// Ensure document direction (ltr/rtl) and lang attribute follow the active language.
-// This updates dynamically on language changes (important for Arabic / RTL).
-if (typeof document !== "undefined") {
-  const setHtmlDirection = (lng?: string) => {
-    const language = lng || i18n.language || "en";
-    try {
-      document.documentElement.lang = language;
-      document.documentElement.dir = i18n.dir(language) || "ltr";
-    } catch (e) {
-      // ignore if not in a browser environment
-    }
-  };
-
-  // Initialize direction based on detected language
-  setHtmlDirection();
-
-  // Update on language change
-  i18n.on("languageChanged", (lng) => {
-    setHtmlDirection(lng);
-  });
-}
 
 export default i18n;
