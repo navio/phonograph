@@ -1,1 +1,8 @@
 .netlify
+build/
+dist/
+dist-desktop/
+.env
+.env.local
+.DS_Store
+

@@ -201,7 +201,7 @@ const Settings: React.FC = () => {
               Theme Palette
             </Typography>
             <ToggleButtonGroup
-              value={state.themeName || "default"}
+              value={state.themeName || "nord"}
               exclusive
               onChange={themeNameSwitcher}
               aria-label="theme palette selector"
@@ -210,6 +210,9 @@ const Settings: React.FC = () => {
               <ToggleButton value={"nord"}>Nord</ToggleButton>
               <ToggleButton value={"dracula"}>Dracula</ToggleButton>
               <ToggleButton value={"highContrast"}>High Contrast</ToggleButton>
+              <ToggleButton value={"matrix"}>Matrix</ToggleButton>
+              <ToggleButton value={"monokai"}>Monokai</ToggleButton>
+              <ToggleButton value={"solarized"}>Solarized</ToggleButton>
             </ToggleButtonGroup>
           </div>
 

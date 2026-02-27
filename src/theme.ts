@@ -9,14 +9,14 @@ const base = {
   },
 };
 
-export type ThemeName = "default" | "nord" | "dracula" | "highContrast";
+export type ThemeName = "default" | "nord" | "dracula" | "highContrast" | "matrix" | "monokai" | "solarized";
 
 export const prefersDark = (): boolean =>
   typeof window !== "undefined" &&
   window.matchMedia &&
   window.matchMedia("(prefers-color-scheme: dark)").matches;
 
-const createAppTheme = (name: ThemeName = "default", mode: PaletteMode = "light"): Theme => {
+const createAppTheme = (name: ThemeName = "nord", mode: PaletteMode = "light"): Theme => {
   const palettes: Record<ThemeName, { light: any; dark: any }> = {
     default: {
       light: {
@@ -79,6 +79,57 @@ const createAppTheme = (name: ThemeName = "default", mode: PaletteMode = "light"
         secondary: { main: "#ffffff", contrastText: "#000000" },
         background: { default: "#000000", paper: "#000000" },
         text: { primary: "#ffffff" },
+      },
+    },
+
+    matrix: {
+      light: {
+        mode: "light",
+        primary: { main: "#0B8457", contrastText: "#ffffff" },
+        secondary: { main: "#2E7D32", contrastText: "#ffffff" },
+        background: { default: "#F5FBF6", paper: "#FFFFFF" },
+        text: { primary: "#0A0A0A" },
+      },
+      dark: {
+        mode: "dark",
+        primary: { main: "#00FF41", contrastText: "#000000" },
+        secondary: { main: "#33FF77", contrastText: "#000000" },
+        background: { default: "#000000", paper: "#07120A" },
+        text: { primary: "#B6FFC8" },
+      },
+    },
+
+    monokai: {
+      light: {
+        mode: "light",
+        primary: { main: "#F92672", contrastText: "#000000" },
+        secondary: { main: "#A6E22E", contrastText: "#000000" },
+        background: { default: "#F5F5F5", paper: "#FFFFFF" },
+        text: { primary: "#2E2E2E" },
+      },
+      dark: {
+        mode: "dark",
+        primary: { main: "#F92672", contrastText: "#ffffff" },
+        secondary: { main: "#A6E22E", contrastText: "#ffffff" },
+        background: { default: "#272822", paper: "#2F312B" },
+        text: { primary: "#F8F8F2" },
+      },
+    },
+
+    solarized: {
+      light: {
+        mode: "light",
+        primary: { main: "#268BD2", contrastText: "#ffffff" },
+        secondary: { main: "#2AA198", contrastText: "#ffffff" },
+        background: { default: "#FDF6E3", paper: "#EEE8D5" },
+        text: { primary: "#657B83" },
+      },
+      dark: {
+        mode: "dark",
+        primary: { main: "#268BD2", contrastText: "#ffffff" },
+        secondary: { main: "#2AA198", contrastText: "#ffffff" },
+        background: { default: "#002B36", paper: "#073642" },
+        text: { primary: "#839496" },
       },
     },
   };
