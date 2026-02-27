@@ -36,7 +36,7 @@ export interface PlaylistItem {
   [key: string]: unknown;
 }
 
-export type ThemeName = "default" | "nord" | "dracula" | "highContrast";
+export type ThemeName = "default" | "nord" | "dracula" | "highContrast" | "matrix" | "monokai" | "solarized";
 
 export interface AppState {
   podcasts: PodcastEntry[];

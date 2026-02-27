@@ -18,7 +18,7 @@ import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import LinearProgress from "@mui/material/LinearProgress";
 
-import { Button } from "@mui/material";
+import { Button, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import PodcastEngine from "podcastsuite";
 import { AppContext } from "../App";
 import { AppContextValue, PodcastEntry } from "../types/app";
@@ -59,7 +59,8 @@ const Settings: React.FC = () => {
     dispatch({ type: "setDark", payload: input as AppContextValue["state"]["theme"] });
   };
 
-  const themeNameSwitcher = (_ev: React.MouseEvent<HTMLElement>, input: string | null) => {
+  const themeNameSwitcher = (ev: any) => {
+    const input = ev?.target?.value as string | undefined;
     if (!input) return;
     dispatch({ type: "setThemeName", payload: input as any });
   };
@@ -197,21 +198,28 @@ const Settings: React.FC = () => {
           </ToggleButtonGroup>
 
           <div style={{ marginTop: 12 }}>
-            <Typography variant="subtitle1" gutterBottom>
-              Theme Palette
-            </Typography>
-            <ToggleButtonGroup
-              value={state.themeName || "default"}
-              exclusive
-              onChange={themeNameSwitcher}
-              aria-label="theme palette selector"
-            >
-              <ToggleButton value={"default"}>Default</ToggleButton>
-              <ToggleButton value={"nord"}>Nord</ToggleButton>
-              <ToggleButton value={"dracula"}>Dracula</ToggleButton>
-              <ToggleButton value={"highContrast"}>High Contrast</ToggleButton>
-            </ToggleButtonGroup>
+            <FormControl fullWidth size="small">
+              <InputLabel id="theme-palette-label">Theme Palette</InputLabel>
+              <Select
+                labelId="theme-palette-label"
+                id="theme-palette"
+                value={(state.themeName || "nord") as any}
+                label="Theme Palette"
+                onChange={themeNameSwitcher}
+                inputProps={{ "aria-label": "theme palette selector" }}
+              >
+                <MenuItem value={"default"}>Default</MenuItem>
+                <MenuItem value={"nord"}>Nord</MenuItem>
+                <MenuItem value={"dracula"}>Dracula</MenuItem>
+                <MenuItem value={"highContrast"}>High Contrast</MenuItem>
+                <MenuItem value={"matrix"}>Matrix</MenuItem>
+                <MenuItem value={"monokai"}>Monokai</MenuItem>
+                <MenuItem value={"solarized"}>Solarized</MenuItem>
+              </Select>
+            </FormControl>
           </div>
+
+
 
           <div style={{ marginTop: 12 }}>
             <Typography variant="subtitle1" gutterBottom>
