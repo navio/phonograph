@@ -1,0 +1,120 @@
+{
+  "app": {
+    "settings": "Agordoj",
+    "configurations": "Agordoj",
+    "version": "Versio:"
+  },
+  "theme": {
+    "selector": "Tem-ŝanĝilo",
+    "paletteLabel": "Tem-paleton",
+    "light": "Luma",
+    "dark": "Malhela",
+    "os": "OS prefero",
+    "default": "Defaŭlta",
+    "nord": "Nord",
+    "dracula": "Dracula",
+    "highContrast": "Alta kontrasto",
+    "matrix": "Matrix",
+    "monokai": "Monokai",
+    "solarized": "Solarized"
+  },
+  "podcast": {
+    "view": "Podkasta vido",
+    "enableView": "Ŝalti podkasta vido",
+    "addToLibrary": "Aldoni al biblioteko",
+    "removeFromLibrary": "Forigi el biblioteko",
+    "share": "Kunhavigi podkaston",
+    "added": "Podkasto aldonita al biblioteko",
+    "linkCopied": "Ligilo kopiita al tondejo",
+    "less": "Malpli",
+    "more": "Pli",
+    "subscribe": "Aboni",
+    "episodes": "Episodoj:"
+  },
+  "opml": {
+    "title": "Importi / Eksporti (OPML)",
+    "export": "Eksporti OPML",
+    "import": "Importi OPML",
+    "importing": "Importante {{done}}/{{total}}…",
+    "noNewFound": "Neniuj novaj podkastoj trovita por importi.",
+    "importedSuccess": "Importitaj {{count}} podkastoj el OPML.",
+    "importedPartial": "Importitaj {{successes}}/{{total}} podkastoj. {{failures}} malsukcesis (kontrolu vian konekton aŭ la fluan URL).",
+    "importFailed": "Ne sukcesis importi OPML."
+  },
+  "data": {
+    "title": "Datumoj"
+  },
+  "delete": "Forigi",
+  "settings": {
+    "reset": "Restarigi staton",
+    "reload": "Reŝarĝi konservitajn podkastojn"
+  },
+  "brand": {
+    "title": "Phonograph",
+    "footer": "evoluigita kun ❤️ en Hoboken, NJ"
+  },
+  "snackbar": {
+    "exported": "Eksportitaj {{count}} podkastoj al OPML."
+  },
+  "playlist": {
+    "title": "Ludlisto",
+    "playingNext": "Ludonta poste:",
+    "clear": "Klari",
+    "empty": "La ludlisto estas malplena."
+  },
+  "discover": {
+    "title": "Malkovri",
+    "noResults": "Neniuj rezultoj trovitaj.",
+    "failedTrending": "Malkapabla ŝarĝi trending podkastojn.",
+    "retry": "Provi denove",
+    "trending": "Tendencoj",
+    "results": "Rezultoj"
+  },
+  "search": {
+    "placeholder": "Serĉi podkastojn"
+  },
+  "library": {
+    "title": "Biblioteko",
+    "addAria": "aldoni",
+    "podcastDefault": "Podkasto",
+    "empty": "Neniuj konservitaj podkastoj."
+  },
+  "season": "Sezono {{season}}",
+  "progress": "Progreso: {{percent}}%",
+  "saved": "Konservita",
+  "drawer": {
+    "playNext": "Ludi poste",
+    "addToQueue": "Aldoni al vico",
+    "markAsPlayed": "Marki kiel ludita",
+    "seeDescription": "Vidi priskribon"
+  },
+  "queued": {
+    "next": "Vico por ludi poste",
+    "added": "Aldita al vico"
+  },
+  "episodes": {
+    "loadMore": "Ŝarĝi pli da episodoj"
+  },
+  "header": {
+    "podcast": "Podkasto"
+  },
+  "footer": {
+    "favorites": "Favoratoj",
+    "playlist": "Ludlisto",
+    "discover": "Malkovri",
+    "settings": "Agordoj"
+  },
+  "language": {
+    "label": "Lingvo",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français",
+    "pt-BR": "Português (Brasil)",
+    "zh-CN": "简体中文",
+    "hi": "हिन्दी",
+    "it": "Italiano",
+    "ar": "العربية",
+    "de": "Deutsch",
+    "eo": "Esperanto"
+  }
+}

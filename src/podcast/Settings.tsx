@@ -18,7 +18,7 @@ import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import LinearProgress from "@mui/material/LinearProgress";
 
-import { Button } from "@mui/material";
+import { Button, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import PodcastEngine from "podcastsuite";
 import { AppContext } from "../App";
 import { AppContextValue, PodcastEntry } from "../types/app";
@@ -38,9 +38,11 @@ import { importFeeds } from "./opmlImporter";
 
 import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import { useTranslation } from "react-i18next";
 
 const Settings: React.FC = () => {
   const { state, dispatch, engine } = useContext(AppContext) as AppContextValue;
+  const { t, i18n } = useTranslation();
 
   const [notice, setNotice] = useState<{ open: boolean; message: string; severity: "success" | "info" | "warning" | "error" }>(
     {
@@ -59,7 +61,8 @@ const Settings: React.FC = () => {
     dispatch({ type: "setDark", payload: input as AppContextValue["state"]["theme"] });
   };
 
-  const themeNameSwitcher = (_ev: React.MouseEvent<HTMLElement>, input: string | null) => {
+  const themeNameSwitcher = (ev: any) => {
+    const input = ev?.target?.value as string | undefined;
     if (!input) return;
     dispatch({ type: "setThemeName", payload: input as any });
   };
@@ -101,7 +104,7 @@ const Settings: React.FC = () => {
 
     URL.revokeObjectURL(url);
 
-    setNotice({ open: true, message: `Exported ${feeds.length} podcasts to OPML.`, severity: "success" });
+    setNotice({ open: true, message: t("snackbar.exported", { count: feeds.length }), severity: "success" });
   };
 
   const importOpmlFile = async (file: File) => {
@@ -119,7 +122,7 @@ const Settings: React.FC = () => {
       const toImport = feeds.filter((f) => f.url && !existing.has(f.url));
 
       if (toImport.length === 0) {
-        setNotice({ open: true, message: "No new podcasts found to import.", severity: "info" });
+        setNotice({ open: true, message: t("opml.noNewFound"), severity: "info" });
         return;
       }
 
@@ -134,16 +137,16 @@ const Settings: React.FC = () => {
       await initializeLibrary(engine as any, dispatch);
 
       if (failures.length === 0) {
-        setNotice({ open: true, message: `Imported ${successes.length} podcasts from OPML.`, severity: "success" });
+        setNotice({ open: true, message: t("opml.importedSuccess", { count: successes.length }), severity: "success" });
       } else {
         setNotice({
           open: true,
-          message: `Imported ${successes.length}/${toImport.length} podcasts. ${failures.length} failed (check your connection or feed URLs).`,
+          message: t("opml.importedPartial", { successes: successes.length, total: toImport.length, failures: failures.length }),
           severity: "warning",
         });
       }
     } catch (err: any) {
-      setNotice({ open: true, message: err?.message || "Failed to import OPML.", severity: "error" });
+      setNotice({ open: true, message: err?.message || t("opml.importFailed"), severity: "error" });
     } finally {
       setIsImporting(false);
       setTimeout(() => setImportProgress(null), 500);
@@ -168,54 +171,60 @@ const Settings: React.FC = () => {
     <>
       <AppBar sx={{ WebkitAppRegion: "drag" }} position="static">
         <Toolbar variant="dense">
-          <Typography variant="h6">Settings</Typography>
+          <Typography variant="h6">{t("app.settings")}</Typography>
         </Toolbar>
       </AppBar>
 
       <Card>
         <CardContent>
-          <Typography variant={"h5"}>Configurations</Typography>
-          Version: {version}
+          <Typography variant={"h5"}>{t("app.configurations")}</Typography>
+          {t("app.version")} {version}
         </CardContent>
       </Card>
 
       <Card>
         <CardContent>
           <Typography variant={"h6"} gutterBottom>
-            Theme Selector
+            {t("theme.selector")}
           </Typography>
           <ToggleButtonGroup value={state.theme} exclusive onChange={themeSwitcher} aria-label="theme selector">
-            <ToggleButton value={"light"} aria-label="White">
+            <ToggleButton value={"light"} aria-label={t("theme.light")}>
               <BrightnessLowIcon />
             </ToggleButton>
-            <ToggleButton value={"dark"} aria-label="Black">
+            <ToggleButton value={"dark"} aria-label={t("theme.dark")}>
               <BrightnessHighIcon />
             </ToggleButton>
-            <ToggleButton value={"os"} aria-label="OS preference">
+            <ToggleButton value={"os"} aria-label={t("theme.os")}>
               OS
             </ToggleButton>
           </ToggleButtonGroup>
 
           <div style={{ marginTop: 12 }}>
-            <Typography variant="subtitle1" gutterBottom>
-              Theme Palette
-            </Typography>
-            <ToggleButtonGroup
-              value={state.themeName || "default"}
-              exclusive
-              onChange={themeNameSwitcher}
-              aria-label="theme palette selector"
-            >
-              <ToggleButton value={"default"}>Default</ToggleButton>
-              <ToggleButton value={"nord"}>Nord</ToggleButton>
-              <ToggleButton value={"dracula"}>Dracula</ToggleButton>
-              <ToggleButton value={"highContrast"}>High Contrast</ToggleButton>
-            </ToggleButtonGroup>
+            <FormControl fullWidth size="small">
+              <InputLabel id="theme-palette-label">{t("theme.paletteLabel")}</InputLabel>
+              <Select
+                labelId="theme-palette-label"
+                id="theme-palette"
+                value={(state.themeName || "nord") as any}
+                label={t("theme.paletteLabel")}
+                onChange={themeNameSwitcher}
+                inputProps={{ "aria-label": "theme palette selector" }}
+              >
+                <MenuItem value={"default"}>{t("theme.default")}</MenuItem>
+                <MenuItem value={"nord"}>{t("theme.nord")}</MenuItem>
+                <MenuItem value={"dracula"}>{t("theme.dracula")}</MenuItem>
+                <MenuItem value={"highContrast"}>{t("theme.highContrast")}</MenuItem>
+                <MenuItem value={"matrix"}>{t("theme.matrix")}</MenuItem>
+                <MenuItem value={"monokai"}>{t("theme.monokai")}</MenuItem>
+                <MenuItem value={"solarized"}>{t("theme.solarized")}</MenuItem>
+              </Select>
+            </FormControl>
           </div>
+
 
           <div style={{ marginTop: 12 }}>
             <Typography variant="subtitle1" gutterBottom>
-              Podcast View
+              {t("podcast.view")}
             </Typography>
             <FormControlLabel
               control={
@@ -228,8 +237,32 @@ const Settings: React.FC = () => {
                   color="primary"
                 />
               }
-              label={"Enable Podcast View"}
+              label={t("podcast.enableView")}
             />
+
+            <div style={{ marginTop: 12 }}>
+              <FormControl fullWidth size="small">
+                <InputLabel id="language-label">{t("language.label")}</InputLabel>
+                <Select
+                  labelId="language-label"
+                  id="language-select"
+                  value={i18n.language || "en"}
+                  label={t("language.label")}
+                  onChange={(ev) => i18n.changeLanguage(ev.target.value)}
+                >
+                  <MenuItem value="en">{t("language.en")}</MenuItem>
+                  <MenuItem value="es">{t("language.es")}</MenuItem>
+                  <MenuItem value="fr">{t("language.fr")}</MenuItem>
+                  <MenuItem value="pt-BR">{t("language.pt-BR")}</MenuItem>
+                  <MenuItem value="zh-CN">{t("language.zh-CN")}</MenuItem>
+                  <MenuItem value="hi">{t("language.hi")}</MenuItem>
+                  <MenuItem value="it">{t("language.it")}</MenuItem>
+                  <MenuItem value="ar">{t("language.ar")}</MenuItem>
+                  <MenuItem value="de">{t("language.de")}</MenuItem>
+                  <MenuItem value="eo">{t("language.eo")}</MenuItem>
+                </Select>
+              </FormControl>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -237,7 +270,7 @@ const Settings: React.FC = () => {
       <Card variant="outlined">
         <CardContent>
           <Typography variant={"h6"} gutterBottom>
-            Import / Export (OPML)
+            {t("opml.title")}
           </Typography>
 
           <input
@@ -256,7 +289,7 @@ const Settings: React.FC = () => {
             disabled={isImporting}
             sx={{ mr: 1 }}
           >
-            Export OPML
+            {t("opml.export")}
           </Button>
 
           <Button
@@ -266,13 +299,13 @@ const Settings: React.FC = () => {
             onClick={openFilePicker}
             disabled={isImporting}
           >
-            Import OPML
+            {t("opml.import")}
           </Button>
 
           {importProgress ? (
             <div style={{ marginTop: 12 }}>
               <Typography variant="caption">
-                Importing {importProgress.done}/{importProgress.total}…
+                {t("opml.importing", { done: importProgress.done, total: importProgress.total })}
               </Typography>
               <LinearProgress
                 variant="determinate"
@@ -287,7 +320,7 @@ const Settings: React.FC = () => {
         <Accordion>
           <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
             <Typography variant="h6" gutterBottom>
-              Data
+              {t("data.title")}
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
@@ -298,7 +331,7 @@ const Settings: React.FC = () => {
                   <div key={podcast.domain as string}>
                     <ListItem
                       secondaryAction={
-                        <IconButton aria-label="Delete" onClick={eraseThisPodcast(podcast.domain as string)}>
+                        <IconButton aria-label={t("delete")} onClick={eraseThisPodcast(podcast.domain as string)}>
                           <DeleteIcon />
                         </IconButton>
                       }
@@ -325,18 +358,18 @@ const Settings: React.FC = () => {
       <Card variant="outlined">
         <CardContent>
           <Button variant="outlined" color="primary" onClick={clearState} disabled={isImporting}>
-            Reset State
+            {t("settings.reset")}
           </Button>
           <Button variant="outlined" color="primary" onClick={reloadCasts} disabled={isImporting}>
-            Reload Saved Podcasts
+            {t("settings.reload")}
           </Button>
         </CardContent>
       </Card>
 
       <Card>
         <CardContent sx={{ textAlign: "center" }}>
-          <Typography variant="h5">Phonograph</Typography>
-          <Typography>is developed with ❤️ in Hoboken, NJ</Typography>
+          <Typography variant="h5">{t("brand.title")}</Typography>
+          <Typography>{t("brand.footer")}</Typography>
         </CardContent>
       </Card>
 

@@ -18,6 +18,7 @@ import Search from "./Search";
 import Geners from "./Geners";
 import Loading from "../../core/Loading";
 import HeroCarousel from "./HeroCarousel";
+import { useTranslation } from "react-i18next";
 
 import {
   getPopularPodcasts,
@@ -26,18 +27,21 @@ import {
   PopularPodcastsResponse,
 } from "./engine";
 
-const Header: React.FC = () => (
-  <AppBar sx={{ WebkitAppRegion: "drag" }} position="static">
-    <Grid>
-      <Toolbar variant="dense">
-        <Grid item xs={8}>
-          <Typography variant="h6">Discover</Typography>
-        </Grid>
-        <Grid item md={4} xs={12}></Grid>
-      </Toolbar>
-    </Grid>
-  </AppBar>
-);
+const Header: React.FC = () => {
+  const { t } = useTranslation();
+  return (
+    <AppBar sx={{ WebkitAppRegion: "drag" }} position="static">
+      <Grid>
+        <Toolbar variant="dense">
+          <Grid item xs={8}>
+            <Typography variant="h6">{t("discover.title")}</Typography>
+          </Grid>
+          <Grid item md={4} xs={12}></Grid>
+        </Toolbar>
+      </Grid>
+    </AppBar>
+  );
+};
 
 const getFinalURL = async (url: string): Promise<string> => {
   const URL = `${window.location.origin}/api/findFinal/?term=${encodeURIComponent(url)}`;
@@ -108,6 +112,7 @@ interface DiscoverState {
 }
 
 const Discover: React.FC<DiscoverProps> = ({ addPodcastHandler, actionAfterClick }) => {
+  const { t } = useTranslation();
   const [state, setState] = useState<DiscoverState>({
     init: 0,
     loading: false,
@@ -165,14 +170,14 @@ const Discover: React.FC<DiscoverProps> = ({ addPodcastHandler, actionAfterClick
   const { podcasts, top, results, trendingLoading, trendingError } = state;
   const casts = podcasts.length > 0 ? podcasts : top || [];
   const isShowingSearch = podcasts.length > 0;
-  const sectionLabel = isShowingSearch ? "Results" : state.name || "Trending";
+  const sectionLabel = isShowingSearch ? t("discover.results") : state.name || t("discover.trending");
 
   // Show a top-hero carousel when we're not searching and we have at least 3 trending items
   const showHero = !isShowingSearch && !trendingLoading && !trendingError && top && top.length >= 3;
 
   const renderContent = () => {
     if (results === "empty") {
-      return <Typography variant={"h6"}>No results were found.</Typography>;
+      return <Typography variant={"h6"}>{t("discover.noResults")}</Typography>;
     }
     if (isShowingSearch) {
       return <GridRender casts={casts} getClickHandler={getClickHandler} />;
@@ -188,7 +193,7 @@ const Discover: React.FC<DiscoverProps> = ({ addPodcastHandler, actionAfterClick
       return (
         <Box sx={{ textAlign: "center", py: 4 }}>
           <Typography variant="body1" gutterBottom>
-            Failed to load trending podcasts.
+            {t("discover.failedTrending")}
           </Typography>
           {state.errorMessage ? (
             <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 2 }}>
@@ -196,7 +201,7 @@ const Discover: React.FC<DiscoverProps> = ({ addPodcastHandler, actionAfterClick
             </Typography>
           ) : null}
           <Button variant="outlined" onClick={() => loadTrending(state.init || null)}>
-            Retry
+            {t("discover.retry")}
           </Button>
         </Box>
       );

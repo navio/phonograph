@@ -11,6 +11,7 @@ import { getImagePalette, Palette } from "../../core/podcastPalette";
 import Loading from "../../core/Loading";
 import EpisodeList from "./EpisodeList";
 import PodcastHeader from "./PodcastHeader";
+import { useTranslation } from "react-i18next";
 
 type Episode = any;
 type Podcast = any;
@@ -28,6 +29,7 @@ const commonRules = (originalUrl: string) => {
 };
 
 const PodcastView: React.FC<{ history: { push: (path: string) => void } }> = (props) => {
+  const { t } = useTranslation();
   let bringAPodcast = window.location.href.split(`${PODCASTVIEW}/`)[1];
 
   if (bringAPodcast) {
@@ -72,7 +74,7 @@ const PodcastView: React.FC<{ history: { push: (path: string) => void } }> = (pr
 
       return { castContent, newPodcast };
     } catch (err: any) {
-      setError({ error: err, message: `There was a problem loading the podcast.` });
+      setError({ error: err, message: t("podcast.loadError") });
       setTimeout(() => props.history.push(DISCOVERVIEW), 3000);
       return null;
     }

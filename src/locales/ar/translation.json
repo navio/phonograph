@@ -1,0 +1,120 @@
+{
+  "app": {
+    "settings": "الإعدادات",
+    "configurations": "التكوينات",
+    "version": "الإصدار:"
+  },
+  "theme": {
+    "selector": "محدد السمة",
+    "paletteLabel": "لوحة ألوان السمة",
+    "light": "فاتح",
+    "dark": "داكن",
+    "os": "تفضيل النظام",
+    "default": "افتراضي",
+    "nord": "Nord",
+    "dracula": "Dracula",
+    "highContrast": "تباين عالي",
+    "matrix": "Matrix",
+    "monokai": "Monokai",
+    "solarized": "Solarized"
+  },
+  "podcast": {
+    "view": "عرض البودكاست",
+    "enableView": "تمكين عرض البودكاست",
+    "addToLibrary": "أضف إلى المكتبة",
+    "removeFromLibrary": "إزالة من المكتبة",
+    "share": "مشاركة البودكاست",
+    "added": "تمت إضافة البودكاست إلى المكتبة",
+    "linkCopied": "تم نسخ الرابط إلى الحافظة",
+    "less": "أقل",
+    "more": "المزيد",
+    "subscribe": "اشترك",
+    "episodes": "الحلقات:"
+  },
+  "opml": {
+    "title": "استيراد / تصدير (OPML)",
+    "export": "تصدير OPML",
+    "import": "استيراد OPML",
+    "importing": "جارٍ الاستيراد {{done}}/{{total}}…",
+    "noNewFound": "لم يتم العثور على بودكاستات جديدة للاستيراد.",
+    "importedSuccess": "تم استيراد {{count}} بودكاست من OPML.",
+    "importedPartial": "تم استيراد {{successes}}/{{total}} بودكاست. فشل {{failures}} (تحقق من الاتصال أو روابط الخلاصات).",
+    "importFailed": "فشل استيراد OPML."
+  },
+  "data": {
+    "title": "البيانات"
+  },
+  "delete": "حذف",
+  "settings": {
+    "reset": "إعادة تعيين الحالة",
+    "reload": "إعادة تحميل البودكاست المحفوظة"
+  },
+  "brand": {
+    "title": "Phonograph",
+    "footer": "تم التطوير بـ ❤️ في هووبوكين"
+  },
+  "snackbar": {
+    "exported": "تم تصدير {{count}} بودكاست إلى OPML."
+  },
+  "playlist": {
+    "title": "قائمة التشغيل",
+    "playingNext": "التشغيل التالي:",
+    "clear": "مسح",
+    "empty": "قائمة التشغيل فارغة."
+  },
+  "discover": {
+    "title": "اكتشف",
+    "noResults": "لم يتم العثور على نتائج.",
+    "failedTrending": "فشل في تحميل البودكاست الشائعة.",
+    "retry": "إعادة المحاولة",
+    "trending": "شائع",
+    "results": "نتائج"
+  },
+  "search": {
+    "placeholder": "البحث عن بودكاست"
+  },
+  "library": {
+    "title": "المكتبة",
+    "addAria": "أضف",
+    "podcastDefault": "بودكاست",
+    "empty": "لا توجد بودكاست محفوظة."
+  },
+  "season": "الموسم {{season}}",
+  "progress": "التقدم: {{percent}}%",
+  "saved": "محفوظ",
+  "drawer": {
+    "playNext": "تشغيل التالي",
+    "addToQueue": "أضف إلى قائمة الانتظار",
+    "markAsPlayed": "وضع علامة كمشغل",
+    "seeDescription": "عرض الوصف"
+  },
+  "queued": {
+    "next": "تمت إضافته إلى قائمة التشغيل التالية",
+    "added": "تمت الإضافة إلى قائمة الانتظار"
+  },
+  "episodes": {
+    "loadMore": "تحميل المزيد من الحلقات"
+  },
+  "header": {
+    "podcast": "بودكاست"
+  },
+  "footer": {
+    "favorites": "المفضلة",
+    "playlist": "قائمة التشغيل",
+    "discover": "اكتشف",
+    "settings": "الإعدادات"
+  },
+  "language": {
+    "label": "اللغة",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français",
+    "pt-BR": "Português (Brasil)",
+    "zh-CN": "简体中文",
+    "hi": "हिन्दी",
+    "it": "Italiano",
+    "ar": "العربية",
+    "de": "Deutsch",
+    "eo": "Esperanto"
+  }
+}

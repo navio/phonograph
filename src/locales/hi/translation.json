@@ -1,0 +1,120 @@
+{
+  "app": {
+    "settings": "सेटिंग्स",
+    "configurations": "कॉन्फ़िगरेशन",
+    "version": "वर्शन:"
+  },
+  "theme": {
+    "selector": "थीम चयनकर्ता",
+    "paletteLabel": "थीम पैलेट",
+    "light": "लाइट",
+    "dark": "डार्क",
+    "os": "ओएस प्राथमिकता",
+    "default": "डिफ़ॉल्ट",
+    "nord": "Nord",
+    "dracula": "Dracula",
+    "highContrast": "उच्च कंट्रास्ट",
+    "matrix": "Matrix",
+    "monokai": "Monokai",
+    "solarized": "Solarized"
+  },
+  "podcast": {
+    "view": "पॉडकास्ट दृश्य",
+    "enableView": "पॉडकास्ट दृश्य सक्षम करें",
+    "addToLibrary": "लाइब्रेरी में जोड़ें",
+    "removeFromLibrary": "लाइब्रेरी से हटाएं",
+    "share": "पॉडकास्ट साझा करें",
+    "added": "पॉडकास्ट लाइब्रेरी में जोड़ दिया गया",
+    "linkCopied": "लिंक क्लिपबोर्ड में कॉपी किया गया",
+    "less": "कम",
+    "more": "और",
+    "subscribe": "सब्सक्राइब",
+    "episodes": "एपिसोड:"
+  },
+  "opml": {
+    "title": "इम्पोर्ट / एक्सपोर्ट (OPML)",
+    "export": "OPML एक्सपोर्ट करें",
+    "import": "OPML इम्पोर्ट करें",
+    "importing": "इम्पोर्ट हो रहा है {{done}}/{{total}}…",
+    "noNewFound": "इम्पोर्ट करने के लिए नए पॉडकास्ट नहीं मिले।",
+    "importedSuccess": "OPML से {{count}} पॉडकास्ट इम्पोर्ट हुए।",
+    "importedPartial": "{{successes}}/{{total}} पॉडकास्ट इम्पोर्ट हुए। {{failures}} विफल रहे (कनेक्शन या फ़ीड URL चेक करें)।",
+    "importFailed": "OPML इम्पोर्ट असफल।"
+  },
+  "data": {
+    "title": "डेटा"
+  },
+  "delete": "हटाएं",
+  "settings": {
+    "reset": "स्टेट रीसेट करें",
+    "reload": "सहेजे गए पॉडकास्ट रीलोड करें"
+  },
+  "brand": {
+    "title": "Phonograph",
+    "footer": "हॉबोकेन में ❤️ के साथ विकसित"
+  },
+  "snackbar": {
+    "exported": "OPML में {{count}} पॉडकास्ट एक्सपोर्ट किए गए।"
+  },
+  "playlist": {
+    "title": "प्ले लिस्ट",
+    "playingNext": "अगला चल रहा है:",
+    "clear": "साफ करें",
+    "empty": "प्ले लिस्ट खाली है।"
+  },
+  "discover": {
+    "title": "खोजें",
+    "noResults": "कोई परिणाम नहीं मिले।",
+    "failedTrending": "ट्रेंडिंग पॉडकास्ट लोड करने में विफल।",
+    "retry": "पुनः प्रयास करें",
+    "trending": "ट्रेंडिंग",
+    "results": "परिणाम"
+  },
+  "search": {
+    "placeholder": "पॉडकास्ट खोजें"
+  },
+  "library": {
+    "title": "लाइब्रेरी",
+    "addAria": "जोड़ें",
+    "podcastDefault": "पॉडकास्ट",
+    "empty": "कोई सहेजा हुआ पॉडकास्ट नहीं है।"
+  },
+  "season": "सीज़न {{season}}",
+  "progress": "प्रगति: {{percent}}%",
+  "saved": "सहेजा गया",
+  "drawer": {
+    "playNext": "अगला प्ले करें",
+    "addToQueue": "क्यू में जोड़ें",
+    "markAsPlayed": "खा गया के रूप में चिह्नित करें",
+    "seeDescription": "विवरण देखें"
+  },
+  "queued": {
+    "next": "अगला चलाने के लिए कतार में रखा गया",
+    "added": "क्यू में जोड़ दिया गया"
+  },
+  "episodes": {
+    "loadMore": "और एपिसोड लोड करें"
+  },
+  "header": {
+    "podcast": "पॉडकास्ट"
+  },
+  "footer": {
+    "favorites": "पसंदीदा",
+    "playlist": "लिस्ट",
+    "discover": "खोजें",
+    "settings": "सेटिंग्स"
+  },
+  "language": {
+    "label": "भाषा",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français",
+    "pt-BR": "Português (Brasil)",
+    "zh-CN": "简体中文",
+    "hi": "हिन्दी",
+    "it": "Italiano",
+    "ar": "العربية",
+    "de": "Deutsch",
+    "eo": "Esperanto"
+  }
+}

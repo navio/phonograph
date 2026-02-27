@@ -6,6 +6,7 @@ import IconButton from "@mui/material/IconButton";
 
 import { AppContext } from "../App";
 import { AppContextValue } from "../types/app";
+import { useTranslation } from "react-i18next";
 
 interface SpeedControlProps {
   onClick: React.Dispatch<React.SetStateAction<boolean>>;
@@ -13,6 +14,7 @@ interface SpeedControlProps {
 }
 
 const SpeedControl: React.FC<SpeedControlProps> = ({ onClick, color }) => {
+  const { t } = useTranslation();
   const { player, playerRef } = useContext(AppContext) as AppContextValue;
   const audio = playerRef?.current || player;
   const [speed, setSpeed] = useState<number>(audio?.playbackRate || 1.0);
@@ -46,7 +48,7 @@ const SpeedControl: React.FC<SpeedControlProps> = ({ onClick, color }) => {
           exclusive
           style={{ margin: "0 auto" }}
           onChange={(_ev, newValue) => changeSpeed(newValue)}
-          aria-label="playback speed"
+          aria-label={t("aria.playbackSpeed")}
         >
           {[1.0, 1.2, 1.5, 1.7, 2.0].map((value) => (
             <ToggleButton key={value} value={value} aria-label={`${value}x`} sx={{ color }}>

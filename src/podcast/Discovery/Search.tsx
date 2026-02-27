@@ -6,6 +6,7 @@ import FormControl from "@mui/material/FormControl";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
 import InputLabel from "@mui/material/InputLabel";
+import { useTranslation } from "react-i18next";
 
 interface SearchProps<T> {
   handleChange: (value: string) => Promise<T[]>;
@@ -13,6 +14,7 @@ interface SearchProps<T> {
 }
 
 const Search = <T,>({ handleChange, updatePodcasts }: SearchProps<T>): React.ReactElement => {
+  const { t } = useTranslation();
   const [term, setTerm] = useState("");
 
   const action = (value: string) =>
@@ -45,17 +47,17 @@ const Search = <T,>({ handleChange, updatePodcasts }: SearchProps<T>): React.Rea
     >
       <Grid xs={12} item>
         <FormControl variant="outlined" sx={{ width: "100%" }}>
-          <InputLabel htmlFor="outlined-search">Search Podcasts</InputLabel>
+          <InputLabel htmlFor="outlined-search">{t("search.placeholder")}</InputLabel>
           <OutlinedInput
             color={"primary"}
             id="outlined-search"
             value={term}
             onChange={onSetTerm}
             onKeyDown={onKeyDown}
-            label="Search Podcasts"
+            label={t("search.placeholder")}
             endAdornment={
               <InputAdornment position="end">
-                <IconButton type="submit" aria-label="search" onClick={clickHandler}>
+                <IconButton type="submit" aria-label={t("search.placeholder")} onClick={clickHandler}>
                   <SearchIcon />
                 </IconButton>
               </InputAdornment>
