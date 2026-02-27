@@ -1,0 +1,12 @@
+{
+  "settings": {
+    "title": "सेटिंग्स",
+    "configurations": "कॉन्फ़िगरेशन",
+    "language": "भाषा",
+    "themeSelector": "थीम चयन",
+    "enablePodcastView": "पॉडकास्ट व्यू सक्षम करें",
+    "importExport": "आयात / निर्यात (OPML)",
+    "exportOpml": "OPML निर्यात करें",
+    "importOpml": "OPML आयात करें"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "settings": {
+    "title": "الإعدادات",
+    "configurations": "التكوينات",
+    "language": "اللغة",
+    "themeSelector": "محدد السمة",
+    "enablePodcastView": "تمكين عرض البودكاست",
+    "importExport": "استيراد / تصدير (OPML)",
+    "exportOpml": "تصدير OPML",
+    "importOpml": "استيراد OPML"
+  }
+}

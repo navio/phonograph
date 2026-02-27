@@ -1,0 +1,12 @@
+{
+  "settings": {
+    "title": "设置",
+    "configurations": "配置",
+    "language": "语言",
+    "themeSelector": "主题选择",
+    "enablePodcastView": "启用播客视图",
+    "importExport": "导入 / 导出（OPML）",
+    "exportOpml": "导出 OPML",
+    "importOpml": "导入 OPML"
+  }
+}

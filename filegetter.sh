@@ -1,4 +1,9 @@
 # set APITOKEN = listennotes
+if [ -z "$LISTENNOTES" ]; then
+  echo "LISTENNOTES not set; skipping filefetcher."
+  exit 0
+fi
+
 echo $LISTENNOTES;
 echo "X-ListenAPI-Key: $LISTENNOTES";
 curl 'https://listen-api.listennotes.com/api/v2/best_podcasts?region=us&safe_mode=0' \

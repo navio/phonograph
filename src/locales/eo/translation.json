@@ -1,0 +1,12 @@
+{
+  "settings": {
+    "title": "Agordoj",
+    "configurations": "Konfiguroj",
+    "language": "Lingvo",
+    "themeSelector": "Tema elektilo",
+    "enablePodcastView": "Ebligi podkastan vidon",
+    "importExport": "Importi / eksporti (OPML)",
+    "exportOpml": "Eksporti OPML",
+    "importOpml": "Importi OPML"
+  }
+}

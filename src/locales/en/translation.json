@@ -1,0 +1,12 @@
+{
+  "settings": {
+    "title": "Settings",
+    "configurations": "Configurations",
+    "language": "Language",
+    "themeSelector": "Theme Selector",
+    "enablePodcastView": "Enable Podcast View",
+    "importExport": "Import / Export (OPML)",
+    "exportOpml": "Export OPML",
+    "importOpml": "Import OPML"
+  }
+}

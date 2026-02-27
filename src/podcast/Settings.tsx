@@ -38,9 +38,16 @@ import { importFeeds } from "./opmlImporter";
 
 import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+
+import { useTranslation } from "react-i18next";
 
 const Settings: React.FC = () => {
   const { state, dispatch, engine } = useContext(AppContext) as AppContextValue;
+  const { t, i18n } = useTranslation();
 
   const [notice, setNotice] = useState<{ open: boolean; message: string; severity: "success" | "info" | "warning" | "error" }>(
     {
@@ -164,25 +171,57 @@ const Settings: React.FC = () => {
 
   const { podcasts } = state;
 
+  const handleLanguageChange = (ev: any) => {
+    const lang = ev.target.value as string;
+    i18n.changeLanguage(lang);
+    try {
+      localStorage.setItem("i18nextLng", lang);
+    } catch (e) {
+      /* ignore */
+    }
+  };
+
   return (
     <>
       <AppBar sx={{ WebkitAppRegion: "drag" }} position="static">
         <Toolbar variant="dense">
-          <Typography variant="h6">Settings</Typography>
+          <Typography variant="h6">{t("settings.title")}</Typography>
         </Toolbar>
       </AppBar>
 
       <Card>
         <CardContent>
-          <Typography variant={"h5"}>Configurations</Typography>
+          <Typography variant={"h5"}>{t("settings.configurations")}</Typography>
           Version: {version}
+
+          <FormControl sx={{ minWidth: 160, ml: 2 }} size="small">
+            <InputLabel id="language-select-label">{t("settings.language")}</InputLabel>
+            <Select
+              labelId="language-select-label"
+              id="language-select"
+              value={i18n.language || "en"}
+              label={t("settings.language")}
+              onChange={handleLanguageChange}
+            >
+              <MenuItem value="en">English</MenuItem>
+              <MenuItem value="es">Español</MenuItem>
+              <MenuItem value="fr">Français</MenuItem>
+              <MenuItem value="de">Deutsch</MenuItem>
+              <MenuItem value="it">Italiano</MenuItem>
+              <MenuItem value="pt-BR">Português (Brasil)</MenuItem>
+              <MenuItem value="zh-CN">中文（简体）</MenuItem>
+              <MenuItem value="hi">हिन्दी</MenuItem>
+              <MenuItem value="ar">العربية</MenuItem>
+              <MenuItem value="eo">Esperanto</MenuItem>
+            </Select>
+          </FormControl>
         </CardContent>
       </Card>
 
       <Card>
         <CardContent>
           <Typography variant={"h6"} gutterBottom>
-            Theme Selector
+            {t("settings.themeSelector")}
           </Typography>
           <ToggleButtonGroup value={state.theme} exclusive onChange={themeSwitcher} aria-label="theme selector">
             <ToggleButton value={"light"} aria-label="White">
@@ -228,7 +267,7 @@ const Settings: React.FC = () => {
                   color="primary"
                 />
               }
-              label={"Enable Podcast View"}
+              label={t("settings.enablePodcastView")}
             />
           </div>
         </CardContent>
@@ -237,7 +276,7 @@ const Settings: React.FC = () => {
       <Card variant="outlined">
         <CardContent>
           <Typography variant={"h6"} gutterBottom>
-            Import / Export (OPML)
+            {t("settings.importExport")}
           </Typography>
 
           <input
@@ -256,7 +295,7 @@ const Settings: React.FC = () => {
             disabled={isImporting}
             sx={{ mr: 1 }}
           >
-            Export OPML
+            {t("settings.exportOpml")}
           </Button>
 
           <Button
@@ -266,7 +305,7 @@ const Settings: React.FC = () => {
             onClick={openFilePicker}
             disabled={isImporting}
           >
-            Import OPML
+            {t("settings.importOpml")}
           </Button>
 
           {importProgress ? (
