@@ -36,6 +36,9 @@ import { initializeLibrary } from "../engine";
 import { buildOpml, parseOpml } from "./opml";
 import { importFeeds } from "./opmlImporter";
 
+import Switch from "@mui/material/Switch";
+import FormControlLabel from "@mui/material/FormControlLabel";
+
 const Settings: React.FC = () => {
   const { state, dispatch, engine } = useContext(AppContext) as AppContextValue;
 
@@ -208,6 +211,25 @@ const Settings: React.FC = () => {
               <ToggleButton value={"dracula"}>Dracula</ToggleButton>
               <ToggleButton value={"highContrast"}>High Contrast</ToggleButton>
             </ToggleButtonGroup>
+          </div>
+
+          <div style={{ marginTop: 12 }}>
+            <Typography variant="subtitle1" gutterBottom>
+              Podcast View
+            </Typography>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={state.podcastViewEnabled !== false}
+                  onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
+                    dispatch({ type: "setPodcastViewEnabled", payload: ev.target.checked })
+                  }
+                  name="podcastViewEnabled"
+                  color="primary"
+                />
+              }
+              label={"Enable Podcast View"}
+            />
           </div>
         </CardContent>
       </Card>

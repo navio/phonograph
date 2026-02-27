@@ -69,6 +69,8 @@ export interface AppState {
   drawerContent?: unknown;
   podcastImage?: string;
   podcastAuthor?: string;
+  // New setting: whether to enable podcast artwork / palette theming
+  podcastViewEnabled?: boolean;
   [key: string]: unknown;
 }
 
@@ -87,7 +89,9 @@ export type AppAction =
   | { type: "removeFromPlayList"; episode: number }
   | { type: "clearPlayList" }
   | { type: "resetState" }
-  | { type: "drawer"; payload?: { status: boolean; drawerContent?: unknown } };
+  | { type: "drawer"; payload?: { status: boolean; drawerContent?: unknown } }
+  | { type: "setPodcastViewEnabled"; payload: boolean }
+  | { type: "setPodcastImage"; payload?: string | null };
 
 export interface AppContextValue {
   state: AppState;
