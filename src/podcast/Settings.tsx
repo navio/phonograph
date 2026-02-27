@@ -205,6 +205,14 @@ const Settings: React.FC = () => {
             >
               <MenuItem value="en">English</MenuItem>
               <MenuItem value="es">Español</MenuItem>
+              <MenuItem value="fr">Français</MenuItem>
+              <MenuItem value="de">Deutsch</MenuItem>
+              <MenuItem value="it">Italiano</MenuItem>
+              <MenuItem value="pt-BR">Português (Brasil)</MenuItem>
+              <MenuItem value="zh-CN">中文（简体）</MenuItem>
+              <MenuItem value="hi">हिन्दी</MenuItem>
+              <MenuItem value="ar">العربية</MenuItem>
+              <MenuItem value="eo">Esperanto</MenuItem>
             </Select>
           </FormControl>
         </CardContent>
