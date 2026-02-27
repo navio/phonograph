@@ -13,8 +13,6 @@ import it from "./locales/it/translation.json";
 import ptBR from "./locales/pt-BR/translation.json";
 import zhCN from "./locales/zh-CN/translation.json";
 
-const LanguageDetectorPlugin: any = (LanguageDetector as any)?.default ?? LanguageDetector;
-
 const updateHtmlLangDir = (lng?: string) => {
   if (typeof document === "undefined") return;
 
@@ -58,7 +56,7 @@ if (typeof document !== "undefined") {
   }
 }
 
-i18n.use(LanguageDetectorPlugin).use(initReactI18next).init({
+i18n.use(LanguageDetector).use(initReactI18next).init({
   resources: {
     ar: { translation: ar },
     de: { translation: de },
