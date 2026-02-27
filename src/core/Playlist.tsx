@@ -16,8 +16,10 @@ import {
 } from "@mui/material";
 import { AppContext } from "../App";
 import { AppContextValue, PlaylistItem } from "../types/app";
+import { useTranslation } from "react-i18next";
 
 const Playlist: React.FC = () => {
+  const { t } = useTranslation();
   const { state, dispatch } = useContext(AppContext) as AppContextValue;
   const removeFromList = (episode: number) => () => {
     dispatch({ type: "removeFromPlayList", episode });
@@ -29,7 +31,7 @@ const Playlist: React.FC = () => {
     <>
       <AppBar sx={{ WebkitAppRegion: "drag" }} position="static">
         <Toolbar variant="dense">
-          <Typography variant="h6">Playlist</Typography>
+          <Typography variant="h6">{t("playlist.title")}</Typography>
         </Toolbar>
       </AppBar>
       {state.playlist && state.playlist.length > 0 ? (
@@ -42,7 +44,7 @@ const Playlist: React.FC = () => {
               alignItems="center"
             >
               <Grid item>
-                <Typography variant="h6">Playing next:</Typography>
+                <Typography variant="h6">{t("playlist.playingNext")}</Typography>
               </Grid>
               <Grid item zeroMinWidth>
                 <Button
@@ -50,7 +52,7 @@ const Playlist: React.FC = () => {
                   variant="contained"
                   color="secondary"
                 >
-                  Clear
+                  {t("playlist.clear")}
                 </Button>
               </Grid>
             </Grid>
@@ -69,11 +71,11 @@ const Playlist: React.FC = () => {
                   <img
                     style={{ width: "2rem", marginRight: "1rem" }}
                     src={mediaElement.podcastImage}
-                    alt={mediaElement.title || "podcast"}
+                    alt={mediaElement.title || t("library.podcastDefault")}
                   />
                   <ListItemText>
                     <Typography variant="body2" display="block" noWrap>
-                      <b>{key + 1}:</b> {mediaElement.episodeInfo?.title || ""}{" "}
+                      <b>{key + 1}:</b> {mediaElement.episodeInfo?.title || ""} 
                     </Typography>
                     <Typography variant="caption" display="block" noWrap>
                       {mediaElement.episodeInfo?.author || ""}
@@ -97,7 +99,7 @@ const Playlist: React.FC = () => {
         >
           <img width={"85rem"} src={phono} />
           <br />
-          Playlist is empty.
+          {t("playlist.empty")}
         </Typography>
       )}
     </>

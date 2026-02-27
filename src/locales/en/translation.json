@@ -1,0 +1,128 @@
+{
+  "app": {
+    "settings": "Settings",
+    "configurations": "Configurations",
+    "version": "Version:"
+  },
+  "theme": {
+    "selector": "Theme Selector",
+    "paletteLabel": "Theme Palette",
+    "light": "Light",
+    "dark": "Dark",
+    "os": "OS",
+    "default": "Default",
+    "nord": "Nord",
+    "dracula": "Dracula",
+    "highContrast": "High Contrast",
+    "matrix": "Matrix",
+    "monokai": "Monokai",
+    "solarized": "Solarized"
+  },
+  "podcast": {
+    "view": "Podcast View",
+    "enableView": "Enable Podcast View",
+    "addToLibrary": "Add to Library",
+    "removeFromLibrary": "Remove from library",
+    "share": "Share Podcast",
+    "added": "Podcast Added to Library",
+    "linkCopied": "Link copied to clipboard",
+    "less": "Less",
+    "more": "More",
+    "subscribe": "Subscribe",
+    "episodes": "Episodes:",
+    "loadError": "There was a problem loading the podcast."
+  },
+  "opml": {
+    "title": "Import / Export (OPML)",
+    "export": "Export OPML",
+    "import": "Import OPML",
+    "importing": "Importing {{done}}/{{total}}…",
+    "noNewFound": "No new podcasts found to import.",
+    "importedSuccess": "Imported {{count}} podcasts from OPML.",
+    "importedPartial": "Imported {{successes}}/{{total}} podcasts. {{failures}} failed (check your connection or feed URLs).",
+    "importFailed": "Failed to import OPML."
+  },
+  "data": {
+    "title": "Data"
+  },
+  "delete": "Delete",
+  "settings": {
+    "reset": "Reset State",
+    "reload": "Reload Saved Podcasts"
+  },
+  "brand": {
+    "title": "Phonograph",
+    "footer": "is developed with ❤️ in Hoboken, NJ"
+  },
+  "snackbar": {
+    "exported": "Exported {{count}} podcasts to OPML."
+  },
+  "playlist": {
+    "title": "Playlist",
+    "playingNext": "Playing next:",
+    "clear": "Clear",
+    "empty": "Playlist is empty."
+  },
+  "discover": {
+    "title": "Discover",
+    "noResults": "No results were found.",
+    "failedTrending": "Failed to load trending podcasts.",
+    "retry": "Retry",
+    "trending": "Trending",
+    "results": "Results"
+  },
+  "search": {
+    "placeholder": "Search Podcasts"
+  },
+  "library": {
+    "title": "Library",
+    "addAria": "add",
+    "podcastDefault": "Podcast",
+    "empty": "No podcasts bookmarked."
+  },
+  "season": "Season {{season}}",
+  "progress": "Progress: {{percent}}%",
+  "saved": "Saved",
+  "drawer": {
+    "playNext": "Play Next",
+    "addToQueue": "Add to queue",
+    "markAsPlayed": "Mark as Played",
+    "seeDescription": "See Description"
+  },
+  "queued": {
+    "next": "Queued to play next",
+    "added": "Added to queue"
+  },
+  "episodes": {
+    "loadMore": "Load More Episodes"
+  },
+  "header": {
+    "podcast": "Podcast",
+    "menu": "Menu",
+    "back": "Back"
+  },
+  "footer": {
+    "favorites": "Favorites",
+    "playlist": "Playlist",
+    "discover": "Discover",
+    "settings": "Settings"
+  },
+  "aria": {
+    "playbackSpeed": "Playback speed",
+    "sleepTimer": "Sleep timer",
+    "minutes": "minutes"
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français",
+    "pt-BR": "Português (Brasil)",
+    "zh-CN": "简体中文",
+    "hi": "हिन्दी",
+    "it": "Italiano",
+    "ar": "العربية",
+    "de": "Deutsch",
+    "eo": "Esperanto"
+  }
+}

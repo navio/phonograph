@@ -1,0 +1,120 @@
+{
+  "app": {
+    "settings": "Impostazioni",
+    "configurations": "Configurazioni",
+    "version": "Versione:"
+  },
+  "theme": {
+    "selector": "Selettore tema",
+    "paletteLabel": "Palette tema",
+    "light": "Chiaro",
+    "dark": "Scuro",
+    "os": "Preferenza SO",
+    "default": "Predefinito",
+    "nord": "Nord",
+    "dracula": "Dracula",
+    "highContrast": "Alto contrasto",
+    "matrix": "Matrix",
+    "monokai": "Monokai",
+    "solarized": "Solarized"
+  },
+  "podcast": {
+    "view": "Vista podcast",
+    "enableView": "Abilita vista podcast",
+    "addToLibrary": "Aggiungi alla libreria",
+    "removeFromLibrary": "Rimuovi dalla libreria",
+    "share": "Condividi podcast",
+    "added": "Podcast aggiunto alla libreria",
+    "linkCopied": "Link copiato negli appunti",
+    "less": "Meno",
+    "more": "Altro",
+    "subscribe": "Iscriviti",
+    "episodes": "Episodi:"
+  },
+  "opml": {
+    "title": "Importa / Esporta (OPML)",
+    "export": "Esporta OPML",
+    "import": "Importa OPML",
+    "importing": "Importazione {{done}}/{{total}}…",
+    "noNewFound": "Nessun nuovo podcast trovato da importare.",
+    "importedSuccess": "Importati {{count}} podcast da OPML.",
+    "importedPartial": "Importati {{successes}}/{{total}} podcast. {{failures}} non riusciti (controlla la connessione o gli URL dei feed).",
+    "importFailed": "Importazione OPML non riuscita."
+  },
+  "data": {
+    "title": "Dati"
+  },
+  "delete": "Elimina",
+  "settings": {
+    "reset": "Reimposta stato",
+    "reload": "Ricarica podcast salvati"
+  },
+  "brand": {
+    "title": "Phonograph",
+    "footer": "sviluppato con ❤️ a Hoboken, NJ"
+  },
+  "snackbar": {
+    "exported": "Esportati {{count}} podcast in OPML."
+  },
+  "playlist": {
+    "title": "Playlist",
+    "playingNext": "In riproduzione successiva:",
+    "clear": "Svuota",
+    "empty": "La playlist è vuota."
+  },
+  "discover": {
+    "title": "Scopri",
+    "noResults": "Nessun risultato trovato.",
+    "failedTrending": "Impossibile caricare i podcast in tendenza.",
+    "retry": "Riprova",
+    "trending": "In tendenza",
+    "results": "Risultati"
+  },
+  "search": {
+    "placeholder": "Cerca podcast"
+  },
+  "library": {
+    "title": "Libreria",
+    "addAria": "aggiungi",
+    "podcastDefault": "Podcast",
+    "empty": "Nessun podcast salvato."
+  },
+  "season": "Stagione {{season}}",
+  "progress": "Progresso: {{percent}}%",
+  "saved": "Salvato",
+  "drawer": {
+    "playNext": "Riproduci dopo",
+    "addToQueue": "Aggiungi alla coda",
+    "markAsPlayed": "Segna come riprodotto",
+    "seeDescription": "Vedi descrizione"
+  },
+  "queued": {
+    "next": "In coda per riprodurre dopo",
+    "added": "Aggiunto alla coda"
+  },
+  "episodes": {
+    "loadMore": "Carica più episodi"
+  },
+  "header": {
+    "podcast": "Podcast"
+  },
+  "footer": {
+    "favorites": "Preferiti",
+    "playlist": "Playlist",
+    "discover": "Scopri",
+    "settings": "Impostazioni"
+  },
+  "language": {
+    "label": "Lingua",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français",
+    "pt-BR": "Português (Brasil)",
+    "zh-CN": "简体中文",
+    "hi": "हिन्दी",
+    "it": "Italiano",
+    "ar": "العربية",
+    "de": "Deutsch",
+    "eo": "Esperanto"
+  }
+}

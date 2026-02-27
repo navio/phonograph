@@ -1,0 +1,120 @@
+{
+  "app": {
+    "settings": "设置",
+    "configurations": "配置",
+    "version": "版本："
+  },
+  "theme": {
+    "selector": "主题选择",
+    "paletteLabel": "主题配色",
+    "light": "浅色",
+    "dark": "深色",
+    "os": "系统偏好",
+    "default": "默认",
+    "nord": "Nord",
+    "dracula": "Dracula",
+    "highContrast": "高对比度",
+    "matrix": "Matrix",
+    "monokai": "Monokai",
+    "solarized": "Solarized"
+  },
+  "podcast": {
+    "view": "播客视图",
+    "enableView": "启用播客视图",
+    "addToLibrary": "添加到收藏",
+    "removeFromLibrary": "从收藏中移除",
+    "share": "分享播客",
+    "added": "已将播客添加到收藏",
+    "linkCopied": "链接已复制到剪贴板",
+    "less": "收起",
+    "more": "展开",
+    "subscribe": "订阅",
+    "episodes": "剧集："
+  },
+  "opml": {
+    "title": "导入 / 导出 (OPML)",
+    "export": "导出 OPML",
+    "import": "导入 OPML",
+    "importing": "正在导入 {{done}}/{{total}}…",
+    "noNewFound": "未找到新的播客可导入。",
+    "importedSuccess": "已从 OPML 导入 {{count}} 个播客。",
+    "importedPartial": "已导入 {{successes}}/{{total}} 个播客。{{failures}} 个失败（请检查您的连接或订阅源 URL）。",
+    "importFailed": "导入 OPML 失败。"
+  },
+  "data": {
+    "title": "数据"
+  },
+  "delete": "删除",
+  "settings": {
+    "reset": "重置状态",
+    "reload": "重新加载已保存的播客"
+  },
+  "brand": {
+    "title": "Phonograph",
+    "footer": "在霍博肯，用❤️开发"
+  },
+  "snackbar": {
+    "exported": "已导出 {{count}} 个播客到 OPML。"
+  },
+  "playlist": {
+    "title": "播放列表",
+    "playingNext": "接下来播放：",
+    "clear": "清除",
+    "empty": "播放列表为空。"
+  },
+  "discover": {
+    "title": "发现",
+    "noResults": "未找到结果。",
+    "failedTrending": "加载趋势播客失败。",
+    "retry": "重试",
+    "trending": "趋势",
+    "results": "结果"
+  },
+  "search": {
+    "placeholder": "搜索播客"
+  },
+  "library": {
+    "title": "收藏",
+    "addAria": "添加",
+    "podcastDefault": "播客",
+    "empty": "没有已收藏的播客。"
+  },
+  "season": "第 {{season}} 季",
+  "progress": "进度：{{percent}}%",
+  "saved": "已保存",
+  "drawer": {
+    "playNext": "下一位播放",
+    "addToQueue": "添加到队列",
+    "markAsPlayed": "标记为已播放",
+    "seeDescription": "查看描述"
+  },
+  "queued": {
+    "next": "已加入下一位播放队列",
+    "added": "已添加到队列"
+  },
+  "episodes": {
+    "loadMore": "加载更多剧集"
+  },
+  "header": {
+    "podcast": "播客"
+  },
+  "footer": {
+    "favorites": "收藏",
+    "playlist": "列表",
+    "discover": "发现",
+    "settings": "设置"
+  },
+  "language": {
+    "label": "语言",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français",
+    "pt-BR": "Português (Brasil)",
+    "zh-CN": "简体中文",
+    "hi": "हिन्दी",
+    "it": "Italiano",
+    "ar": "العربية",
+    "de": "Deutsch",
+    "eo": "Esperanto"
+  }
+}

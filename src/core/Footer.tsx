@@ -13,6 +13,7 @@ import { LIBVIEW, DISCOVERVIEW, SETTINGSVIEW, PLAYLIST } from "../constants";
 
 import { AppContext } from "../App";
 import { AppContextValue } from "../types/app";
+import { useTranslation } from "react-i18next";
 
 const StyledBottomNavigationAction = styled(BottomNavigationAction)({
   "& .MuiBottomNavigationAction-label": {
@@ -63,6 +64,7 @@ const hotkeys = (redirects: (url: string) => void) => {
 };
 
 const SimpleBottomNavigation: React.FC = () => {
+  const { t } = useTranslation();
   const history = useHistory();
   const location = useLocation();
   const handleRedirect = (url: string) => () => history.push(url);
@@ -95,13 +97,13 @@ const SimpleBottomNavigation: React.FC = () => {
           }}
         >
           <StyledBottomNavigationAction
-            label="Favorites"
+            label={t("footer.favorites")}
             value={LIBVIEW}
             onClick={handleRedirect(LIBVIEW)}
             icon={<Favorite />}
           />
           <StyledBottomNavigationAction
-            label="Playlist"
+            label={t("footer.playlist")}
             value={PLAYLIST}
             onClick={handleRedirect(PLAYLIST)}
             icon={
@@ -111,13 +113,13 @@ const SimpleBottomNavigation: React.FC = () => {
             }
           />
           <StyledBottomNavigationAction
-            label="Discover"
+            label={t("footer.discover")}
             value={DISCOVERVIEW}
             onClick={handleRedirect(DISCOVERVIEW)}
             icon={<DiscoverIcon />}
           />
           <StyledBottomNavigationAction
-            label="Settings"
+            label={t("footer.settings")}
             value={SETTINGSVIEW}
             onClick={handleRedirect(SETTINGSVIEW)}
             icon={<Settings />}

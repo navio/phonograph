@@ -23,11 +23,13 @@ import { clearText } from "./EpisodeList";
 import { Consumer } from "../../App";
 import { useHistory } from "react-router-dom";
 import { buildThemeFromPalette, toRGBA } from "../../core/podcastPalette";
+import { useTranslation } from "react-i18next";
 
 const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 const prod = DEBUG ? '' : ''
 
 function PodcastHeader(props) {
+  const { t } = useTranslation();
   const { inLibrary, savePodcast, removePodcast } = props;
   const theme = useTheme();
   const showDesktop = useMediaQuery(theme.breakpoints.up("md"));
@@ -44,7 +46,7 @@ function PodcastHeader(props) {
   const isInLibrary = inLibrary()
   const saveThisPodcastToLibrary = (ev) => {
     savePodcast(ev);
-    setMessage("Podcast Added to Library");
+    setMessage(t("podcast.added"));
     setOpen(true);
   };
 
@@ -57,10 +59,7 @@ function PodcastHeader(props) {
     setOpen(false);
   };
 
-  // const colorThief = new ColorThief();
-
   const makeMeAHash = (url) => btoa(url);
-
 
   const shareLink = !!(navigator.share || navigator.clipboard);
   const share = (title, text, url) => {
@@ -74,7 +73,7 @@ function PodcastHeader(props) {
     } else if (navigator.clipboard) {
       return () => {
         navigator.clipboard.writeText(`${title} ${url.toString()}`);
-        setMessage("Link copied to clipboard");
+        setMessage(t("podcast.linkCopied"));
         setOpen(true);
       };
     } else {
@@ -90,8 +89,6 @@ function PodcastHeader(props) {
         const enabled = data?.state?.podcastViewEnabled !== false;
         const themeColors = enabled && palette ? buildThemeFromPalette(palette) : null;
 
-        // If we don't have a palette/themeColors (eg CORS/image failure),
-        // fall back to the app theme text colors (not white-on-white).
         const textColor = themeColors?.text || theme.palette.text.primary;
         const subText = themeColors?.subText || theme.palette.text.secondary;
         const overlay = enabled
@@ -126,7 +123,7 @@ function PodcastHeader(props) {
                   <Grid item xs={6}>
                     <IconButton
                       size="small"
-                      aria-label="back"
+                      aria-label={t("header.back")}
                       onClick={backHandler}
                       sx={{ color: theme.palette.primary.contrastText }}
                     >
@@ -135,29 +132,30 @@ function PodcastHeader(props) {
                   </Grid>
                   <Grid item xs={6} sx={{ textAlign: "right" }}>
                     {isInLibrary ? (
-                      <Tooltip title="Remove from library" placement="bottom">
+                      <Tooltip title={t("podcast.removeFromLibrary")} placement="bottom">
                         <IconButton
                           size="small"
                           sx={{ color: theme.palette.primary.contrastText }}
                           onClick={removePodcast}
-                          aria-label="Remove from Library"
+                          aria-label={t("podcast.removeFromLibrary")}
                         >
                           <Favorite />
                         </IconButton>
                       </Tooltip>
                     ) : (
-                      <Tooltip title="Add to Library" placement="bottom">
+                      <Tooltip title={t("podcast.addToLibrary")} placement="bottom">
                         <IconButton
                           size="small"
                           sx={{ color: theme.palette.primary.contrastText }}
                           onClick={saveThisPodcastToLibrary}
+                          aria-label={t("podcast.addToLibrary")}
                         >
                           <BookmarkBorderIcon />
                         </IconButton>
                       </Tooltip>
                     )}
                     {shareLink && (
-                      <Tooltip title="Share Podcast" placement="bottom">
+                      <Tooltip title={t("podcast.share")} placement="bottom">
                         <IconButton
                           sx={{ color: theme.palette.primary.contrastText }}
                           size="small"
@@ -166,6 +164,7 @@ function PodcastHeader(props) {
                             state.title,
                             `${document.location.origin}/podcast/${makeMeAHash(state.domain)}`
                           )}
+                          aria-label={t("podcast.share")}
                         >
                           <ShareIcon />
                         </IconButton>
@@ -265,7 +264,7 @@ function PodcastHeader(props) {
                           },
                         }}
                       >
-                        {descExpanded ? "Less" : "More"}
+                        {descExpanded ? t("podcast.less") : t("podcast.more")}
                       </Button>
                     )}
                   </Box>
@@ -285,11 +284,11 @@ function PodcastHeader(props) {
                         : theme.palette.primary.contrastText,
                     }}
                   >
-                    Subscribe
+                    {t("podcast.subscribe")}
                   </Button>
                 )}
                 <Typography sx={{ color: subText }}>
-                  <b>Episodes:</b> {state.items.length}
+                  <b>{t("podcast.episodes")}</b> {state.items.length}
                 </Typography>
               </Box>
             </Box>

@@ -6,6 +6,7 @@ import NightsStayIcon from "@mui/icons-material/NightsStay";
 
 import { AppContext } from "../App";
 import { AppContextValue } from "../types/app";
+import { useTranslation } from "react-i18next";
 
 const convertMinsToHrsMins = (mins: number) => {
   if (!Number.isInteger(mins)) return "";
@@ -23,6 +24,7 @@ interface SleepTimerProps {
 }
 
 const SleepTimer: React.FC<SleepTimerProps> = ({ onClick, color }) => {
+  const { t } = useTranslation();
   const { player, playerRef } = useContext(AppContext) as AppContextValue;
   const audio = playerRef?.current || player;
 
@@ -101,10 +103,10 @@ const SleepTimer: React.FC<SleepTimerProps> = ({ onClick, color }) => {
           exclusive
           style={{ margin: "0 auto" }}
           onChange={(_ev, newValue) => setTimer(newValue)}
-          aria-label="sleep timer"
+          aria-label={t("aria.sleepTimer")}
         >
           {[1, 5, 15, 30, 45, 60].map((time) => (
-            <ToggleButton key={time} value={time} aria-label={`${time} minutes`} sx={{ color }}>
+            <ToggleButton key={time} value={time} aria-label={`${time} ${t("aria.minutes")}`} sx={{ color }}>
               {time}
             </ToggleButton>
           ))}

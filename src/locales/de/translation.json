@@ -1,0 +1,120 @@
+{
+  "app": {
+    "settings": "Einstellungen",
+    "configurations": "Konfigurationen",
+    "version": "Version:"
+  },
+  "theme": {
+    "selector": "Themenauswahl",
+    "paletteLabel": "Theme-Palette",
+    "light": "Hell",
+    "dark": "Dunkel",
+    "os": "Betriebssystem-Einstellung",
+    "default": "Standard",
+    "nord": "Nord",
+    "dracula": "Dracula",
+    "highContrast": "Hoher Kontrast",
+    "matrix": "Matrix",
+    "monokai": "Monokai",
+    "solarized": "Solarized"
+  },
+  "podcast": {
+    "view": "Podcast-Ansicht",
+    "enableView": "Podcast-Ansicht aktivieren",
+    "addToLibrary": "Zur Bibliothek hinzufügen",
+    "removeFromLibrary": "Aus Bibliothek entfernen",
+    "share": "Podcast teilen",
+    "added": "Podcast zur Bibliothek hinzugefügt",
+    "linkCopied": "Link in die Zwischenablage kopiert",
+    "less": "Weniger",
+    "more": "Mehr",
+    "subscribe": "Abonnieren",
+    "episodes": "Episoden:"
+  },
+  "opml": {
+    "title": "Import / Export (OPML)",
+    "export": "OPML exportieren",
+    "import": "OPML importieren",
+    "importing": "Importiere {{done}}/{{total}}…",
+    "noNewFound": "Keine neuen Podcasts zum Importieren gefunden.",
+    "importedSuccess": "{{count}} Podcasts aus OPML importiert.",
+    "importedPartial": "{{successes}}/{{total}} Podcasts importiert. {{failures}} fehlgeschlagen (überprüfen Sie Ihre Verbindung oder Feed-URLs).",
+    "importFailed": "OPML-Import fehlgeschlagen."
+  },
+  "data": {
+    "title": "Daten"
+  },
+  "delete": "Löschen",
+  "settings": {
+    "reset": "Status zurücksetzen",
+    "reload": "Gespeicherte Podcasts neu laden"
+  },
+  "brand": {
+    "title": "Phonograph",
+    "footer": "entwickelt mit ❤️ in Hoboken, NJ"
+  },
+  "snackbar": {
+    "exported": "{{count}} Podcasts nach OPML exportiert."
+  },
+  "playlist": {
+    "title": "Wiedergabeliste",
+    "playingNext": "Als nächstes:",
+    "clear": "Löschen",
+    "empty": "Die Wiedergabeliste ist leer."
+  },
+  "discover": {
+    "title": "Entdecken",
+    "noResults": "Keine Ergebnisse gefunden.",
+    "failedTrending": "Laden der Trend-Podcasts fehlgeschlagen.",
+    "retry": "Erneut versuchen",
+    "trending": "Trending",
+    "results": "Ergebnisse"
+  },
+  "search": {
+    "placeholder": "Podcasts suchen"
+  },
+  "library": {
+    "title": "Bibliothek",
+    "addAria": "hinzufügen",
+    "podcastDefault": "Podcast",
+    "empty": "Keine gespeicherten Podcasts."
+  },
+  "season": "Staffel {{season}}",
+  "progress": "Fortschritt: {{percent}}%",
+  "saved": "Gespeichert",
+  "drawer": {
+    "playNext": "Als nächstes abspielen",
+    "addToQueue": "Zur Warteschlange hinzufügen",
+    "markAsPlayed": "Als abgespielt markieren",
+    "seeDescription": "Beschreibung ansehen"
+  },
+  "queued": {
+    "next": "In die Wiedergabeliste als nächstes gestellt",
+    "added": "Zur Warteschlange hinzugefügt"
+  },
+  "episodes": {
+    "loadMore": "Mehr Episoden laden"
+  },
+  "header": {
+    "podcast": "Podcast"
+  },
+  "footer": {
+    "favorites": "Favoriten",
+    "playlist": "Playlist",
+    "discover": "Entdecken",
+    "settings": "Einstellungen"
+  },
+  "language": {
+    "label": "Sprache",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français",
+    "pt-BR": "Português (Brasil)",
+    "zh-CN": "简体中文",
+    "hi": "हिन्दी",
+    "it": "Italiano",
+    "ar": "العربية",
+    "de": "Deutsch",
+    "eo": "Esperanto"
+  }
+}

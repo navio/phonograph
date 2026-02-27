@@ -31,6 +31,7 @@ import Snackbar from "@mui/material/Snackbar";
 
 import { AppContext } from "../../App";
 import { buildThemeFromPalette, toRGBA } from "../../core/podcastPalette";
+import { useTranslation } from "react-i18next";
 
 const DOMPurify = createDOMPurify(window);
 const { sanitize } = DOMPurify;
@@ -47,21 +48,13 @@ const today = dayjs();
 const episodeDate = (date) => today.from(date, true);
 
 const saveOffline = async (mediaURL) => {
-  // const audio = document.createElement('audio');
-  // audio.src = mediaURL;
-  // window.audio = audio;
-  // console.log(audio.data);
-
-  // const rawPodcast = await fetch('/rss-full/'+(mediaURL));
-  // const podcastBlob = await rawPodcast.blob();
-  // const response = new Response(podcastBlob)
-
   const cache = await caches.open("offline-podcasts");
   await cache.put(mediaURL, response);
   cache.add(mediaURL);
 };
 
-const IsAvaliable = (url) => {
+const IsAvaliable = ({ url }) => {
+  const { t } = useTranslation();
   const [hasIt, setHasIt] = useState(false);
 
   const availableOffline = async (media) => {
@@ -70,13 +63,14 @@ const IsAvaliable = (url) => {
   };
 
   useEffect(() => {
-    availableOffline(url.url);
-  }, []);
+    availableOffline(url);
+  }, [url]);
 
-  return hasIt ? "Saved" : "";
+  return hasIt ? t("saved") : "";
 };
 
 const EpisodeListDescription = (props) => {
+  const { t } = useTranslation();
   const episode = props.episode;
   const { currentTime, duration, completed } = props.history || {};
   const { palette, textColor, subText, accent } = props;
@@ -84,16 +78,15 @@ const EpisodeListDescription = (props) => {
     currentTime && duration ? Math.round((currentTime * 100) / duration) : null;
   return (
     <ListItemText
-      // {...props}
       primary={
         <>
           {episode.season && (
             <Typography sx={{ color: accent }}>
-              Season {episode.season}
+              {t("season", { season: episode.season })}
             </Typography>
           )}
           <Typography component="div" variant="subtitle1" noWrap sx={{ color: textColor }}>
-            {clearText(episode.title)}{" "}
+            {clearText(episode.title)} {" "}
             <IsAvaliable url={episode.enclosures[0].url} />
           </Typography>
           <Typography variant="overline" component="div" sx={{ color: subText }}>
@@ -106,7 +99,7 @@ const EpisodeListDescription = (props) => {
                 style={{ marginLeft: "10px" }}
                 variant="outlined"
                 size="small"
-                label={`Progress: ${total}%`}
+                label={t("progress", { percent: total })}
                 sx={{
                   borderColor: accent,
                   color: textColor,
@@ -153,6 +146,7 @@ const Description = (props) => {
 };
 
 const EpisodeList = (props) => {
+  const { t } = useTranslation();
   const [episodeHistory, setEpisodeHistory] = useState({});
   const [open, setOpen] = React.useState(null);
   const [amount, setAmount] = React.useState(1);
@@ -162,7 +156,6 @@ const EpisodeList = (props) => {
   const [drawer, openDrawer] = useState(false);
   const [currentEpisode, setCurrentEpisode] = useState(null);
   const [message, setMessage] = useState(null);
-  // console.log('heree',podcast);
   const { dispatch } = useContext(AppContext);
   const theme = useTheme();
   const palette = props.palette;
@@ -192,8 +185,6 @@ const EpisodeList = (props) => {
 
   const handleClose = (value) => {
     setOpen(null);
-    // reFresh(Date.now());
-    // setSelectedValue(value);
   };
 
   const completeEpisode = async (episode) => {
@@ -236,7 +227,6 @@ const EpisodeList = (props) => {
   const closeMessage = () => setMessage(null);
 
   useEffect(() => {
-    // console.log("getting new history");
     getHistory(props.current);
   }, [fresh, props.shouldRefresh]);
   return (
@@ -278,7 +268,6 @@ const EpisodeList = (props) => {
                               )}
                               sx={{
                                 color: iconColor,
-                                // Give the button a subtle surface so it stays visible on pale themes
                                 backgroundColor: palette ? toRGBA(palette.primary, 0.18) : "transparent",
                                 "&:hover": {
                                   backgroundColor: palette ? toRGBA(palette.primary, 0.26) : undefined,
@@ -318,26 +307,29 @@ const EpisodeList = (props) => {
                                       typeContent: "list",
                                       content: [
                                         {
-                                          label: "Play Next",
+                                          label: t("drawer.playNext"),
                                           icon: "addnext",
                                           fn: () => {
-                                            setMessage("Queued to play next");
+                                            setMessage(t("queued.next"));
                                             playNext(episode.guid);
                                           },
                                         },
-                                        { label: "Add to queue",
-                                        icon: "queue",
-                                        fn: () => {
-                                          setMessage("Added to queue");
-                                          playLast(episode.guid);
-                                        } },
-                                        { label: "Mark as Played",
+                                        {
+                                          label: t("drawer.addToQueue"),
+                                          icon: "queue",
                                           fn: () => {
-                                            completeEpisode(episode.guid);
-                                          }  
+                                            setMessage(t("queued.added"));
+                                            playLast(episode.guid);
+                                          },
                                         },
                                         {
-                                          label: "See Description",
+                                          label: t("drawer.markAsPlayed"),
+                                          fn: () => {
+                                            completeEpisode(episode.guid);
+                                          },
+                                        },
+                                        {
+                                          label: t("drawer.seeDescription"),
                                           icon: "description",
                                           fn: () => setOpen({title: episode.title ,description: episode.description})
                                         }
@@ -358,10 +350,6 @@ const EpisodeList = (props) => {
                               <MoreVertIcon sx={{ color: iconColor }} />
                             </IconButton>
 
-                            {/* <ShowProgress
-                              guid={episode.guid}
-                              episodeData={episodeData}
-                            /> */}
                           </ListItemIcon>
                         </ListItem>
                         <Divider sx={{ borderColor: toRGBA(palette?.primary, 0.2) }} />
@@ -381,8 +369,7 @@ const EpisodeList = (props) => {
                         color: textColor,
                       }}
                     >
-                      {" "}
-                      Load More Episodes{" "}
+                      {t("episodes.loadMore")}
                     </Button>
                   </List>
                 )}

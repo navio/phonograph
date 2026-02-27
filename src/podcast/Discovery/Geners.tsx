@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import Chip from "@mui/material/Chip";
 import Box from "@mui/material/Box";
+import { useTranslation } from "react-i18next";
 
 interface Genre {
   id: number;
@@ -16,6 +17,7 @@ interface GenersProps {
 }
 
 const Geners: React.FC<GenersProps> = ({ getPopularPodcasts, selected }) => {
+  const { t } = useTranslation();
   const [genres, setGenres] = useState<Genre[]>([]);
 
   useEffect(() => {
@@ -48,7 +50,7 @@ const Geners: React.FC<GenersProps> = ({ getPopularPodcasts, selected }) => {
         <Chip
           key={genre.id}
           onClick={() => getPopularPodcasts(genre.id)}
-          label={genre.name}
+          label={genre.id === 0 ? t("discover.trending") : genre.name}
           variant={selected === genre.id ? "filled" : "outlined"}
           color={genre.id === 0 ? "secondary" : "primary"}
         />
