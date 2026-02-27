@@ -224,6 +224,8 @@ export const reducer = (state: AppState, action: AppAction): AppState => {
     }
     case "setPodcastViewEnabled":
       return { ...state, podcastViewEnabled: action.payload };
+    case "setPodcastImage":
+      return { ...state, podcastImage: (action as any).payload };
     default:
       return state;
   }

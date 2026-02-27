@@ -90,7 +90,8 @@ export type AppAction =
   | { type: "clearPlayList" }
   | { type: "resetState" }
   | { type: "drawer"; payload?: { status: boolean; drawerContent?: unknown } }
-  | { type: "setPodcastViewEnabled"; payload: boolean };
+  | { type: "setPodcastViewEnabled"; payload: boolean }
+  | { type: "setPodcastImage"; payload?: string | null };
 
 export interface AppContextValue {
   state: AppState;
