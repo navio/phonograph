@@ -34,6 +34,7 @@ import DownloadIcon from "@mui/icons-material/Download";
 
 import { initializeLibrary } from "../engine";
 import { buildOpml, parseOpml } from "./opml";
+import { importFeeds } from "./opmlImporter";
 
 const Settings: React.FC = () => {
   const { state, dispatch, engine } = useContext(AppContext) as AppContextValue;
@@ -116,28 +117,20 @@ const Settings: React.FC = () => {
 
       setImportProgress({ done: 0, total: toImport.length });
 
-      const failures: Array<{ url: string; error?: unknown }> = [];
-      let done = 0;
-
-      for (const feed of toImport) {
-        try {
-          await (engine as any).getPodcast(feed.url, { save: true });
-        } catch (err) {
-          failures.push({ url: feed.url, error: err });
-        } finally {
-          done += 1;
-          setImportProgress({ done, total: toImport.length });
-        }
-      }
+      const { successes, failures } = await importFeeds(engine, toImport, {
+        timeoutMs: 15000,
+        save: true,
+        onProgress: (done, total) => setImportProgress({ done, total }),
+      });
 
       await initializeLibrary(engine as any, dispatch);
 
       if (failures.length === 0) {
-        setNotice({ open: true, message: `Imported ${toImport.length} podcasts from OPML.`, severity: "success" });
+        setNotice({ open: true, message: `Imported ${successes.length} podcasts from OPML.`, severity: "success" });
       } else {
         setNotice({
           open: true,
-          message: `Imported ${toImport.length - failures.length}/${toImport.length} podcasts. ${failures.length} failed (check your connection or feed URLs).`,
+          message: `Imported ${successes.length}/${toImport.length} podcasts. ${failures.length} failed (check your connection or feed URLs).`,
           severity: "warning",
         });
       }
