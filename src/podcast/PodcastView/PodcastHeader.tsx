@@ -100,7 +100,7 @@ function PodcastHeader(props) {
             : showDesktop
               ? "rgba(0,0,0,0.55)"
               : "rgba(0,0,0,0.75)"
-          : theme.palette.background.default;
+          : "transparent";
         return (
           <>
             <Snackbar
@@ -183,7 +183,7 @@ function PodcastHeader(props) {
                   md: "15vh",
                 },
                 position: "relative",
-                backgroundImage: enabled && state.image ? `url(${prod + state.image})` : "none",
+                backgroundImage: state.image ? `url(${prod + state.image})` : "none",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }}
@@ -255,7 +255,9 @@ function PodcastHeader(props) {
                           minWidth: 0,
                           textTransform: "none",
                           fontWeight: 700,
-                          color: themeColors?.accentText || textColor,
+                          color: enabled
+                            ? themeColors?.accentText || textColor
+                            : theme.palette.primary.main,
                           backgroundColor: "transparent",
                           "&:hover": {
                             backgroundColor: "transparent",
@@ -275,8 +277,12 @@ function PodcastHeader(props) {
                     onClick={saveThisPodcastToLibrary}
                     variant="contained"
                     sx={{
-                      backgroundColor: themeColors?.accent || theme.palette.primary.main,
-                      color: themeColors?.accentText || textColor,
+                      backgroundColor: enabled
+                        ? themeColors?.accent || theme.palette.primary.main
+                        : theme.palette.primary.main,
+                      color: enabled
+                        ? themeColors?.accentText || theme.palette.primary.contrastText
+                        : theme.palette.primary.contrastText,
                     }}
                   >
                     Subscribe
