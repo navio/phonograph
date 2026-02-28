@@ -13,6 +13,8 @@ import LinearProgress from "@mui/material/LinearProgress";
 import { Grid, Card } from "@mui/material";
 import CloseIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
+import BookmarkIcon from "@mui/icons-material/Bookmark";
 
 import { AppContext } from "../App";
 import { AppContextValue } from "../types/app";
@@ -23,7 +25,8 @@ import { getImagePalette, toRGBA, buildThemeFromPalette, Palette, PaletteTheme }
 
 // Time values from HTMLAudioElement (currentTime/duration) are in **seconds**.
 const formatTime = (seconds: number | null | undefined) => {
-  if (typeof seconds !== "number" || !Number.isFinite(seconds) || seconds < 0) return "00:00";
+  // Use a single helper for all time formatting. Return a clear placeholder for invalid/unknown durations.
+  if (typeof seconds !== "number" || !Number.isFinite(seconds) || seconds < 0) return "--:--";
 
   const totalSeconds = Math.floor(seconds);
   const hours = Math.floor(totalSeconds / 3600);
@@ -37,15 +40,6 @@ const formatTime = (seconds: number | null | undefined) => {
   }
 
   return `${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-};
-
-const formatRemaining = (durationSeconds?: number, currentSeconds?: number | null) => {
-  if (typeof durationSeconds !== "number" || typeof currentSeconds !== "number") return "∞";
-  if (!Number.isFinite(durationSeconds) || !Number.isFinite(currentSeconds) || durationSeconds <= 0) return "∞";
-
-  const remaining = Math.max(0, Math.floor(durationSeconds - currentSeconds));
-  if (!Number.isFinite(remaining)) return "∞";
-  return "- " + formatTime(remaining);
 };
 
 interface MediaControlProps {
@@ -63,8 +57,10 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
   const showExpand = useMediaQuery(theme.breakpoints.up("sm"));
   const history = useHistory();
 
+  // UI-only toggles (local presentation state)
   const [showSpeed, setShowSpeed] = useState(true);
   const [showTimer, setShowTimer] = useState(true);
+  const [saved, setSaved] = useState(false);
   const [palette, setPalette] = useState<Palette | null>(null);
 
   const saveStorage = (value: boolean) => {
@@ -203,6 +199,10 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
     return cleanup;
   }, []);
 
+  // Presentation styling helpers
+  const timeTypography = { fontSize: "0.95rem", fontVariantNumeric: "tabular-nums", color: paletteStyles.text };
+  const controlGap = 1.5;
+
   return state.episodeInfo ? (
     <>
       <Card
@@ -236,7 +236,10 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
           <Grid container direction="row-reverse">
             <Grid item sx={{ padding: ".5rem" }}>
               <IconButton
-                onClick={() => { saveStorage(!open); setOpen(false); }}
+                onClick={() => {
+                  saveStorage(!open);
+                  setOpen(false);
+                }}
                 sx={{ color: paletteStyles.text }}
               >
                 <CloseIcon />
@@ -317,40 +320,53 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
                         value={sliderValue}
                         max={sliderMax}
                         onChange={handleSeek}
-                        sx={{ width: "100%", maxWidth: 720, mx: 0, my: 0, color: paletteStyles.accent }}
+                        sx={{ width: "clamp(280px, 60vw, 720px)", mx: 0, my: 0, color: paletteStyles.accent }}
                       />
 
+                      {/* Time row: single current time (left) and total duration (right) */}
                       <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%", maxWidth: 720, mt: 1 }}>
-                        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+                        <Typography sx={timeTypography} component="div">
+                          {formatTime(state.currentTime)}
+                        </Typography>
+                        <Typography sx={{ ...timeTypography, color: paletteStyles.subText }} component="div">
+                          {formatTime(state.duration)}
+                        </Typography>
+                      </Box>
+
+                      {/* Controls row: clear 3-zone layout */}
+                      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: 720, mt: 1, gap: controlGap }}>
+                        {/* Left zone: sleep timer + rewind */}
+                        <Box sx={{ display: "flex", alignItems: "center", gap: controlGap, minWidth: 120 }}>
+                          <SleepTimer onClick={setShowTimer} color={paletteStyles.text} />
                           <IconButton onClick={props.rewind} sx={{ color: paletteStyles.text }}>
                             <SkipPreviousIcon />
                           </IconButton>
-                          <IconButton onClick={props.handler} sx={{ color: paletteStyles.text }}>
-                            {state.status === "paused" ? <PlayArrowIcon /> : <PauseIcon />}
+                        </Box>
+
+                        {/* Center zone: play/pause and forward - centered */}
+                        <Box sx={{ display: "flex", alignItems: "center", gap: controlGap, justifyContent: "center", flex: "1 1 auto" }}>
+                          <IconButton onClick={props.handler} sx={{ color: paletteStyles.text, width: 56, height: 56 }}>
+                            {state.status === "paused" ? <PlayArrowIcon sx={{ fontSize: 30 }} /> : <PauseIcon sx={{ fontSize: 30 }} />}
                           </IconButton>
                           <IconButton onClick={props.forward} sx={{ color: paletteStyles.text }}>
                             <SkipNextIcon />
                           </IconButton>
-
-                          <Typography sx={{ color: paletteStyles.text }}>{formatTime(state.currentTime)}</Typography>
                         </Box>
 
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                          <div style={{ textAlign: "right" }}>
-                            <Typography sx={{ color: paletteStyles.subText }} variant="caption">
-                              {formatRemaining(state.duration, state.currentTime)}
-                            </Typography>
-                            <Typography sx={{ color: paletteStyles.subText }} variant="caption">
-                              {formatTime(state.currentTime)}
-                            </Typography>
-                          </div>
+                        {/* Right zone: speed control + save */}
+                        <Box sx={{ display: "flex", alignItems: "center", gap: controlGap, minWidth: 120, justifyContent: "flex-end" }}>
+                          <SpeedControl onClick={setShowSpeed} color={paletteStyles.text} />
+                          <IconButton onClick={() => setSaved((s) => !s)} sx={{ color: paletteStyles.text }} aria-label="save">
+                            {saved ? <BookmarkIcon /> : <BookmarkBorderIcon />}
+                          </IconButton>
                         </Box>
                       </Box>
                     </Box>
                   </Grid>
                   <Grid item xs={6} md={3}>
                     <div style={{ display: "flex", justifyContent: "center" }}>
-                      <SpeedControl />
+                      {/* Keep speed control present for larger displays as well (redundant but harmless) */}
+                      <SpeedControl onClick={setShowSpeed} color={paletteStyles.text} />
                     </div>
                   </Grid>
                 </Grid>
@@ -358,37 +374,53 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
             </div>
           </div>
         ) : (
-          // Minimized single-row layout
+          // Minimized single-row layout - 3-zone layout with centered slider
           <div style={{ display: "flex", alignItems: "center", width: "100%", padding: "0 0.75rem", gap: "8px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: "fit-content" }}>
+            {/* Left zone: sleep timer + rewind */}
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", minWidth: "fit-content" }}>
+              <SleepTimer onClick={setShowTimer} color={paletteStyles.text} />
               <IconButton size="small" onClick={props.rewind} sx={{ color: paletteStyles.text }}>
                 <SkipPreviousIcon fontSize="small" />
               </IconButton>
+            </div>
+
+            {/* Center zone: slider with play/pause/forward overlaid */}
+            <div style={{ display: "flex", alignItems: "center", flex: 1, margin: "0 8px", gap: "8px", justifyContent: "center" }}>
               <IconButton size="small" onClick={props.handler} sx={{ color: paletteStyles.text }}>
                 {state.status === "paused" ? <PlayArrowIcon fontSize="small" /> : <PauseIcon fontSize="small" />}
               </IconButton>
+
+              <div style={{ flex: 1, display: "flex", alignItems: "center" }}>
+                <Slider
+                  size="small"
+                  value={sliderValue}
+                  max={sliderMax}
+                  onChange={handleSeek}
+                  sx={{ color: paletteStyles.accent, mx: 0, my: 0, width: "100%" }}
+                />
+              </div>
+
               <IconButton size="small" onClick={props.forward} sx={{ color: paletteStyles.text }}>
                 <SkipNextIcon fontSize="small" />
               </IconButton>
             </div>
 
-            <div style={{ flex: 1, display: "flex", alignItems: "center", margin: "0 8px" }}>
-              <Slider
-                size="small"
-                value={sliderValue}
-                max={sliderMax}
-                onChange={handleSeek}
-                sx={{ color: paletteStyles.accent, mx: 0, my: 0 }}
-              />
-            </div>
-
+            {/* Right zone: speed + save */}
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", minWidth: "72px" }}>
-              <Typography sx={{ color: paletteStyles.subText }} variant="caption">
-                {formatTime(state.currentTime)}
-              </Typography>
-              <Typography sx={{ color: paletteStyles.subText }} variant="caption">
-                {formatRemaining(state.duration, state.currentTime)}
-              </Typography>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <SpeedControl onClick={setShowSpeed} color={paletteStyles.text} />
+                <IconButton size="small" onClick={() => setSaved((s) => !s)} sx={{ color: paletteStyles.text }}>
+                  {saved ? <BookmarkIcon fontSize="small" /> : <BookmarkBorderIcon fontSize="small" />}
+                </IconButton>
+              </div>
+              <div style={{ marginTop: 4, textAlign: "right" }}>
+                <Typography sx={{ color: paletteStyles.subText, fontVariantNumeric: "tabular-nums", fontSize: "0.85rem" }} variant="caption">
+                  {formatTime(state.currentTime)}
+                </Typography>
+                <Typography sx={{ color: paletteStyles.subText, fontVariantNumeric: "tabular-nums", fontSize: "0.75rem" }} variant="caption">
+                  {formatTime(state.duration)}
+                </Typography>
+              </div>
             </div>
           </div>
         ))}
