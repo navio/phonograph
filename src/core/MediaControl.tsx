@@ -197,12 +197,16 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
                 backgroundColor: paletteStyles.primary,
                 position: "fixed",
                 zIndex: 2,
+                height: "3.50rem",
+                display: "flex",
+                alignItems: "center",
+                padding: 0,
               }
         }
       >
         {open && (
           <Grid container direction="row-reverse">
-          <Grid item sx={{ padding: ".5rem" }}>
+            <Grid item sx={{ padding: ".5rem" }}>
               <IconButton
                 onClick={() => { saveStorage(!open); setOpen(false); }}
                 sx={{ color: paletteStyles.text }}
@@ -212,7 +216,8 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
             </Grid>
           </Grid>
         )}
-        {state.episodeInfo && (
+
+        {state.episodeInfo && (open ? (
           <div>
             {open && (
               <Grid
@@ -272,7 +277,7 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
                   }}
                   gutterBottom
                 >
-                   {episodeInfo?.subtitle}
+                  {episodeInfo?.subtitle}
                 </Typography>
               )}
 
@@ -323,7 +328,41 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
               </div>
             </div>
           </div>
-        )}
+        ) : (
+          // Minimized single-row layout
+          <div style={{ display: "flex", alignItems: "center", width: "100%", padding: "0 0.75rem", gap: "8px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: "fit-content" }}>
+              <IconButton size="small" onClick={props.rewind} sx={{ color: paletteStyles.text }}>
+                <SkipPreviousIcon fontSize="small" />
+              </IconButton>
+              <IconButton size="small" onClick={props.handler} sx={{ color: paletteStyles.text }}>
+                {state.status === "paused" ? <PlayArrowIcon fontSize="small" /> : <PauseIcon fontSize="small" />}
+              </IconButton>
+              <IconButton size="small" onClick={props.forward} sx={{ color: paletteStyles.text }}>
+                <SkipNextIcon fontSize="small" />
+              </IconButton>
+            </div>
+
+            <div style={{ flex: 1, display: "flex", alignItems: "center", margin: "0 8px" }}>
+              <Slider
+                size="small"
+                value={typeof state.currentTime === "number" ? state.currentTime : 0}
+                max={typeof state.duration === "number" ? Math.round(state.duration) : 1}
+                onChange={props.seek}
+                sx={{ color: paletteStyles.accent }}
+              />
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", minWidth: "72px" }}>
+              <Typography sx={{ color: paletteStyles.subText }} variant="caption">
+                {toMin(state.currentTime)}
+              </Typography>
+              <Typography sx={{ color: paletteStyles.subText }} variant="caption">
+                {toMinutes(state.duration, state.currentTime)}
+              </Typography>
+            </div>
+          </div>
+        ))}
       </Card>
     </>
   ) : null;
