@@ -9,6 +9,8 @@ import SkipPreviousIcon from "@mui/icons-material/Replay10";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import SkipNextIcon from "@mui/icons-material/Forward30";
+import BookmarkIcon from "@mui/icons-material/Bookmark";
+import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import LinearProgress from "@mui/material/LinearProgress";
 import { Grid, Card } from "@mui/material";
 import CloseIcon from "@mui/icons-material/ExpandMore";
@@ -65,6 +67,7 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
 
   const [showSpeed, setShowSpeed] = useState(true);
   const [showTimer, setShowTimer] = useState(true);
+  const [saved, setSaved] = useState(false);
   const [palette, setPalette] = useState<Palette | null>(null);
 
   const saveStorage = (value: boolean) => {
@@ -311,8 +314,8 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
 
               <div style={{ padding: "1rem" }}>
                 <Grid container spacing={2} alignItems="center" justifyContent="center">
-                  <Grid item xs={12} md={9}>
-                    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0.75rem 0" }}>
+                  <Grid item xs={12}>
+                    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0.75rem 0", width: "100%" }}>
                       <Slider
                         value={sliderValue}
                         max={sliderMax}
@@ -320,38 +323,40 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
                         sx={{ width: "100%", maxWidth: 720, mx: 0, my: 0, color: paletteStyles.accent }}
                       />
 
+                      {/* Primary control row */}
+                      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 2, width: "100%", maxWidth: 720, mt: 1 }}>
+                        <IconButton onClick={props.rewind} sx={{ color: paletteStyles.text }}>
+                          <SkipPreviousIcon />
+                        </IconButton>
+                        <IconButton onClick={props.handler} sx={{ color: paletteStyles.text }}>
+                          {state.status === "paused" ? <PlayArrowIcon /> : <PauseIcon />}
+                        </IconButton>
+                        <IconButton onClick={props.forward} sx={{ color: paletteStyles.text }}>
+                          <SkipNextIcon />
+                        </IconButton>
+                      </Box>
+
+                      {/* Secondary control row: smaller, visually lighter */}
+                      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 2, width: "100%", maxWidth: 720, mt: 1, opacity: 0.85, '& .MuiIconButton-root': { padding: '6px' } }}>
+                        <SleepTimer onClick={setShowTimer} color={paletteStyles.subText} />
+                        <SpeedControl onClick={setShowSpeed} color={paletteStyles.subText} />
+                        <IconButton onClick={() => setSaved((s) => !s)} sx={{ color: paletteStyles.subText }}>
+                          {saved ? <BookmarkIcon /> : <BookmarkBorderIcon />}
+                        </IconButton>
+                      </Box>
+
                       <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%", maxWidth: 720, mt: 1 }}>
-                        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-                          <IconButton onClick={props.rewind} sx={{ color: paletteStyles.text }}>
-                            <SkipPreviousIcon />
-                          </IconButton>
-                          <IconButton onClick={props.handler} sx={{ color: paletteStyles.text }}>
-                            {state.status === "paused" ? <PlayArrowIcon /> : <PauseIcon />}
-                          </IconButton>
-                          <IconButton onClick={props.forward} sx={{ color: paletteStyles.text }}>
-                            <SkipNextIcon />
-                          </IconButton>
-
-                          <Typography sx={{ color: paletteStyles.text }}>{formatTime(state.currentTime)}</Typography>
-                        </Box>
-
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                          <div style={{ textAlign: "right" }}>
-                            <Typography sx={{ color: paletteStyles.subText }} variant="caption">
-                              {formatRemaining(state.duration, state.currentTime)}
-                            </Typography>
-                            <Typography sx={{ color: paletteStyles.subText }} variant="caption">
-                              {formatTime(state.currentTime)}
-                            </Typography>
-                          </div>
-                        </Box>
+                        <Typography sx={{ color: paletteStyles.text }}>{formatTime(state.currentTime)}</Typography>
+                        <div style={{ textAlign: "right" }}>
+                          <Typography sx={{ color: paletteStyles.subText }} variant="caption">
+                            {formatRemaining(state.duration, state.currentTime)}
+                          </Typography>
+                          <Typography sx={{ color: paletteStyles.subText }} variant="caption">
+                            {formatTime(state.currentTime)}
+                          </Typography>
+                        </div>
                       </Box>
                     </Box>
-                  </Grid>
-                  <Grid item xs={6} md={3}>
-                    <div style={{ display: "flex", justifyContent: "center" }}>
-                      <SpeedControl />
-                    </div>
                   </Grid>
                 </Grid>
               </div>
