@@ -17,6 +17,7 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import LinearProgress from "@mui/material/LinearProgress";
+import { FormattedMessage } from "react-intl";
 
 import { Button } from "@mui/material";
 import PodcastEngine from "podcastsuite";
@@ -168,7 +169,7 @@ const Settings: React.FC = () => {
     <>
       <AppBar sx={{ WebkitAppRegion: "drag" }} position="static">
         <Toolbar variant="dense">
-          <Typography variant="h6">Settings</Typography>
+          <Typography variant="h6"><FormattedMessage id="settings.title" defaultMessage="Settings" /></Typography>
         </Toolbar>
       </AppBar>
 
