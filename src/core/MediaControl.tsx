@@ -59,6 +59,10 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
   const [showTimer, setShowTimer] = useState(true);
   const [palette, setPalette] = useState<Palette | null>(null);
 
+  // New seeking state: local slider value while dragging and a flag
+  const [isSeeking, setIsSeeking] = useState<boolean>(false);
+  const [localSeek, setLocalSeek] = useState<number | null>(null);
+
   const saveStorage = (value: boolean) => {
     if (typeof localStorage === "undefined") return;
     localStorage.setItem("openPlayer", JSON.stringify(value));
@@ -175,6 +179,39 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
     return cleanup;
   }, []);
 
+  // Compute safe slider bounds and displayed value. Guard against NaN/undefined duration/currentTime.
+  const sliderMax = Number.isFinite(state.duration as number) && (state.duration as number) > 0 ? Math.round(state.duration as number) : 1;
+  const safeCurrentTime = Number.isFinite(state.currentTime as number) && (state.currentTime as number) >= 0 ? (state.currentTime as number) : 0;
+  const displayedTime = isSeeking && localSeek !== null ? Math.min(Math.max(localSeek, 0), sliderMax) : Math.min(safeCurrentTime, sliderMax);
+
+  // Handlers for slider interaction. Update local state while dragging; commit sets audio.currentTime and updates store.
+  const handleSeekChange = (_ev: Event, value: number | number[]) => {
+    const v = Array.isArray(value) ? value[0] : value;
+    setIsSeeking(true);
+    setLocalSeek(typeof v === "number" && Number.isFinite(v) ? v : 0);
+  };
+
+  const handleSeekCommit = (_ev: Event, value: number | number[]) => {
+    const v = Array.isArray(value) ? value[0] : value;
+    setIsSeeking(false);
+    setLocalSeek(null);
+
+    const audio = props.player;
+    if (audio && typeof v === "number" && Number.isFinite(v)) {
+      audio.currentTime = v;
+      const loadedNow = audio.buffered.length ? (100 * audio.buffered.end(0)) / audio.duration : 0;
+      dispatch({
+        type: "audioUpdate",
+        payload: {
+          loaded: loadedNow,
+          currentTime: audio.currentTime,
+          duration: audio.duration,
+          played: (100 * audio.currentTime) / audio.duration,
+        },
+      });
+    }
+  };
+
   return state.episodeInfo ? (
     <>
       <Card
@@ -286,9 +323,10 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
                   <Grid item xs={12} md={9}>
                     <div style={{ padding: "1rem 0" }}>
                       <Slider
-                        value={typeof state.currentTime === "number" ? state.currentTime : 0}
-                        max={typeof state.duration === "number" ? Math.round(state.duration) : 1}
-                        onChange={props.seek}
+                        value={displayedTime}
+                        max={sliderMax}
+                        onChange={handleSeekChange}
+                        onChangeCommitted={handleSeekCommit}
                       />
 
                       <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -346,9 +384,10 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
             <div style={{ flex: 1, display: "flex", alignItems: "center", margin: "0 8px" }}>
               <Slider
                 size="small"
-                value={typeof state.currentTime === "number" ? state.currentTime : 0}
-                max={typeof state.duration === "number" ? Math.round(state.duration) : 1}
-                onChange={props.seek}
+                value={displayedTime}
+                max={sliderMax}
+                onChange={handleSeekChange}
+                onChangeCommitted={handleSeekCommit}
                 sx={{ color: paletteStyles.accent }}
               />
             </div>
