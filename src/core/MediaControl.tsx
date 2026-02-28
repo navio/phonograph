@@ -310,9 +310,9 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
               )}
 
               <div style={{ padding: "1rem" }}>
-                <Grid container spacing={2} alignItems="center" justifyContent="center">
-                  <Grid item xs={12} md={9}>
-                    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0.75rem 0" }}>
+                <Grid container spacing={{ xs: 2, md: 2 }} alignItems="center" justifyContent="center" sx={{ width: "100%", display: "flex", justifyContent: "center", padding: 0 }}>
+                  <Grid item xs={12} md="auto" sx={{ width: { xs: "100%", md: "auto" }, display: "flex", justifyContent: "center" }}>
+                    <Box sx={{ width: "100%", maxWidth: 720, display: "flex", flexDirection: "column", alignItems: "center", padding: "0.75rem 0" }}>
                       <Slider
                         value={sliderValue}
                         max={sliderMax}
@@ -348,7 +348,7 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
                       </Box>
                     </Box>
                   </Grid>
-                  <Grid item xs={6} md={3}>
+                  <Grid item xs={6} md="auto" sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                     <div style={{ display: "flex", justifyContent: "center" }}>
                       <SpeedControl />
                     </div>
