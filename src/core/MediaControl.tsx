@@ -21,23 +21,31 @@ import SleepTimer from "./SleepTimer";
 import { PODCASTVIEW } from "../constants";
 import { getImagePalette, toRGBA, buildThemeFromPalette, Palette, PaletteTheme } from "./podcastPalette";
 
-const toMinutes = (totalTime?: number, currentTime?: number | null) => {
-  if (typeof totalTime !== "number" || typeof currentTime !== "number") return "∞";
-  const remaining = Math.floor(totalTime - currentTime);
-  if (!Number.isFinite(remaining)) return "∞";
-  return "- " + convertMinsToHrsMins(remaining);
+// Time values from HTMLAudioElement (currentTime/duration) are in **seconds**.
+const formatTime = (seconds: number | null | undefined) => {
+  if (typeof seconds !== "number" || !Number.isFinite(seconds) || seconds < 0) return "00:00";
+
+  const totalSeconds = Math.floor(seconds);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const secs = totalSeconds % 60;
+
+  if (hours > 0) {
+    return `${hours.toString().padStart(2, "0")}:${minutes
+      .toString()
+      .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  }
+
+  return `${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
 };
 
-const toMin = (theTime: number | null | undefined) =>
-  typeof theTime === "number"
-    ? convertMinsToHrsMins(Math.floor(theTime))
-    : `00:00`;
+const formatRemaining = (durationSeconds?: number, currentSeconds?: number | null) => {
+  if (typeof durationSeconds !== "number" || typeof currentSeconds !== "number") return "∞";
+  if (!Number.isFinite(durationSeconds) || !Number.isFinite(currentSeconds) || durationSeconds <= 0) return "∞";
 
-const convertMinsToHrsMins = (mins: number) => {
-  if (!Number.isInteger(mins)) return "";
-  const hours = Math.floor(mins / 60);
-  const minutes = mins % 60;
-  return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+  const remaining = Math.max(0, Math.floor(durationSeconds - currentSeconds));
+  if (!Number.isFinite(remaining)) return "∞";
+  return "- " + formatTime(remaining);
 };
 
 interface MediaControlProps {
@@ -164,6 +172,26 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
   const played = typeof state.played === "number" ? state.played : Number(state.played || 0);
   const loaded = typeof state.loaded === "number" ? state.loaded : Number(state.loaded || 0);
 
+  // Slider values should work in seconds. Compute safe, clamped values here.
+  const sliderMax =
+    typeof state.duration === "number" && Number.isFinite(state.duration) && state.duration > 0
+      ? state.duration
+      : 1;
+  const sliderValue = (() => {
+    const ct = typeof state.currentTime === "number" && Number.isFinite(state.currentTime) && state.currentTime >= 0 ? state.currentTime : 0;
+    return Math.min(Math.max(ct, 0), sliderMax);
+  })();
+
+  const handleSeek = (_ev: Event, value: number | number[]) => {
+    const seconds = Array.isArray(value) ? value[0] : value;
+    // Convert seconds -> percent because engine.seek expects a percentage value (0-100).
+    const dur = typeof state.duration === "number" && Number.isFinite(state.duration) && state.duration > 0 ? state.duration : 1;
+    let percent = dur > 0 ? Math.round((seconds / dur) * 100) : 0;
+    if (!Number.isFinite(percent) || percent < 0) percent = 0;
+    if (percent > 100) percent = 100;
+    props.seek(_ev, percent);
+  };
+
   useEffect(() => {
     const cleanup = hotkeys(setOpen);
     if (typeof localStorage !== "undefined") {
@@ -284,15 +312,16 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
               <div style={{ padding: "1rem" }}>
                 <Grid container spacing={2} alignItems="center" justifyContent="center">
                   <Grid item xs={12} md={9}>
-                    <div style={{ padding: "1rem 0" }}>
+                    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0.75rem 0" }}>
                       <Slider
-                        value={typeof state.currentTime === "number" ? state.currentTime : 0}
-                        max={typeof state.duration === "number" ? Math.round(state.duration) : 1}
-                        onChange={props.seek}
+                        value={sliderValue}
+                        max={sliderMax}
+                        onChange={handleSeek}
+                        sx={{ width: "100%", maxWidth: 720, mx: 0, my: 0, color: paletteStyles.accent }}
                       />
 
-                      <div style={{ display: "flex", justifyContent: "space-between" }}>
-                        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                      <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%", maxWidth: 720, mt: 1 }}>
+                        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
                           <IconButton onClick={props.rewind} sx={{ color: paletteStyles.text }}>
                             <SkipPreviousIcon />
                           </IconButton>
@@ -303,21 +332,21 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
                             <SkipNextIcon />
                           </IconButton>
 
-                          <Typography sx={{ color: paletteStyles.text }}>{toMin(state.played)}</Typography>
-                        </div>
+                          <Typography sx={{ color: paletteStyles.text }}>{formatTime(state.currentTime)}</Typography>
+                        </Box>
 
-                        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                           <div style={{ textAlign: "right" }}>
                             <Typography sx={{ color: paletteStyles.subText }} variant="caption">
-                              {toMinutes(state.duration, state.currentTime)}
+                              {formatRemaining(state.duration, state.currentTime)}
                             </Typography>
                             <Typography sx={{ color: paletteStyles.subText }} variant="caption">
-                              {toMin(state.currentTime)}
+                              {formatTime(state.currentTime)}
                             </Typography>
                           </div>
-                        </div>
-                      </div>
-                    </div>
+                        </Box>
+                      </Box>
+                    </Box>
                   </Grid>
                   <Grid item xs={6} md={3}>
                     <div style={{ display: "flex", justifyContent: "center" }}>
@@ -346,19 +375,19 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
             <div style={{ flex: 1, display: "flex", alignItems: "center", margin: "0 8px" }}>
               <Slider
                 size="small"
-                value={typeof state.currentTime === "number" ? state.currentTime : 0}
-                max={typeof state.duration === "number" ? Math.round(state.duration) : 1}
-                onChange={props.seek}
-                sx={{ color: paletteStyles.accent }}
+                value={sliderValue}
+                max={sliderMax}
+                onChange={handleSeek}
+                sx={{ color: paletteStyles.accent, mx: 0, my: 0 }}
               />
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", minWidth: "72px" }}>
               <Typography sx={{ color: paletteStyles.subText }} variant="caption">
-                {toMin(state.currentTime)}
+                {formatTime(state.currentTime)}
               </Typography>
               <Typography sx={{ color: paletteStyles.subText }} variant="caption">
-                {toMinutes(state.duration, state.currentTime)}
+                {formatRemaining(state.duration, state.currentTime)}
               </Typography>
             </div>
           </div>
