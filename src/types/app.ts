@@ -71,6 +71,8 @@ export interface AppState {
   podcastAuthor?: string;
   // New setting: whether to enable podcast artwork / palette theming
   podcastViewEnabled?: boolean;
+  // Whether the player is expanded (fullscreen)
+  isPlayerExpanded?: boolean;
   [key: string]: unknown;
 }
 
@@ -91,7 +93,8 @@ export type AppAction =
   | { type: "resetState" }
   | { type: "drawer"; payload?: { status: boolean; drawerContent?: unknown } }
   | { type: "setPodcastViewEnabled"; payload: boolean }
-  | { type: "setPodcastImage"; payload?: string | null };
+  | { type: "setPodcastImage"; payload?: string | null }
+  | { type: "setPlayerExpanded"; payload: boolean };
 
 export interface AppContextValue {
   state: AppState;
