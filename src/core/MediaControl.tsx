@@ -215,11 +215,12 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
             ? {
                 borderTop: `1px solid ${paletteStyles.accent}`,
                 position: "fixed",
-                width: "100%",
-                backgroundColor: paletteStyles.primary,
-                zIndex: 50,
-                height: "100%",
                 top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                backgroundColor: paletteStyles.primary,
+                zIndex: (theme) => theme.zIndex.appBar + 10,
               }
             : {
                 bottom: "3.50rem",
