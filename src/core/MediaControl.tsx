@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useMemo } from "react";
+import React, { useContext, useEffect, useMemo } from "react";
 import { Slider, Box } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -14,10 +14,10 @@ import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import LinearProgress from "@mui/material/LinearProgress";
 import { Grid, Card } from "@mui/material";
 import CloseIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 
 import { AppContext } from "../App";
 import { AppContextValue } from "../types/app";
+import { getAppState } from "../store/appStore";
 import SpeedControl from "./SpeedControl";
 import SleepTimer from "./SleepTimer";
 import { PODCASTVIEW } from "../constants";
@@ -60,29 +60,30 @@ interface MediaControlProps {
 
 const MediaControlCard: React.FC<MediaControlProps> = (props) => {
   const { state, dispatch } = useContext(AppContext) as AppContextValue;
-  const [open, setOpen] = useState<boolean>(false);
   const theme = useTheme();
   const showExpand = useMediaQuery(theme.breakpoints.up("sm"));
   const history = useHistory();
 
-  const [showSpeed, setShowSpeed] = useState(true);
-  const [showTimer, setShowTimer] = useState(true);
-  const [saved, setSaved] = useState(false);
-  const [palette, setPalette] = useState<Palette | null>(null);
+  const [showSpeed, setShowSpeed] = React.useState(true);
+  const [showTimer, setShowTimer] = React.useState(true);
+  const [saved, setSaved] = React.useState(false);
+  const [palette, setPalette] = React.useState<Palette | null>(null);
+
+  const open = state.isPlayerExpanded ?? false;
 
   const saveStorage = (value: boolean) => {
     if (typeof localStorage === "undefined") return;
     localStorage.setItem("openPlayer", JSON.stringify(value));
   };
 
-  const hotkeys = (toggle: React.Dispatch<React.SetStateAction<boolean>>) => {
+  const hotkeys = () => {
     const handler = (ev: KeyboardEvent) => {
-      const { target, key } = ev;
+      const { target, key } = ev as any;
       if (document.body === target && key === "Escape") {
-        toggle((value) => {
-          saveStorage(!value);
-          return !value;
-        });
+        const current = getAppState();
+        const newVal = !Boolean(current.isPlayerExpanded);
+        saveStorage(newVal);
+        dispatch({ type: "setPlayerExpanded", payload: newVal });
       }
     };
 
@@ -164,7 +165,13 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
     }
   }, [open, playing]);
 
-  useEffect(() => setOpen(true), [media]);
+  useEffect(() => {
+    if (media) {
+      saveStorage(true);
+      dispatch({ type: "setPlayerExpanded", payload: true });
+    }
+  }, [media]);
+
   useEffect(() => {
     const { episodeInfo } = state;
     if (episodeInfo === null) {
@@ -196,11 +203,11 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
   };
 
   useEffect(() => {
-    const cleanup = hotkeys(setOpen);
+    const cleanup = hotkeys();
     if (typeof localStorage !== "undefined") {
       const stored = localStorage.getItem("openPlayer");
       if (stored !== null) {
-        setOpen(stored === "true");
+        dispatch({ type: "setPlayerExpanded", payload: stored === "true" });
       }
     }
     return cleanup;
@@ -239,7 +246,10 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
           <Grid container direction="row-reverse">
             <Grid item sx={{ padding: ".5rem" }}>
               <IconButton
-                onClick={() => { saveStorage(!open); setOpen(false); }}
+                onClick={() => {
+                  saveStorage(false);
+                  dispatch({ type: "setPlayerExpanded", payload: false });
+                }}
                 sx={{ color: paletteStyles.text }}
               >
                 <CloseIcon />
@@ -386,8 +396,8 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
           </div>
         ) : (
           // Minimized single-row layout
-          <div style={{ display: "flex", alignItems: "center", width: "100%", padding: "0 0.75rem", gap: "8px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: "fit-content" }}>
+          <div onClick={() => { saveStorage(true); dispatch({ type: "setPlayerExpanded", payload: true }); }} style={{ display: "flex", alignItems: "center", width: "100%", padding: "0 0.75rem", gap: "8px" }}>
+            <div onClick={(e) => e.stopPropagation()} style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: "fit-content" }}>
               <IconButton size="small" onClick={props.rewind} sx={{ color: paletteStyles.text }}>
                 <SkipPreviousIcon fontSize="small" />
               </IconButton>

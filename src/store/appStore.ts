@@ -113,6 +113,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
       case "setPodcastImage":
         return set({ state: { ...current, podcastImage: action.payload } });
 
+      case "setPlayerExpanded":
+        return set({ state: { ...current, isPlayerExpanded: action.payload } });
+
       default:
         return set({ state: current });
     }

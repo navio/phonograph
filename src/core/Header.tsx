@@ -1,11 +1,16 @@
-import React from "react";
+import React, { useContext } from "react";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
+import { AppContext } from "../App";
+import { AppContextValue } from "../types/app";
 
 function NavigationApp(): React.ReactElement {
+  const ctx = useContext(AppContext) as AppContextValue | null;
+  const isExpanded = ctx?.state?.isPlayerExpanded ?? false;
+
   return (
     <div>
       <div
@@ -17,7 +22,7 @@ function NavigationApp(): React.ReactElement {
           zIndex: 4000,
         }}
       >
-        <AppBar position="static">
+        <AppBar position="static" sx={{ display: isExpanded ? "none" : "block" }}>
           <Toolbar>
             <IconButton
               sx={{ marginLeft: -1.5, marginRight: 2.5 }}

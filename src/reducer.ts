@@ -127,6 +127,9 @@ export const defaultState: AppState = {
 
   // new toggle defaults to enabled
   podcastViewEnabled: true,
+
+  // player expanded state default
+  isPlayerExpanded: false,
 };
 
 const safeReadLocalStorage = (key: string): string | null => {
@@ -155,6 +158,12 @@ export const getInitialState = (): AppState => {
   delete (cleaned as Record<string, unknown>)["image"];
   delete (cleaned as Record<string, unknown>)["link"];
   delete (cleaned as Record<string, unknown>)["created"];
+
+  // If legacy openPlayer key exists, respect it unless explicit state value is present.
+  const legacyOpen = safeReadLocalStorage("openPlayer");
+  if (cleaned.isPlayerExpanded === undefined && legacyOpen !== null) {
+    cleaned.isPlayerExpanded = legacyOpen === "true";
+  }
 
   cleaned.status = cleaned.status || "paused";
 
@@ -226,6 +235,8 @@ export const reducer = (state: AppState, action: AppAction): AppState => {
       return { ...state, podcastViewEnabled: action.payload };
     case "setPodcastImage":
       return { ...state, podcastImage: (action as any).payload };
+    case "setPlayerExpanded":
+      return { ...state, isPlayerExpanded: (action as any).payload };
     default:
       return state;
   }
