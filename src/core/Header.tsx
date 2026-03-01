@@ -4,8 +4,10 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
+import { FormattedMessage, useIntl } from "react-intl";
 
 function NavigationApp(): React.ReactElement {
+  const intl = useIntl();
   return (
     <div>
       <div
@@ -22,7 +24,7 @@ function NavigationApp(): React.ReactElement {
             <IconButton
               sx={{ marginLeft: -1.5, marginRight: 2.5 }}
               color="inherit"
-              aria-label="Menu"
+              aria-label={intl.formatMessage({ id: "a11y.menu", defaultMessage: "Menu" })}
             >
               <MenuIcon />
             </IconButton>
@@ -30,7 +32,7 @@ function NavigationApp(): React.ReactElement {
               variant="h2"
               color="inherit"
             >
-              Podcast
+              <FormattedMessage id="common.podcast" defaultMessage="Podcast" />
             </Typography>
             {/* <Button color="inherit">Login</Button> */}
           </Toolbar>

@@ -3,6 +3,7 @@ import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import IconButton from "@mui/material/IconButton";
 import NightsStayIcon from "@mui/icons-material/NightsStay";
+import { useIntl } from "react-intl";
 
 import { AppContext } from "../App";
 import { AppContextValue } from "../types/app";
@@ -24,6 +25,7 @@ interface SleepTimerProps {
 
 const SleepTimer: React.FC<SleepTimerProps> = ({ onClick, color }) => {
   const { player, playerRef } = useContext(AppContext) as AppContextValue;
+  const intl = useIntl();
   const audio = playerRef?.current || player;
 
   const [timeto, setTimeto] = useState<number | null>(null);
@@ -101,10 +103,15 @@ const SleepTimer: React.FC<SleepTimerProps> = ({ onClick, color }) => {
           exclusive
           style={{ margin: "0 auto" }}
           onChange={(_ev, newValue) => setTimer(newValue)}
-          aria-label="sleep timer"
+          aria-label={intl.formatMessage({ id: "a11y.sleepTimer", defaultMessage: "sleep timer" })}
         >
           {[1, 5, 15, 30, 45, 60].map((time) => (
-            <ToggleButton key={time} value={time} aria-label={`${time} minutes`} sx={{ color }}>
+            <ToggleButton
+              key={time}
+              value={time}
+              aria-label={intl.formatMessage({ id: "a11y.minutesValue", defaultMessage: "{count} minutes" }, { count: time })}
+              sx={{ color }}
+            >
               {time}
             </ToggleButton>
           ))}

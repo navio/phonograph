@@ -3,17 +3,19 @@ import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import SpeedIcon from "@mui/icons-material/Speed";
 import IconButton from "@mui/material/IconButton";
+import { useIntl } from "react-intl";
 
 import { AppContext } from "../App";
 import { AppContextValue } from "../types/app";
 
 interface SpeedControlProps {
-  onClick: React.Dispatch<React.SetStateAction<boolean>>;
+  onClick?: React.Dispatch<React.SetStateAction<boolean>>;
   color?: string;
 }
 
-const SpeedControl: React.FC<SpeedControlProps> = ({ onClick, color }) => {
+const SpeedControl: React.FC<SpeedControlProps> = ({ onClick = () => {}, color }) => {
   const { player, playerRef } = useContext(AppContext) as AppContextValue;
+  const intl = useIntl();
   const audio = playerRef?.current || player;
   const [speed, setSpeed] = useState<number>(audio?.playbackRate || 1.0);
   const [visible, setVisible] = useState(false);
@@ -46,7 +48,7 @@ const SpeedControl: React.FC<SpeedControlProps> = ({ onClick, color }) => {
           exclusive
           style={{ margin: "0 auto" }}
           onChange={(_ev, newValue) => changeSpeed(newValue)}
-          aria-label="playback speed"
+          aria-label={intl.formatMessage({ id: "a11y.playbackSpeed", defaultMessage: "playback speed" })}
         >
           {[1.0, 1.2, 1.5, 1.7, 2.0].map((value) => (
             <ToggleButton key={value} value={value} aria-label={`${value}x`} sx={{ color }}>

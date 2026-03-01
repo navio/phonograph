@@ -7,6 +7,7 @@ import IconButton from "@mui/material/IconButton";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import { FormattedMessage, useIntl } from "react-intl";
 import phono from "../../public/phono.svg";
 import {
   List,
@@ -19,6 +20,7 @@ import { AppContextValue, PlaylistItem } from "../types/app";
 
 const Playlist: React.FC = () => {
   const { state, dispatch } = useContext(AppContext) as AppContextValue;
+  const intl = useIntl();
   const removeFromList = (episode: number) => () => {
     dispatch({ type: "removeFromPlayList", episode });
   };
@@ -29,7 +31,9 @@ const Playlist: React.FC = () => {
     <>
       <AppBar sx={{ WebkitAppRegion: "drag" }} position="static">
         <Toolbar variant="dense">
-          <Typography variant="h6">Playlist</Typography>
+          <Typography variant="h6">
+            <FormattedMessage id="playlist.title" defaultMessage="Playlist" />
+          </Typography>
         </Toolbar>
       </AppBar>
       {state.playlist && state.playlist.length > 0 ? (
@@ -42,7 +46,9 @@ const Playlist: React.FC = () => {
               alignItems="center"
             >
               <Grid item>
-                <Typography variant="h6">Playing next:</Typography>
+                <Typography variant="h6">
+                  <FormattedMessage id="playlist.playingNext" defaultMessage="Playing next:" />
+                </Typography>
               </Grid>
               <Grid item zeroMinWidth>
                 <Button
@@ -50,7 +56,7 @@ const Playlist: React.FC = () => {
                   variant="contained"
                   color="secondary"
                 >
-                  Clear
+                  <FormattedMessage id="common.clear" defaultMessage="Clear" />
                 </Button>
               </Grid>
             </Grid>
@@ -69,7 +75,7 @@ const Playlist: React.FC = () => {
                   <img
                     style={{ width: "2rem", marginRight: "1rem" }}
                     src={mediaElement.podcastImage}
-                    alt={mediaElement.title || "podcast"}
+                    alt={mediaElement.title || intl.formatMessage({ id: "common.podcast", defaultMessage: "podcast" })}
                   />
                   <ListItemText>
                     <Typography variant="body2" display="block" noWrap>
@@ -97,7 +103,7 @@ const Playlist: React.FC = () => {
         >
           <img width={"85rem"} src={phono} />
           <br />
-          Playlist is empty.
+          <FormattedMessage id="playlist.empty" defaultMessage="Playlist is empty." />
         </Typography>
       )}
     </>
