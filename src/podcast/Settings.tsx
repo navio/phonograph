@@ -17,6 +17,7 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import LinearProgress from "@mui/material/LinearProgress";
+import { FormattedMessage, useIntl } from "react-intl";
 
 import { Button } from "@mui/material";
 import PodcastEngine from "podcastsuite";
@@ -41,6 +42,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 
 const Settings: React.FC = () => {
   const { state, dispatch, engine } = useContext(AppContext) as AppContextValue;
+  const intl = useIntl();
 
   const [notice, setNotice] = useState<{ open: boolean; message: string; severity: "success" | "info" | "warning" | "error" }>(
     {
@@ -101,7 +103,14 @@ const Settings: React.FC = () => {
 
     URL.revokeObjectURL(url);
 
-    setNotice({ open: true, message: `Exported ${feeds.length} podcasts to OPML.`, severity: "success" });
+    setNotice({
+      open: true,
+      message: intl.formatMessage(
+        { id: "settings.exportSuccess", defaultMessage: "Exported {count} podcasts to OPML." },
+        { count: feeds.length }
+      ),
+      severity: "success",
+    });
   };
 
   const importOpmlFile = async (file: File) => {
@@ -119,7 +128,11 @@ const Settings: React.FC = () => {
       const toImport = feeds.filter((f) => f.url && !existing.has(f.url));
 
       if (toImport.length === 0) {
-        setNotice({ open: true, message: "No new podcasts found to import.", severity: "info" });
+        setNotice({
+          open: true,
+          message: intl.formatMessage({ id: "settings.importNoneFound", defaultMessage: "No new podcasts found to import." }),
+          severity: "info",
+        });
         return;
       }
 
@@ -134,16 +147,33 @@ const Settings: React.FC = () => {
       await initializeLibrary(engine as any, dispatch);
 
       if (failures.length === 0) {
-        setNotice({ open: true, message: `Imported ${successes.length} podcasts from OPML.`, severity: "success" });
+        setNotice({
+          open: true,
+          message: intl.formatMessage(
+            { id: "settings.importSuccess", defaultMessage: "Imported {count} podcasts from OPML." },
+            { count: successes.length }
+          ),
+          severity: "success",
+        });
       } else {
         setNotice({
           open: true,
-          message: `Imported ${successes.length}/${toImport.length} podcasts. ${failures.length} failed (check your connection or feed URLs).`,
+          message: intl.formatMessage(
+            {
+              id: "settings.importPartial",
+              defaultMessage: "Imported {successCount}/{totalCount} podcasts. {failureCount} failed (check your connection or feed URLs).",
+            },
+            { successCount: successes.length, totalCount: toImport.length, failureCount: failures.length }
+          ),
           severity: "warning",
         });
       }
     } catch (err: any) {
-      setNotice({ open: true, message: err?.message || "Failed to import OPML.", severity: "error" });
+      setNotice({
+        open: true,
+        message: err?.message || intl.formatMessage({ id: "settings.importFailed", defaultMessage: "Failed to import OPML." }),
+        severity: "error",
+      });
     } finally {
       setIsImporting(false);
       setTimeout(() => setImportProgress(null), 500);
@@ -168,54 +198,71 @@ const Settings: React.FC = () => {
     <>
       <AppBar sx={{ WebkitAppRegion: "drag" }} position="static">
         <Toolbar variant="dense">
-          <Typography variant="h6">Settings</Typography>
+          <Typography variant="h6">
+            <FormattedMessage id="settings.title" defaultMessage="Settings" />
+          </Typography>
         </Toolbar>
       </AppBar>
 
       <Card>
         <CardContent>
-          <Typography variant={"h5"}>Configurations</Typography>
-          Version: {version}
+          <Typography variant={"h5"}>
+            <FormattedMessage id="settings.configurations" defaultMessage="Configurations" />
+          </Typography>
+          <FormattedMessage id="settings.version" defaultMessage="Version:" /> {version}
         </CardContent>
       </Card>
 
       <Card>
         <CardContent>
           <Typography variant={"h6"} gutterBottom>
-            Theme Selector
+            <FormattedMessage id="settings.themeSelector" defaultMessage="Theme Selector" />
           </Typography>
-          <ToggleButtonGroup value={state.theme} exclusive onChange={themeSwitcher} aria-label="theme selector">
-            <ToggleButton value={"light"} aria-label="White">
+          <ToggleButtonGroup
+            value={state.theme}
+            exclusive
+            onChange={themeSwitcher}
+            aria-label={intl.formatMessage({ id: "a11y.themeSelector", defaultMessage: "theme selector" })}
+          >
+            <ToggleButton value={"light"} aria-label={intl.formatMessage({ id: "a11y.lightTheme", defaultMessage: "Light theme" })}>
               <BrightnessLowIcon />
             </ToggleButton>
-            <ToggleButton value={"dark"} aria-label="Black">
+            <ToggleButton value={"dark"} aria-label={intl.formatMessage({ id: "a11y.darkTheme", defaultMessage: "Dark theme" })}>
               <BrightnessHighIcon />
             </ToggleButton>
-            <ToggleButton value={"os"} aria-label="OS preference">
-              OS
+            <ToggleButton value={"os"} aria-label={intl.formatMessage({ id: "a11y.osPreference", defaultMessage: "OS preference" })}>
+              <FormattedMessage id="settings.osTheme" defaultMessage="OS" />
             </ToggleButton>
           </ToggleButtonGroup>
 
           <div style={{ marginTop: 12 }}>
             <Typography variant="subtitle1" gutterBottom>
-              Theme Palette
+              <FormattedMessage id="settings.themePalette" defaultMessage="Theme Palette" />
             </Typography>
             <ToggleButtonGroup
               value={state.themeName || "default"}
               exclusive
               onChange={themeNameSwitcher}
-              aria-label="theme palette selector"
+              aria-label={intl.formatMessage({ id: "a11y.themePaletteSelector", defaultMessage: "theme palette selector" })}
             >
-              <ToggleButton value={"default"}>Default</ToggleButton>
-              <ToggleButton value={"nord"}>Nord</ToggleButton>
-              <ToggleButton value={"dracula"}>Dracula</ToggleButton>
-              <ToggleButton value={"highContrast"}>High Contrast</ToggleButton>
+              <ToggleButton value={"default"}>
+                <FormattedMessage id="settings.themeDefault" defaultMessage="Default" />
+              </ToggleButton>
+              <ToggleButton value={"nord"}>
+                <FormattedMessage id="settings.themeNord" defaultMessage="Nord" />
+              </ToggleButton>
+              <ToggleButton value={"dracula"}>
+                <FormattedMessage id="settings.themeDracula" defaultMessage="Dracula" />
+              </ToggleButton>
+              <ToggleButton value={"highContrast"}>
+                <FormattedMessage id="settings.themeHighContrast" defaultMessage="High Contrast" />
+              </ToggleButton>
             </ToggleButtonGroup>
           </div>
 
           <div style={{ marginTop: 12 }}>
             <Typography variant="subtitle1" gutterBottom>
-              Podcast View
+              <FormattedMessage id="settings.podcastView" defaultMessage="Podcast View" />
             </Typography>
             <FormControlLabel
               control={
@@ -228,7 +275,7 @@ const Settings: React.FC = () => {
                   color="primary"
                 />
               }
-              label={"Enable Podcast View"}
+              label={intl.formatMessage({ id: "settings.enablePodcastView", defaultMessage: "Enable Podcast View" })}
             />
           </div>
         </CardContent>
@@ -237,7 +284,7 @@ const Settings: React.FC = () => {
       <Card variant="outlined">
         <CardContent>
           <Typography variant={"h6"} gutterBottom>
-            Import / Export (OPML)
+            <FormattedMessage id="settings.importExport" defaultMessage="Import / Export (OPML)" />
           </Typography>
 
           <input
@@ -256,7 +303,7 @@ const Settings: React.FC = () => {
             disabled={isImporting}
             sx={{ mr: 1 }}
           >
-            Export OPML
+            <FormattedMessage id="settings.exportOpml" defaultMessage="Export OPML" />
           </Button>
 
           <Button
@@ -266,13 +313,17 @@ const Settings: React.FC = () => {
             onClick={openFilePicker}
             disabled={isImporting}
           >
-            Import OPML
+            <FormattedMessage id="settings.importOpml" defaultMessage="Import OPML" />
           </Button>
 
           {importProgress ? (
             <div style={{ marginTop: 12 }}>
               <Typography variant="caption">
-                Importing {importProgress.done}/{importProgress.total}…
+                <FormattedMessage
+                  id="settings.importingProgress"
+                  defaultMessage="Importing {done}/{total}…"
+                  values={{ done: importProgress.done, total: importProgress.total }}
+                />
               </Typography>
               <LinearProgress
                 variant="determinate"
@@ -287,7 +338,7 @@ const Settings: React.FC = () => {
         <Accordion>
           <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
             <Typography variant="h6" gutterBottom>
-              Data
+              <FormattedMessage id="settings.data" defaultMessage="Data" />
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
@@ -298,7 +349,10 @@ const Settings: React.FC = () => {
                   <div key={podcast.domain as string}>
                     <ListItem
                       secondaryAction={
-                        <IconButton aria-label="Delete" onClick={eraseThisPodcast(podcast.domain as string)}>
+                        <IconButton
+                          aria-label={intl.formatMessage({ id: "a11y.delete", defaultMessage: "Delete" })}
+                          onClick={eraseThisPodcast(podcast.domain as string)}
+                        >
                           <DeleteIcon />
                         </IconButton>
                       }
@@ -308,7 +362,7 @@ const Settings: React.FC = () => {
                           <Typography component="span" variant="subtitle1">
                             {podcast.title} <br />
                             <Typography component="span" variant="caption">
-                              {podcast.created ? new Date(podcast.created as number).toLocaleString() : ""}
+                              {podcast.created ? intl.formatDate(new Date(podcast.created as number), { dateStyle: "medium", timeStyle: "short" }) : ""}
                             </Typography>
                           </Typography>
                         }
@@ -325,10 +379,10 @@ const Settings: React.FC = () => {
       <Card variant="outlined">
         <CardContent>
           <Button variant="outlined" color="primary" onClick={clearState} disabled={isImporting}>
-            Reset State
+            <FormattedMessage id="settings.resetState" defaultMessage="Reset State" />
           </Button>
           <Button variant="outlined" color="primary" onClick={reloadCasts} disabled={isImporting}>
-            Reload Saved Podcasts
+            <FormattedMessage id="settings.reloadPodcasts" defaultMessage="Reload Saved Podcasts" />
           </Button>
         </CardContent>
       </Card>
@@ -336,7 +390,9 @@ const Settings: React.FC = () => {
       <Card>
         <CardContent sx={{ textAlign: "center" }}>
           <Typography variant="h5">Phonograph</Typography>
-          <Typography>is developed with ❤️ in Hoboken, NJ</Typography>
+          <Typography>
+            <FormattedMessage id="settings.developedIn" defaultMessage="is developed with ❤️ in Hoboken, NJ" />
+          </Typography>
         </CardContent>
       </Card>
 

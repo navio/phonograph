@@ -13,11 +13,10 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
 import DialogContent from "@mui/material/DialogContent";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
 import { Chip, IconButton } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import createDOMPurify from "dompurify";
+import { FormattedMessage, useIntl } from "react-intl";
 import { Consumer } from "../../App";
 import PS from "podcastsuite";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -41,10 +40,6 @@ export const clearText = (html) => {
   tmp.innerHTML = html;
   return tmp.textContent || tmp.innerText;
 };
-
-dayjs.extend(relativeTime);
-const today = dayjs();
-const episodeDate = (date) => today.from(date, true);
 
 const saveOffline = async (mediaURL) => {
   // const audio = document.createElement('audio');
@@ -77,11 +72,22 @@ const IsAvaliable = (url) => {
 };
 
 const EpisodeListDescription = (props) => {
+  const intl = useIntl();
   const episode = props.episode;
   const { currentTime, duration, completed } = props.history || {};
   const { palette, textColor, subText, accent } = props;
   const total =
     currentTime && duration ? Math.round((currentTime * 100) / duration) : null;
+
+  // Format relative time using intl
+  const episodeAge = episode.created
+    ? intl.formatRelativeTime(
+        -Math.round((Date.now() - new Date(episode.created).getTime()) / (24 * 60 * 60 * 1000)),
+        "day",
+        { numeric: "auto" }
+      ).replace(/^in /, "").replace(/ ago$/, "")
+    : "";
+
   return (
     <ListItemText
       // {...props}
@@ -89,7 +95,7 @@ const EpisodeListDescription = (props) => {
         <>
           {episode.season && (
             <Typography sx={{ color: accent }}>
-              Season {episode.season}
+              <FormattedMessage id="episode.season" defaultMessage="Season {season}" values={{ season: episode.season }} />
             </Typography>
           )}
           <Typography component="div" variant="subtitle1" noWrap sx={{ color: textColor }}>
@@ -100,13 +106,13 @@ const EpisodeListDescription = (props) => {
             {(completed || total > 97) && (
               <CheckCircleOutlineIcon sx={{ color: textColor }} fontSize="small" />
             )}{" "}
-            {episodeDate(episode.created)}
+            {episodeAge}
             {total && (
               <Chip
                 style={{ marginLeft: "10px" }}
                 variant="outlined"
                 size="small"
-                label={`Progress: ${total}%`}
+                label={intl.formatMessage({ id: "episode.progress", defaultMessage: "Progress: {percent}%" }, { percent: total })}
                 sx={{
                   borderColor: accent,
                   color: textColor,
@@ -164,6 +170,7 @@ const EpisodeList = (props) => {
   const [message, setMessage] = useState(null);
   // console.log('heree',podcast);
   const { dispatch } = useContext(AppContext);
+  const intl = useIntl();
   const theme = useTheme();
   const palette = props.palette;
   const themeColors = palette ? buildThemeFromPalette(palette) : null;
@@ -318,29 +325,32 @@ const EpisodeList = (props) => {
                                       typeContent: "list",
                                       content: [
                                         {
-                                          label: "Play Next",
+                                          label: intl.formatMessage({ id: "episode.playNext", defaultMessage: "Play Next" }),
                                           icon: "addnext",
                                           fn: () => {
-                                            setMessage("Queued to play next");
+                                            setMessage(intl.formatMessage({ id: "episode.queuedNext", defaultMessage: "Queued to play next" }));
                                             playNext(episode.guid);
                                           },
                                         },
-                                        { label: "Add to queue",
-                                        icon: "queue",
-                                        fn: () => {
-                                          setMessage("Added to queue");
-                                          playLast(episode.guid);
-                                        } },
-                                        { label: "Mark as Played",
+                                        {
+                                          label: intl.formatMessage({ id: "episode.addToQueue", defaultMessage: "Add to queue" }),
+                                          icon: "queue",
                                           fn: () => {
-                                            completeEpisode(episode.guid);
-                                          }  
+                                            setMessage(intl.formatMessage({ id: "episode.addedToQueue", defaultMessage: "Added to queue" }));
+                                            playLast(episode.guid);
+                                          },
                                         },
                                         {
-                                          label: "See Description",
+                                          label: intl.formatMessage({ id: "episode.markAsPlayed", defaultMessage: "Mark as Played" }),
+                                          fn: () => {
+                                            completeEpisode(episode.guid);
+                                          },
+                                        },
+                                        {
+                                          label: intl.formatMessage({ id: "episode.seeDescription", defaultMessage: "See Description" }),
                                           icon: "description",
-                                          fn: () => setOpen({title: episode.title ,description: episode.description})
-                                        }
+                                          fn: () => setOpen({ title: episode.title, description: episode.description }),
+                                        },
                                       ],
                                     },
                                     status: true,
@@ -381,8 +391,7 @@ const EpisodeList = (props) => {
                         color: textColor,
                       }}
                     >
-                      {" "}
-                      Load More Episodes{" "}
+                      <FormattedMessage id="episode.loadMore" defaultMessage="Load More Episodes" />
                     </Button>
                   </List>
                 )}

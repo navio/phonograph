@@ -9,6 +9,7 @@ import Settings from "@mui/icons-material/Settings";
 import Playlist from "@mui/icons-material/PlaylistPlay";
 import Paper from "@mui/material/Paper";
 import { useHistory, useLocation } from "react-router-dom";
+import { useIntl } from "react-intl";
 import { LIBVIEW, DISCOVERVIEW, SETTINGSVIEW, PLAYLIST } from "../constants";
 
 import { AppContext } from "../App";
@@ -65,6 +66,7 @@ const hotkeys = (redirects: (url: string) => void) => {
 const SimpleBottomNavigation: React.FC = () => {
   const history = useHistory();
   const location = useLocation();
+  const intl = useIntl();
   const handleRedirect = (url: string) => () => history.push(url);
 
   useEffect(() => hotkeys((url) => history.push(url)), [history]);
@@ -95,13 +97,13 @@ const SimpleBottomNavigation: React.FC = () => {
           }}
         >
           <StyledBottomNavigationAction
-            label="Favorites"
+            label={intl.formatMessage({ id: "nav.favorites", defaultMessage: "Favorites" })}
             value={LIBVIEW}
             onClick={handleRedirect(LIBVIEW)}
             icon={<Favorite />}
           />
           <StyledBottomNavigationAction
-            label="Playlist"
+            label={intl.formatMessage({ id: "nav.playlist", defaultMessage: "Playlist" })}
             value={PLAYLIST}
             onClick={handleRedirect(PLAYLIST)}
             icon={
@@ -111,13 +113,13 @@ const SimpleBottomNavigation: React.FC = () => {
             }
           />
           <StyledBottomNavigationAction
-            label="Discover"
+            label={intl.formatMessage({ id: "nav.discover", defaultMessage: "Discover" })}
             value={DISCOVERVIEW}
             onClick={handleRedirect(DISCOVERVIEW)}
             icon={<DiscoverIcon />}
           />
           <StyledBottomNavigationAction
-            label="Settings"
+            label={intl.formatMessage({ id: "nav.settings", defaultMessage: "Settings" })}
             value={SETTINGSVIEW}
             onClick={handleRedirect(SETTINGSVIEW)}
             icon={<Settings />}

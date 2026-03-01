@@ -10,6 +10,7 @@ import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import CardActionArea from "@mui/material/CardActionArea";
 import Skeleton from "@mui/material/Skeleton";
+import { FormattedMessage, useIntl } from "react-intl";
 
 import { AppContext } from "../App";
 import { AppContextValue, PodcastEntry } from "../types/app";
@@ -117,6 +118,7 @@ const PodcastCover: React.FC<{ src?: string; alt: string; bgColor: string }> = (
 
 const LibraryView: React.FC<LibraryProps> = ({ addPodcastHandler, actionAfterSelectPodcast }) => {
   const theme = useTheme();
+  const intl = useIntl();
   const { state, dispatch } = useContext(AppContext) as AppContextValue;
   const podcasts = (state.podcasts as PodcastEntry[]) || [];
 
@@ -148,13 +150,15 @@ const LibraryView: React.FC<LibraryProps> = ({ addPodcastHandler, actionAfterSel
     <>
       <AppBar sx={{ WebkitAppRegion: "drag" }} position="static">
         <Toolbar variant="dense">
-          <Typography variant="h6">Library</Typography>
+          <Typography variant="h6">
+            <FormattedMessage id="library.title" defaultMessage="Library" />
+          </Typography>
         </Toolbar>
       </AppBar>
 
       <Fab
         color="secondary"
-        aria-label="add"
+        aria-label={intl.formatMessage({ id: "a11y.addPodcast", defaultMessage: "Add podcast" })}
         sx={{
           position: "fixed",
           zIndex: 1,
@@ -174,7 +178,7 @@ const LibraryView: React.FC<LibraryProps> = ({ addPodcastHandler, actionAfterSel
             .map((podcast) => {
               const domain = podcast.domain as string;
               const bgColor = colorSwatches[hashToIndex(domain, colorSwatches.length)];
-              const title = (podcast.title as string) || "Podcast";
+              const title = (podcast.title as string) || intl.formatMessage({ id: "common.podcast", defaultMessage: "Podcast" });
 
               return (
                 <Grid item xs={3} sm={2} md={1} key={domain}>
@@ -199,7 +203,7 @@ const LibraryView: React.FC<LibraryProps> = ({ addPodcastHandler, actionAfterSel
           >
             <img width={"85rem"} src={phono} />
             <br />
-            No podcasts bookmarked.
+            <FormattedMessage id="library.noPodcasts" defaultMessage="No podcasts bookmarked." />
           </Typography>
         )}
       </Grid>

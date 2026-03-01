@@ -18,6 +18,7 @@ import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import ShareIcon from "@mui/icons-material/ShareOutlined";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Alert from "@mui/material/Alert";
+import { FormattedMessage, useIntl } from "react-intl";
 
 import { clearText } from "./EpisodeList";
 import { Consumer } from "../../App";
@@ -30,6 +31,7 @@ const prod = DEBUG ? '' : ''
 function PodcastHeader(props) {
   const { inLibrary, savePodcast, removePodcast } = props;
   const theme = useTheme();
+  const intl = useIntl();
   const showDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const [open, setOpen] = React.useState(false);
   const [message, setMessage] = React.useState("");
@@ -44,7 +46,7 @@ function PodcastHeader(props) {
   const isInLibrary = inLibrary()
   const saveThisPodcastToLibrary = (ev) => {
     savePodcast(ev);
-    setMessage("Podcast Added to Library");
+    setMessage(intl.formatMessage({ id: "podcast.addedToLibrary", defaultMessage: "Podcast Added to Library" }));
     setOpen(true);
   };
 
@@ -74,7 +76,7 @@ function PodcastHeader(props) {
     } else if (navigator.clipboard) {
       return () => {
         navigator.clipboard.writeText(`${title} ${url.toString()}`);
-        setMessage("Link copied to clipboard");
+        setMessage(intl.formatMessage({ id: "podcast.linkCopied", defaultMessage: "Link copied to clipboard" }));
         setOpen(true);
       };
     } else {
@@ -126,7 +128,7 @@ function PodcastHeader(props) {
                   <Grid item xs={6}>
                     <IconButton
                       size="small"
-                      aria-label="back"
+                      aria-label={intl.formatMessage({ id: "a11y.back", defaultMessage: "Go back" })}
                       onClick={backHandler}
                       sx={{ color: theme.palette.primary.contrastText }}
                     >
@@ -135,18 +137,18 @@ function PodcastHeader(props) {
                   </Grid>
                   <Grid item xs={6} sx={{ textAlign: "right" }}>
                     {isInLibrary ? (
-                      <Tooltip title="Remove from library" placement="bottom">
+                      <Tooltip title={intl.formatMessage({ id: "podcast.removeFromLibrary", defaultMessage: "Remove from library" })} placement="bottom">
                         <IconButton
                           size="small"
                           sx={{ color: theme.palette.primary.contrastText }}
                           onClick={removePodcast}
-                          aria-label="Remove from Library"
+                          aria-label={intl.formatMessage({ id: "a11y.removeFromLibrary", defaultMessage: "Remove from Library" })}
                         >
                           <Favorite />
                         </IconButton>
                       </Tooltip>
                     ) : (
-                      <Tooltip title="Add to Library" placement="bottom">
+                      <Tooltip title={intl.formatMessage({ id: "podcast.addToLibrary", defaultMessage: "Add to Library" })} placement="bottom">
                         <IconButton
                           size="small"
                           sx={{ color: theme.palette.primary.contrastText }}
@@ -157,7 +159,7 @@ function PodcastHeader(props) {
                       </Tooltip>
                     )}
                     {shareLink && (
-                      <Tooltip title="Share Podcast" placement="bottom">
+                      <Tooltip title={intl.formatMessage({ id: "podcast.sharePodcast", defaultMessage: "Share Podcast" })} placement="bottom">
                         <IconButton
                           sx={{ color: theme.palette.primary.contrastText }}
                           size="small"
@@ -265,7 +267,9 @@ function PodcastHeader(props) {
                           },
                         }}
                       >
-                        {descExpanded ? "Less" : "More"}
+                        {descExpanded
+                          ? <FormattedMessage id="common.less" defaultMessage="Less" />
+                          : <FormattedMessage id="common.more" defaultMessage="More" />}
                       </Button>
                     )}
                   </Box>
@@ -285,11 +289,11 @@ function PodcastHeader(props) {
                         : theme.palette.primary.contrastText,
                     }}
                   >
-                    Subscribe
+                    <FormattedMessage id="podcast.subscribe" defaultMessage="Subscribe" />
                   </Button>
                 )}
                 <Typography sx={{ color: subText }}>
-                  <b>Episodes:</b> {state.items.length}
+                  <b><FormattedMessage id="podcast.episodes" defaultMessage="Episodes:" /></b> {state.items.length}
                 </Typography>
               </Box>
             </Box>

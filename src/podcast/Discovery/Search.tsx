@@ -6,6 +6,7 @@ import FormControl from "@mui/material/FormControl";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
 import InputLabel from "@mui/material/InputLabel";
+import { useIntl } from "react-intl";
 
 interface SearchProps<T> {
   handleChange: (value: string) => Promise<T[]>;
@@ -13,7 +14,10 @@ interface SearchProps<T> {
 }
 
 const Search = <T,>({ handleChange, updatePodcasts }: SearchProps<T>): React.ReactElement => {
+  const intl = useIntl();
   const [term, setTerm] = useState("");
+
+  const searchLabel = intl.formatMessage({ id: "discover.searchPodcasts", defaultMessage: "Search Podcasts" });
 
   const action = (value: string) =>
     value.length > 2 &&
@@ -45,17 +49,21 @@ const Search = <T,>({ handleChange, updatePodcasts }: SearchProps<T>): React.Rea
     >
       <Grid xs={12} item>
         <FormControl variant="outlined" sx={{ width: "100%" }}>
-          <InputLabel htmlFor="outlined-search">Search Podcasts</InputLabel>
+          <InputLabel htmlFor="outlined-search">{searchLabel}</InputLabel>
           <OutlinedInput
             color={"primary"}
             id="outlined-search"
             value={term}
             onChange={onSetTerm}
             onKeyDown={onKeyDown}
-            label="Search Podcasts"
+            label={searchLabel}
             endAdornment={
               <InputAdornment position="end">
-                <IconButton type="submit" aria-label="search" onClick={clickHandler}>
+                <IconButton
+                  type="submit"
+                  aria-label={intl.formatMessage({ id: "a11y.search", defaultMessage: "search" })}
+                  onClick={clickHandler}
+                >
                   <SearchIcon />
                 </IconButton>
               </InputAdornment>
