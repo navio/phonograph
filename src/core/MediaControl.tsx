@@ -346,9 +346,26 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
                       </Box>
 
                       <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%", maxWidth: 720, mt: 1 }}>
-                        <Typography sx={{ color: paletteStyles.text }}>{formatTime(state.currentTime)}</Typography>
+                        <Typography
+                          sx={{
+                            color: paletteStyles.text,
+                            fontSize: theme.typography.body1.fontSize,
+                            fontWeight: theme.typography.fontWeightRegular,
+                            fontVariantNumeric: "tabular-nums",
+                          }}
+                        >
+                          {formatTime(state.currentTime)}
+                        </Typography>
                         <div style={{ textAlign: "right" }}>
-                          <Typography sx={{ color: paletteStyles.subText }} variant="caption">
+                          <Typography
+                            sx={{
+                              color: paletteStyles.subText,
+                              fontSize: theme.typography.body1.fontSize,
+                              fontWeight: theme.typography.fontWeightRegular,
+                              fontVariantNumeric: "tabular-nums",
+                            }}
+                            variant="caption"
+                          >
                             {(() => {
                               const duration = state.duration;
                               const currentTime = state.currentTime;
