@@ -349,10 +349,15 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
                         <Typography sx={{ color: paletteStyles.text }}>{formatTime(state.currentTime)}</Typography>
                         <div style={{ textAlign: "right" }}>
                           <Typography sx={{ color: paletteStyles.subText }} variant="caption">
-                            {formatRemaining(state.duration, state.currentTime)}
-                          </Typography>
-                          <Typography sx={{ color: paletteStyles.subText }} variant="caption">
-                            {formatTime(state.currentTime)}
+                            {(() => {
+                              const duration = state.duration;
+                              const currentTime = state.currentTime;
+                              if (typeof duration !== "number" || typeof currentTime !== "number") return "∞";
+                              if (!Number.isFinite(duration) || !Number.isFinite(currentTime) || duration <= 0) return "∞";
+
+                              const remaining = Math.max(0, duration - currentTime);
+                              return `- ${formatTime(remaining)}`;
+                            })()}
                           </Typography>
                         </div>
                       </Box>
