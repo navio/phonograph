@@ -87,6 +87,8 @@ const PodcastCover: React.FC<{ src?: string; alt: string; bgColor: string }> = (
           decoding="async"
           // @ts-ignore fetchPriority is supported by modern Chromium-based browsers
           fetchPriority="low"
+          width={512}
+          height={512}
           onLoad={() => setLoaded(true)}
           onError={() => {
             setErrored(true);
@@ -201,7 +203,7 @@ const LibraryView: React.FC<LibraryProps> = ({ addPodcastHandler, actionAfterSel
             align="center"
             variant="h5"
           >
-            <img width={"85rem"} src={phono} />
+            <img width={"85rem"} src={phono} alt="phonograph logo" loading="lazy" decoding="async" />
             <br />
             <FormattedMessage id="library.noPodcasts" defaultMessage="No podcasts bookmarked." />
           </Typography>
