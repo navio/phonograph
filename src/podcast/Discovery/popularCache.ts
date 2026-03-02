@@ -1,6 +1,7 @@
 import type { PopularPodcastsResponse } from "./engine";
 
-const WEEK_MS = 1000 * 60 * 60 * 24 * 7;
+// 10 days TTL to minimize Listen Notes API calls (limited to 300/month)
+const TEN_DAYS_MS = 1000 * 60 * 60 * 24 * 10;
 
 type CachedValue<T> = {
   cachedAt: number;
@@ -34,7 +35,7 @@ export const getCachedBestPodcasts = async (key: string): Promise<PopularPodcast
     const cached = (await idb.get(key)) as CachedValue<PopularPodcastsResponse> | undefined;
     if (!cached || !cached.value) return null;
 
-    const isFresh = Date.now() - cached.cachedAt < WEEK_MS;
+    const isFresh = Date.now() - cached.cachedAt < TEN_DAYS_MS;
     return isFresh ? cached.value : null;
   } catch {
     return null;

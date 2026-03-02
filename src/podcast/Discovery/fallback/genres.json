@@ -1,0 +1,24 @@
+{
+  "genres": [
+    { "id": 144, "name": "Personal Finance", "parent_id": 67 },
+    { "id": 151, "name": "Locally Focused", "parent_id": 67 },
+    { "id": 68, "name": "TV & Film", "parent_id": null },
+    { "id": 127, "name": "Technology", "parent_id": null },
+    { "id": 135, "name": "True Crime", "parent_id": null },
+    { "id": 99, "name": "News", "parent_id": null },
+    { "id": 93, "name": "Business", "parent_id": null },
+    { "id": 77, "name": "Sports", "parent_id": null },
+    { "id": 69, "name": "Religion & Spirituality", "parent_id": null },
+    { "id": 88, "name": "Health & Fitness", "parent_id": null },
+    { "id": 107, "name": "Science", "parent_id": null },
+    { "id": 122, "name": "Society & Culture", "parent_id": null },
+    { "id": 125, "name": "History", "parent_id": null },
+    { "id": 132, "name": "Kids & Family", "parent_id": null },
+    { "id": 82, "name": "Leisure", "parent_id": null },
+    { "id": 100, "name": "Arts", "parent_id": null },
+    { "id": 111, "name": "Education", "parent_id": null },
+    { "id": 133, "name": "Comedy", "parent_id": null },
+    { "id": 134, "name": "Music", "parent_id": null },
+    { "id": 67, "name": "Government", "parent_id": null }
+  ]
+}

@@ -1,5 +1,6 @@
 import PodcastSearcher, { PodcastSearchResponse } from "./PodcastSearcher";
 import { bestPodcastsCacheKey, getCachedBestPodcasts, setCachedBestPodcasts } from "./popularCache";
+import fallbackTrending from "./fallback/trending.json";
 
 export interface PodcastSearchResult {
   title: string;
@@ -97,6 +98,13 @@ export const getPopularPodcasts = async function (query: number | null = null): 
   try {
     const resp = await fetch(`/ln/best_podcasts?${params}`);
     if (!resp.ok) {
+      // On rate limit (429) or other errors, use fallback data for default trending
+      if (query === null) {
+        console.warn(`Listen Notes API returned ${resp.status}, using fallback trending data`);
+        const fallback = fallbackTrending as PopularPodcastsResponse;
+        memory = fallback;
+        return fallback;
+      }
       throw new Error(`Listen Notes best_podcasts failed: ${resp.status}`);
     }
     const data = await resp.json();
@@ -127,12 +135,21 @@ export const getPopularPodcasts = async function (query: number | null = null): 
     // Keep existing in-memory optimization for the default view.
     if (!query) memory = response;
 
-    // Persist weekly cache for both default and per-genre calls.
+    // Persist 10-day cache for both default and per-genre calls.
     await setCachedBestPodcasts(cacheKey, response);
 
     return response;
   } catch (error: any) {
     console.error("getPopularPodcasts failed:", error);
+    
+    // For default trending view, return fallback data instead of empty error state
+    if (query === null) {
+      console.warn("Using fallback trending data due to error");
+      const fallback = fallbackTrending as PopularPodcastsResponse;
+      memory = fallback;
+      return fallback;
+    }
+    
     const fallbackInit = query !== null ? Number(query) : 0;
     return { top: [], loading: false, init: Number.isFinite(fallbackInit) ? fallbackInit : 0, name: null, error: true, errorMessage: String(error?.message || error) };
   }

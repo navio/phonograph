@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import Chip from "@mui/material/Chip";
 import Box from "@mui/material/Box";
+import fallbackGenres from "./fallback/genres.json";
 
 interface Genre {
   id: number;
@@ -16,16 +17,8 @@ interface GenersProps {
 }
 
 const Geners: React.FC<GenersProps> = ({ getPopularPodcasts, selected }) => {
-  const [genres, setGenres] = useState<Genre[]>([]);
-
-  useEffect(() => {
-    import("./genres.json")
-      .then((response) => (response as any).default || response)
-      .then((data: { genres?: Genre[] }) => {
-        const { genres = [] } = data || {};
-        setGenres(genres);
-      });
-  }, []);
+  // Use bundled fallback genres - no API call needed
+  const genres = fallbackGenres.genres as Genre[];
 
   const sortedGenres = useMemo(() => {
     const rest = [...(genres || [])].sort((a, b) => (a?.name || "").localeCompare(b?.name || ""));

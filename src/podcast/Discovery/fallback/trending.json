@@ -1,0 +1,77 @@
+{
+  "name": "Trending",
+  "top": [
+    {
+      "title": "1. The Daily",
+      "rss": "https://www.listennotes.com/c/r/d0b6b6f6b0f641e6b3f3b0f6b6f6b6f6",
+      "publisher": "The New York Times",
+      "thumbnail": "https://production.listennotes.com/podcasts/the-daily-the-new-york-times-erf67D5lFGw-xp9WfIfS5XZ.300x300.jpg",
+      "description": "This is what the news should sound like. The biggest stories of our time, told by the best journalists in the world."
+    },
+    {
+      "title": "2. Crime Junkie",
+      "rss": "https://www.listennotes.com/c/r/e0c6c6f6c0f641e6c3f3c0f6c6f6c6f6",
+      "publisher": "audiochuck",
+      "thumbnail": "https://production.listennotes.com/podcasts/crime-junkie-audiochuck-f-erf67D5lFGw.300x300.jpg",
+      "description": "If you can never get enough true crime... Congratulations, you've found your people."
+    },
+    {
+      "title": "3. The Joe Rogan Experience",
+      "rss": "https://www.listennotes.com/c/r/f0d6d6f6d0f641e6d3f3d0f6d6f6d6f6",
+      "publisher": "Joe Rogan",
+      "thumbnail": "https://production.listennotes.com/podcasts/the-joe-rogan-experience-joe-rogan-erf67D5lFGw.300x300.jpg",
+      "description": "The official podcast of comedian Joe Rogan."
+    },
+    {
+      "title": "4. Call Her Daddy",
+      "rss": "https://www.listennotes.com/c/r/a0b6b6f6a0f641e6a3f3a0f6a6f6a6f6",
+      "publisher": "Alex Cooper",
+      "thumbnail": "https://production.listennotes.com/podcasts/call-her-daddy-alex-cooper-erf67D5lFGw.300x300.jpg",
+      "description": "The most listened-to podcast by women."
+    },
+    {
+      "title": "5. SmartLess",
+      "rss": "https://www.listennotes.com/c/r/b0c6c6f6b0f641e6b3f3b0f6b6f6b6f6",
+      "publisher": "Jason Bateman, Sean Hayes, Will Arnett",
+      "thumbnail": "https://production.listennotes.com/podcasts/smartless-jason-bateman-will-arnett-erf67D5lFGw.300x300.jpg",
+      "description": "Three friends and a mystery guest."
+    },
+    {
+      "title": "6. Huberman Lab",
+      "rss": "https://www.listennotes.com/c/r/c0d6d6f6c0f641e6c3f3c0f6c6f6c6f6",
+      "publisher": "Scicomm Media",
+      "thumbnail": "https://production.listennotes.com/podcasts/huberman-lab-scicomm-media-erf67D5lFGw.300x300.jpg",
+      "description": "Neuroscience meets daily life."
+    },
+    {
+      "title": "7. Dateline NBC",
+      "rss": "https://www.listennotes.com/c/r/d0e6e6f6d0f641e6d3f3d0f6d6f6d6f6",
+      "publisher": "NBC News",
+      "thumbnail": "https://production.listennotes.com/podcasts/dateline-nbc-nbc-news-erf67D5lFGw.300x300.jpg",
+      "description": "Current events, true crime, and mysteries."
+    },
+    {
+      "title": "8. Stuff You Should Know",
+      "rss": "https://www.listennotes.com/c/r/e0f6f6f6e0f641e6e3f3e0f6e6f6e6f6",
+      "publisher": "iHeartPodcasts",
+      "thumbnail": "https://production.listennotes.com/podcasts/stuff-you-should-know-iheartpodcasts-erf67D5lFGw.300x300.jpg",
+      "description": "If you've ever wanted to know about stuff, this is the podcast for you."
+    },
+    {
+      "title": "9. This American Life",
+      "rss": "https://www.listennotes.com/c/r/f0a6a6f6f0f641e6f3f3f0f6f6f6f6f6",
+      "publisher": "This American Life",
+      "thumbnail": "https://production.listennotes.com/podcasts/this-american-life-this-american-life-erf67D5lFGw.300x300.jpg",
+      "description": "Stories that are always surprising and incredibly human."
+    },
+    {
+      "title": "10. Morbid",
+      "rss": "https://www.listennotes.com/c/r/a0b6b6a6a0f641e6a3f3a0a6a6a6a6a6",
+      "publisher": "Morbid Network",
+      "thumbnail": "https://production.listennotes.com/podcasts/morbid-morbid-network-erf67D5lFGw.300x300.jpg",
+      "description": "True crime and spooky stories."
+    }
+  ],
+  "loading": false,
+  "init": 0
+}

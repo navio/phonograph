@@ -51,23 +51,24 @@ export const handler: Handler = async (event) => {
     // Default: do not cache.
     // Only cache endpoints that are effectively static and safe.
     // CDN caches will key by full URL (including query params).
-    const week = 60 * 60 * 24 * 7;
+    const tenDays = 60 * 60 * 24 * 10;
     const day = 60 * 60 * 24;
 
     if (pathname === "/genres") {
-      const ttl = week * 4; // ~30 days
+      // Genres rarely change - cache aggressively
       return {
-        // short browser cache, long CDN cache
-        "Cache-Control": `public, max-age=300`,
-        "Netlify-CDN-Cache-Control": `public, s-maxage=${ttl}, stale-while-revalidate=${day}`,
+        // 1 day browser cache, 10 days CDN cache, serve stale for 10 days while revalidating
+        "Cache-Control": `public, max-age=${day}`,
+        "Netlify-CDN-Cache-Control": `public, s-maxage=${tenDays}, stale-while-revalidate=${tenDays}`,
       };
     }
 
     if (pathname === "/best_podcasts") {
-      const ttl = week;
+      // Best podcasts update weekly-ish, but freshness is less important than availability
       return {
-        "Cache-Control": `public, max-age=300`,
-        "Netlify-CDN-Cache-Control": `public, s-maxage=${ttl}, stale-while-revalidate=${day}`,
+        // 1 day browser cache, 10 days CDN cache, serve stale for 10 days while revalidating
+        "Cache-Control": `public, max-age=${day}`,
+        "Netlify-CDN-Cache-Control": `public, s-maxage=${tenDays}, stale-while-revalidate=${tenDays}`,
       };
     }
 
