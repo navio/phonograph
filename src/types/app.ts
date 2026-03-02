@@ -38,6 +38,8 @@ export interface PlaylistItem {
 
 export type ThemeName = "default" | "nord" | "dracula" | "highContrast";
 
+export type SupportedLocale = "en" | "es" | "fr" | "zh";
+
 export interface AppState {
   podcasts: PodcastEntry[];
   // theme historically stored mode (boolean | "dark" | "light" | "os") kept for compatibility
@@ -71,6 +73,8 @@ export interface AppState {
   podcastAuthor?: string;
   // New setting: whether to enable podcast artwork / palette theming
   podcastViewEnabled?: boolean;
+  // User-selected locale for i18n (overrides browser detection)
+  locale?: SupportedLocale;
   [key: string]: unknown;
 }
 
@@ -91,7 +95,8 @@ export type AppAction =
   | { type: "resetState" }
   | { type: "drawer"; payload?: { status: boolean; drawerContent?: unknown } }
   | { type: "setPodcastViewEnabled"; payload: boolean }
-  | { type: "setPodcastImage"; payload?: string | null };
+  | { type: "setPodcastImage"; payload?: string | null }
+  | { type: "setLocale"; payload: SupportedLocale };
 
 export interface AppContextValue {
   state: AppState;

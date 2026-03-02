@@ -113,6 +113,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
       case "setPodcastImage":
         return set({ state: { ...current, podcastImage: action.payload } });
 
+      case "setLocale":
+        return set({ state: { ...current, locale: action.payload } });
+
       default:
         return set({ state: current });
     }

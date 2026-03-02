@@ -39,6 +39,12 @@ import { importFeeds } from "./opmlImporter";
 
 import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
+
+import { SUPPORTED_LOCALES, LOCALE_LABELS, getBrowserLocale, type SupportedLocale } from "../i18n/locale";
 
 const Settings: React.FC = () => {
   const { state, dispatch, engine } = useContext(AppContext) as AppContextValue;
@@ -65,6 +71,14 @@ const Settings: React.FC = () => {
     if (!input) return;
     dispatch({ type: "setThemeName", payload: input as any });
   };
+
+  const localeSwitcher = (event: React.ChangeEvent<{ value: unknown }> | any) => {
+    const value = event.target.value as SupportedLocale;
+    dispatch({ type: "setLocale", payload: value });
+  };
+
+  // Current locale: stored in state or detected from browser
+  const currentLocale: SupportedLocale = (state.locale as SupportedLocale) || getBrowserLocale();
 
   const clearState = async () => {
     await dispatch({ type: "resetState" });
@@ -277,6 +291,31 @@ const Settings: React.FC = () => {
               }
               label={intl.formatMessage({ id: "settings.enablePodcastView", defaultMessage: "Enable Podcast View" })}
             />
+          </div>
+
+          <div style={{ marginTop: 12 }}>
+            <Typography variant="subtitle1" gutterBottom>
+              <FormattedMessage id="settings.language" defaultMessage="Language" />
+            </Typography>
+            <FormControl variant="outlined" size="small" sx={{ minWidth: 200 }}>
+              <InputLabel id="language-select-label">
+                <FormattedMessage id="settings.language" defaultMessage="Language" />
+              </InputLabel>
+              <Select
+                labelId="language-select-label"
+                id="language-select"
+                value={currentLocale}
+                onChange={localeSwitcher}
+                label={intl.formatMessage({ id: "settings.language", defaultMessage: "Language" })}
+                aria-label={intl.formatMessage({ id: "a11y.languageSelector", defaultMessage: "language selector" })}
+              >
+                {SUPPORTED_LOCALES.map((loc) => (
+                  <MenuItem key={loc} value={loc}>
+                    {LOCALE_LABELS[loc]}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </div>
         </CardContent>
       </Card>

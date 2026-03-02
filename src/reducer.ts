@@ -226,6 +226,8 @@ export const reducer = (state: AppState, action: AppAction): AppState => {
       return { ...state, podcastViewEnabled: action.payload };
     case "setPodcastImage":
       return { ...state, podcastImage: (action as any).payload };
+    case "setLocale":
+      return { ...state, locale: action.payload };
     default:
       return state;
   }
