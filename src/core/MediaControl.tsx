@@ -387,15 +387,66 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
           </div>
         ) : (
           // Minimized single-row layout
-          <div style={{ display: "flex", alignItems: "center", width: "100%", padding: "0 0.75rem", gap: "8px" }}>
+          <div
+            style={{ display: "flex", alignItems: "center", width: "100%", padding: "0 0.75rem", gap: "8px" }}
+            onClick={() => {
+              // Expand when the minimized bar itself is clicked
+              saveStorage(true);
+              setOpen(true);
+              // Dispatch a semantic action for consumers (no-op if not handled)
+              try {
+                dispatch({ type: "setPlayerExpanded", payload: true } as any);
+              } catch (_) {
+                // ignore type errors at runtime
+              }
+            }}
+          >
             <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: "fit-content" }}>
-              <IconButton size="small" onClick={props.rewind} sx={{ color: paletteStyles.text }}>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // Explicit expand affordance
+                  saveStorage(true);
+                  setOpen(true);
+                  try {
+                    dispatch({ type: "setPlayerExpanded", payload: true } as any);
+                  } catch (_) {}
+                }}
+                sx={{ color: paletteStyles.text }}
+                aria-label="Expand player"
+              >
+                <ExpandLessIcon fontSize="small" />
+              </IconButton>
+
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  props.rewind();
+                }}
+                sx={{ color: paletteStyles.text }}
+              >
                 <SkipPreviousIcon fontSize="small" />
               </IconButton>
-              <IconButton size="small" onClick={props.handler} sx={{ color: paletteStyles.text }}>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  props.handler();
+                }}
+                sx={{ color: paletteStyles.text }}
+              >
                 {state.status === "paused" ? <PlayArrowIcon fontSize="small" /> : <PauseIcon fontSize="small" />}
               </IconButton>
-              <IconButton size="small" onClick={props.forward} sx={{ color: paletteStyles.text }}>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  props.forward();
+                }}
+                sx={{ color: paletteStyles.text }}
+              >
                 <SkipNextIcon fontSize="small" />
               </IconButton>
             </div>
@@ -405,7 +456,15 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
                 size="small"
                 value={sliderValue}
                 max={sliderMax}
-                onChange={handleSeek}
+                onChange={(e, v) => {
+                  // Prevent the container click from firing while interacting with the slider
+                  try {
+                    (e as Event & { stopPropagation?: () => void }).stopPropagation?.();
+                  } catch (_) {}
+                  handleSeek(e as Event, v as number);
+                }}
+                onMouseDown={(e) => e.stopPropagation()}
+                onTouchStart={(e) => e.stopPropagation()}
                 sx={{ color: paletteStyles.accent, mx: 0, my: 0 }}
               />
             </div>
