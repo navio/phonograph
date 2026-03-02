@@ -66,7 +66,9 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
 
   // Cache images (including cross-origin) to avoid repeatedly depending on slow podcast hosts.
-  if (request.destination === "image" && (url.protocol === "http:" || url.protocol === "https:")) {
+  const acceptHeader = request.headers.get("accept") || "";
+  const isImageRequest = request.destination === "image" || acceptHeader.includes("image");
+  if (isImageRequest && (url.protocol === "http:" || url.protocol === "https:")) {
     event.respondWith(
       caches.open(IMAGE_CACHE).then((cache) => {
         return cache.match(request).then((cached) => {

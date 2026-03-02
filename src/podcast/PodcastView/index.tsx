@@ -83,6 +83,24 @@ const PodcastView: React.FC<{ history: { push: (path: string) => void } }> = (pr
     if (!result) return;
     const { newPodcast } = result;
     const { items, description, link, created, ...allPodcast } = newPodcast;
+
+    // Preload artwork in background without blocking the UI.
+    try {
+      const preload = () => {
+        if (newPodcast.image) {
+          const img = new Image();
+          img.src = newPodcast.image;
+        }
+      };
+      if (typeof (window as any).requestIdleCallback === "function") {
+        (window as any).requestIdleCallback(preload, { timeout: 2000 });
+      } else {
+        setTimeout(preload, 0);
+      }
+    } catch (err) {
+      // noop - preload failures shouldn't block saving
+    }
+
     dispatch({ type: "updatePodcasts", podcasts: [...global.podcasts, allPodcast] });
   };
 
