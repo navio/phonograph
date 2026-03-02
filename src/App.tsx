@@ -148,18 +148,34 @@ const App: React.FC = () => {
             )}
           />
 
+          {/*
+            If the user lands on the root path, decide the initial view synchronously
+            from the initial app state (derived from localStorage). This avoids flicker
+            by performing the decision during render rather than in an effect.
+          */}
           <Route
             exact
-            path={[DISCOVERVIEW, ROOT]}
+            path={ROOT}
+            render={() => {
+              const hasSaved = state && state.podcasts && state.podcasts.length > 0;
+              return <Redirect to={hasSaved ? LIBVIEW : DISCOVERVIEW} />;
+            }}
+          />
+
+          <Route
+            exact
+            path={[DISCOVERVIEW]}
             render={({ history }) => (
               <Suspense fallback={<Loading />}>
                 <Discover
                   addPodcastHandler={loadPodcast}
                   actionAfterClick={() => history.push(PODCASTVIEW)}
                 />
-            </Suspense>
-          )}
-        />
+              </Suspense>
+            )}
+          />
+
+        </Switch>
 
         <Route
           path={SETTINGSVIEW}
@@ -173,7 +189,6 @@ const App: React.FC = () => {
           <Route>
             <Redirect to={DISCOVERVIEW} />
           </Route>
-        </Switch>
 
         {state.episodeInfo && <Underground />}
 
