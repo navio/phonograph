@@ -1,4 +1,4 @@
-const VERSION = "1.10";
+const VERSION = "1.11";
 const CORE_CACHE = "phonograph-core-" + VERSION;
 const RUNTIME_CACHE = "phonograph-runtime-" + VERSION;
 const IMAGE_CACHE = "phonograph-images-" + VERSION;
@@ -48,6 +48,30 @@ const shouldIgnore = (url) => {
   return false;
 };
 
+// Conservative allowlist of common podcast artwork hosts. Keep this list intentionally
+// small to avoid caching arbitrary third-party images.
+const ARTWORK_HOSTS = [
+  "mzstatic.com",
+  "simplecastcdn.com",
+  "simplecast.com",
+  "art19.com",
+  "megaphone.fm",
+  "podcastcdn.com",
+  "podbean.com",
+  "audioboom.com",
+  "cloudinary.com",
+  "feedburner.com",
+  "amazonaws.com",
+  "gravatar.com",
+  "twimg.com",
+  "googleusercontent.com"
+];
+
+const isArtworkOrigin = (url) => {
+  const host = (url.hostname || "").toLowerCase();
+  return ARTWORK_HOSTS.some((h) => host === h || host.endsWith("." + h));
+};
+
 const isNavigationRequest = (request) => {
   if (request.mode === "navigate") return true;
   const accept = request.headers.get("accept") || "";
@@ -69,6 +93,32 @@ self.addEventListener("fetch", (event) => {
   const acceptHeader = request.headers.get("accept") || "";
   const isImageRequest = request.destination === "image" || acceptHeader.includes("image");
   if (isImageRequest && (url.protocol === "http:" || url.protocol === "https:")) {
+    // Apply a strict cache-first strategy for known artwork hosts to avoid
+    // unnecessary network requests when images are already cached.
+    if (isArtworkOrigin(url)) {
+      event.respondWith(
+        caches.open(IMAGE_CACHE).then((cache) => {
+          return cache.match(request).then((cached) => {
+            if (cached) return cached;
+
+            return fetch(request)
+              .then((response) => {
+                // Cross-origin image requests are often opaque (status 0).
+                if (response && (response.ok || response.type === "opaque")) {
+                  cache.put(request, response.clone()).catch(() => {});
+                }
+                return response;
+              })
+              .catch(() => cached);
+          });
+        })
+      );
+
+      return;
+    }
+
+    // For other images keep the existing behavior (serve cached if available,
+    // but still revalidate in the background) to avoid changing unrelated rules.
     event.respondWith(
       caches.open(IMAGE_CACHE).then((cache) => {
         return cache.match(request).then((cached) => {
