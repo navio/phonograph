@@ -26,8 +26,19 @@ const createAppTheme = (name: ThemeName = "default", mode: PaletteMode = "light"
       },
       dark: {
         mode: "dark",
-        primary: blue,
-        secondary: deepOrange,
+        // Vercel-inspired dark palette
+        background: { default: "#0a0a0a", paper: "#111111" },
+        text: { primary: "#ffffff", secondary: "#a1a1aa" },
+        divider: "#27272a",
+        primary: { main: "#0070f3", contrastText: "#ffffff" },
+        // Keep secondary accent minimal / neutral
+        secondary: { main: "#a1a1aa", contrastText: "#0a0a0a" },
+        action: {
+          hover: "rgba(255,255,255,0.04)",
+          selected: "rgba(255,255,255,0.08)",
+          disabled: "rgba(255,255,255,0.3)",
+          disabledBackground: "rgba(255,255,255,0.12)",
+        },
       },
     },
 
