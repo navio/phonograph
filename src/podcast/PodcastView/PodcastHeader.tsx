@@ -50,12 +50,15 @@ function PodcastHeader(props) {
     setOpen(true);
   };
 
+  const removeThisPodcastFromLibrary = () => {
+    removePodcast();
+    setMessage(intl.formatMessage({ id: "podcast.removedFromLibrary", defaultMessage: "Podcast Removed from Library" }));
+    setOpen(true);
+  };
+
   const backHandler = () => history.goBack();
 
-  const handleClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
+  const handleClose = (_event, _reason) => {
     setOpen(false);
   };
 
@@ -109,7 +112,8 @@ function PodcastHeader(props) {
               open={open}
               onClose={handleClose}
               anchorOrigin={{ vertical: "top", horizontal: "center" }}
-              autoHideDuration={4000}
+              autoHideDuration={2000}
+              sx={{ pointerEvents: "none", "& .MuiAlert-root": { pointerEvents: "auto" } }}
             >
               <Alert elevation={6} variant="filled" severity="success">
                 {message}
@@ -141,7 +145,7 @@ function PodcastHeader(props) {
                         <IconButton
                           size="small"
                           sx={{ color: theme.palette.primary.contrastText }}
-                          onClick={removePodcast}
+                          onClick={removeThisPodcastFromLibrary}
                           aria-label={intl.formatMessage({ id: "a11y.removeFromLibrary", defaultMessage: "Remove from Library" })}
                         >
                           <Favorite />
@@ -276,7 +280,7 @@ function PodcastHeader(props) {
                 );
               })()}
               <Box sx={{ mt: 2, display: "flex", alignItems: "center", gap: 2 }}>
-                {!isInLibrary && (
+                {!isInLibrary ? (
                   <Button
                     onClick={saveThisPodcastToLibrary}
                     variant="contained"
@@ -290,6 +294,21 @@ function PodcastHeader(props) {
                     }}
                   >
                     <FormattedMessage id="podcast.subscribe" defaultMessage="Subscribe" />
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={removeThisPodcastFromLibrary}
+                    variant="outlined"
+                    sx={{
+                      borderColor: enabled
+                        ? themeColors?.accent || theme.palette.primary.main
+                        : theme.palette.primary.main,
+                      color: enabled
+                        ? themeColors?.accentText || textColor
+                        : theme.palette.primary.main,
+                    }}
+                  >
+                    <FormattedMessage id="podcast.unsubscribe" defaultMessage="Unsubscribe" />
                   </Button>
                 )}
                 <Typography sx={{ color: subText }}>
