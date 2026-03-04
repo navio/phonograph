@@ -175,20 +175,20 @@ const App: React.FC = () => {
             )}
           />
 
-        </Switch>
+          <Route
+            path={SETTINGSVIEW}
+            exact
+            render={() => (
+              <Suspense fallback={<Loading />}>
+                <Settings />
+              </Suspense>
+            )}
+          />
 
-        <Route
-          path={SETTINGSVIEW}
-          exact
-          render={() => (
-            <Suspense fallback={<Loading />}>
-              <Settings />
-            </Suspense>
-          )}
-        />
           <Route>
             <Redirect to={DISCOVERVIEW} />
           </Route>
+        </Switch>
 
         {state.episodeInfo && <Underground />}
 
