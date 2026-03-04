@@ -210,6 +210,9 @@ function PodcastHeader(props) {
                 px: { xs: 2, md: 4 },
                 pt: { xs: 3, md: 2 },
                 pb: { xs: 2, md: 3 },
+                position: "sticky",
+                top: 48, // dense toolbar height
+                zIndex: theme.zIndex.appBar,
                 background: enabled && palette
                   ? themeColors?.primary
                   : theme.palette.background.default,
