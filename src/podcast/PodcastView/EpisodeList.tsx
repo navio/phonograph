@@ -1,6 +1,6 @@
 // @ts-nocheck
-import React, { useEffect, useState, useContext } from "react";
-import List from "@mui/material/List";
+import React, { useEffect, useState, useContext, useRef } from "react";
+import { WarperComponent, WarperComponentRef } from "@itsmeadarsh/warper";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
@@ -9,7 +9,6 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Dialog from "@mui/material/Dialog";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
-import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
 import DialogContent from "@mui/material/DialogContent";
@@ -161,12 +160,9 @@ const Description = (props) => {
 const EpisodeList = (props) => {
   const [episodeHistory, setEpisodeHistory] = useState({});
   const [open, setOpen] = React.useState(null);
-  const [amount, setAmount] = React.useState(1);
   const [fresh, reFresh] = React.useState(Date.now());
   const { episodes, podcast, playNext, playLast } = props;
-  const episodeList = episodes.slice(0, 20 * amount);
-  const [drawer, openDrawer] = useState(false);
-  const [currentEpisode, setCurrentEpisode] = useState(null);
+  const warperRef = useRef<WarperComponentRef>(null);
   const [message, setMessage] = useState(null);
   // console.log('heree',podcast);
   const { dispatch } = useContext(AppContext);
@@ -262,142 +258,134 @@ const EpisodeList = (props) => {
       <Consumer>
         {(state) => (
           <div style={{ background: listBackground }}>
-            {episodeList ? (
-              <>
-                <List sx={{ background: "transparent" }}>
-                  {episodeList.map((episode, id) => {
-                    const episodeData = episodeHistory[episode.guid] || {};
-                    return (
-                      <div key={episode.guid}>
-                        <ListItem
-                          selected={state.playing === episode.guid}
-                          sx={{
-                            backgroundColor: palette ? toRGBA(palette.primary, 0.12) : "transparent",
-                            color: textColor,
+            {episodes && episodes.length > 0 ? (
+              <WarperComponent
+                ref={warperRef}
+                itemCount={episodes.length}
+                estimateSize={() => 88}
+                height="calc(100vh - 280px)"
+                overscan={5}
+                loadingPlaceholder={
+                  <div style={{ textAlign: "center", padding: "2rem" }}>
+                    <CircularProgress />
+                  </div>
+                }
+                errorPlaceholder={(error) => (
+                  <div style={{ textAlign: "center", padding: "2rem", color: textColor }}>
+                    Failed to initialize list: {error.message}
+                  </div>
+                )}
+              >
+                {(index) => {
+                  const episode = episodes[index];
+                  const episodeData = episodeHistory[episode.guid] || {};
+                  return (
+                    <div key={episode.guid}>
+                      <ListItem
+                        selected={state.playing === episode.guid}
+                        sx={{
+                          backgroundColor: palette ? toRGBA(palette.primary, 0.12) : "transparent",
+                          color: textColor,
+                        }}
+                      >
+                        <ListItemIcon>
+                          <IconButton
+                            onClick={props.handler(
+                              episode.guid,
+                              whenToStart(episodeData),
+                              podcast
+                            )}
+                            sx={{
+                              color: iconColor,
+                              backgroundColor: palette ? toRGBA(palette.primary, 0.18) : "transparent",
+                              "&:hover": {
+                                backgroundColor: palette ? toRGBA(palette.primary, 0.26) : undefined,
+                              },
+                            }}
+                          >
+                            {props.playing === episode.guid && props.status !== "paused" ? (
+                              <PauseIcon fontSize="large" sx={{ color: iconColor }} />
+                            ) : (
+                              <PlayArrowIcon fontSize="large" sx={{ color: iconColor }} />
+                            )}
+                          </IconButton>
+                        </ListItemIcon>
+                        <EpisodeListDescription
+                          onClick={() => {
+                            setOpen({
+                              description: episode.description,
+                              title: episode.title,
+                            });
                           }}
-                        >
-                          <ListItemIcon>
-                            <IconButton
-                              onClick={props.handler(
-                                episode.guid,
-                                whenToStart(episodeData),
-                                podcast
-                              )}
-                              sx={{
-                                color: iconColor,
-                                // Give the button a subtle surface so it stays visible on pale themes
-                                backgroundColor: palette ? toRGBA(palette.primary, 0.18) : "transparent",
-                                "&:hover": {
-                                  backgroundColor: palette ? toRGBA(palette.primary, 0.26) : undefined,
-                                },
-                              }}
-                            >
-                              {props.playing === episode.guid && props.status !== "paused" ? (
-                                <PauseIcon fontSize="large" sx={{ color: iconColor }} />
-                              ) : (
-                                <PlayArrowIcon fontSize="large" sx={{ color: iconColor }} />
-                              )}
-                            </IconButton>
-                          </ListItemIcon>
-                          <EpisodeListDescription
+                          history={episodeData}
+                          episode={episode}
+                          palette={palette}
+                          textColor={textColor}
+                          subText={subText}
+                          accent={accent}
+                        />
+                        <ListItemIcon>
+                          <IconButton
+                            edge="end"
                             onClick={() => {
-
-                              setOpen({
-                                description: episode.description,
-                                title: episode.title,
+                              dispatch({
+                                type: "drawer",
+                                payload: {
+                                  drawerContent: {
+                                    typeContent: "list",
+                                    content: [
+                                      {
+                                        label: intl.formatMessage({ id: "episode.playNext", defaultMessage: "Play Next" }),
+                                        icon: "addnext",
+                                        fn: () => {
+                                          setMessage(intl.formatMessage({ id: "episode.queuedNext", defaultMessage: "Queued to play next" }));
+                                          playNext(episode.guid);
+                                        },
+                                      },
+                                      {
+                                        label: intl.formatMessage({ id: "episode.addToQueue", defaultMessage: "Add to queue" }),
+                                        icon: "queue",
+                                        fn: () => {
+                                          setMessage(intl.formatMessage({ id: "episode.addedToQueue", defaultMessage: "Added to queue" }));
+                                          playLast(episode.guid);
+                                        },
+                                      },
+                                      {
+                                        label: intl.formatMessage({ id: "episode.markAsPlayed", defaultMessage: "Mark as Played" }),
+                                        fn: () => {
+                                          completeEpisode(episode.guid);
+                                        },
+                                      },
+                                      {
+                                        label: intl.formatMessage({ id: "episode.seeDescription", defaultMessage: "See Description" }),
+                                        icon: "description",
+                                        fn: () => setOpen({ title: episode.title, description: episode.description }),
+                                      },
+                                    ],
+                                  },
+                                  status: true,
+                                },
                               });
                             }}
-                            history={episodeData}
-                            episode={episode}
-                            palette={palette}
-                            textColor={textColor}
-                            subText={subText}
-                            accent={accent}
-                          />
-                          <ListItemIcon>
-                            <IconButton
-                              edge="end"
-                              onClick={() => {
-                                dispatch({
-                                  type: "drawer",
-                                  payload: {
-                                    drawerContent: {
-                                      typeContent: "list",
-                                      content: [
-                                        {
-                                          label: intl.formatMessage({ id: "episode.playNext", defaultMessage: "Play Next" }),
-                                          icon: "addnext",
-                                          fn: () => {
-                                            setMessage(intl.formatMessage({ id: "episode.queuedNext", defaultMessage: "Queued to play next" }));
-                                            playNext(episode.guid);
-                                          },
-                                        },
-                                        {
-                                          label: intl.formatMessage({ id: "episode.addToQueue", defaultMessage: "Add to queue" }),
-                                          icon: "queue",
-                                          fn: () => {
-                                            setMessage(intl.formatMessage({ id: "episode.addedToQueue", defaultMessage: "Added to queue" }));
-                                            playLast(episode.guid);
-                                          },
-                                        },
-                                        {
-                                          label: intl.formatMessage({ id: "episode.markAsPlayed", defaultMessage: "Mark as Played" }),
-                                          fn: () => {
-                                            completeEpisode(episode.guid);
-                                          },
-                                        },
-                                        {
-                                          label: intl.formatMessage({ id: "episode.seeDescription", defaultMessage: "See Description" }),
-                                          icon: "description",
-                                          fn: () => setOpen({ title: episode.title, description: episode.description }),
-                                        },
-                                      ],
-                                    },
-                                    status: true,
-                                  },
-                                });
-                              }}
-                              sx={{
-                                color: iconColor,
-                                backgroundColor: palette ? toRGBA(palette.primary, 0.08) : "transparent",
-                                "&:hover": {
-                                  backgroundColor: palette ? toRGBA(palette.primary, 0.16) : undefined,
-                                },
-                              }}
-                            >
-                              <MoreVertIcon sx={{ color: iconColor }} />
-                            </IconButton>
-
-                            {/* <ShowProgress
-                              guid={episode.guid}
-                              episodeData={episodeData}
-                            /> */}
-                          </ListItemIcon>
-                        </ListItem>
-                        <Divider sx={{ borderColor: toRGBA(palette?.primary, 0.2) }} />
-                      </div>
-                    );
-                  })}
-                </List>
-                {episodes.length > episodeList.length && (
-                  <List sx={{ textAlign: "center" }}>
-                    <Button
-                      onClick={() => setAmount(amount + 1)}
-                      variant="outlined"
-                      style={{ width: "80%" }}
-                      size="large"
-                      sx={{
-                        borderColor: accent,
-                        color: textColor,
-                      }}
-                    >
-                      <FormattedMessage id="episode.loadMore" defaultMessage="Load More Episodes" />
-                    </Button>
-                  </List>
-                )}
-              </>
+                            sx={{
+                              color: iconColor,
+                              backgroundColor: palette ? toRGBA(palette.primary, 0.08) : "transparent",
+                              "&:hover": {
+                                backgroundColor: palette ? toRGBA(palette.primary, 0.16) : undefined,
+                              },
+                            }}
+                          >
+                            <MoreVertIcon sx={{ color: iconColor }} />
+                          </IconButton>
+                        </ListItemIcon>
+                      </ListItem>
+                      <Divider sx={{ borderColor: toRGBA(palette?.primary, 0.2) }} />
+                    </div>
+                  );
+                }}
+              </WarperComponent>
             ) : (
-              <div>
+              <div style={{ textAlign: "center", padding: "2rem" }}>
                 <CircularProgress />
               </div>
             )}
