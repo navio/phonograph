@@ -46,8 +46,8 @@ const PodcastView: React.FC<{ history: { push: (path: string) => void } }> = (pr
   const [stickyOffset, setStickyOffset] = useState(250); // AppBar (48) + title box estimate
   const stickyRef = useCallback((node: HTMLElement | null) => {
     if (node) {
-      // 48px dense AppBar + measured title box height
-      setStickyOffset(48 + node.offsetHeight);
+      // 48px dense AppBar + measured title box height + small buffer
+      setStickyOffset(48 + node.offsetHeight + 4);
     }
   }, []);
 
