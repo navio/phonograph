@@ -29,7 +29,7 @@ const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 const prod = DEBUG ? '' : ''
 
 function PodcastHeader(props) {
-  const { inLibrary, savePodcast, removePodcast } = props;
+  const { inLibrary, savePodcast, removePodcast, stickyRef } = props;
   const theme = useTheme();
   const intl = useIntl();
   const showDesktop = useMediaQuery(theme.breakpoints.up("md"));
@@ -206,6 +206,7 @@ function PodcastHeader(props) {
               </Box>
             </Box>
             <Box
+              ref={stickyRef}
               sx={{
                 px: { xs: 2, md: 4 },
                 pt: { xs: 3, md: 2 },

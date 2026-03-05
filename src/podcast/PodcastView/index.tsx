@@ -1,4 +1,4 @@
-import React, { useRef, useContext, useEffect, useState } from "react";
+import React, { useRef, useContext, useEffect, useState, useCallback } from "react";
 import PodcastEngine from "podcastsuite";
 import Typography from "@mui/material/Typography";
 
@@ -43,6 +43,13 @@ const PodcastView: React.FC<{ history: { push: (path: string) => void } }> = (pr
   const [error, setError] = useState<{ message?: string; error?: unknown }>({});
   const [shouldRefresh, setToRefresh] = useState(Date.now());
   const [palette, setPalette] = useState<Palette | null>(null);
+  const [stickyOffset, setStickyOffset] = useState(250); // AppBar (48) + title box estimate
+  const stickyRef = useCallback((node: HTMLElement | null) => {
+    if (node) {
+      // 48px dense AppBar + measured title box height + small buffer
+      setStickyOffset(48 + node.offsetHeight + 4);
+    }
+  }, []);
 
   const podcastURL = commonRules(bringAPodcast || (global.current as string));
 
@@ -303,6 +310,7 @@ const PodcastView: React.FC<{ history: { push: (path: string) => void } }> = (pr
         removePodcast={removePodcast}
         inLibrary={isPodcastInLibrary}
         palette={global.podcastViewEnabled === false ? null : palette}
+        stickyRef={stickyRef}
       />
       <EpisodeList
         episodes={podcast.items || []}
@@ -315,6 +323,7 @@ const PodcastView: React.FC<{ history: { push: (path: string) => void } }> = (pr
         current={global.current as any}
         shouldRefresh={shouldRefresh}
         palette={global.podcastViewEnabled === false ? null : palette}
+        stickyOffset={stickyOffset}
       />
     </>
   ) : (
