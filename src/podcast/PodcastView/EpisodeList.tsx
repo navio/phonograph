@@ -161,7 +161,7 @@ const EpisodeList = (props) => {
   const [episodeHistory, setEpisodeHistory] = useState({});
   const [open, setOpen] = React.useState(null);
   const [fresh, reFresh] = React.useState(Date.now());
-  const { episodes, podcast, playNext, playLast } = props;
+  const { episodes, podcast, playNext, playLast, stickyOffset = 250 } = props;
   const warperRef = useRef<WarperComponentRef>(null);
   const [message, setMessage] = useState(null);
   // console.log('heree',podcast);
@@ -258,7 +258,12 @@ const EpisodeList = (props) => {
       <Consumer>
         {(state) => (
           <div
-            style={{ background: listBackground }}
+            style={{
+              background: listBackground,
+              position: "sticky",
+              top: stickyOffset,
+              zIndex: theme.zIndex.appBar - 1,
+            }}
             className="episode-list-container"
           >
             <style>{`
@@ -275,7 +280,7 @@ const EpisodeList = (props) => {
                 ref={warperRef}
                 itemCount={episodes.length}
                 estimateSize={() => 72}
-                height="calc(100vh - 280px)"
+                height={`calc(100vh - ${stickyOffset}px)`}
                 overscan={5}
                 loadingPlaceholder={
                   <div style={{ textAlign: "center", padding: "2rem" }}>
