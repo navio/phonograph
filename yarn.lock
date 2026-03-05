@@ -1302,6 +1302,11 @@
   dependencies:
     minipass "^7.0.4"
 
+"@itsmeadarsh/warper@^7.2.0":
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/@itsmeadarsh/warper/-/warper-7.2.0.tgz#ee8cf47b7010fb478f76b215db52f1525440a02a"
+  integrity sha512-/nHRnqvYpRFjpsCtlEuNPkL79gLbIJ/JSLzU1dGNvxqUCI5jldvgM244c2IRwr1f5ILGwYcBTvceYJ3f4QcAig==
+
 "@jridgewell/gen-mapping@^0.3.12", "@jridgewell/gen-mapping@^0.3.5":
   version "0.3.13"
   resolved "https://registry.yarnpkg.com/@jridgewell/gen-mapping/-/gen-mapping-0.3.13.tgz#6342a19f44347518c93e43b1ac69deb3c4656a1f"
