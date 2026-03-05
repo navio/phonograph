@@ -1,5 +1,6 @@
 import PodcastSearcher, { PodcastSearchResponse } from "./PodcastSearcher";
 import { appleCacheKey, getBrowserCached, setBrowserCached } from "./appleBrowserCache";
+import { bestPodcastsCacheKey, getCachedBestPodcasts, setCachedBestPodcasts } from "./popularCache";
 
 export interface PodcastSearchResult {
   title: string;
@@ -45,6 +46,22 @@ export const searchForPodcasts = async function (search?: string): Promise<Podca
       });
   };
 
+  const normalizeListenNotes = (data: PodcastSearchResponse = {} as PodcastSearchResponse): PodcastSearchResult[] => {
+    const { results = [] } = data;
+    return results
+      .filter((podcast) => podcast && podcast.rss)
+      .map((podcast: any) => {
+        const { rss, publisher_original, title_original, thumbnail, genre_ids } = podcast;
+        return {
+          title: title_original,
+          rss,
+          publisher: publisher_original,
+          thumbnail,
+          tag: genre_ids,
+        };
+      });
+  };
+
   const term = (search || "").trim();
   try {
     const cacheKey = appleCacheKey({ kind: "search", term });
@@ -53,8 +70,17 @@ export const searchForPodcasts = async function (search?: string): Promise<Podca
 
     const data = await SFP.apple(term);
     const podcasts = normalizeApple(data);
-    await setBrowserCached(cacheKey, podcasts);
-    return podcasts;
+    if (podcasts.length > 0) {
+      await setBrowserCached(cacheKey, podcasts);
+      return podcasts;
+    }
+  } catch {
+    // fall through to Listen Notes
+  }
+
+  try {
+    const lnData = await SFP.search(term);
+    return normalizeListenNotes(lnData as PodcastSearchResponse);
   } catch {
     return [];
   }
@@ -72,38 +98,81 @@ export const getPopularPodcasts = async function (query: number | null = null): 
     return memory;
   }
 
-  const storefront = "us";
-  const limit = 25;
-  const genre = query === null || query === 0 ? "all" : String(query);
+  // Default view (Top) comes from Apple Marketing Tools.
+  if (query === null) {
+    const storefront = "us";
+    const limit = 25;
+    const cacheKey = appleCacheKey({ kind: "top", storefront, limit, feed: "podcasts" });
+    const cached = await getBrowserCached<PopularPodcastsResponse>(cacheKey);
+    if (cached) return cached;
 
-  // Browser (IndexedDB) cache: 3 days TTL.
-  const cacheKey = appleCacheKey({ kind: "top-podcasts", storefront, genre, limit });
-  const cached = await getBrowserCached<PopularPodcastsResponse>(cacheKey);
-  if (cached) return cached;
+    try {
+      const resp = await fetch(`/apple/rss/${storefront}/podcasts/top/${limit}/podcasts.json`);
+      if (!resp.ok) throw new Error(`Apple top failed: ${resp.status}`);
+      const data = await resp.json();
+      const results = (data && data.feed && data.feed.results) || [];
 
-  try {
-    const resp = await fetch(`/apple/rss/podcasts/${storefront}/top-podcasts/${genre}/${limit}/json`);
-    if (!resp.ok) {
-      throw new Error(`Apple top-podcasts failed: ${resp.status}`);
+      const cleanedCasts: PodcastSearchResult[] = (results || []).map((item: any, num: number) => {
+        const id = item && item.id;
+        const title = item && item.name;
+        const publisher = item && item.artistName;
+        const thumbnail = item && item.artworkUrl100;
+        const itunesUrl = item && item.url;
+        const genres = item && item.genres;
+
+        return {
+          title: `${num + 1}. ${title || ""}`.trim(),
+          rss: "",
+          publisher,
+          thumbnail,
+          tag: genres,
+          appleId: id ? String(id) : undefined,
+          itunesUrl: itunesUrl ? String(itunesUrl) : undefined,
+        } as PodcastSearchResult;
+      });
+
+      const response: PopularPodcastsResponse = {
+        top: cleanedCasts,
+        loading: false,
+        init: 0,
+        name: (data && data.feed && data.feed.title) || "Top",
+      };
+
+      memory = response;
+      await setBrowserCached(cacheKey, response);
+      return response;
+    } catch (error: any) {
+      console.error("getPopularPodcasts (apple top) failed:", error);
+      return { top: [], loading: false, init: 0, name: null, error: true, errorMessage: String(error?.message || error) };
     }
-    const data = await resp.json();
-    const results = (data && (data.feed && data.feed.results)) || data.results || [];
-    const cleanedCasts: PodcastSearchResult[] = (results || []).map((item: any, num: number) => {
-      const id = item && (item.id || item.podcastId || item.collectionId);
-      const title = item && (item.name || item.title || item.trackName);
-      const publisher = item && (item.artistName || item.publisher || item.artist);
-      const thumbnail = item && (item.artworkUrl100 || item.artworkUrl60 || item.thumbnail || item.image);
-      const itunesUrl = item && (item.url || item.itunesUrl || item.link);
-      const genres = item && item.genres;
+  }
 
+  // Genres (and other list views) fall back to Listen Notes.
+  const params = new URLSearchParams({ page: "1", region: "us" });
+  if (query !== null) params.set("genre_id", String(query));
+
+  const lnCacheKey = bestPodcastsCacheKey(query, { region: "us", page: "1" });
+  const cachedLn = await getCachedBestPodcasts(lnCacheKey);
+  if (cachedLn) return cachedLn;
+
+  const URI = "https://www.listennotes.com/c/r/";
+  try {
+    const resp = await fetch(`/ln/best_podcasts?${params}`);
+    if (!resp.ok) throw new Error(`Listen Notes best_podcasts failed: ${resp.status}`);
+    const data = await resp.json();
+    const { podcasts = [], name } = data;
+    const cleanedCasts: PodcastSearchResult[] = podcasts.map((podcast: any, num: number) => {
+      const { title, domain, thumbnail, description, id, total_episodes: episodes, earliest_pub_date_ms: startDate, publisher } = podcast;
+      const rss = `${URI}${id}`;
       return {
-        title: `${num + 1}. ${title || ""}`.trim(),
-        rss: "",
-        publisher,
+        title: `${num + 1}. ${title}`,
         thumbnail,
-        tag: genres,
-        appleId: id ? String(id) : undefined,
-        itunesUrl: itunesUrl ? String(itunesUrl) : undefined,
+        domain,
+        description,
+        rss,
+        episodes,
+        startDate,
+        publisher,
       } as PodcastSearchResult;
     });
 
@@ -112,17 +181,13 @@ export const getPopularPodcasts = async function (query: number | null = null): 
       top: cleanedCasts,
       loading: false,
       init: Number.isFinite(initValue) ? initValue : 0,
-      name: null,
+      name,
     };
 
-    // Keep existing in-memory optimization for the default view.
-    if (!query) memory = response;
-
-    await setBrowserCached(cacheKey, response);
-
+    await setCachedBestPodcasts(lnCacheKey, response);
     return response;
   } catch (error: any) {
-    console.error("getPopularPodcasts failed:", error);
+    console.error("getPopularPodcasts (listennotes) failed:", error);
     const fallbackInit = query !== null ? Number(query) : 0;
     return { top: [], loading: false, init: Number.isFinite(fallbackInit) ? fallbackInit : 0, name: null, error: true, errorMessage: String(error?.message || error) };
   }

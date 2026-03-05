@@ -31,6 +31,21 @@ export default class PodcastSearcher {
     });
   }
 
+  search(term: string): Promise<PodcastSearchResponse> {
+    if (this.currentRequest) this.currentRequest.abort();
+    this.currentRequest = new AbortController();
+    const { signal } = this.currentRequest;
+    return new Promise((accept, reject) =>
+      fetch(`/ln/search?type=podcast&q=${encodeURIComponent(term)}`, { signal })
+        .then((result) => (result.ok && result.json().then(accept).catch(reject)) || reject(result))
+        .catch(reject)
+    );
+  }
+
+  listennotes(term: string): Promise<PodcastSearchResponse> {
+    return this.querySearch(`/ln/typeahead?q=${encodeURIComponent(term)}&show_podcasts=1`);
+  }
+
   apple(term: string): Promise<PodcastSearchResponse> {
     return this.querySearch(`/apple/search?term=${encodeURIComponent(term)}`);
   }

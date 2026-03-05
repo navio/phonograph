@@ -1,20 +1,30 @@
 import React, { useState, useEffect, useMemo } from "react";
 import Chip from "@mui/material/Chip";
 import Box from "@mui/material/Box";
-import { getApplePodcastGenres, PodcastGenre } from "./engine";
 
-const TOP: PodcastGenre = { id: 0, name: "Top", parent_id: null };
+interface Genre {
+  id: number;
+  name: string;
+  parent_id?: number | null;
+}
+
+const TOP: Genre = { id: 0, name: "Top", parent_id: null };
 
 interface GenersProps {
-  onSelectGenre: (genre: PodcastGenre) => void;
+  getPopularPodcasts: (genreId: number) => void;
   selected?: number;
 }
 
-const Geners: React.FC<GenersProps> = ({ onSelectGenre, selected }) => {
-  const [genres, setGenres] = useState<PodcastGenre[]>([]);
+const Geners: React.FC<GenersProps> = ({ getPopularPodcasts, selected }) => {
+  const [genres, setGenres] = useState<Genre[]>([]);
 
   useEffect(() => {
-    getApplePodcastGenres().then(setGenres).catch(() => setGenres([]));
+    import("./genres.json")
+      .then((response) => (response as any).default || response)
+      .then((data: { genres?: Genre[] }) => {
+        const { genres = [] } = data || {};
+        setGenres(genres);
+      });
   }, []);
 
   const sortedGenres = useMemo(() => {
@@ -37,7 +47,7 @@ const Geners: React.FC<GenersProps> = ({ onSelectGenre, selected }) => {
       {sortedGenres.map((genre) => (
         <Chip
           key={genre.id}
-          onClick={() => onSelectGenre(genre)}
+          onClick={() => getPopularPodcasts(genre.id)}
           label={genre.name}
           variant={selected === genre.id ? "filled" : "outlined"}
           color={genre.id === 0 ? "secondary" : "primary"}

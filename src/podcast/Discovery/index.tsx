@@ -26,7 +26,6 @@ import {
   PodcastSearchResult,
   PopularPodcastsResponse,
   resolveApplePodcastFeedUrl,
-  PodcastGenre,
 } from "./engine";
 
 const Header: React.FC = () => (
@@ -104,7 +103,6 @@ interface DiscoverState {
   top: PodcastSearchResult[] | null;
   results: string;
   name: string | null;
-  selectedGenreName?: string | null;
   trendingLoading: boolean;
   trendingError: boolean;
   errorMessage?: string;
@@ -122,7 +120,6 @@ const Discover: React.FC<DiscoverProps> = ({ addPodcastHandler, actionAfterClick
     top: null,
     results: "",
     name: null,
-    selectedGenreName: null,
     trendingLoading: true,
     trendingError: false,
   });
@@ -185,10 +182,8 @@ const Discover: React.FC<DiscoverProps> = ({ addPodcastHandler, actionAfterClick
       .finally(() => setState((prev) => ({ ...prev, loadContent: false })));
   };
 
-  const genreHandler = (genre: PodcastGenre) => {
-    const genreId = genre && genre.id;
+  const genreHandler = (genreId: number) => {
     setState((prev) => ({ ...prev, podcasts: [], results: "", term: "" }));
-    setState((prev) => ({ ...prev, selectedGenreName: genreId === 0 ? null : genre.name }));
     loadTrending(genreId === 0 ? null : genreId);
   };
 
@@ -197,9 +192,7 @@ const Discover: React.FC<DiscoverProps> = ({ addPodcastHandler, actionAfterClick
   const isShowingSearch = podcasts.length > 0;
   const sectionLabel = isShowingSearch
     ? intl.formatMessage({ id: "discover.results", defaultMessage: "Results" })
-    : state.selectedGenreName
-      ? intl.formatMessage({ id: "discover.topGenre", defaultMessage: "Top {genre}" }, { genre: state.selectedGenreName })
-      : intl.formatMessage({ id: "discover.top", defaultMessage: "Top Podcasts" });
+    : state.name || intl.formatMessage({ id: "discover.top", defaultMessage: "Top Podcasts" });
 
   // Show a top-hero carousel when we're not searching and we have at least 3 trending items
   const showHero = !isShowingSearch && !trendingLoading && !trendingError && top && top.length >= 3;
@@ -250,7 +243,7 @@ const Discover: React.FC<DiscoverProps> = ({ addPodcastHandler, actionAfterClick
           <Stack spacing={2} sx={{ maxWidth: 760, mx: "auto", px: 1, pb: 1 }}>
             <Search<PodcastSearchResult> handleChange={searchForPodcasts} updatePodcasts={updatePodcasts} />
             {showHero ? <HeroCarousel items={top!} onItemClick={onPodcastClick} /> : null}
-            <Geners onSelectGenre={genreHandler} selected={state.init} />
+            <Geners getPopularPodcasts={genreHandler} selected={state.init} />
           </Stack>
 
           <Typography variant={"h6"} sx={{ mt: 2, mb: 1 }}>

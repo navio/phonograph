@@ -33,23 +33,41 @@ describe("Discovery Engine", () => {
       expect(results[0].rss).toBe("http://rss.com");
     });
 
-    it("should return [] when Apple search fails", async () => {
+    it("should fall back to Listen Notes when Apple returns empty", async () => {
       mockFetch.mockResolvedValueOnce({
-        ok: false,
-        text: async () => "",
+        ok: true,
+        text: async () => JSON.stringify({ results: [] }),
+      });
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          results: [
+            {
+              rss: "http://ln.com",
+              title_original: "LN Podcast",
+              publisher_original: "LN Artist",
+              thumbnail: "ln.jpg",
+              genre_ids: [1],
+            },
+          ],
+        }),
       });
 
       const results = await searchForPodcasts("test");
-      expect(results).toHaveLength(0);
+      expect(results).toHaveLength(1);
+      expect(results[0].title).toBe("LN Podcast");
+      expect(results[0].rss).toBe("http://ln.com");
     });
   });
 
   describe("getPopularPodcasts", () => {
-    it("should fetch popular podcasts", async () => {
+    it("should fetch Apple top podcasts when query is null", async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           feed: {
+            title: "Top Shows",
             results: [
               {
                 id: "123",
@@ -66,6 +84,7 @@ describe("Discovery Engine", () => {
       const response = await getPopularPodcasts(null);
       expect(response.top).toHaveLength(1);
       expect(response.top[0].title).toBe("1. Popular Cast");
+      expect(response.name).toBe("Top Shows");
     });
 
     it("should handle fetch failure", async () => {
