@@ -274,6 +274,9 @@ const EpisodeList = (props) => {
               .episode-list-container [style*="overflow"]::-webkit-scrollbar {
                 display: none;
               }
+              .episode-list-container [data-warper-inner] {
+                pointer-events: auto !important;
+              }
             `}</style>
             {episodes && episodes.length > 0 ? (
               <WarperComponent
