@@ -235,7 +235,7 @@ function PodcastHeader(props) {
                 const isLong = description.length > 160;
 
                 return (
-                  <Box sx={{ mt: 1, maxWidth: "65ch" }}>
+                  <Box sx={{ mt: 1 }}>
                     <Typography
                       variant="body1"
                       sx={
