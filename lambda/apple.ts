@@ -20,7 +20,13 @@ const json = (statusCode: number, body: unknown, headers?: Record<string, string
 
 export const handler: Handler = async (event) => {
   const rawPath = event.path || "";
-  const splat = rawPath.split("/.netlify/functions/apple/")[1] || "";
+
+  // Netlify will sometimes pass the original path (e.g. /apple/...) and sometimes
+  // the internal functions path (/.netlify/functions/apple/...). Support both.
+  const splat =
+    rawPath.split("/.netlify/functions/apple/")[1] ||
+    rawPath.split("/apple/")[1] ||
+    "";
   const action = splat.split("/")[0] || "";
 
   try {
@@ -28,7 +34,23 @@ export const handler: Handler = async (event) => {
       const rest = splat.replace(/^rss\//, "");
       if (!rest) return json(400, { error: "Missing RSS path" });
 
-      const url = `${APPLE_RSS_BASE}${rest}`;
+      // Apple RSS API format varies in docs/examples:
+      // - recommended: .../{limit}.{format}
+      // - sometimes shown: .../{limit}/{format}
+      // Normalize the latter to the former.
+      const parts = rest.split("/").filter(Boolean);
+      let finalPath = rest;
+      if (parts.length >= 2) {
+        const maybeFormat = parts[parts.length - 1];
+        const maybeLimit = parts[parts.length - 2];
+        const isFormat = maybeFormat === "json" || maybeFormat === "rss";
+        const isLimit = /^[0-9]+$/.test(maybeLimit);
+        if (isFormat && isLimit) {
+          finalPath = [...parts.slice(0, -2), `${maybeLimit}.${maybeFormat}`].join("/");
+        }
+      }
+
+      const url = `${APPLE_RSS_BASE}${finalPath}`;
       const resp = await fetch(url, {
         headers: {
           "User-Agent": "phonograph",
