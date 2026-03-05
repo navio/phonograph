@@ -33,33 +33,14 @@ describe("Discovery Engine", () => {
       expect(results[0].rss).toBe("http://rss.com");
     });
 
-    it("should fall back to Listen Notes if Apple fails (empty)", async () => {
-      // Apple returns empty or error
+    it("should return [] when Apple search fails", async () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         text: async () => "",
       });
 
-      // Listen Notes returns results
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          results: [
-            {
-              rss: "http://ln.com",
-              title_original: "LN Podcast",
-              publisher_original: "LN Artist",
-              thumbnail: "ln.jpg",
-              genre_ids: [1],
-            },
-          ],
-        }),
-      });
-
       const results = await searchForPodcasts("test");
-      expect(results).toHaveLength(1);
-      expect(results[0].title).toBe("LN Podcast");
-      expect(results[0].rss).toBe("http://ln.com");
+      expect(results).toHaveLength(0);
     });
   });
 
@@ -68,29 +49,27 @@ describe("Discovery Engine", () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          podcasts: [
-            {
-              title: "Popular Cast",
-              domain: "domain",
-              thumbnail: "img.jpg",
-              description: "desc",
-              id: "123",
-              total_episodes: 10,
-              earliest_pub_date_ms: 1000,
-              publisher: "Pub",
-            },
-          ],
-          name: "Trending",
+          feed: {
+            results: [
+              {
+                id: "123",
+                name: "Popular Cast",
+                artistName: "Pub",
+                artworkUrl100: "img.jpg",
+                url: "https://podcasts.apple.com/us/podcast/popular/id123",
+              },
+            ],
+          },
         }),
       });
 
       const response = await getPopularPodcasts(null);
       expect(response.top).toHaveLength(1);
       expect(response.top[0].title).toBe("1. Popular Cast");
-      expect(response.name).toBe("Trending");
     });
 
     it("should handle fetch failure", async () => {
+      const spy = vi.spyOn(console, "error").mockImplementation(() => {});
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 500,
@@ -100,6 +79,8 @@ describe("Discovery Engine", () => {
       const response = await getPopularPodcasts(9999);
       expect(response.error).toBe(true);
       expect(response.top).toEqual([]);
+
+      spy.mockRestore();
     });
   });
 });

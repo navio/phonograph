@@ -7,7 +7,7 @@ import { PodcastSearchResult } from "./engine";
 
 interface HeroCarouselProps {
   items: PodcastSearchResult[];
-  onItemClick: (rss: string) => void;
+  onItemClick: (podcast: PodcastSearchResult) => void;
   intervalMs?: number; // milliseconds for auto-advance; if falsy, auto-advance is disabled
 }
 
@@ -184,7 +184,7 @@ const HeroCarousel: React.FC<HeroCarouselProps> = ({ items, onItemClick, interva
           {slides.map((p, i) => (
             <Box key={p.rss || p.title || i} sx={{ scrollSnapAlign: "start", flex: "0 0 100%", px: 0 }}>
               <Card
-                onClick={() => onItemClick(p.rss)}
+                onClick={() => onItemClick(p)}
                 role="button"
                 tabIndex={0}
                 sx={{

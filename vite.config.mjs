@@ -24,6 +24,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '/.netlify/functions/')
       },
+      '/apple': {
+        target: 'http://localhost:9999',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/apple/, '/.netlify/functions/apple')
+      },
       '/rss-full': {
         target: 'http://localhost:9999',
         changeOrigin: true,
