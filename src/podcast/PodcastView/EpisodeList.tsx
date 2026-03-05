@@ -257,12 +257,24 @@ const EpisodeList = (props) => {
       <Description handleClose={handleClose} open={open} />
       <Consumer>
         {(state) => (
-          <div style={{ background: listBackground }}>
+          <div
+            style={{ background: listBackground }}
+            className="episode-list-container"
+          >
+            <style>{`
+              .episode-list-container [style*="overflow"] {
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+              }
+              .episode-list-container [style*="overflow"]::-webkit-scrollbar {
+                display: none;
+              }
+            `}</style>
             {episodes && episodes.length > 0 ? (
               <WarperComponent
                 ref={warperRef}
                 itemCount={episodes.length}
-                estimateSize={() => 88}
+                estimateSize={() => 72}
                 height="calc(100vh - 280px)"
                 overscan={5}
                 loadingPlaceholder={
@@ -282,10 +294,12 @@ const EpisodeList = (props) => {
                   return (
                     <div key={episode.guid}>
                       <ListItem
+                        dense
                         selected={state.playing === episode.guid}
                         sx={{
                           backgroundColor: palette ? toRGBA(palette.primary, 0.12) : "transparent",
                           color: textColor,
+                          py: 0.5,
                         }}
                       >
                         <ListItemIcon>
