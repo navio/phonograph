@@ -9,7 +9,7 @@ self.addEventListener("install", (event) => {
       .open(CORE_CACHE)
       .then((cache) => {
         // Populated by swGenerator.js at build time.
-        return cache.addAll(["/","/index.html","/android-chrome-192x192.png","/android-chrome-512x512.png","/apple-touch-icon.png","/assets/Alert-Ho9PHsCK.js","/assets/Bookmark-CuLPRN6e.js","/assets/Box-6xtEx085.js","/assets/Button-CBwsM5yQ.js","/assets/Card-5sM0Ea55.js","/assets/Chip-DGrW4oxe.js","/assets/Footer-AJWU_zQ8.js","/assets/Grid-Bbc0mj7F.js","/assets/IconButton-Mo8qj0eT.js","/assets/InputLabel-kdtVJIzX.js","/assets/Library-BWPlu1QX.js","/assets/MediaControl-CH2Y9TvG.js","/assets/Playlist-BVcy34ZV.js","/assets/Settings-DPlwCFAr.js","/assets/ToggleButtonGroup-DSWXZwIv.js","/assets/Toolbar-Do1SsA3s.js","/assets/genres-BIHI7g3E.js","/assets/getThemeProps-BVtbYPp6.js","/assets/index-Dw3vdOGA.js","/assets/index-IYgdcH2L.js","/assets/index-d-YJxQtm.js","/assets/phono-BvkXXBod.js","/assets/phono-MQU5S9LX.svg","/assets/podcastPalette-hGHTsg1a.js","/assets/useSlotProps-qa3GVWS3.js","/assets/worker-D2CeV9X9.js","/browserconfig.xml","/favicon-16x16.png","/favicon-32x32.png","/favicon.ico","/loading.svg","/manifest.webmanifest","/mstile-144x144.png","/mstile-150x150.png","/mstile-310x150.png","/mstile-310x310.png","/mstile-70x70.png","/phono.svg","/robots.txt","/safari-pinned-tab.svg"]);
+        return cache.addAll(["/","/index.html","/android-chrome-192x192.png","/android-chrome-512x512.png","/apple-touch-icon.png","/assets/Alert-DQpOxi8r.js","/assets/Bookmark-eKQV8r8q.js","/assets/Box-d0Id9DtW.js","/assets/Button-C5s9_Qq1.js","/assets/Card-C1dmhkvd.js","/assets/Chip-5ujdzoIy.js","/assets/Footer-C_FnZ8Pt.js","/assets/IconButton-BNhp0AnJ.js","/assets/InputLabel-BO1pK9w2.js","/assets/Library-BSJmpB3J.js","/assets/MediaControl-BAzighHs.js","/assets/NightsStay-ZhdBsfmv.js","/assets/Playlist-BLRNaM51.js","/assets/Settings-B-gpHcNW.js","/assets/Toolbar-BuF7zGMS.js","/assets/genres-BIHI7g3E.js","/assets/getThemeProps-D6H5iHiF.js","/assets/index-BLOqWZHN.js","/assets/index-BdmTxJTs.js","/assets/index-C3s066cY.js","/assets/phono-BvkXXBod.js","/assets/phono-MQU5S9LX.svg","/assets/podcastPalette-ClxEuOLx.js","/assets/useSlotProps-5TaRNajk.js","/assets/warper_wasm-BprzSiyn.js","/assets/warper_wasm_bg-imKzLXKO.wasm","/assets/worker-D2CeV9X9.js","/browserconfig.xml","/favicon-16x16.png","/favicon-32x32.png","/favicon.ico","/loading.svg","/manifest.webmanifest","/mstile-144x144.png","/mstile-150x150.png","/mstile-310x150.png","/mstile-310x310.png","/mstile-70x70.png","/phono.svg","/robots.txt","/safari-pinned-tab.svg"]);
       })
       .then(() => self.skipWaiting())
   );
@@ -90,7 +90,9 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
 
   // Cache images (including cross-origin) to avoid repeatedly depending on slow podcast hosts.
-  if (request.destination === "image" && (url.protocol === "http:" || url.protocol === "https:")) {
+  const acceptHeader = request.headers.get("accept") || "";
+  const isImageRequest = request.destination === "image" || acceptHeader.includes("image");
+  if (isImageRequest && (url.protocol === "http:" || url.protocol === "https:")) {
     // Apply a strict cache-first strategy for known artwork hosts to avoid
     // unnecessary network requests when images are already cached.
     if (isArtworkOrigin(url)) {
