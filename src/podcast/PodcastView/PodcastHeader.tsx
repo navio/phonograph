@@ -122,8 +122,7 @@ function PodcastHeader(props) {
             <AppBar
               position="sticky"
               sx={{
-                backgroundColor: theme.palette.primary.main,
-                color: theme.palette.primary.contrastText,
+                WebkitAppRegion: "drag",
                 zIndex: theme.zIndex.appBar + 1,
               }}
             >
@@ -132,9 +131,9 @@ function PodcastHeader(props) {
                   <Grid item xs={6}>
                     <IconButton
                       size="small"
+                      color="inherit"
                       aria-label={intl.formatMessage({ id: "a11y.back", defaultMessage: "Go back" })}
                       onClick={backHandler}
-                      sx={{ color: theme.palette.primary.contrastText }}
                     >
                       <ArrowBackIcon />
                     </IconButton>
@@ -144,7 +143,7 @@ function PodcastHeader(props) {
                       <Tooltip title={intl.formatMessage({ id: "podcast.removeFromLibrary", defaultMessage: "Remove from library" })} placement="bottom">
                         <IconButton
                           size="small"
-                          sx={{ color: theme.palette.primary.contrastText }}
+                          color="inherit"
                           onClick={removeThisPodcastFromLibrary}
                           aria-label={intl.formatMessage({ id: "a11y.removeFromLibrary", defaultMessage: "Remove from Library" })}
                         >
@@ -155,7 +154,7 @@ function PodcastHeader(props) {
                       <Tooltip title={intl.formatMessage({ id: "podcast.addToLibrary", defaultMessage: "Add to Library" })} placement="bottom">
                         <IconButton
                           size="small"
-                          sx={{ color: theme.palette.primary.contrastText }}
+                          color="inherit"
                           onClick={saveThisPodcastToLibrary}
                         >
                           <BookmarkBorderIcon />
@@ -165,7 +164,7 @@ function PodcastHeader(props) {
                     {shareLink && (
                       <Tooltip title={intl.formatMessage({ id: "podcast.sharePodcast", defaultMessage: "Share Podcast" })} placement="bottom">
                         <IconButton
-                          sx={{ color: theme.palette.primary.contrastText }}
+                          color="inherit"
                           size="small"
                           onClick={share(
                             "Phonograph",
