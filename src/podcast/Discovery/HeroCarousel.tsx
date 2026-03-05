@@ -189,26 +189,38 @@ const HeroCarousel: React.FC<HeroCarouselProps> = ({ items, onItemClick, interva
                 tabIndex={0}
                 sx={{
                   display: "flex",
-                  alignItems: "stretch",
-                  flexDirection: { xs: "column", sm: "row" },
+                  alignItems: "center",
+                  flexDirection: "row",
                   width: "100%",
                   overflow: "hidden",
+                  pr: 1,
                 }}
                 elevation={2}
               >
                 <Box
-                  component="img"
-                  src={p.thumbnail}
-                  alt={p.title}
                   sx={{
-                    width: { xs: "100%", sm: 240 },
-                    height: { xs: 140, sm: 140 },
-                    objectFit: "cover",
                     flexShrink: 0,
-                    display: "block",
+                    p: { xs: 1.25, sm: 1.5 },
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
-                />
-                <CardContent sx={{ flex: 1, p: 2 }}>
+                >
+                  <Box
+                    component="img"
+                    src={p.thumbnail}
+                    alt={p.title}
+                    sx={{
+                      width: { xs: 88, sm: 112 },
+                      height: { xs: 88, sm: 112 },
+                      borderRadius: 2,
+                      objectFit: "cover",
+                      display: "block",
+                      backgroundColor: "background.paper",
+                    }}
+                  />
+                </Box>
+                <CardContent sx={{ flex: 1, py: 2, px: { xs: 0.5, sm: 1.5 }, minWidth: 0 }}>
                   <Typography variant="h6" sx={{ fontWeight: 700 }} gutterBottom noWrap>
                     {p.title}
                   </Typography>
