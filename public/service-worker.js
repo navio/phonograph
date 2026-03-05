@@ -2,6 +2,10 @@ const VERSION = "1.11";
 const CORE_CACHE = "phonograph-core-" + VERSION;
 const RUNTIME_CACHE = "phonograph-runtime-" + VERSION;
 const IMAGE_CACHE = "phonograph-images-" + VERSION;
+const APPLE_CACHE = "phonograph-apple-" + VERSION;
+const APPLE_META_CACHE = "phonograph-apple-meta-" + VERSION;
+
+const APPLE_TTL_MS = 1000 * 60 * 60 * 24 * 7;
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -16,7 +20,7 @@ self.addEventListener("install", (event) => {
 });
 
 self.addEventListener("activate", (event) => {
-  const keep = new Set([CORE_CACHE, RUNTIME_CACHE, IMAGE_CACHE]);
+  const keep = new Set([CORE_CACHE, RUNTIME_CACHE, IMAGE_CACHE, APPLE_CACHE, APPLE_META_CACHE]);
   event.waitUntil(
     caches
       .keys()
@@ -46,6 +50,53 @@ const shouldIgnore = (url) => {
   if (pathname.startsWith("/media/")) return true;
   if (pathname.startsWith("/ignoreme/")) return true;
   return false;
+};
+
+const isAppleApiRequest = (url) => url.pathname.startsWith("/apple/");
+
+const metaRequestFor = (requestUrl) => {
+  const u = new URL(requestUrl);
+  u.searchParams.set("__sw_meta", "1");
+  return new Request(u.toString(), { method: "GET" });
+};
+
+const handleAppleApi = async (request) => {
+  const cache = await caches.open(APPLE_CACHE);
+  const metaCache = await caches.open(APPLE_META_CACHE);
+  const metaReq = metaRequestFor(request.url);
+
+  const cached = await cache.match(request);
+  if (cached) {
+    const meta = await metaCache.match(metaReq);
+    if (meta) {
+      try {
+        const data = await meta.json();
+        const cachedAt = Number(data && data.cachedAt);
+        if (Number.isFinite(cachedAt) && Date.now() - cachedAt < APPLE_TTL_MS) {
+          return cached;
+        }
+      } catch {
+        // ignore meta parsing issues
+      }
+    } else {
+      // If we have a response but no meta, treat it as fresh to avoid a network hit.
+      metaCache.put(metaReq, new Response(JSON.stringify({ cachedAt: Date.now() }), { headers: { "Content-Type": "application/json" } })).catch(() => {});
+      return cached;
+    }
+  }
+
+  try {
+    const response = await fetch(request);
+    if (response && response.ok) {
+      cache.put(request, response.clone()).catch(() => {});
+      metaCache
+        .put(metaReq, new Response(JSON.stringify({ cachedAt: Date.now() }), { headers: { "Content-Type": "application/json" } }))
+        .catch(() => {});
+    }
+    return response;
+  } catch {
+    return cached || Response.error();
+  }
 };
 
 // Conservative allowlist of common podcast artwork hosts. Keep this list intentionally
@@ -88,6 +139,12 @@ self.addEventListener("fetch", (event) => {
   if (request.headers.has("range")) return;
 
   const url = new URL(request.url);
+
+  // Apple discovery API (same-origin proxy). Cache for 7 days; never re-hit the same URL within TTL.
+  if (url.origin === self.location.origin && isAppleApiRequest(url)) {
+    event.respondWith(handleAppleApi(request));
+    return;
+  }
 
   // Cache images (including cross-origin) to avoid repeatedly depending on slow podcast hosts.
   const acceptHeader = request.headers.get("accept") || "";

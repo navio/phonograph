@@ -1,5 +1,3 @@
-const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
-
 export interface PodcastSearchResponse {
   results?: Array<Record<string, any>>;
   [key: string]: any;
@@ -7,13 +5,9 @@ export interface PodcastSearchResponse {
 
 export default class PodcastSearcher {
   private currentRequest: AbortController | null;
-  private API: string;
-  private prodProxy: string;
 
-  constructor(API: string) {
+  constructor() {
     this.currentRequest = null;
-    this.API = API;
-    this.prodProxy = !DEBUG ? "/rss-full/?term=" : "";
   }
 
   querySearch(url: string): Promise<PodcastSearchResponse> {
@@ -42,22 +36,17 @@ export default class PodcastSearcher {
     this.currentRequest = new AbortController();
     const { signal } = this.currentRequest;
     return new Promise((accept, reject) =>
-      fetch(`${this.API}search?type=podcast&q=${encodeURIComponent(term)}`, { signal })
-        .then(
-          (result) =>
-            (result.ok && result.json().then(accept).catch(reject)) || reject(result)
-        )
+      fetch(`/ln/search?type=podcast&q=${encodeURIComponent(term)}`, { signal })
+        .then((result) => (result.ok && result.json().then(accept).catch(reject)) || reject(result))
         .catch(reject)
     );
   }
 
   listennotes(term: string): Promise<PodcastSearchResponse> {
-    return this.querySearch(
-      `${this.API}typeahead?q=${encodeURIComponent(term)}&show_podcasts=1`
-    );
+    return this.querySearch(`/ln/typeahead?q=${encodeURIComponent(term)}&show_podcasts=1`);
   }
 
   apple(term: string): Promise<PodcastSearchResponse> {
-    return this.querySearch(`/search/?term=${encodeURIComponent(term)}`);
+    return this.querySearch(`/apple/search?term=${encodeURIComponent(term)}`);
   }
 }

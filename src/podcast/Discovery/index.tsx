@@ -25,6 +25,7 @@ import {
   searchForPodcasts,
   PodcastSearchResult,
   PopularPodcastsResponse,
+  resolveApplePodcastFeedUrl,
 } from "./engine";
 
 const Header: React.FC = () => (
@@ -55,17 +56,14 @@ const getFinalURL = async (url: string): Promise<string> => {
   }
 };
 
-const GridRender: React.FC<{ casts: PodcastSearchResult[]; getClickHandler: (rss: string) => () => void }> = ({
-  casts,
-  getClickHandler,
-}) => (
+const GridRender: React.FC<{ casts: PodcastSearchResult[]; onPodcastClick: (podcast: PodcastSearchResult) => void }> = ({ casts, onPodcastClick }) => (
   <Grid container>
     {casts
       ? casts.map((podcast) => (
           <Grid key={podcast.title} item xs={12} sm={6} md={4} lg={3}>
             <List dense component="nav" aria-label="top podcast" key={podcast.title}>
               <ListItem disablePadding>
-                <ListItemButton onClick={getClickHandler(podcast.rss)}>
+                <ListItemButton onClick={() => onPodcastClick(podcast)}>
                   <img style={{ width: "8em", marginRight: ".5em" }} alt={podcast.title} src={podcast.thumbnail} />
 
                   <ListItemText
@@ -130,9 +128,9 @@ const Discover: React.FC<DiscoverProps> = ({ addPodcastHandler, actionAfterClick
     setState((prev) => ({ ...prev, trendingLoading: true, trendingError: false }));
     getPopularPodcasts(genreId).then((response: PopularPodcastsResponse) => {
       if (response.error) {
-        setState((prev) => ({ ...prev, trendingLoading: false, trendingError: true, init: genreId || 0 }));
+        setState((prev) => ({ ...prev, trendingLoading: false, trendingError: true, init: genreId || 0, errorMessage: response.errorMessage }));
       } else {
-        setState((prev) => ({ ...prev, ...response, trendingLoading: false, trendingError: false }));
+        setState((prev) => ({ ...prev, ...response, trendingLoading: false, trendingError: false, errorMessage: undefined }));
       }
     });
   }, []);
@@ -149,21 +147,44 @@ const Discover: React.FC<DiscoverProps> = ({ addPodcastHandler, actionAfterClick
     setState((prev) => ({ ...prev, podcasts, term: value, results: "" }));
   };
 
-  const getClickHandler = (domain: string) => {
-    return () => {
-      setState((prev) => ({ ...prev, loadContent: true }));
-      getFinalURL(domain)
-        .then((finalDomain) => {
-          setState((prev) => ({ ...prev, loadContent: false }));
-          addPodcastHandler(finalDomain, actionAfterClick);
-        })
-        .catch(console.error);
+  const extractAppleIdFromUrl = (maybeUrl?: string) => {
+    if (!maybeUrl) return null;
+    const m = String(maybeUrl).match(/\/id(\d+)/);
+    return m && m[1] ? m[1] : null;
+  };
+
+  const onPodcastClick = (podcast: PodcastSearchResult) => {
+    setState((prev) => ({ ...prev, loadContent: true, errorMessage: undefined }));
+
+    const go = async () => {
+      let feedUrl = (podcast && podcast.rss) || "";
+      if (!feedUrl) {
+        const id = podcast.appleId || extractAppleIdFromUrl(podcast.itunesUrl) || null;
+        if (id) {
+          const resolved = await resolveApplePodcastFeedUrl(String(id));
+          if (resolved) feedUrl = resolved;
+        }
+      }
+
+      if (!feedUrl) {
+        throw new Error("Could not resolve podcast feed URL");
+      }
+
+      const finalUrl = await getFinalURL(feedUrl);
+      addPodcastHandler(finalUrl, actionAfterClick);
     };
+
+    go()
+      .catch((err) => {
+        console.error(err);
+        setState((prev) => ({ ...prev, errorMessage: String(err?.message || err) }));
+      })
+      .finally(() => setState((prev) => ({ ...prev, loadContent: false })));
   };
 
   const genreHandler = (genreId: number) => {
     setState((prev) => ({ ...prev, podcasts: [], results: "", term: "" }));
-    loadTrending(genreId || null);
+    loadTrending(genreId === 0 ? null : genreId);
   };
 
   const { podcasts, top, results, trendingLoading, trendingError } = state;
@@ -171,7 +192,7 @@ const Discover: React.FC<DiscoverProps> = ({ addPodcastHandler, actionAfterClick
   const isShowingSearch = podcasts.length > 0;
   const sectionLabel = isShowingSearch
     ? intl.formatMessage({ id: "discover.results", defaultMessage: "Results" })
-    : state.name || intl.formatMessage({ id: "discover.trending", defaultMessage: "Trending" });
+    : state.name || intl.formatMessage({ id: "discover.top", defaultMessage: "Top Podcasts" });
 
   // Show a top-hero carousel when we're not searching and we have at least 3 trending items
   const showHero = !isShowingSearch && !trendingLoading && !trendingError && top && top.length >= 3;
@@ -185,7 +206,7 @@ const Discover: React.FC<DiscoverProps> = ({ addPodcastHandler, actionAfterClick
       );
     }
     if (isShowingSearch) {
-      return <GridRender casts={casts} getClickHandler={getClickHandler} />;
+      return <GridRender casts={casts} onPodcastClick={onPodcastClick} />;
     }
     if (trendingLoading) {
       return (
@@ -211,7 +232,7 @@ const Discover: React.FC<DiscoverProps> = ({ addPodcastHandler, actionAfterClick
         </Box>
       );
     }
-    return <GridRender casts={casts} getClickHandler={getClickHandler} />;
+    return <GridRender casts={casts} onPodcastClick={onPodcastClick} />;
   };
 
   return (
@@ -221,7 +242,7 @@ const Discover: React.FC<DiscoverProps> = ({ addPodcastHandler, actionAfterClick
         <CardContent>
           <Stack spacing={2} sx={{ maxWidth: 760, mx: "auto", px: 1, pb: 1 }}>
             <Search<PodcastSearchResult> handleChange={searchForPodcasts} updatePodcasts={updatePodcasts} />
-            {showHero ? <HeroCarousel items={top!} onItemClick={(rss) => getClickHandler(rss)()} /> : null}
+            {showHero ? <HeroCarousel items={top!} onItemClick={onPodcastClick} /> : null}
             <Geners getPopularPodcasts={genreHandler} selected={state.init} />
           </Stack>
 

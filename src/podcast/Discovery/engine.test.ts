@@ -33,14 +33,12 @@ describe("Discovery Engine", () => {
       expect(results[0].rss).toBe("http://rss.com");
     });
 
-    it("should fall back to Listen Notes if Apple fails (empty)", async () => {
-      // Apple returns empty or error
+    it("should fall back to Listen Notes when Apple returns empty", async () => {
       mockFetch.mockResolvedValueOnce({
-        ok: false,
-        text: async () => "",
+        ok: true,
+        text: async () => JSON.stringify({ results: [] }),
       });
 
-      // Listen Notes returns results
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -64,33 +62,33 @@ describe("Discovery Engine", () => {
   });
 
   describe("getPopularPodcasts", () => {
-    it("should fetch popular podcasts", async () => {
+    it("should fetch Apple top podcasts when query is null", async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          podcasts: [
-            {
-              title: "Popular Cast",
-              domain: "domain",
-              thumbnail: "img.jpg",
-              description: "desc",
-              id: "123",
-              total_episodes: 10,
-              earliest_pub_date_ms: 1000,
-              publisher: "Pub",
-            },
-          ],
-          name: "Trending",
+          feed: {
+            title: "Top Shows",
+            results: [
+              {
+                id: "123",
+                name: "Popular Cast",
+                artistName: "Pub",
+                artworkUrl100: "img.jpg",
+                url: "https://podcasts.apple.com/us/podcast/popular/id123",
+              },
+            ],
+          },
         }),
       });
 
       const response = await getPopularPodcasts(null);
       expect(response.top).toHaveLength(1);
       expect(response.top[0].title).toBe("1. Popular Cast");
-      expect(response.name).toBe("Trending");
+      expect(response.name).toBe("Top Shows");
     });
 
     it("should handle fetch failure", async () => {
+      const spy = vi.spyOn(console, "error").mockImplementation(() => {});
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 500,
@@ -100,6 +98,8 @@ describe("Discovery Engine", () => {
       const response = await getPopularPodcasts(9999);
       expect(response.error).toBe(true);
       expect(response.top).toEqual([]);
+
+      spy.mockRestore();
     });
   });
 });
