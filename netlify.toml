@@ -1,7 +1,7 @@
 [build]
   base    = "/"
   publish = "/dist"
-  command = "yarn; yarn build"
+  command = "yarn && VITE_APP_VERSION=$(node -p \"require('./package.json').version\") VITE_COMMIT_REF=$COMMIT_REF VITE_DEPLOY_ID=$DEPLOY_ID yarn build"
   functions = "lambda/"
 
 [build.environment]

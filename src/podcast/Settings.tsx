@@ -23,7 +23,7 @@ import { Button } from "@mui/material";
 import PodcastEngine from "podcastsuite";
 import { AppContext } from "../App";
 import { AppContextValue, PodcastEntry } from "../types/app";
-import { version } from "../../package.json";
+import { APP_COMMIT_REF, APP_VERSION } from "../version";
 
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
@@ -223,7 +223,8 @@ const Settings: React.FC = () => {
           <Typography variant={"h5"}>
             <FormattedMessage id="settings.configurations" defaultMessage="Configurations" />
           </Typography>
-          <FormattedMessage id="settings.version" defaultMessage="Version:" /> {version}
+          <FormattedMessage id="settings.version" defaultMessage="Version:" /> {APP_VERSION}
+          {APP_COMMIT_REF ? ` (${APP_COMMIT_REF.slice(0, 7)})` : ""}
         </CardContent>
       </Card>
 

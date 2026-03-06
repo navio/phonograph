@@ -1,0 +1,53 @@
+name: Bump Version
+
+on:
+  push:
+    branches: [main, master]
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Detect release bump commit
+        id: check
+        run: |
+          msg="$(git log -1 --pretty=%s)"
+          if echo "$msg" | grep -Eiq '^chore\(release\): v?[0-9]+\.[0-9]+\.[0-9]+'; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Bump patch version
+        if: steps.check.outputs.skip != 'true'
+        run: node scripts/bump-version.mjs patch
+
+      - name: Commit and tag
+        if: steps.check.outputs.skip != 'true'
+        run: |
+          next="$(node -p "require('./package.json').version")"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json || true
+          if git diff --cached --quiet; then
+            echo "No version changes to commit."
+            exit 0
+          fi
+          git commit -m "chore(release): v$next"
+          git tag "v$next"
+          git push
+          git push --tags
