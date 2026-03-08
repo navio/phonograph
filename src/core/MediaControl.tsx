@@ -69,6 +69,7 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
   const [showTimer, setShowTimer] = useState(true);
   const [saved, setSaved] = useState(false);
   const [palette, setPalette] = useState<Palette | null>(null);
+  const [thumbHidden, setThumbHidden] = useState(false);
 
   const saveStorage = (value: boolean) => {
     if (typeof localStorage === "undefined") return;
@@ -97,6 +98,14 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
 
   const { media, playing } = state;
   const episodeInfo = state.episodeInfo;
+  const currentPodcast =
+    (state.podcasts || []).find((pod) => pod.domain === state.audioOrigin || pod.url === state.audioOrigin || pod.feed === state.audioOrigin) ||
+    (state.podcasts || []).find((pod) => pod.domain === state.current || pod.url === state.current || pod.feed === state.current);
+  const minimizedImage = state.podcastImage || currentPodcast?.image || null;
+
+  useEffect(() => {
+    setThumbHidden(false);
+  }, [minimizedImage]);
 
   useEffect(() => {
     let active = true;
@@ -401,10 +410,11 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
               }
             }}
           >
-            {state.podcastImage && (
+            {minimizedImage && !thumbHidden && (
               <img
-                src={state.podcastImage}
+                src={minimizedImage}
                 alt="Podcast"
+                onError={() => setThumbHidden(true)}
                 style={{
                   width: "40px",
                   height: "40px",
