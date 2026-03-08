@@ -85,7 +85,7 @@ const App: React.FC = () => {
 
   const systemPrefersDark = prefersDark();
   const resolvedMode = state.theme === "light" ? "light" : state.theme === "dark" ? "dark" : systemPrefersDark ? "dark" : "light";
-  const resolvedName = (state.themeName as string) || "default";
+  const resolvedName = (state.themeName as string) || "nord";
   const finalTheme = createAppTheme(resolvedName as any, resolvedMode as any);
 
   return (

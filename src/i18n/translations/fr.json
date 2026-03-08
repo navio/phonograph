@@ -68,7 +68,7 @@
   "settings.podcastView": "Vue podcast",
   "settings.reloadPodcasts": "Recharger les podcasts enregistrés",
   "settings.resetState": "Réinitialiser l'état",
-  "settings.themeDefault": "Par défaut",
+  "settings.themeLegacy": "Legacy",
   "settings.themeDracula": "Dracula",
   "settings.themeHighContrast": "Contraste élevé",
   "settings.themeNord": "Nord",

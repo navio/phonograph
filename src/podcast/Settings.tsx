@@ -255,13 +255,13 @@ const Settings: React.FC = () => {
               <FormattedMessage id="settings.themePalette" defaultMessage="Theme Palette" />
             </Typography>
             <ToggleButtonGroup
-              value={state.themeName || "default"}
+              value={state.themeName || "nord"}
               exclusive
               onChange={themeNameSwitcher}
               aria-label={intl.formatMessage({ id: "a11y.themePaletteSelector", defaultMessage: "theme palette selector" })}
             >
-              <ToggleButton value={"default"}>
-                <FormattedMessage id="settings.themeDefault" defaultMessage="Default" />
+              <ToggleButton value={"legacy"}>
+                <FormattedMessage id="settings.themeLegacy" defaultMessage="Legacy" />
               </ToggleButton>
               <ToggleButton value={"nord"}>
                 <FormattedMessage id="settings.themeNord" defaultMessage="Nord" />

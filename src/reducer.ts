@@ -104,7 +104,7 @@ export const checkIfMediaSessionLodaded = (state: AppState) => {
 export const defaultState: AppState = {
   podcasts: [],
   theme: true,
-  themeName: "default",
+  themeName: "nord",
   current: null,
 
   status: null,
