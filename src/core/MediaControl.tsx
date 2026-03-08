@@ -69,6 +69,7 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
   const [showTimer, setShowTimer] = useState(true);
   const [saved, setSaved] = useState(false);
   const [palette, setPalette] = useState<Palette | null>(null);
+  const [thumbHidden, setThumbHidden] = useState(false);
 
   const saveStorage = (value: boolean) => {
     if (typeof localStorage === "undefined") return;
@@ -97,6 +98,15 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
 
   const { media, playing } = state;
   const episodeInfo = state.episodeInfo;
+  const podcasts = Array.isArray(state.podcasts) ? state.podcasts : [];
+  const currentPodcast =
+    podcasts.find((pod) => pod.domain === state.audioOrigin || pod.url === state.audioOrigin || pod.feed === state.audioOrigin) ||
+    podcasts.find((pod) => pod.domain === state.current || pod.url === state.current || pod.feed === state.current);
+  const minimizedImage = state.podcastImage || currentPodcast?.image || null;
+
+  useEffect(() => {
+    setThumbHidden(false);
+  }, [minimizedImage]);
 
   useEffect(() => {
     let active = true;
@@ -228,7 +238,7 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
                 borderTop: `1px solid ${paletteStyles.accent}`,
                 backgroundColor: paletteStyles.primary,
                 position: "fixed",
-                zIndex: 2,
+                zIndex: (theme) => theme.zIndex.appBar + 2,
                 height: "3.50rem",
                 display: "flex",
                 alignItems: "center",
@@ -401,6 +411,20 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
               }
             }}
           >
+            {minimizedImage && !thumbHidden && (
+              <img
+                src={minimizedImage}
+                alt="Podcast"
+                onError={() => setThumbHidden(true)}
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "4px",
+                  objectFit: "cover",
+                  flexShrink: 0,
+                }}
+              />
+            )}
             <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: "fit-content" }}>
               <IconButton
                 size="small"
