@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useMemo } from "react";
+import React, { useContext, useState, useEffect, useMemo, useRef } from "react";
 import { Slider, Box } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -61,6 +61,7 @@ interface MediaControlProps {
 const MediaControlCard: React.FC<MediaControlProps> = (props) => {
   const { state, dispatch } = useContext(AppContext) as AppContextValue;
   const [open, setOpen] = useState<boolean>(false);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const theme = useTheme();
   const showExpand = useMediaQuery(theme.breakpoints.up("sm"));
   const history = useHistory();
@@ -205,6 +206,42 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
     props.seek(_ev, percent);
   };
 
+  const setExpanded = (value: boolean) => {
+    saveStorage(value);
+    setOpen(value);
+    try {
+      dispatch({ type: "setPlayerExpanded", payload: value } as any);
+    } catch (_) {
+      // ignore type errors at runtime
+    }
+  };
+
+  const onTouchStart = (event: React.TouchEvent<HTMLElement>) => {
+    if (event.touches.length !== 1) return;
+    const touch = event.touches[0];
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+  };
+
+  const onTouchEnd = (event: React.TouchEvent<HTMLElement>) => {
+    if (!touchStartRef.current || event.changedTouches.length !== 1) return;
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - touchStartRef.current.x;
+    const deltaY = touch.clientY - touchStartRef.current.y;
+    touchStartRef.current = null;
+
+    const swipeThreshold = 56;
+    if (Math.abs(deltaY) < swipeThreshold) return;
+    if (Math.abs(deltaY) < Math.abs(deltaX)) return;
+
+    if (open && deltaY > 0) {
+      setExpanded(false);
+    }
+
+    if (!open && deltaY < 0) {
+      setExpanded(true);
+    }
+  };
+
   useEffect(() => {
     const cleanup = hotkeys(setOpen);
     if (typeof localStorage !== "undefined") {
@@ -220,6 +257,8 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
     <>
       <Card
         variant="outlined"
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
         sx={(theme) =>
           open
             ? {
@@ -250,7 +289,7 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
           <Grid container direction="row-reverse">
             <Grid item sx={{ padding: ".5rem" }}>
               <IconButton
-                onClick={() => { saveStorage(!open); setOpen(false); }}
+                onClick={() => setExpanded(false)}
                 sx={{ color: paletteStyles.text }}
               >
                 <CloseIcon />
@@ -401,14 +440,7 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
             style={{ display: "flex", alignItems: "center", width: "100%", padding: "0 0.75rem", gap: "8px" }}
             onClick={() => {
               // Expand when the minimized bar itself is clicked
-              saveStorage(true);
-              setOpen(true);
-              // Dispatch a semantic action for consumers (no-op if not handled)
-              try {
-                dispatch({ type: "setPlayerExpanded", payload: true } as any);
-              } catch (_) {
-                // ignore type errors at runtime
-              }
+              setExpanded(true);
             }}
           >
             {minimizedImage && !thumbHidden && (
@@ -431,11 +463,7 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
                 onClick={(e) => {
                   e.stopPropagation();
                   // Explicit expand affordance
-                  saveStorage(true);
-                  setOpen(true);
-                  try {
-                    dispatch({ type: "setPlayerExpanded", payload: true } as any);
-                  } catch (_) {}
+                  setExpanded(true);
                 }}
                 sx={{ color: paletteStyles.text }}
                 aria-label="Expand player"
