@@ -238,7 +238,7 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
                 borderTop: `1px solid ${paletteStyles.accent}`,
                 backgroundColor: paletteStyles.primary,
                 position: "fixed",
-                zIndex: 2,
+                zIndex: (theme) => theme.zIndex.appBar + 2,
                 height: "3.50rem",
                 display: "flex",
                 alignItems: "center",
