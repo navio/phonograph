@@ -401,6 +401,19 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
               }
             }}
           >
+            {state.podcastImage && (
+              <img
+                src={state.podcastImage}
+                alt="Podcast"
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "4px",
+                  objectFit: "cover",
+                  flexShrink: 0,
+                }}
+              />
+            )}
             <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: "fit-content" }}>
               <IconButton
                 size="small"
