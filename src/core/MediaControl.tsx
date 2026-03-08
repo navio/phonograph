@@ -98,9 +98,10 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
 
   const { media, playing } = state;
   const episodeInfo = state.episodeInfo;
+  const podcasts = Array.isArray(state.podcasts) ? state.podcasts : [];
   const currentPodcast =
-    (state.podcasts || []).find((pod) => pod.domain === state.audioOrigin || pod.url === state.audioOrigin || pod.feed === state.audioOrigin) ||
-    (state.podcasts || []).find((pod) => pod.domain === state.current || pod.url === state.current || pod.feed === state.current);
+    podcasts.find((pod) => pod.domain === state.audioOrigin || pod.url === state.audioOrigin || pod.feed === state.audioOrigin) ||
+    podcasts.find((pod) => pod.domain === state.current || pod.url === state.current || pod.feed === state.current);
   const minimizedImage = state.podcastImage || currentPodcast?.image || null;
 
   useEffect(() => {
