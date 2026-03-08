@@ -68,7 +68,7 @@
   "settings.podcastView": "播客视图",
   "settings.reloadPodcasts": "重新加载已保存的播客",
   "settings.resetState": "重置状态",
-  "settings.themeDefault": "默认",
+  "settings.themeLegacy": "Legacy",
   "settings.themeDracula": "德古拉",
   "settings.themeHighContrast": "高对比度",
   "settings.themeNord": "Nord",

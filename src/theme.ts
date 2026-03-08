@@ -9,16 +9,16 @@ const base = {
   },
 };
 
-export type ThemeName = "default" | "nord" | "dracula" | "highContrast";
+export type ThemeName = "legacy" | "nord" | "dracula" | "highContrast";
 
 export const prefersDark = (): boolean =>
   typeof window !== "undefined" &&
   window.matchMedia &&
   window.matchMedia("(prefers-color-scheme: dark)").matches;
 
-const createAppTheme = (name: ThemeName = "default", mode: PaletteMode = "light"): Theme => {
+const createAppTheme = (name: ThemeName = "nord", mode: PaletteMode = "light"): Theme => {
   const palettes: Record<ThemeName, { light: any; dark: any }> = {
-    default: {
+    legacy: {
       light: {
         mode: "light",
         primary: blue,
