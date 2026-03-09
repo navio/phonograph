@@ -67,6 +67,7 @@ const SimpleBottomNavigation: React.FC = () => {
   const history = useHistory();
   const location = useLocation();
   const intl = useIntl();
+  const bottomNavHeight = 56;
   const handleRedirect = (url: string) => () => history.push(url);
 
   useEffect(() => hotkeys((url) => history.push(url)), [history]);
@@ -81,8 +82,12 @@ const SimpleBottomNavigation: React.FC = () => {
         sx={{
           position: "fixed",
           bottom: 0,
+          left: 0,
+          right: 0,
           width: "100%",
           borderTop: "1px solid rgba(0, 0, 0, 0.12)",
+          paddingBottom: "env(safe-area-inset-bottom)",
+          zIndex: (theme) => theme.zIndex.appBar,
         }}
         elevation={4}
       >
@@ -90,10 +95,8 @@ const SimpleBottomNavigation: React.FC = () => {
           value={selected}
           showLabels
           sx={{
-            position: "fixed",
-            bottom: 0,
             width: "100%",
-            borderTop: "1px solid rgba(0, 0, 0, 0.12)",
+            height: `${bottomNavHeight}px`,
           }}
         >
           <StyledBottomNavigationAction
@@ -126,7 +129,7 @@ const SimpleBottomNavigation: React.FC = () => {
           />
         </BottomNavigation>
       </Paper>
-      <div style={{ height: 48, width: "100%" }} />
+      <div style={{ height: `calc(${bottomNavHeight}px + env(safe-area-inset-bottom))`, width: "100%" }} />
     </div>
   );
 };
