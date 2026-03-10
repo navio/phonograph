@@ -366,23 +366,50 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
                 <Grid container spacing={2} alignItems="center" justifyContent="center">
                   <Grid item xs={12}>
                     <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "0.75rem 0", width: "100%" }}>
-                      <Slider
-                        value={sliderValue}
-                        max={sliderMax}
-                        onChange={handleSeek}
-                        sx={{ width: "100%", maxWidth: 720, mx: 0, my: 0, color: paletteStyles.accent }}
-                      />
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 2, width: "100%", maxWidth: 720 }}>
+                        <Typography
+                          sx={{
+                            color: paletteStyles.text,
+                            fontSize: theme.typography.body1.fontSize,
+                            fontWeight: theme.typography.fontWeightRegular,
+                            fontVariantNumeric: "tabular-nums",
+                            minWidth: "64px",
+                            textAlign: "left",
+                          }}
+                        >
+                          {formatTime(state.currentTime)}
+                        </Typography>
+                        <Slider
+                          value={sliderValue}
+                          max={sliderMax}
+                          onChange={handleSeek}
+                          sx={{ flex: 1, mx: 0, my: 0, color: paletteStyles.accent }}
+                        />
+                        <Typography
+                          sx={{
+                            color: paletteStyles.subText,
+                            fontSize: theme.typography.body1.fontSize,
+                            fontWeight: theme.typography.fontWeightRegular,
+                            fontVariantNumeric: "tabular-nums",
+                            minWidth: "64px",
+                            textAlign: "right",
+                          }}
+                          variant="caption"
+                        >
+                          {formatRemaining(state.duration, state.currentTime)}
+                        </Typography>
+                      </Box>
 
                       {/* Primary control row */}
                       <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 2, width: "100%", maxWidth: 720, mt: 1 }}>
-                        <IconButton onClick={props.rewind} sx={{ color: paletteStyles.text }}>
-                          <SkipPreviousIcon />
+                        <IconButton onClick={props.rewind} sx={{ color: paletteStyles.text, p: 1 }}>
+                          <SkipPreviousIcon sx={{ fontSize: "3rem" }} />
                         </IconButton>
-                        <IconButton onClick={props.handler} sx={{ color: paletteStyles.text }}>
-                          {state.status === "paused" ? <PlayArrowIcon /> : <PauseIcon />}
+                        <IconButton onClick={props.handler} sx={{ color: paletteStyles.text, p: 1 }}>
+                          {state.status === "paused" ? <PlayArrowIcon sx={{ fontSize: "3.75rem" }} /> : <PauseIcon sx={{ fontSize: "3.75rem" }} />}
                         </IconButton>
-                        <IconButton onClick={props.forward} sx={{ color: paletteStyles.text }}>
-                          <SkipNextIcon />
+                        <IconButton onClick={props.forward} sx={{ color: paletteStyles.text, p: 1 }}>
+                          <SkipNextIcon sx={{ fontSize: "3rem" }} />
                         </IconButton>
                       </Box>
 
@@ -395,39 +422,6 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
                         </IconButton>
                       </Box>
 
-                      <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%", maxWidth: 720, mt: 1 }}>
-                        <Typography
-                          sx={{
-                            color: paletteStyles.text,
-                            fontSize: theme.typography.body1.fontSize,
-                            fontWeight: theme.typography.fontWeightRegular,
-                            fontVariantNumeric: "tabular-nums",
-                          }}
-                        >
-                          {formatTime(state.currentTime)}
-                        </Typography>
-                        <div style={{ textAlign: "right" }}>
-                          <Typography
-                            sx={{
-                              color: paletteStyles.subText,
-                              fontSize: theme.typography.body1.fontSize,
-                              fontWeight: theme.typography.fontWeightRegular,
-                              fontVariantNumeric: "tabular-nums",
-                            }}
-                            variant="caption"
-                          >
-                            {(() => {
-                              const duration = state.duration;
-                              const currentTime = state.currentTime;
-                              if (typeof duration !== "number" || typeof currentTime !== "number") return "∞";
-                              if (!Number.isFinite(duration) || !Number.isFinite(currentTime) || duration <= 0) return "∞";
-
-                              const remaining = Math.max(0, duration - currentTime);
-                              return `- ${formatTime(remaining)}`;
-                            })()}
-                          </Typography>
-                        </div>
-                      </Box>
                     </Box>
                   </Grid>
                 </Grid>
