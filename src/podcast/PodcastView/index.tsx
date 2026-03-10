@@ -280,21 +280,17 @@ const PodcastView: React.FC<{ history: { push: (path: string) => void } }> = (pr
     // If the user has disabled podcast view, don't compute or use palettes.
     if (global.podcastViewEnabled === false) {
       setPalette(null);
-      dispatch({ type: "setPodcastImage", payload: null });
       return;
     }
 
     if (!podcast.image) {
       setPalette(null);
-      dispatch({ type: "setPodcastImage", payload: null });
       return;
     }
     let active = true;
     getImagePalette(podcast.image).then((colors) => {
       if (active) {
         setPalette(colors);
-        // Mirror the podcast artwork into global state so the player can compute the palette too.
-        dispatch({ type: "setPodcastImage", payload: podcast.image });
       }
     });
     return () => {
