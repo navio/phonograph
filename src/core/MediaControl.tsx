@@ -100,14 +100,14 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
   const { media, playing } = state;
   const episodeInfo = state.episodeInfo;
   const podcasts = Array.isArray(state.podcasts) ? state.podcasts : [];
-  const currentPodcast =
-    podcasts.find((pod) => pod.domain === state.audioOrigin || pod.url === state.audioOrigin || pod.feed === state.audioOrigin) ||
-    podcasts.find((pod) => pod.domain === state.current || pod.url === state.current || pod.feed === state.current);
-  const minimizedImage = state.podcastImage || currentPodcast?.image || null;
+  const currentPodcast = podcasts.find(
+    (pod) => pod.domain === state.audioOrigin || pod.url === state.audioOrigin || pod.feed === state.audioOrigin
+  );
+  const activePodcastImage = state.podcastImage || currentPodcast?.image || null;
 
   useEffect(() => {
     setThumbHidden(false);
-  }, [minimizedImage]);
+  }, [activePodcastImage]);
 
   useEffect(() => {
     let active = true;
@@ -120,20 +120,20 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
       };
     }
 
-    if (!state.podcastImage) {
+    if (!activePodcastImage) {
       setPalette(null);
       return () => {
         active = false;
       };
     }
 
-    getImagePalette(state.podcastImage).then((colors) => {
+    getImagePalette(activePodcastImage).then((colors) => {
       if (active) setPalette(colors);
     });
     return () => {
       active = false;
     };
-  }, [state.podcastImage, state.podcastViewEnabled]);
+  }, [activePodcastImage, state.podcastViewEnabled]);
 
   const paletteStyles: PaletteTheme = useMemo(() => {
     if (!palette) {
@@ -318,7 +318,7 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
                       boxShadow: `0 24px 60px ${toRGBA(palette?.primary, 0.35)}`,
                       maxWidth: "460px",
                     }}
-                    src={state.podcastImage}
+                    src={activePodcastImage || undefined}
                   />
                 </Grid>
               </Grid>
@@ -443,9 +443,9 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
               setExpanded(true);
             }}
           >
-            {minimizedImage && !thumbHidden && (
+            {activePodcastImage && !thumbHidden && (
               <img
-                src={minimizedImage}
+                src={activePodcastImage}
                 alt="Podcast"
                 onError={() => setThumbHidden(true)}
                 style={{
