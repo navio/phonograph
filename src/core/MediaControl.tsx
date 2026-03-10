@@ -313,7 +313,7 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
                       width: "100%",
                       display: "block",
                       margin: "0 auto",
-                      paddingBottom: "5vh",
+                      marginBottom: "5vh",
                       borderRadius: "16px",
                       boxShadow: `0 24px 60px ${toRGBA(palette?.primary, 0.35)}`,
                       maxWidth: "460px",

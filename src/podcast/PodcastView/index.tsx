@@ -321,6 +321,7 @@ const PodcastView: React.FC<{ history: { push: (path: string) => void } }> = (pr
         status={global.status as any}
         playing={global.playing as any}
         current={global.current as any}
+        hasPlayer={Boolean(global.episodeInfo)}
         shouldRefresh={shouldRefresh}
         palette={global.podcastViewEnabled === false ? null : palette}
         stickyOffset={stickyOffset}
