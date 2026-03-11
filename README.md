@@ -14,6 +14,16 @@ https://phonograph.app
 # Goals
 Provide a First Class a PWA for Audio Execution. The first release focused on Podcasts.
 
+# Netlify Deploy Previews
+
+Deploy previews are managed natively by Netlify's GitHub integration.
+
+- Open or update a pull request and Netlify creates a Deploy Preview automatically.
+- Netlify updates the PR status as the preview build progresses.
+- Preview comments are configured in Netlify under **Project configuration > Notifications > Deploy notifications**.
+
+This repository intentionally avoids custom GitHub scripts for preview-link comments.
+
 # Todo
 
 App

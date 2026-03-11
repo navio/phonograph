@@ -272,7 +272,7 @@ const MediaControlCard: React.FC<MediaControlProps> = (props) => {
                 zIndex: (theme) => theme.zIndex.appBar + 10,
               }
             : {
-                bottom: "3.50rem",
+                bottom: "calc(3.50rem + env(safe-area-inset-bottom))",
                 width: "100%",
                 borderTop: `1px solid ${paletteStyles.accent}`,
                 backgroundColor: paletteStyles.primary,
