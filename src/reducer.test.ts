@@ -13,15 +13,31 @@ vi.mock("podcastsuite", () => ({
 }));
 
 // Mock window.player
-const mockPlayer = {
+const mockPlayer: Record<string, any> = {
   src: "",
   currentTime: 0,
+  playbackRate: 1.0,
 };
 
+const store: Record<string, string> = {};
+
 beforeEach(() => {
+  mockPlayer.src = "";
+  mockPlayer.currentTime = 0;
+  mockPlayer.playbackRate = 1.0;
+  Object.keys(store).forEach((k) => delete store[k]);
+
   vi.stubGlobal("window", {
     player: mockPlayer,
+    localStorage: {
+      getItem: vi.fn((key: string) => store[key] ?? null),
+      setItem: vi.fn((key: string, value: string) => {
+        store[key] = value;
+      }),
+      removeItem: vi.fn((key: string) => delete store[key]),
+    },
   });
+  vi.stubGlobal("localStorage", (window as any).localStorage);
   vi.stubGlobal("navigator", {
     mediaSession: {
       playbackState: "none",
@@ -119,5 +135,92 @@ describe("completeEpisode", () => {
     expect(newState.media).toBe("");
     expect(newState.playing).toBeNull();
     expect(newState.status).toBeNull();
+  });
+
+  it("should apply skip intro when next episode has no saved position and settings exist", () => {
+    store["podcastSettings"] = JSON.stringify({
+      "https://feed.example.com": { skipIntro: 1.5, skipOutro: 0, defaultSpeed: 1.0 },
+    });
+
+    const startState: AppState = {
+      ...defaultState,
+      playlist: [
+        { media: "next.mp3", currentTime: 0, audioOrigin: "https://feed.example.com" },
+      ] as PlaylistItem[],
+    };
+
+    completeEpisode(startState);
+
+    // skipIntro = 1.5 min → 90 s
+    expect(mockPlayer.currentTime).toBe(90);
+  });
+
+  it("should NOT apply skip intro when next episode has a saved position", () => {
+    store["podcastSettings"] = JSON.stringify({
+      "https://feed.example.com": { skipIntro: 2, skipOutro: 0, defaultSpeed: 1.0 },
+    });
+
+    const startState: AppState = {
+      ...defaultState,
+      playlist: [
+        { media: "next.mp3", currentTime: 300, audioOrigin: "https://feed.example.com" },
+      ] as PlaylistItem[],
+    };
+
+    completeEpisode(startState);
+
+    // Should use saved position, not skip intro
+    expect(mockPlayer.currentTime).toBe(300);
+  });
+
+  it("should apply default speed when transitioning to next playlist item", () => {
+    store["podcastSettings"] = JSON.stringify({
+      "https://feed.example.com": { skipIntro: 0, skipOutro: 0, defaultSpeed: 1.7 },
+    });
+
+    const startState: AppState = {
+      ...defaultState,
+      playlist: [
+        { media: "next.mp3", currentTime: 0, audioOrigin: "https://feed.example.com" },
+      ] as PlaylistItem[],
+    };
+
+    completeEpisode(startState);
+
+    expect(mockPlayer.playbackRate).toBe(1.7);
+  });
+
+  it("should NOT change speed when default speed is 1.0", () => {
+    store["podcastSettings"] = JSON.stringify({
+      "https://feed.example.com": { skipIntro: 0, skipOutro: 0, defaultSpeed: 1.0 },
+    });
+
+    mockPlayer.playbackRate = 2.0; // user had previously set 2x
+
+    const startState: AppState = {
+      ...defaultState,
+      playlist: [
+        { media: "next.mp3", currentTime: 0, audioOrigin: "https://feed.example.com" },
+      ] as PlaylistItem[],
+    };
+
+    completeEpisode(startState);
+
+    // defaultSpeed is 1.0 → condition skips, keeps existing rate
+    expect(mockPlayer.playbackRate).toBe(2.0);
+  });
+
+  it("should work without podcast settings (no audioOrigin)", () => {
+    const startState: AppState = {
+      ...defaultState,
+      playlist: [
+        { media: "next.mp3", currentTime: 0 },
+      ] as PlaylistItem[],
+    };
+
+    completeEpisode(startState);
+
+    expect(mockPlayer.currentTime).toBe(0);
+    expect(mockPlayer.playbackRate).toBe(1.0);
   });
 });

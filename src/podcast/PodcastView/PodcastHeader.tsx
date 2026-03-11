@@ -319,46 +319,50 @@ function PodcastHeader(props) {
                     <FormattedMessage id="podcast.unsubscribe" defaultMessage="Unsubscribe" />
                   </Button>
                 )}
-                <Tooltip
-                  title={intl.formatMessage({
-                    id: "podcastSettings.title",
-                    defaultMessage: "Settings",
-                  })}
-                  placement="bottom"
-                >
-                  <IconButton
-                    size="small"
-                    onClick={() => setSettingsOpen((v) => !v)}
-                    aria-expanded={settingsOpen}
-                    aria-label={intl.formatMessage({
+                {isInLibrary && (
+                  <Tooltip
+                    title={intl.formatMessage({
                       id: "podcastSettings.title",
                       defaultMessage: "Settings",
                     })}
-                    sx={{
-                      color: enabled
-                        ? themeColors?.accentText || textColor
-                        : theme.palette.primary.main,
-                    }}
+                    placement="bottom"
                   >
-                    <TuneIcon />
-                  </IconButton>
-                </Tooltip>
+                    <IconButton
+                      size="small"
+                      onClick={() => setSettingsOpen((v) => !v)}
+                      aria-expanded={settingsOpen}
+                      aria-label={intl.formatMessage({
+                        id: "podcastSettings.title",
+                        defaultMessage: "Settings",
+                      })}
+                      sx={{
+                        color: enabled
+                          ? themeColors?.accentText || textColor
+                          : theme.palette.primary.main,
+                      }}
+                    >
+                      <TuneIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
                 <Typography sx={{ color: subText }}>
                   <b><FormattedMessage id="podcast.episodes" defaultMessage="Episodes:" /></b> {state.items.length}
                 </Typography>
               </Box>
-              {/* Per-podcast settings (collapsible) */}
-              <PodcastSettingsPanel
-                podcastUrl={state.domain || state.url || ""}
-                open={settingsOpen}
-                textColor={textColor}
-                subText={subText}
-                accentColor={
-                  enabled
-                    ? themeColors?.accent || theme.palette.primary.main
-                    : theme.palette.primary.main
-                }
-              />
+              {/* Per-podcast settings (collapsible, subscribed only) */}
+              {isInLibrary && (
+                <PodcastSettingsPanel
+                  podcastUrl={state.domain || state.url || ""}
+                  open={settingsOpen}
+                  textColor={textColor}
+                  subText={subText}
+                  accentColor={
+                    enabled
+                      ? themeColors?.accent || theme.palette.primary.main
+                      : theme.palette.primary.main
+                  }
+                />
+              )}
             </Box>
           </>
         );
