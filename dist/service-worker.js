@@ -2,6 +2,10 @@ const VERSION = "1.11";
 const CORE_CACHE = "phonograph-core-" + VERSION;
 const RUNTIME_CACHE = "phonograph-runtime-" + VERSION;
 const IMAGE_CACHE = "phonograph-images-" + VERSION;
+const APPLE_CACHE = "phonograph-apple-" + VERSION;
+const APPLE_META_CACHE = "phonograph-apple-meta-" + VERSION;
+
+const APPLE_TTL_MS = 1000 * 60 * 60 * 24 * 7;
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -9,14 +13,14 @@ self.addEventListener("install", (event) => {
       .open(CORE_CACHE)
       .then((cache) => {
         // Populated by swGenerator.js at build time.
-        return cache.addAll(["/","/index.html","/android-chrome-192x192.png","/android-chrome-512x512.png","/apple-touch-icon.png","/assets/Alert-Ho9PHsCK.js","/assets/Bookmark-CuLPRN6e.js","/assets/Box-6xtEx085.js","/assets/Button-CBwsM5yQ.js","/assets/Card-5sM0Ea55.js","/assets/Chip-DGrW4oxe.js","/assets/Footer-AJWU_zQ8.js","/assets/Grid-Bbc0mj7F.js","/assets/IconButton-Mo8qj0eT.js","/assets/InputLabel-kdtVJIzX.js","/assets/Library-BWPlu1QX.js","/assets/MediaControl-CH2Y9TvG.js","/assets/Playlist-BVcy34ZV.js","/assets/Settings-DPlwCFAr.js","/assets/ToggleButtonGroup-DSWXZwIv.js","/assets/Toolbar-Do1SsA3s.js","/assets/genres-BIHI7g3E.js","/assets/getThemeProps-BVtbYPp6.js","/assets/index-Dw3vdOGA.js","/assets/index-IYgdcH2L.js","/assets/index-d-YJxQtm.js","/assets/phono-BvkXXBod.js","/assets/phono-MQU5S9LX.svg","/assets/podcastPalette-hGHTsg1a.js","/assets/useSlotProps-qa3GVWS3.js","/assets/worker-D2CeV9X9.js","/browserconfig.xml","/favicon-16x16.png","/favicon-32x32.png","/favicon.ico","/loading.svg","/manifest.webmanifest","/mstile-144x144.png","/mstile-150x150.png","/mstile-310x150.png","/mstile-310x310.png","/mstile-70x70.png","/phono.svg","/robots.txt","/safari-pinned-tab.svg"]);
+        return cache.addAll(["/","/index.html","/android-chrome-192x192.png","/android-chrome-512x512.png","/apple-touch-icon.png","/assets/Alert-5Xj23BFr.js","/assets/Bookmark-D4tDZhBT.js","/assets/Box-DIW-Sde5.js","/assets/Button-CaCJWOdn.js","/assets/Card-BvPQdIXC.js","/assets/Chip-D1m4n-mr.js","/assets/Footer-CgXkG4LO.js","/assets/IconButton-DgU2BvGS.js","/assets/InputLabel-B16Nk4xB.js","/assets/Library-BmNslLyk.js","/assets/MediaControl-jXNjKZyQ.js","/assets/NightsStay-BcNFu5HB.js","/assets/Playlist-CYlqeCst.js","/assets/Settings-Dfo5bCJ5.js","/assets/ToggleButtonGroup-7txxIp5d.js","/assets/Toolbar-BiNy1S--.js","/assets/genres-BIHI7g3E.js","/assets/getThemeProps-uPdpvQUk.js","/assets/index-BZeUhDsM.js","/assets/index-D6E-3vLQ.js","/assets/index-DFfA7fn2.js","/assets/phono-BvkXXBod.js","/assets/phono-MQU5S9LX.svg","/assets/podcastPalette-CLfRQ2ZP.js","/assets/warper_wasm-BprzSiyn.js","/assets/warper_wasm_bg-imKzLXKO.wasm","/assets/worker-D2CeV9X9.js","/browserconfig.xml","/favicon-16x16.png","/favicon-32x32.png","/favicon.ico","/loading.svg","/manifest.webmanifest","/mstile-144x144.png","/mstile-150x150.png","/mstile-310x150.png","/mstile-310x310.png","/mstile-70x70.png","/phono.svg","/robots.txt","/safari-pinned-tab.svg"]);
       })
       .then(() => self.skipWaiting())
   );
 });
 
 self.addEventListener("activate", (event) => {
-  const keep = new Set([CORE_CACHE, RUNTIME_CACHE, IMAGE_CACHE]);
+  const keep = new Set([CORE_CACHE, RUNTIME_CACHE, IMAGE_CACHE, APPLE_CACHE, APPLE_META_CACHE]);
   event.waitUntil(
     caches
       .keys()
@@ -46,6 +50,53 @@ const shouldIgnore = (url) => {
   if (pathname.startsWith("/media/")) return true;
   if (pathname.startsWith("/ignoreme/")) return true;
   return false;
+};
+
+const isAppleApiRequest = (url) => url.pathname.startsWith("/apple/");
+
+const metaRequestFor = (requestUrl) => {
+  const u = new URL(requestUrl);
+  u.searchParams.set("__sw_meta", "1");
+  return new Request(u.toString(), { method: "GET" });
+};
+
+const handleAppleApi = async (request) => {
+  const cache = await caches.open(APPLE_CACHE);
+  const metaCache = await caches.open(APPLE_META_CACHE);
+  const metaReq = metaRequestFor(request.url);
+
+  const cached = await cache.match(request);
+  if (cached) {
+    const meta = await metaCache.match(metaReq);
+    if (meta) {
+      try {
+        const data = await meta.json();
+        const cachedAt = Number(data && data.cachedAt);
+        if (Number.isFinite(cachedAt) && Date.now() - cachedAt < APPLE_TTL_MS) {
+          return cached;
+        }
+      } catch {
+        // ignore meta parsing issues
+      }
+    } else {
+      // If we have a response but no meta, treat it as fresh to avoid a network hit.
+      metaCache.put(metaReq, new Response(JSON.stringify({ cachedAt: Date.now() }), { headers: { "Content-Type": "application/json" } })).catch(() => {});
+      return cached;
+    }
+  }
+
+  try {
+    const response = await fetch(request);
+    if (response && response.ok) {
+      cache.put(request, response.clone()).catch(() => {});
+      metaCache
+        .put(metaReq, new Response(JSON.stringify({ cachedAt: Date.now() }), { headers: { "Content-Type": "application/json" } }))
+        .catch(() => {});
+    }
+    return response;
+  } catch {
+    return cached || Response.error();
+  }
 };
 
 // Conservative allowlist of common podcast artwork hosts. Keep this list intentionally
@@ -89,8 +140,16 @@ self.addEventListener("fetch", (event) => {
 
   const url = new URL(request.url);
 
+  // Apple discovery API (same-origin proxy). Cache for 7 days; never re-hit the same URL within TTL.
+  if (url.origin === self.location.origin && isAppleApiRequest(url)) {
+    event.respondWith(handleAppleApi(request));
+    return;
+  }
+
   // Cache images (including cross-origin) to avoid repeatedly depending on slow podcast hosts.
-  if (request.destination === "image" && (url.protocol === "http:" || url.protocol === "https:")) {
+  const acceptHeader = request.headers.get("accept") || "";
+  const isImageRequest = request.destination === "image" || acceptHeader.includes("image");
+  if (isImageRequest && (url.protocol === "http:" || url.protocol === "https:")) {
     // Apply a strict cache-first strategy for known artwork hosts to avoid
     // unnecessary network requests when images are already cached.
     if (isArtworkOrigin(url)) {
