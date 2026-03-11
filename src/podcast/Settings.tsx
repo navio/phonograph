@@ -431,7 +431,7 @@ const Settings: React.FC = () => {
         <CardContent sx={{ textAlign: "center" }}>
           <Typography variant="h5">Phonograph</Typography>
           <Typography>
-            <FormattedMessage id="settings.developedIn" defaultMessage="is developed with ❤️ in Hoboken, NJ" />
+            <FormattedMessage id="settings.developedIn" defaultMessage="is developed with ❤️ in Jersey City, NJ" />
           </Typography>
         </CardContent>
       </Card>
