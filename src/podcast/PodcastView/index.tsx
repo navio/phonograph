@@ -8,6 +8,7 @@ import useOnline from "../../engine/useOnline";
 import { PODCASTVIEW, DISCOVERVIEW } from "../../constants";
 import { recordEpisode as saveEpisodeState } from "../../reducer";
 import { getImagePalette, Palette } from "../../core/podcastPalette";
+import { getOrCreateGridImage } from "../gridImageCache";
 import Loading from "../../core/Loading";
 import EpisodeList from "./EpisodeList";
 import PodcastHeader from "./PodcastHeader";
@@ -91,6 +92,11 @@ const PodcastView: React.FC<{ history: { push: (path: string) => void } }> = (pr
     const { newPodcast } = result;
     const { items, description, link, created, ...allPodcast } = newPodcast;
 
+    const gridImage = await Promise.race([
+      getOrCreateGridImage(podcastURL, newPodcast.image),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 1500)),
+    ]);
+
     // Preload artwork in background without blocking the UI.
     try {
       const preload = () => {
@@ -108,7 +114,10 @@ const PodcastView: React.FC<{ history: { push: (path: string) => void } }> = (pr
       // noop - preload failures shouldn't block saving
     }
 
-    dispatch({ type: "updatePodcasts", podcasts: [...global.podcasts, allPodcast] });
+    dispatch({
+      type: "updatePodcasts",
+      podcasts: [...global.podcasts, { ...allPodcast, gridImage: gridImage || undefined }],
+    });
   };
 
   const removePodcast = async () => {

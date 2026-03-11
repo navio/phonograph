@@ -19,6 +19,7 @@ export interface PodcastEntry {
   url?: string;
   title?: string;
   image?: string;
+  gridImage?: string;
   author?: string;
   created?: number;
   [key: string]: unknown;

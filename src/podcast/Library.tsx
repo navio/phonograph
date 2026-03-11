@@ -14,6 +14,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 
 import { AppContext } from "../App";
 import { AppContextValue, PodcastEntry } from "../types/app";
+import { getOrCreateGridImage } from "./gridImageCache";
 import phono from "../../public/phono.svg";
 
 interface LibraryProps {
@@ -148,6 +149,56 @@ const LibraryView: React.FC<LibraryProps> = ({ addPodcastHandler, actionAfterSel
     actionAfterSelectPodcast();
   };
 
+  useEffect(() => {
+    const missingThumbnails = podcasts.filter((podcast) => {
+      const hasCacheKey = Boolean((podcast.url || podcast.domain) as string);
+      return hasCacheKey && Boolean(podcast.image) && !podcast.gridImage;
+    });
+
+    if (missingThumbnails.length === 0) return;
+
+    let active = true;
+
+    const backfillGridImages = async () => {
+      const generated = await Promise.all(
+        missingThumbnails.map(async (podcast) => {
+          const cacheKey = (podcast.url || podcast.domain) as string;
+          const thumb = await getOrCreateGridImage(cacheKey, podcast.image as string);
+          if (!thumb) return null;
+          return { cacheKey, thumb };
+        })
+      );
+
+      if (!active) return;
+
+      const updates = generated.filter((entry): entry is { cacheKey: string; thumb: string } => Boolean(entry));
+      if (updates.length === 0) return;
+
+      const byKey = new Map(updates.map((entry) => [entry.cacheKey, entry.thumb]));
+      let hasChanges = false;
+
+      const nextPodcasts = podcasts.map((podcast) => {
+        const cacheKey = (podcast.url || podcast.domain) as string;
+        const thumb = byKey.get(cacheKey);
+        if (!thumb || podcast.gridImage === thumb) {
+          return podcast;
+        }
+        hasChanges = true;
+        return { ...podcast, gridImage: thumb };
+      });
+
+      if (hasChanges) {
+        dispatch({ type: "updatePodcasts", podcasts: nextPodcasts });
+      }
+    };
+
+    void backfillGridImages();
+
+    return () => {
+      active = false;
+    };
+  }, [dispatch, podcasts]);
+
   return (
     <>
       <AppBar sx={{ WebkitAppRegion: "drag" }} position="static">
@@ -186,7 +237,7 @@ const LibraryView: React.FC<LibraryProps> = ({ addPodcastHandler, actionAfterSel
                 <Grid item xs={3} sm={2} md={1} key={domain}>
                   <Card raised>
                     <CardActionArea onClick={() => processClick(domain)}>
-                      <PodcastCover src={(podcast.image as string) || undefined} alt={title} bgColor={bgColor} />
+                      <PodcastCover src={(podcast.gridImage as string) || (podcast.image as string) || undefined} alt={title} bgColor={bgColor} />
                     </CardActionArea>
                   </Card>
                 </Grid>
