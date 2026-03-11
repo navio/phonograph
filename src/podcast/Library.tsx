@@ -14,6 +14,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 
 import { AppContext } from "../App";
 import { AppContextValue, PodcastEntry } from "../types/app";
+import { prefetchSavedPodcasts } from "./prefetchSavedPodcasts";
 import phono from "../../public/phono.svg";
 
 interface LibraryProps {
@@ -121,8 +122,16 @@ const PodcastCover: React.FC<{ src?: string; alt: string; bgColor: string }> = (
 const LibraryView: React.FC<LibraryProps> = ({ addPodcastHandler, actionAfterSelectPodcast }) => {
   const theme = useTheme();
   const intl = useIntl();
-  const { state, dispatch } = useContext(AppContext) as AppContextValue;
+  const { state, dispatch, engine } = useContext(AppContext) as AppContextValue;
   const podcasts = (state.podcasts as PodcastEntry[]) || [];
+
+  useEffect(() => {
+    const domains = podcasts
+      .map((podcast) => podcast.domain)
+      .filter((domain): domain is string => Boolean(domain));
+
+    void prefetchSavedPodcasts(engine as any, domains);
+  }, [engine, podcasts]);
 
   const colorSwatches = useMemo(
     () => [
