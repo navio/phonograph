@@ -24,6 +24,7 @@ jobs:
           python - <<'PY'
           import json
           import os
+          import time
           import urllib.request
 
           token = os.environ.get("NETLIFY_AUTH_TOKEN")
@@ -33,26 +34,37 @@ jobs:
           gh_token = os.environ.get("GITHUB_TOKEN")
 
           if not token or not site_id:
-            raise SystemExit("Missing NETLIFY_AUTH_TOKEN or NETLIFY_SITE_ID.")
+            print("Skipping: missing NETLIFY_AUTH_TOKEN or NETLIFY_SITE_ID.")
+            raise SystemExit(0)
 
-          # Fetch deploy previews for this PR.
-          url = f"https://api.netlify.com/api/v1/sites/{site_id}/deploys?per_page=10"
-          req = urllib.request.Request(url, headers={"Authorization": f"Bearer {token}"})
-          with urllib.request.urlopen(req) as resp:
-            deploys = json.loads(resp.read().decode("utf-8"))
+          if not gh_token:
+            print("Skipping: missing GITHUB_TOKEN.")
+            raise SystemExit(0)
 
           preview = None
-          for deploy in deploys:
-            if str(deploy.get("review_id")) == str(pr_number) and deploy.get("context") == "deploy-preview":
-              preview = deploy
+          url = f"https://api.netlify.com/api/v1/sites/{site_id}/deploys?per_page=30"
+          for _ in range(18):
+            req = urllib.request.Request(url, headers={"Authorization": f"Bearer {token}"})
+            with urllib.request.urlopen(req) as resp:
+              deploys = json.loads(resp.read().decode("utf-8"))
+
+            for deploy in deploys:
+              if str(deploy.get("review_id")) == str(pr_number) and deploy.get("context") == "deploy-preview":
+                preview = deploy
+                break
+
+            if preview:
               break
+            time.sleep(10)
 
           if not preview:
-            raise SystemExit("No deploy preview found yet.")
+            print("No deploy preview found yet; skipping comment update.")
+            raise SystemExit(0)
 
           preview_url = preview.get("deploy_ssl_url") or preview.get("ssl_url") or preview.get("url")
           if not preview_url:
-            raise SystemExit("Deploy preview URL missing.")
+            print("Deploy preview URL missing; skipping comment update.")
+            raise SystemExit(0)
 
           marker = "<!-- netlify-preview -->"
           body = f"{marker}\nNetlify Deploy Preview: {preview_url}"
