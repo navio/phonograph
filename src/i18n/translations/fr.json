@@ -75,5 +75,9 @@
   "settings.themePalette": "Palette de thèmes",
   "settings.themeSelector": "Sélecteur de thème",
   "settings.title": "Paramètres",
-  "settings.version": "Version :"
+  "settings.version": "Version :",
+  "podcastSettings.title": "Paramètres",
+  "podcastSettings.skipStart": "Sauter le début",
+  "podcastSettings.skipEnd": "Sauter la fin",
+  "podcastSettings.defaultSpeed": "Vitesse par défaut"
 }

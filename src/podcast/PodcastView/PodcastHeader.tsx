@@ -17,8 +17,11 @@ import Favorite from "@mui/icons-material/Bookmark";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import ShareIcon from "@mui/icons-material/ShareOutlined";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import TuneIcon from "@mui/icons-material/Tune";
 import Alert from "@mui/material/Alert";
 import { FormattedMessage, useIntl } from "react-intl";
+
+import PodcastSettingsPanel from "./PodcastSettings";
 
 import { clearText } from "./EpisodeList";
 import { Consumer } from "../../App";
@@ -36,10 +39,12 @@ function PodcastHeader(props) {
   const [open, setOpen] = React.useState(false);
   const [message, setMessage] = React.useState("");
   const [descExpanded, setDescExpanded] = React.useState(false);
+  const [settingsOpen, setSettingsOpen] = React.useState(false);
 
   React.useEffect(() => {
     // Reset when switching podcasts
     setDescExpanded(false);
+    setSettingsOpen(false);
   }, [props?.podcast?.domain, props?.podcast?.title]);
 
   let history = useHistory();
@@ -314,10 +319,46 @@ function PodcastHeader(props) {
                     <FormattedMessage id="podcast.unsubscribe" defaultMessage="Unsubscribe" />
                   </Button>
                 )}
+                <Tooltip
+                  title={intl.formatMessage({
+                    id: "podcastSettings.title",
+                    defaultMessage: "Settings",
+                  })}
+                  placement="bottom"
+                >
+                  <IconButton
+                    size="small"
+                    onClick={() => setSettingsOpen((v) => !v)}
+                    aria-expanded={settingsOpen}
+                    aria-label={intl.formatMessage({
+                      id: "podcastSettings.title",
+                      defaultMessage: "Settings",
+                    })}
+                    sx={{
+                      color: enabled
+                        ? themeColors?.accentText || textColor
+                        : theme.palette.primary.main,
+                    }}
+                  >
+                    <TuneIcon />
+                  </IconButton>
+                </Tooltip>
                 <Typography sx={{ color: subText }}>
                   <b><FormattedMessage id="podcast.episodes" defaultMessage="Episodes:" /></b> {state.items.length}
                 </Typography>
               </Box>
+              {/* Per-podcast settings (collapsible) */}
+              <PodcastSettingsPanel
+                podcastUrl={state.domain || state.url || ""}
+                open={settingsOpen}
+                textColor={textColor}
+                subText={subText}
+                accentColor={
+                  enabled
+                    ? themeColors?.accent || theme.palette.primary.main
+                    : theme.palette.primary.main
+                }
+              />
             </Box>
           </>
         );

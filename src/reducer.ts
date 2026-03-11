@@ -1,5 +1,6 @@
 import PS from "podcastsuite";
 import { AppAction, AppState, PlaylistItem } from "./types/app";
+import { getPodcastSettings } from "./podcast/PodcastView/settingsStorage";
 
 const db = PS.createDatabase("history", "podcasts");
 
@@ -27,7 +28,20 @@ export const completeEpisode = (state: AppState): AppState => {
   if (playlist && playlist.length > 0) {
     const nextEpisode = playlist.shift() as PlaylistItem;
     player.src = nextEpisode.media;
-    player.currentTime = nextEpisode.currentTime || 0;
+
+    // ---- Per-podcast settings: skip intro & default speed ----
+    let startTime = nextEpisode.currentTime || 0;
+    const nextOrigin = (nextEpisode as any).audioOrigin;
+    if (nextOrigin) {
+      const podSettings = getPodcastSettings(nextOrigin);
+      if (startTime === 0 && podSettings.skipIntro > 0) {
+        startTime = podSettings.skipIntro * 60;
+      }
+      if (podSettings.defaultSpeed && podSettings.defaultSpeed !== 1.0) {
+        player.playbackRate = podSettings.defaultSpeed;
+      }
+    }
+    player.currentTime = startTime;
 
     return { ...state, ...nextEpisode, playlist, refresh: Date.now() };
   }

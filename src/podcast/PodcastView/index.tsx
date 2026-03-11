@@ -11,6 +11,7 @@ import { getImagePalette, Palette } from "../../core/podcastPalette";
 import Loading from "../../core/Loading";
 import EpisodeList from "./EpisodeList";
 import PodcastHeader from "./PodcastHeader";
+import { getPodcastSettings } from "./settingsStorage";
 
 type Episode = any;
 type Podcast = any;
@@ -224,6 +225,20 @@ const PodcastView: React.FC<{ history: { push: (path: string) => void } }> = (pr
 
       audio.setAttribute("src", proxy + (episode.media || episode.enclosures[0]?.url));
 
+      // ---- Per-podcast settings: skip intro & default speed ----
+      const podSettings = getPodcastSettings(podcastURL);
+      let effectiveCurrentTime = currentTime;
+
+      // If this is a fresh start (no saved position), apply skip-intro
+      if (!currentTime && podSettings.skipIntro > 0) {
+        effectiveCurrentTime = podSettings.skipIntro * 60;
+      }
+
+      // Apply default playback speed for this podcast
+      if (podSettings.defaultSpeed && podSettings.defaultSpeed !== 1.0) {
+        audio.playbackRate = podSettings.defaultSpeed;
+      }
+
       const payload: any = {
         audioOrigin: podcastURL,
         media: episode.enclosures[0].url,
@@ -233,7 +248,7 @@ const PodcastView: React.FC<{ history: { push: (path: string) => void } }> = (pr
         episodeInfo: episode,
         podcastImage: pod.image,
         podcastAuthor: pod.author,
-        currentTime,
+        currentTime: effectiveCurrentTime,
       };
 
       updateMediaSessionState("playing");
@@ -257,8 +272,8 @@ const PodcastView: React.FC<{ history: { push: (path: string) => void } }> = (pr
         payload.playlist = [prevPodcasts, ...playlist];
       }
 
-      if (currentTime) {
-        audio.currentTime = currentTime;
+      if (effectiveCurrentTime) {
+        audio.currentTime = effectiveCurrentTime;
       }
 
       recordEpisode(global);

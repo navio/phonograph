@@ -8,12 +8,17 @@
 // }
 
 import { AppAction, AppState } from "../types/app";
+import { getSettingsForCurrentPodcast } from "../podcast/PodcastView/settingsStorage";
 
 export default function attachEvents(
   player: HTMLAudioElement,
   dispatch: (action: AppAction) => void,
   state: AppState
 ) {
+  // Track the last source for which we applied per-podcast settings so we
+  // only apply skip-intro / default-speed once per episode, not on every
+  // play/resume event.
+  let lastAppliedSrc = "";
   if ("mediaSession" in navigator) {
     navigator.mediaSession.setActionHandler("play", () => {
       player
@@ -45,11 +50,49 @@ export default function attachEvents(
   };
 
   const playTick = () => {
+    // ---- Per-podcast settings: skip intro & default speed ----
+    const isNewSource = player.src !== lastAppliedSrc;
+    const podSettings = getSettingsForCurrentPodcast();
+
+    if (isNewSource && podSettings) {
+      lastAppliedSrc = player.src;
+
+      // Apply default playback speed for this podcast
+      if (podSettings.defaultSpeed && podSettings.defaultSpeed !== 1.0) {
+        player.playbackRate = podSettings.defaultSpeed;
+      }
+
+      // Skip intro: only when the episode just started (currentTime near 0)
+      if (podSettings.skipIntro > 0 && player.currentTime < 2) {
+        player.currentTime = podSettings.skipIntro * 60;
+      }
+    }
+
     dispatch({ type: "playingStatus", status: "playing" });
     tick = setInterval(() => {
       const loaded = player.buffered.length
         ? (100 * player.buffered.end(0)) / player.duration
         : 0;
+
+      // ---- Per-podcast settings: skip outro ----
+      if (
+        podSettings &&
+        podSettings.skipOutro > 0 &&
+        player.duration > 0 &&
+        !isNaN(player.duration)
+      ) {
+        const skipOutroSec = podSettings.skipOutro * 60;
+        const remaining = player.duration - player.currentTime;
+        // Trigger completion when remaining time falls within the skip
+        // window, but only if we've played past the intro zone to avoid
+        // false positives on very short episodes or during seeks.
+        if (remaining > 0 && remaining <= skipOutroSec && player.currentTime > skipOutroSec) {
+          if (tick) clearInterval(tick);
+          dispatch({ type: "audioCompleted" });
+          return;
+        }
+      }
+
       dispatch({
         type: "audioUpdate",
         payload: {
