@@ -52,7 +52,7 @@
   "podcast.subscribe": "S'abonner",
   "settings.configurations": "Configurations",
   "settings.data": "Données",
-  "settings.developedIn": "est développé avec ❤️ à Hoboken, NJ",
+  "settings.developedIn": "est développé avec ❤️ à Jersey City, NJ",
   "settings.enablePodcastView": "Activer la vue podcast",
   "settings.exportOpml": "Exporter OPML",
   "settings.exportSuccess": "{count} podcasts exportés en OPML.",
@@ -75,5 +75,9 @@
   "settings.themePalette": "Palette de thèmes",
   "settings.themeSelector": "Sélecteur de thème",
   "settings.title": "Paramètres",
-  "settings.version": "Version :"
+  "settings.version": "Version :",
+  "podcastSettings.title": "Paramètres",
+  "podcastSettings.skipStart": "Sauter le début",
+  "podcastSettings.skipEnd": "Sauter la fin",
+  "podcastSettings.defaultSpeed": "Vitesse par défaut"
 }

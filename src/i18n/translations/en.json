@@ -52,7 +52,7 @@
   "podcast.subscribe": "Subscribe",
   "settings.configurations": "Configurations",
   "settings.data": "Data",
-  "settings.developedIn": "is developed with ❤️ in Hoboken, NJ",
+  "settings.developedIn": "is developed with ❤️ in Jersey City, NJ",
   "settings.enablePodcastView": "Enable Podcast View",
   "settings.exportOpml": "Export OPML",
   "settings.exportSuccess": "Exported {count} podcasts to OPML.",
@@ -75,5 +75,9 @@
   "settings.themePalette": "Theme Palette",
   "settings.themeSelector": "Theme Selector",
   "settings.title": "Settings",
-  "settings.version": "Version:"
+  "settings.version": "Version:",
+  "podcastSettings.title": "Settings",
+  "podcastSettings.skipStart": "Skip Start",
+  "podcastSettings.skipEnd": "Skip End",
+  "podcastSettings.defaultSpeed": "Default Speed"
 }

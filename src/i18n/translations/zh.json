@@ -52,7 +52,7 @@
   "podcast.subscribe": "订阅",
   "settings.configurations": "配置",
   "settings.data": "数据",
-  "settings.developedIn": "由 Hoboken, NJ 用 ❤️ 开发",
+  "settings.developedIn": "由 Jersey City, NJ 用 ❤️ 开发",
   "settings.enablePodcastView": "启用播客视图",
   "settings.exportOpml": "导出 OPML",
   "settings.exportSuccess": "已导出 {count} 个播客到 OPML。",
@@ -75,5 +75,9 @@
   "settings.themePalette": "主题调色板",
   "settings.themeSelector": "主题选择器",
   "settings.title": "设置",
-  "settings.version": "版本："
+  "settings.version": "版本：",
+  "podcastSettings.title": "设置",
+  "podcastSettings.skipStart": "跳过开头",
+  "podcastSettings.skipEnd": "跳过结尾",
+  "podcastSettings.defaultSpeed": "默认速度"
 }
