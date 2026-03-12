@@ -55,3 +55,14 @@ if (fs.existsSync(lockPath)) {
 }
 
 process.stdout.write(next);
+
+const tauriConfigPath = path.join(repoRoot, "src-tauri", "tauri.conf.json");
+if (fs.existsSync(tauriConfigPath)) {
+  try {
+    const tauriConfig = readJson(tauriConfigPath);
+    tauriConfig.version = next;
+    fs.writeFileSync(tauriConfigPath, JSON.stringify(tauriConfig, null, 2) + "\n");
+  } catch (e) {
+    // Ignore tauri config updates if the file is malformed.
+  }
+}
