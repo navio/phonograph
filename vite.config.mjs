@@ -3,6 +3,8 @@ import react from '@vitejs/plugin-react'
 import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill'
 import { NodeModulesPolyfillPlugin } from '@esbuild-plugins/node-modules-polyfill'
 
+const tauriDevHost = process.env.TAURI_DEV_HOST
+
 export default defineConfig({
   plugins: [react()],
   optimizeDeps: {
@@ -18,6 +20,15 @@ export default defineConfig({
   },
   server: {
     port: 1234,
+    strictPort: true,
+    host: tauriDevHost || undefined,
+    hmr: tauriDevHost
+      ? {
+        protocol: 'ws',
+        host: tauriDevHost,
+        port: 1235,
+      }
+      : undefined,
     proxy: {
       '/api': {
         target: 'http://localhost:9999',
