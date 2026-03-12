@@ -32,7 +32,7 @@ Phonograph is organized around a client runtime and a lightweight serverless pro
 ### 1) Client Runtime (Vite + React + TypeScript)
 
 - **Entry point:** `src/index.tsx`
-  - Boots React 19, internationalization wrapper, router, and service worker registration.
+  - Boots React 19, internationalization wrapper, router, and runtime-specific platform adapter hooks.
 - **App shell:** `src/App.tsx`
   - Sets routes (`/discover`, `/library`, `/podcast`, `/playlist`, `/settings`).
   - Lazily loads heavy views for better startup performance.
@@ -60,7 +60,14 @@ Phonograph is organized around a client runtime and a lightweight serverless pro
   - Episode/podcast detail views: `src/podcast/PodcastView/`
   - Settings/import support: `src/podcast/Settings.tsx`, `src/podcast/opmlImporter.ts`
 
-### 4) Background and Offline Behavior
+### 4) Platform Runtime Adapter (Web + Desktop)
+
+- **Adapter boundary:** `src/platform/`
+  - Selects runtime (`web` or `tauri`) at startup.
+  - Isolates runtime-specific integrations: service worker registration, backend URL resolution, and share URL generation.
+  - Keeps core app flows (`discover`, `library`, `podcast`, `playlist`, `settings`, playback controls) on shared UI/domain modules.
+
+### 5) Background and Offline Behavior
 
 - **Service worker registration:** `src/serviceworker/index.ts`
 - **Worker refresh loop:** `src/serviceworker/worker.ts`
@@ -68,7 +75,7 @@ Phonograph is organized around a client runtime and a lightweight serverless pro
 - **Build-time SW patching:** `swGenerator.js`
   - Rewrites the generated `service-worker.js` precache list from actual `dist/` assets.
 
-### 5) Serverless Proxy Layer (Netlify Functions)
+### 6) Serverless Proxy Layer (Netlify Functions)
 
 Located in `lambda/` and routed via `netlify.toml`:
 
@@ -187,8 +194,12 @@ Build pipeline (`yarn build`) includes:
 
 - `LISTEN_NOTES_API_KEY` (preferred)
 - `LISTENNOTES` / `listennotes` (backward-compatible alternatives)
+- `VITE_DESKTOP_API_ORIGIN` (optional; desktop backend origin, defaults to `https://phonograph.app`)
+- `VITE_PUBLIC_WEB_ORIGIN` (optional; desktop share-link origin, defaults to `https://phonograph.app`)
 
 These are used for discovery/proxy calls that depend on Listen Notes.
+
+Desktop parity status and known follow-up items are tracked in `docs/desktop-parity.md`.
 
 ## Quality and Testing
 
