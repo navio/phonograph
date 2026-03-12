@@ -14,6 +14,7 @@ import {
   PODCASTVIEW,
   DISCOVERVIEW,
   SETTINGSVIEW,
+  DOWNLOADVIEW,
 } from "./constants";
 import playerFunctions from "./engine/player";
 import { getPodcastEngine, checkIfNewPodcastInURL } from "./engine";
@@ -34,6 +35,7 @@ const Playlist = React.lazy(async () => await import("./core/Playlist"));
 const MediaControl = React.lazy(async () => await import("./core/MediaControl"));
 const PodcastView = React.lazy(async () => await import("./podcast/PodcastView"));
 const Footer = React.lazy(async () => await import("./core/Footer"));
+const DesktopDownload = React.lazy(async () => await import("./core/DesktopDownload"));
 
 const Loading = () => (
   <div style={{ margin: "0 auto", display: "block", paddingTop: "40%", textAlign: "center" }}>
@@ -181,6 +183,16 @@ const App: React.FC = () => {
             render={() => (
               <Suspense fallback={<Loading />}>
                 <Settings />
+              </Suspense>
+            )}
+          />
+
+          <Route
+            path={[DOWNLOADVIEW, `${DOWNLOADVIEW}/mac`]}
+            exact
+            render={() => (
+              <Suspense fallback={<Loading />}>
+                <DesktopDownload />
               </Suspense>
             )}
           />

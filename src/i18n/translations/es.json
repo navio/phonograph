@@ -82,7 +82,17 @@
   "podcastSettings.skipEnd": "Saltar final",
   "podcastSettings.defaultSpeed": "Velocidad predeterminada",
   "a11y.openUserManual": "Abrir manual de usuario",
+  "a11y.openDesktopDownloads": "Abrir descargas de escritorio",
+  "download.title": "Descargar aplicación de escritorio",
+  "download.description": "Elige la arquitectura de tu Mac para descargar la última versión de escritorio de Phonograph.",
+  "download.appleSilicon": "Descargar para Apple Silicon",
+  "download.intel": "Descargar para Mac Intel",
+  "download.releaseNotes": "Ver notas de versión",
+  "download.warning": "Si macOS avisa que la app es de un desarrollador no identificado, haz clic derecho en la app y elige Abrir una vez para confiar en ella.",
   "settings.userManual": "Manual de usuario",
   "settings.userManualDescription": "Consulta la documentación oficial de Phonograph para introducción, controles de reproducción y solución de problemas.",
-  "settings.openUserManual": "Abrir manual de usuario"
+  "settings.openUserManual": "Abrir manual de usuario",
+  "settings.desktopApp": "Aplicación de escritorio",
+  "settings.desktopAppDescription": "¿Necesitas la app para macOS? Abre la página de descargas para Apple Silicon e Intel.",
+  "settings.openDesktopDownloads": "Abrir descargas de escritorio"
 }

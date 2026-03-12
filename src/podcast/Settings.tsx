@@ -18,6 +18,7 @@ import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import LinearProgress from "@mui/material/LinearProgress";
 import { FormattedMessage, useIntl } from "react-intl";
+import { useHistory } from "react-router-dom";
 
 import { Button } from "@mui/material";
 import PodcastEngine from "podcastsuite";
@@ -37,6 +38,7 @@ import { initializeLibrary } from "../engine";
 import { exportOpmlWithNativeDialog, hasNativeOpmlDialogs, importOpmlFromNativeDialog } from "../platform/opmlDialogs";
 import { buildOpml, parseOpml } from "./opml";
 import { importFeeds } from "./opmlImporter";
+import { DOWNLOADVIEW } from "../constants";
 
 import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -52,6 +54,7 @@ const USER_MANUAL_URL = "https://phonograph.app/docs/";
 const Settings: React.FC = () => {
   const { state, dispatch, engine } = useContext(AppContext) as AppContextValue;
   const intl = useIntl();
+  const history = useHistory();
 
   const [notice, setNotice] = useState<{ open: boolean; message: string; severity: "success" | "info" | "warning" | "error" }>(
     {
@@ -439,6 +442,28 @@ const Settings: React.FC = () => {
             aria-label={intl.formatMessage({ id: "a11y.openUserManual", defaultMessage: "Open user manual" })}
           >
             <FormattedMessage id="settings.openUserManual" defaultMessage="Open User Manual" />
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card variant="outlined">
+        <CardContent>
+          <Typography variant="h6" gutterBottom>
+            <FormattedMessage id="settings.desktopApp" defaultMessage="Desktop App" />
+          </Typography>
+          <Typography variant="body2" sx={{ mb: 1.5 }}>
+            <FormattedMessage
+              id="settings.desktopAppDescription"
+              defaultMessage="Need the macOS app? Open the download page for Apple Silicon and Intel builds."
+            />
+          </Typography>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => history.push(DOWNLOADVIEW)}
+            aria-label={intl.formatMessage({ id: "a11y.openDesktopDownloads", defaultMessage: "Open desktop downloads" })}
+          >
+            <FormattedMessage id="settings.openDesktopDownloads" defaultMessage="Open Desktop Downloads" />
           </Button>
         </CardContent>
       </Card>
