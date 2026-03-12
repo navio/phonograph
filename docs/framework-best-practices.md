@@ -39,13 +39,13 @@ yarn format:check
 
 ## CI Quality Gates
 
-GitHub Actions now runs quality gates on `main`, `master`, and pull requests:
+GitHub Actions uses a unified web+desktop CI pipeline on `main`, `master`, and pull requests:
 
-1. `yarn typecheck`
-2. `yarn lint:errors`
-3. `yarn test`
+1. Web quality stage: `yarn typecheck`, `yarn lint:errors`, `yarn test`, and `yarn build`.
+2. Pull-request coverage stage: `yarn test:coverage` plus changed-file coverage enforcement.
+3. Desktop quality stage (when `src-tauri/tauri.conf.json` exists): Rust compile validation on Linux/macOS/Windows.
 
-This provides a single standardized signal for merge readiness.
+The final status summary job enforces one standardized merge-readiness signal across all enabled targets.
 
 ## Implementation Guidelines
 
