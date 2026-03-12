@@ -5,8 +5,16 @@ on:
   push:
     branches: [main, master]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-gates-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  quality:
+  web-quality:
+    name: Web lint/test/build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -29,3 +37,201 @@ jobs:
 
       - name: Test
         run: yarn test
+
+      - name: Build web bundle
+        run: yarn bundle
+
+  desktop-compile:
+    name: Desktop compile smoke
+    runs-on: ubuntu-latest
+    outputs:
+      has_desktop: ${{ steps.detect.outputs.has_desktop }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect desktop workspace
+        id: detect
+        shell: bash
+        run: |
+          if [[ -f src-tauri/Cargo.toml && -f src-tauri/tauri.conf.json ]]; then
+            echo "has_desktop=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_desktop=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Node
+        if: steps.detect.outputs.has_desktop == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install desktop dependencies
+        if: steps.detect.outputs.has_desktop == 'true'
+        run: yarn install --frozen-lockfile
+
+      - name: Install desktop Linux system dependencies
+        if: steps.detect.outputs.has_desktop == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgtk-3-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf
+
+          if apt-cache show libwebkit2gtk-4.1-dev >/dev/null 2>&1; then
+            sudo apt-get install -y libwebkit2gtk-4.1-dev
+          else
+            sudo apt-get install -y libwebkit2gtk-4.0-dev
+          fi
+
+      - name: Setup Rust
+        if: steps.detect.outputs.has_desktop == 'true'
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Compile desktop app
+        if: steps.detect.outputs.has_desktop == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if node -e "const scripts = require('./package.json').scripts || {}; process.exit(scripts['desktop:build'] ? 0 : 1);"; then
+            yarn desktop:build -- --no-bundle
+          else
+            cargo check --manifest-path src-tauri/Cargo.toml --locked
+          fi
+
+      - name: Desktop compile summary
+        if: steps.detect.outputs.has_desktop != 'true'
+        run: echo "No src-tauri workspace found; skipping desktop compile smoke."
+
+  desktop-package-smoke:
+    name: Desktop package smoke + artifacts
+    runs-on: ubuntu-latest
+    needs: desktop-compile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        if: needs.desktop-compile.outputs.has_desktop == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install desktop dependencies
+        if: needs.desktop-compile.outputs.has_desktop == 'true'
+        run: yarn install --frozen-lockfile
+
+      - name: Install desktop Linux system dependencies
+        if: needs.desktop-compile.outputs.has_desktop == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgtk-3-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf
+
+          if apt-cache show libwebkit2gtk-4.1-dev >/dev/null 2>&1; then
+            sudo apt-get install -y libwebkit2gtk-4.1-dev
+          else
+            sudo apt-get install -y libwebkit2gtk-4.0-dev
+          fi
+
+      - name: Setup Rust
+        if: needs.desktop-compile.outputs.has_desktop == 'true'
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Package unsigned desktop build
+        if: needs.desktop-compile.outputs.has_desktop == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if node -e "const scripts = require('./package.json').scripts || {}; process.exit(scripts['desktop:build'] ? 0 : 1);"; then
+            yarn desktop:build -- --bundles deb,appimage
+          else
+            cargo build --manifest-path src-tauri/Cargo.toml --release --locked
+          fi
+
+      - name: Collect desktop artifacts
+        id: collect
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p desktop-artifacts
+          if [[ "${{ needs.desktop-compile.outputs.has_desktop }}" == "true" ]]; then
+            if [[ -d src-tauri/target/release/bundle ]]; then
+              cp -R src-tauri/target/release/bundle desktop-artifacts/
+            fi
+
+            if [[ -f src-tauri/target/release/phonograph ]]; then
+              cp src-tauri/target/release/phonograph desktop-artifacts/
+            fi
+
+            if [[ -f src-tauri/target/release/phonograph.exe ]]; then
+              cp src-tauri/target/release/phonograph.exe desktop-artifacts/
+            fi
+
+            {
+              echo "run_id=${GITHUB_RUN_ID}"
+              echo "sha=${GITHUB_SHA}"
+              echo "unsigned=true"
+            } > desktop-artifacts/metadata.txt
+          else
+            {
+              echo "Desktop package smoke skipped."
+              echo "Reason: src-tauri workspace not found in this branch."
+              echo "run_id=${GITHUB_RUN_ID}"
+              echo "sha=${GITHUB_SHA}"
+            } > desktop-artifacts/desktop-smoke-skipped.txt
+          fi
+
+          artifact_count=$(find desktop-artifacts -type f | wc -l | tr -d ' ')
+          echo "artifact_count=$artifact_count" >> "$GITHUB_OUTPUT"
+
+      - name: Upload desktop artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-unsigned-${{ github.run_id }}
+          path: desktop-artifacts
+          if-no-files-found: error
+
+      - name: Ensure desktop artifacts were produced
+        if: needs.desktop-compile.outputs.has_desktop == 'true'
+        shell: bash
+        run: |
+          if [[ "${{ steps.collect.outputs.artifact_count }}" -lt 2 ]]; then
+            echo "Expected desktop binaries/packages plus metadata for QA review."
+            exit 1
+          fi
+
+  merge-gate:
+    name: Merge gate (web + desktop)
+    runs-on: ubuntu-latest
+    needs:
+      - web-quality
+      - desktop-compile
+      - desktop-package-smoke
+    if: always()
+    steps:
+      - name: Enforce required CI outcomes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          web_result="${{ needs.web-quality.result }}"
+          compile_result="${{ needs.desktop-compile.result }}"
+          package_result="${{ needs.desktop-package-smoke.result }}"
+
+          echo "web-quality: $web_result"
+          echo "desktop-compile: $compile_result"
+          echo "desktop-package-smoke: $package_result"
+
+          if [[ "$web_result" != "success" || "$compile_result" != "success" || "$package_result" != "success" ]]; then
+            echo "Merge blocked: web or desktop quality checks failed."
+            exit 1
+          fi
