@@ -207,6 +207,15 @@ Run the local quality gate sequence with:
 yarn quality
 ```
 
+PR CI now enforces a dual-surface quality matrix:
+
+- `web-quality`: typecheck, lint, test, and production web bundle build.
+- `desktop-compile`: desktop compile smoke validation when `src-tauri/` is present.
+- `desktop-package-smoke`: unsigned desktop package smoke build and artifact upload for QA.
+- `merge-gate`: fails when any required web/desktop check fails.
+
+Desktop smoke artifacts are published as `desktop-unsigned-<run_id>` in the Actions run.
+
 Framework and linting standards are documented in `docs/framework-best-practices.md`.
 Current repository includes targeted tests for reducers, engine events, app store behavior, and podcast utilities.
 
