@@ -42,7 +42,16 @@ jobs:
           next="$(node -p "require('./package.json').version")"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package.json package-lock.json src-tauri/tauri.conf.json src-tauri/Cargo.toml || true
+          git add package.json package-lock.json
+
+          if [ -f src-tauri/tauri.conf.json ]; then
+            git add src-tauri/tauri.conf.json
+          fi
+
+          if [ -f src-tauri/Cargo.toml ]; then
+            git add src-tauri/Cargo.toml
+          fi
+
           if git diff --cached --quiet; then
             echo "No version changes to commit."
             exit 0
