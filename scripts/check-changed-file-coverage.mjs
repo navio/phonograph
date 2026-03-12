@@ -65,6 +65,7 @@ const changedFiles = getChangedFiles()
 
 const changedSourceFiles = changedFiles
   .filter((filePath) => /^src\/.+\.(js|jsx|ts|tsx)$/.test(filePath))
+  .filter((filePath) => !/\.d\.ts$/.test(filePath))
   .filter((filePath) => !/(\.test|\.spec)\.(js|jsx|ts|tsx)$/.test(filePath));
 
 if (changedSourceFiles.length === 0) {
