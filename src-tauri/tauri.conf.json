@@ -1,0 +1,39 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Phonograph",
+  "version": "1.3.18",
+  "identifier": "app.phonograph.desktop",
+  "build": {
+    "beforeDevCommand": "yarn start --host 0.0.0.0 --port 1420",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "yarn bundle",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Phonograph",
+        "width": 1280,
+        "height": 800,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["app", "msi", "nsis", "appimage", "deb"],
+    "icon": [
+      "../public/android-chrome-192x192.png",
+      "../public/android-chrome-512x512.png",
+      "../public/apple-touch-icon.png",
+      "../public/favicon.ico"
+    ],
+    "shortDescription": "Open source podcast player for web and desktop.",
+    "longDescription": "Phonograph desktop runtime built from the same web application with signed installer artifacts.",
+    "category": "Music"
+  }
+}
