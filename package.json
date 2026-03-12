@@ -42,6 +42,12 @@
     "docs:manuals:build": "vitepress build manuals --outDir dist/docs",
     "docs:manuals:preview": "vitepress preview manuals",
     "typecheck": "tsc --noEmit",
+    "lint": "biome lint src lambda scripts vite.config.mjs vitest.config.mjs swGenerator.js proxy.js --files-ignore-unknown=true --max-diagnostics=200",
+    "lint:errors": "biome lint src lambda scripts vite.config.mjs vitest.config.mjs swGenerator.js proxy.js --files-ignore-unknown=true --diagnostic-level=error",
+    "lint:fix": "biome lint src lambda scripts vite.config.mjs vitest.config.mjs swGenerator.js proxy.js --write --unsafe --files-ignore-unknown=true --max-diagnostics=200",
+    "format": "biome format . --write --files-ignore-unknown=true",
+    "format:check": "biome format . --files-ignore-unknown=true",
+    "quality": "yarn typecheck && yarn lint:errors && yarn test",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
@@ -58,6 +64,7 @@
     "public": "/public/"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.4.6",
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
     "@formatjs/cli": "^6.13.0",
