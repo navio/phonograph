@@ -49,6 +49,8 @@ const shouldIgnore = (url) => {
   if (pathname.startsWith("/image/")) return true;
   if (pathname.startsWith("/media/")) return true;
   if (pathname.startsWith("/ignoreme/")) return true;
+  if (pathname === "/docs") return true;
+  if (pathname.startsWith("/docs/")) return true;
   return false;
 };
 
