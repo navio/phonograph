@@ -46,6 +46,8 @@ import FormControl from "@mui/material/FormControl";
 
 import { SUPPORTED_LOCALES, LOCALE_LABELS, getBrowserLocale, type SupportedLocale } from "../i18n/locale";
 
+const USER_MANUAL_URL = "https://phonograph.app/docs/";
+
 const Settings: React.FC = () => {
   const { state, dispatch, engine } = useContext(AppContext) as AppContextValue;
   const intl = useIntl();
@@ -371,6 +373,31 @@ const Settings: React.FC = () => {
               />
             </div>
           ) : null}
+        </CardContent>
+      </Card>
+
+      <Card variant="outlined">
+        <CardContent>
+          <Typography variant="h6" gutterBottom>
+            <FormattedMessage id="settings.userManual" defaultMessage="User Manual" />
+          </Typography>
+          <Typography variant="body2" sx={{ mb: 1.5 }}>
+            <FormattedMessage
+              id="settings.userManualDescription"
+              defaultMessage="Read the official Phonograph docs for onboarding, playback controls, and troubleshooting."
+            />
+          </Typography>
+          <Button
+            variant="outlined"
+            color="primary"
+            component="a"
+            href={USER_MANUAL_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={intl.formatMessage({ id: "a11y.openUserManual", defaultMessage: "Open user manual" })}
+          >
+            <FormattedMessage id="settings.openUserManual" defaultMessage="Open User Manual" />
+          </Button>
         </CardContent>
       </Card>
 
