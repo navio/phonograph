@@ -55,6 +55,7 @@
   "settings.developedIn": "由 Jersey City, NJ 用 ❤️ 开发",
   "settings.enablePodcastView": "启用播客视图",
   "settings.exportOpml": "导出 OPML",
+  "settings.exportFailed": "导出 OPML 失败。",
   "settings.exportSuccess": "已导出 {count} 个播客到 OPML。",
   "settings.importExport": "导入 / 导出 (OPML)",
   "settings.importFailed": "导入 OPML 失败。",
