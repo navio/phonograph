@@ -194,6 +194,20 @@ Validate the pull-request changed-file coverage gate (70% minimum across lines/f
 COVERAGE_BASE_REF=origin/master yarn coverage:changed
 ```
 
+Run lint checks with:
+
+```bash
+yarn lint
+yarn lint:errors
+```
+
+Run the local quality gate sequence with:
+
+```bash
+yarn quality
+```
+
+Framework and linting standards are documented in `docs/framework-best-practices.md`.
 Current repository includes targeted tests for reducers, engine events, app store behavior, and podcast utilities.
 
 ## Roadmap Direction
