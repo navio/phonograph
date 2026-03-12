@@ -41,6 +41,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "coverage:changed": "node scripts/check-changed-file-coverage.mjs",
     "SEO": "cp ./public/robots.txt ./dist/robots.txt",
     "bundle": "vite build",
     "lambda:build": "netlify functions:build --src ./lambda --functions .netlify/functions-dist",
@@ -72,6 +74,7 @@
     "netlify-cli": "^23.4.3",
     "typescript": "^5.9.3",
     "vite": "^5.0.0",
+    "@vitest/coverage-v8": "^4.0.18",
     "vitest": "^4.0.18"
   },
   "config": {

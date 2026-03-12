@@ -166,6 +166,18 @@ Run tests with:
 yarn test
 ```
 
+Run coverage locally with:
+
+```bash
+yarn test:coverage
+```
+
+Validate the pull-request changed-file coverage gate (70% minimum across lines/functions/branches/statements):
+
+```bash
+COVERAGE_BASE_REF=origin/master yarn coverage:changed
+```
+
 Current repository includes targeted tests for reducers, engine events, app store behavior, and podcast utilities.
 
 ## Roadmap Direction
