@@ -58,6 +58,10 @@ jobs:
             git add src-tauri/Cargo.toml
           fi
 
+          if [ -f src-tauri/Cargo.lock ]; then
+            git add src-tauri/Cargo.lock
+          fi
+
           if git diff --cached --quiet; then
             echo "No version changes to commit."
             exit 0

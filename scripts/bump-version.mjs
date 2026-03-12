@@ -32,9 +32,39 @@ const bump = (version, type) => {
   return `${major}.${minor}.${patch + 1}`;
 };
 
+const parseCargoPackageName = (cargoToml) => {
+  const match = cargoToml.match(/^name\s*=\s*"([^"]+)"$/m);
+  if (!match) {
+    throw new Error("Unable to determine Cargo package name from src-tauri/Cargo.toml");
+  }
+
+  return match[1];
+};
+
+const syncCargoLockVersion = ({ cargoLockPath, cargoPackageName, version }) => {
+  if (!fs.existsSync(cargoLockPath)) {
+    return;
+  }
+
+  const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const escapedPackageName = escapeRegex(cargoPackageName);
+  const cargoLock = fs.readFileSync(cargoLockPath, "utf8");
+  const packageVersionPattern = new RegExp(
+    `(\\[\\[package\\]\\][\\r\\n]+name = \"${escapedPackageName}\"[\\r\\n]+version = \"")[^"]+(\")`,
+    "m",
+  );
+
+  const updatedCargoLock = cargoLock.replace(packageVersionPattern, `$1${version}$2`);
+
+  if (updatedCargoLock !== cargoLock) {
+    fs.writeFileSync(cargoLockPath, updatedCargoLock);
+  }
+};
+
 const syncDesktopVersion = (version) => {
   const tauriConfigPath = path.join(repoRoot, "src-tauri", "tauri.conf.json");
   const cargoTomlPath = path.join(repoRoot, "src-tauri", "Cargo.toml");
+  const cargoLockPath = path.join(repoRoot, "src-tauri", "Cargo.lock");
 
   if (!fs.existsSync(tauriConfigPath) || !fs.existsSync(cargoTomlPath)) {
     return;
@@ -47,11 +77,14 @@ const syncDesktopVersion = (version) => {
   }
 
   const cargoToml = fs.readFileSync(cargoTomlPath, "utf8");
+  const cargoPackageName = parseCargoPackageName(cargoToml);
   const updatedCargoToml = cargoToml.replace(/^(version\s*=\s*").*(")$/m, `$1${version}$2`);
 
   if (updatedCargoToml !== cargoToml) {
     fs.writeFileSync(cargoTomlPath, updatedCargoToml);
   }
+
+  syncCargoLockVersion({ cargoLockPath, cargoPackageName, version });
 };
 
 const pkgPath = path.join(repoRoot, "package.json");
@@ -71,7 +104,7 @@ if (fs.existsSync(lockPath)) {
       lock.packages[""].version = next;
     }
     writeJson(lockPath, lock);
-  } catch (e) {
+  } catch (error) {
     // Ignore lockfile updates if it's malformed/out of date.
   }
 }
