@@ -7,6 +7,8 @@ It combines a modern React frontend, a resilient browser playback engine, and Ne
 
 **Production URL:** https://phonograph.app
 
+**User manual:** https://phonograph.app/docs/
+
 ## Mission
 
 Deliver a first-class, fast, and reliable audio experience on the web with strong mobile/PWA behavior.
@@ -104,6 +106,7 @@ lambda/            # Netlify Functions
 public/            # Static assets copied to dist/
 dist/              # Production build output
 docs/              # Planning and migration docs
+manuals/           # User-facing manual source (VitePress)
 ```
 
 ## Local Development
@@ -143,13 +146,26 @@ yarn build
 yarn serve
 ```
 
+Build manuals only:
+
+```bash
+yarn docs:manuals:build
+```
+
+Run manuals locally:
+
+```bash
+yarn docs:manuals:dev
+```
+
 Build pipeline (`yarn build`) includes:
 
 1. Fetching discovery JSON assets (`filegetter.sh`)
 2. Vite production build
 3. SEO/static file copy
 4. Service worker precache rewrite
-5. Netlify function build
+5. User manual static build to `/dist/docs`
+6. Netlify function build
 
 ## Environment Variables
 
