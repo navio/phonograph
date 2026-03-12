@@ -79,5 +79,9 @@
   "podcastSettings.title": "Settings",
   "podcastSettings.skipStart": "Skip Start",
   "podcastSettings.skipEnd": "Skip End",
-  "podcastSettings.defaultSpeed": "Default Speed"
+  "podcastSettings.defaultSpeed": "Default Speed",
+  "a11y.openUserManual": "Open user manual",
+  "settings.userManual": "User Manual",
+  "settings.userManualDescription": "Read the official Phonograph docs for onboarding, playback controls, and troubleshooting.",
+  "settings.openUserManual": "Open User Manual"
 }
