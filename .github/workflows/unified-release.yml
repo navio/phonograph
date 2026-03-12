@@ -57,15 +57,18 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Build web distribution
+        id: web_build
         run: yarn build
 
       - name: Archive web distribution
+        id: web_archive
         run: |
           archive="phonograph-web-${GITHUB_REF_NAME}.tar.gz"
           tar -czf "$archive" dist
           echo "WEB_RELEASE_ARCHIVE=$archive" >> "$GITHUB_ENV"
 
       - name: Publish web release artifact
+        id: web_publish
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
@@ -80,7 +83,13 @@ jobs:
         run: |
           {
             echo "## Web release"
-            echo "- Uploaded ${WEB_RELEASE_ARCHIVE} to release ${GITHUB_REF_NAME}."
+            echo "- Build: ${{ steps.web_build.outcome }}"
+            echo "- Archive: ${{ steps.web_archive.outcome }}"
+            echo "- Publish release asset: ${{ steps.web_publish.outcome }}"
+            echo "- Job result: ${{ job.status }}"
+            if [ -n "${WEB_RELEASE_ARCHIVE:-}" ]; then
+              echo "- Release asset: ${WEB_RELEASE_ARCHIVE}"
+            fi
           } >> "$GITHUB_STEP_SUMMARY"
 
   desktop_release:
@@ -122,6 +131,7 @@ jobs:
 
       - name: Prepare Apple API key
         if: matrix.os == 'macos-latest'
+        shell: bash
         env:
           APPLE_API_PRIVATE_KEY: ${{ secrets.APPLE_API_PRIVATE_KEY }}
           APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
@@ -136,6 +146,7 @@ jobs:
           echo "APPLE_API_KEY_PATH=$key_file" >> "$GITHUB_ENV"
 
       - name: Validate desktop signing configuration
+        id: desktop_signing
         env:
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
@@ -148,6 +159,7 @@ jobs:
         run: node scripts/validate-desktop-signing-env.mjs --force
 
       - name: Build and publish signed desktop bundles
+        id: desktop_build_publish
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -170,10 +182,13 @@ jobs:
 
       - name: Report desktop release status
         if: always()
+        shell: bash
         run: |
           {
             echo "## Desktop release (${{ matrix.os }})"
-            echo "- Desktop release job completed with signed artifacts."
+            echo "- Signing validation: ${{ steps.desktop_signing.outcome }}"
+            echo "- Build + publish: ${{ steps.desktop_build_publish.outcome }}"
+            echo "- Job result: ${{ job.status }}"
           } >> "$GITHUB_STEP_SUMMARY"
 
   release_status:
