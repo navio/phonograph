@@ -27,6 +27,7 @@ import { clearText } from "./EpisodeList";
 import { Consumer } from "../../App";
 import { useHistory } from "react-router-dom";
 import { buildThemeFromPalette, toRGBA } from "../../core/podcastPalette";
+import platform from "../../platform";
 
 const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 const prod = DEBUG ? '' : ''
@@ -174,7 +175,7 @@ function PodcastHeader(props) {
                           onClick={share(
                             "Phonograph",
                             state.title,
-                            `${document.location.origin}/podcast/${makeMeAHash(state.domain)}`
+                            platform.resolveShareUrl(`/podcast/${makeMeAHash(state.domain)}`)
                           )}
                         >
                           <ShareIcon />
