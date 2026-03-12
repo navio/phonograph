@@ -40,6 +40,17 @@ const next = bump(current, bumpType);
 pkg.version = next;
 writeJson(pkgPath, pkg);
 
+const tauriConfigPath = path.join(repoRoot, "src-tauri", "tauri.conf.json");
+if (fs.existsSync(tauriConfigPath)) {
+  try {
+    const tauriConfig = readJson(tauriConfigPath);
+    tauriConfig.version = next;
+    writeJson(tauriConfigPath, tauriConfig);
+  } catch (e) {
+    // Ignore tauri config updates when desktop workspace is not present.
+  }
+}
+
 const lockPath = path.join(repoRoot, "package-lock.json");
 if (fs.existsSync(lockPath)) {
   try {

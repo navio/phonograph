@@ -1,15 +1,13 @@
 import PodcastEngine from "podcastsuite";
 import { podcasts } from "../podcast";
 import { AppAction } from "../types/app";
+import platform from "../platform";
 
 const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 
-const HOST =
-  typeof window !== "undefined" && window.location ? window.location.host : "";
-
 const PROXY = {
-  "https:": `//${HOST}/rss-full/?term=https://`,
-  "http:": `//${HOST}/rss-full/?term=http://`,
+  "https:": platform.resolveBackendUrl("/rss-full/?term=https://"),
+  "http:": platform.resolveBackendUrl("/rss-full/?term=http://"),
 };
 
 export const checkIfNewPodcastInURL = () => {
