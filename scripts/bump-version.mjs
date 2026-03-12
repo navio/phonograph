@@ -32,6 +32,28 @@ const bump = (version, type) => {
   return `${major}.${minor}.${patch + 1}`;
 };
 
+const syncDesktopVersion = (version) => {
+  const tauriConfigPath = path.join(repoRoot, "src-tauri", "tauri.conf.json");
+  const cargoTomlPath = path.join(repoRoot, "src-tauri", "Cargo.toml");
+
+  if (!fs.existsSync(tauriConfigPath) || !fs.existsSync(cargoTomlPath)) {
+    return;
+  }
+
+  const tauriConfig = readJson(tauriConfigPath);
+  if (tauriConfig.version !== version) {
+    tauriConfig.version = version;
+    writeJson(tauriConfigPath, tauriConfig);
+  }
+
+  const cargoToml = fs.readFileSync(cargoTomlPath, "utf8");
+  const updatedCargoToml = cargoToml.replace(/^(version\s*=\s*").*(")$/m, `$1${version}$2`);
+
+  if (updatedCargoToml !== cargoToml) {
+    fs.writeFileSync(cargoTomlPath, updatedCargoToml);
+  }
+};
+
 const pkgPath = path.join(repoRoot, "package.json");
 const pkg = readJson(pkgPath);
 const current = pkg.version;
@@ -53,5 +75,7 @@ if (fs.existsSync(lockPath)) {
     // Ignore lockfile updates if it's malformed/out of date.
   }
 }
+
+syncDesktopVersion(next);
 
 process.stdout.write(next);
