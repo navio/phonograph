@@ -170,9 +170,17 @@ Current repository includes targeted tests for reducers, engine events, app stor
 
 ## CI and Release Automation
 
-- `Unified CI` (`.github/workflows/quality-gates.yml`) runs web quality checks on every PR/push and automatically enables desktop checks when `src-tauri/tauri.conf.json` exists.
+- `Unified CI` (`.github/workflows/quality-gates.yml`) runs web typecheck/tests/build on every PR/push, uploads `dist` as an artifact, and enables desktop `cargo check` automatically when `src-tauri/tauri.conf.json` exists.
 - `Bump Version` (`.github/workflows/version-bump.yml`) increments patch versions on `main`/`master`, commits `chore(release): vX.Y.Z`, and pushes a matching `vX.Y.Z` tag.
-- `Unified Release` (`.github/workflows/unified-release.yml`) publishes web artifacts for every `v*` tag and, when desktop sources are present, also builds signed desktop bundles per OS.
+- `Unified Release` (`.github/workflows/unified-release.yml`) publishes web release archives (plus SHA256 checksums) for every `v*` tag and, when desktop sources are present, builds and publishes signed desktop bundles per OS.
+
+Manual release dispatch supports:
+
+- `release_tag`: explicit tag to publish (`vX.Y.Z`)
+- `draft`: mark the GitHub release as draft
+- `prerelease`: mark the GitHub release as pre-release
+
+Each workflow writes a GitHub Step Summary report with stage-by-stage outcomes for clear release status visibility.
 
 Desktop release signing secrets expected by CI:
 

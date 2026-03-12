@@ -7,10 +7,15 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: version-bump-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   bump:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,23 +39,33 @@ jobs:
 
       - name: Bump patch version
         if: steps.check.outputs.skip != 'true'
+        id: bump
         run: node scripts/bump-version.mjs patch
 
       - name: Commit and tag
         if: steps.check.outputs.skip != 'true'
+        id: commit_and_tag
         run: |
           next="$(node -p "require('./package.json').version")"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package.json package-lock.json src-tauri/tauri.conf.json src-tauri/Cargo.toml || true
+          git add package.json package-lock.json
+
+          if [ -f src-tauri/tauri.conf.json ]; then
+            git add src-tauri/tauri.conf.json
+          fi
+
+          if [ -f src-tauri/Cargo.toml ]; then
+            git add src-tauri/Cargo.toml
+          fi
+
           if git diff --cached --quiet; then
             echo "No version changes to commit."
             exit 0
           fi
           git commit -m "chore(release): v$next"
           git tag "v$next"
-          git push
-          git push --tags
+          git push --follow-tags
 
       - name: Report version bump status
         if: always()
@@ -58,6 +73,9 @@ jobs:
           {
             echo "## Version bump"
             echo "- Release bump skipped: ${{ steps.check.outputs.skip }}"
+            echo "- Bump step: ${{ steps.bump.outcome }}"
+            echo "- Commit/tag step: ${{ steps.commit_and_tag.outcome }}"
+            echo "- Job result: ${{ job.status }}"
             if [ "${{ steps.check.outputs.skip }}" = "true" ]; then
               echo "- Existing release commit detected; no new tag created."
             else
