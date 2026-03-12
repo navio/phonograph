@@ -82,7 +82,17 @@
   "podcastSettings.skipEnd": "跳过结尾",
   "podcastSettings.defaultSpeed": "默认速度",
   "a11y.openUserManual": "打开用户手册",
+  "a11y.openDesktopDownloads": "打开桌面版下载",
+  "download.title": "下载桌面版应用",
+  "download.description": "请选择你的 Mac 芯片架构以下载最新的 Phonograph 桌面版。",
+  "download.appleSilicon": "下载 Apple Silicon 版本",
+  "download.intel": "下载 Intel Mac 版本",
+  "download.releaseNotes": "查看发布说明",
+  "download.warning": "如果 macOS 提示应用来自未识别开发者，请右键应用并选择“打开”一次以信任该应用。",
   "settings.userManual": "用户手册",
   "settings.userManualDescription": "阅读 Phonograph 官方文档，了解上手指南、播放控制和故障排查。",
-  "settings.openUserManual": "打开用户手册"
+  "settings.openUserManual": "打开用户手册",
+  "settings.desktopApp": "桌面版应用",
+  "settings.desktopAppDescription": "需要 macOS 应用吗？打开下载页面获取 Apple Silicon 和 Intel 版本。",
+  "settings.openDesktopDownloads": "打开桌面版下载"
 }
