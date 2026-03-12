@@ -36,13 +36,26 @@ jobs:
         if: steps.check.outputs.skip != 'true'
         run: node scripts/bump-version.mjs patch
 
+      - name: Sync desktop version files
+        if: steps.check.outputs.skip != 'true'
+        run: node scripts/sync-desktop-version.mjs
+
       - name: Commit and tag
         if: steps.check.outputs.skip != 'true'
         run: |
           next="$(node -p "require('./package.json').version")"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package.json package-lock.json || true
+          git add package.json package-lock.json
+
+          if [ -f src-tauri/tauri.conf.json ]; then
+            git add src-tauri/tauri.conf.json
+          fi
+
+          if [ -f src-tauri/Cargo.toml ]; then
+            git add src-tauri/Cargo.toml
+          fi
+
           if git diff --cached --quiet; then
             echo "No version changes to commit."
             exit 0
@@ -51,3 +64,16 @@ jobs:
           git tag "v$next"
           git push
           git push --tags
+
+      - name: Report version bump status
+        if: always()
+        run: |
+          {
+            echo "## Version bump"
+            echo "- Release bump skipped: ${{ steps.check.outputs.skip }}"
+            if [ "${{ steps.check.outputs.skip }}" = "true" ]; then
+              echo "- Existing release commit detected; no new tag created."
+            else
+              echo "- Patch version bumped and tag pushed."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
