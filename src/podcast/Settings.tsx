@@ -34,6 +34,7 @@ import UploadFileIcon from "@mui/icons-material/UploadFile";
 import DownloadIcon from "@mui/icons-material/Download";
 
 import { initializeLibrary } from "../engine";
+import { exportOpmlWithNativeDialog, hasNativeOpmlDialogs, importOpmlFromNativeDialog } from "../platform/opmlDialogs";
 import { buildOpml, parseOpml } from "./opml";
 import { importFeeds } from "./opmlImporter";
 
@@ -61,6 +62,31 @@ const Settings: React.FC = () => {
   const [isImporting, setIsImporting] = useState(false);
   const [importProgress, setImportProgress] = useState<{ done: number; total: number } | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const showExportSuccessNotice = (count: number) => {
+    setNotice({
+      open: true,
+      message: intl.formatMessage(
+        { id: "settings.exportSuccess", defaultMessage: "Exported {count} podcasts to OPML." },
+        { count }
+      ),
+      severity: "success",
+    });
+  };
+
+  const exportOpmlToBrowser = (opml: string, suggestedFileName: string) => {
+    const blob = new Blob([opml], { type: "text/x-opml" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = suggestedFileName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    URL.revokeObjectURL(url);
+  };
 
   const themeSwitcher = (_ev: React.MouseEvent<HTMLElement>, input: string | null) => {
     if (!input) return;
@@ -95,7 +121,7 @@ const Settings: React.FC = () => {
     await (PodcastEngine as any).db.del(podcast);
   };
 
-  const exportOpml = () => {
+  const exportOpml = async () => {
     const feeds = (state.podcasts || [])
       .map((p: any) => ({
         url: (p.url || p.domain || "").toString(),
@@ -104,35 +130,35 @@ const Settings: React.FC = () => {
       .filter((f) => !!f.url);
 
     const opml = buildOpml(feeds, { title: "Phonograph Subscriptions" });
+    const suggestedFileName = `phonograph-subscriptions-${new Date().toISOString().slice(0, 10)}.opml`;
 
-    const blob = new Blob([opml], { type: "text/x-opml" });
-    const url = URL.createObjectURL(blob);
+    try {
+      const nativeExportStatus = await exportOpmlWithNativeDialog(opml, suggestedFileName);
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `phonograph-subscriptions-${new Date().toISOString().slice(0, 10)}.opml`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+      if (nativeExportStatus === "cancelled") {
+        return;
+      }
 
-    URL.revokeObjectURL(url);
+      if (nativeExportStatus === "unsupported") {
+        exportOpmlToBrowser(opml, suggestedFileName);
+      }
 
-    setNotice({
-      open: true,
-      message: intl.formatMessage(
-        { id: "settings.exportSuccess", defaultMessage: "Exported {count} podcasts to OPML." },
-        { count: feeds.length }
-      ),
-      severity: "success",
-    });
+      showExportSuccessNotice(feeds.length);
+    } catch (error: any) {
+      setNotice({
+        open: true,
+        message:
+          error?.message || intl.formatMessage({ id: "settings.exportFailed", defaultMessage: "Failed to export OPML." }),
+        severity: "error",
+      });
+    }
   };
 
-  const importOpmlFile = async (file: File) => {
+  const importOpmlText = async (text: string) => {
     setIsImporting(true);
     setImportProgress(null);
 
     try {
-      const text = await file.text();
       const { feeds } = parseOpml(text);
 
       const existing = new Set(
@@ -194,8 +220,24 @@ const Settings: React.FC = () => {
     }
   };
 
-  const openFilePicker = () => {
+  const openFilePicker = async () => {
     if (isImporting) return;
+
+    if (hasNativeOpmlDialogs()) {
+      try {
+        const selected = await importOpmlFromNativeDialog();
+        if (!selected) return;
+        await importOpmlText(selected.text);
+      } catch (err: any) {
+        setNotice({
+          open: true,
+          message: err?.message || intl.formatMessage({ id: "settings.importFailed", defaultMessage: "Failed to import OPML." }),
+          severity: "error",
+        });
+      }
+      return;
+    }
+
     fileInputRef.current?.click();
   };
 
@@ -203,7 +245,7 @@ const Settings: React.FC = () => {
     const file = ev.target.files?.[0];
     ev.target.value = ""; // allow re-importing the same file
     if (!file) return;
-    await importOpmlFile(file);
+    await importOpmlText(await file.text());
   };
 
   const { podcasts } = state;
