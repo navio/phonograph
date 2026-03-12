@@ -79,5 +79,9 @@
   "podcastSettings.title": "设置",
   "podcastSettings.skipStart": "跳过开头",
   "podcastSettings.skipEnd": "跳过结尾",
-  "podcastSettings.defaultSpeed": "默认速度"
+  "podcastSettings.defaultSpeed": "默认速度",
+  "a11y.openUserManual": "打开用户手册",
+  "settings.userManual": "用户手册",
+  "settings.userManualDescription": "阅读 Phonograph 官方文档，了解上手指南、播放控制和故障排查。",
+  "settings.openUserManual": "打开用户手册"
 }
