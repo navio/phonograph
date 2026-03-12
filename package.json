@@ -36,6 +36,10 @@
   ],
   "scripts": {
     "start": "vite",
+    "desktop:sync-version": "node scripts/sync-desktop-version.mjs",
+    "desktop:dev": "yarn desktop:sync-version && tauri dev",
+    "desktop:build": "yarn desktop:sync-version && tauri build",
+    "desktop:build:ci": "yarn desktop:sync-version && node scripts/validate-desktop-signing-env.mjs --force && tauri build",
     "build": "yarn getter && vite build && yarn SEO && yarn sw && yarn docs:manuals:build && yarn lambda:build",
     "serve": "vite preview",
     "docs:manuals:dev": "vitepress dev manuals",
@@ -69,6 +73,7 @@
     "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
     "@formatjs/cli": "^6.13.0",
     "@netlify/functions": "^5.1.2",
+    "@tauri-apps/cli": "^2.9.1",
     "@types/dompurify": "^3.2.0",
     "@types/node": "^25.2.3",
     "@types/node-fetch": "2",
@@ -76,6 +81,7 @@
     "@types/react-dom": "^19.2.3",
     "@types/react-router-dom": "5",
     "@vitejs/plugin-react": "^5.0.2",
+    "@vitest/coverage-v8": "^4.0.18",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "concurrently": "^9.2.1",
     "cz-conventional-changelog": "3.2.0",
@@ -85,7 +91,6 @@
     "typescript": "^5.9.3",
     "vite": "^5.0.0",
     "vitepress": "^1.6.3",
-    "@vitest/coverage-v8": "^4.0.18",
     "vitest": "^4.0.18"
   },
   "config": {

@@ -102,6 +102,8 @@ src/
   App.tsx
   index.tsx
 
+src-tauri/         # Tauri desktop runtime and packaging config
+
 lambda/            # Netlify Functions
 public/            # Static assets copied to dist/
 dist/              # Production build output
@@ -115,6 +117,7 @@ manuals/           # User-facing manual source (VitePress)
 
 - Node.js 20+
 - Yarn
+- Rust toolchain (for desktop builds)
 
 ### Install
 
@@ -138,6 +141,14 @@ This starts:
 ```bash
 yarn start
 ```
+
+### Run desktop shell (Tauri)
+
+```bash
+yarn desktop:dev
+```
+
+This starts a Tauri desktop window and points it to the local Vite app on `http://localhost:1420`.
 
 ## Build and Preview
 
@@ -209,6 +220,35 @@ yarn quality
 
 Framework and linting standards are documented in `docs/framework-best-practices.md`.
 Current repository includes targeted tests for reducers, engine events, app store behavior, and podcast utilities.
+
+## Desktop Release Automation
+
+Desktop packaging/signing automation runs in `.github/workflows/desktop-release.yml` on version tags (`v*`).
+
+It builds signed installers for:
+
+- macOS (`.app`)
+- Windows (`.msi`, `.nsis`)
+- Linux (`.deb`, `.AppImage`)
+
+Required CI secrets:
+
+- `APPLE_CERTIFICATE`
+- `APPLE_CERTIFICATE_PASSWORD`
+- `APPLE_SIGNING_IDENTITY`
+- `APPLE_API_ISSUER`
+- `APPLE_API_KEY`
+- `APPLE_API_PRIVATE_KEY`
+- `TAURI_WINDOWS_CERTIFICATE`
+- `TAURI_WINDOWS_CERTIFICATE_PASSWORD`
+
+Local desktop packaging command:
+
+```bash
+yarn desktop:build
+```
+
+The desktop version is synchronized from `package.json` to `src-tauri/tauri.conf.json` and `src-tauri/Cargo.toml` through `yarn desktop:sync-version`.
 
 ## Roadmap Direction
 
