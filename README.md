@@ -94,6 +94,7 @@ src/
   core/            # Shared UI + playback controls
   engine/          # Audio engine wiring and events
   i18n/            # Internationalization wrappers/messages
+  platform/        # Runtime abstraction (web + tauri adapters)
   podcast/         # Podcast discovery/library/view features
   serviceworker/   # SW registration + web worker logic
   store/           # Zustand store
@@ -101,6 +102,7 @@ src/
   index.tsx
 
 lambda/            # Netlify Functions
+src-tauri/         # Tauri desktop host (Rust + tauri.conf)
 public/            # Static assets copied to dist/
 dist/              # Production build output
 docs/              # Planning and migration docs
@@ -112,6 +114,8 @@ docs/              # Planning and migration docs
 
 - Node.js 20+
 - Yarn
+- Rust toolchain (`rustup`)
+- Tauri CLI (installed via `yarn install`)
 
 ### Install
 
@@ -134,6 +138,18 @@ This starts:
 
 ```bash
 yarn start
+```
+
+### Run desktop shell (Tauri)
+
+```bash
+yarn desktop:dev
+```
+
+Build desktop bundles:
+
+```bash
+yarn desktop:build
 ```
 
 ## Build and Preview
