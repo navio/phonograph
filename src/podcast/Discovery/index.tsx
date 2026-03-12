@@ -19,6 +19,7 @@ import Search from "./Search";
 import Geners from "./Geners";
 import Loading from "../../core/Loading";
 import HeroCarousel from "./HeroCarousel";
+import platform from "../../platform";
 
 import {
   getPopularPodcasts,
@@ -44,7 +45,7 @@ const Header: React.FC = () => (
 );
 
 const getFinalURL = async (url: string): Promise<string> => {
-  const URL = `${window.location.origin}/api/findFinal/?term=${encodeURIComponent(url)}`;
+  const URL = platform.resolveBackendUrl(`/api/findFinal/?term=${encodeURIComponent(url)}`);
   try {
     const data = await fetch(URL);
     const result = await data.json();
