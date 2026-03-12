@@ -55,6 +55,7 @@
   "settings.developedIn": "est développé avec ❤️ à Jersey City, NJ",
   "settings.enablePodcastView": "Activer la vue podcast",
   "settings.exportOpml": "Exporter OPML",
+  "settings.exportFailed": "Échec de l'export OPML.",
   "settings.exportSuccess": "{count} podcasts exportés en OPML.",
   "settings.importExport": "Importer / Exporter (OPML)",
   "settings.importFailed": "Échec de l'importation OPML.",
