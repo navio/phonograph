@@ -1,3 +1,5 @@
+import platform from "../../platform";
+
 export interface PodcastSearchResponse {
   results?: Array<Record<string, any>>;
   [key: string]: any;
@@ -36,17 +38,17 @@ export default class PodcastSearcher {
     this.currentRequest = new AbortController();
     const { signal } = this.currentRequest;
     return new Promise((accept, reject) =>
-      fetch(`/ln/search?type=podcast&q=${encodeURIComponent(term)}`, { signal })
+      fetch(platform.resolveBackendUrl(`/ln/search?type=podcast&q=${encodeURIComponent(term)}`), { signal })
         .then((result) => (result.ok && result.json().then(accept).catch(reject)) || reject(result))
         .catch(reject)
     );
   }
 
   listennotes(term: string): Promise<PodcastSearchResponse> {
-    return this.querySearch(`/ln/typeahead?q=${encodeURIComponent(term)}&show_podcasts=1`);
+    return this.querySearch(platform.resolveBackendUrl(`/ln/typeahead?q=${encodeURIComponent(term)}&show_podcasts=1`));
   }
 
   apple(term: string): Promise<PodcastSearchResponse> {
-    return this.querySearch(`/apple/search?term=${encodeURIComponent(term)}`);
+    return this.querySearch(platform.resolveBackendUrl(`/apple/search?term=${encodeURIComponent(term)}`));
   }
 }
