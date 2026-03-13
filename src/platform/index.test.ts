@@ -21,11 +21,11 @@ describe("platform adapter", () => {
   it("preserves fully-qualified URLs", () => {
     const webAdapter = createPlatformAdapter(false);
     const tauriAdapter = createPlatformAdapter(true);
-    const absolute = "https://example.com/path";
+    const absoluteUrl = "https://example.com/path";
 
-    expect(webAdapter.resolveBackendUrl(absolute)).toBe(absolute);
-    expect(tauriAdapter.resolveBackendUrl(absolute)).toBe(absolute);
-    expect(webAdapter.resolveShareUrl(absolute)).toBe(absolute);
-    expect(tauriAdapter.resolveShareUrl(absolute)).toBe(absolute);
+    expect(webAdapter.resolveBackendUrl(absoluteUrl)).toBe(absoluteUrl);
+    expect(tauriAdapter.resolveBackendUrl(absoluteUrl)).toBe(absoluteUrl);
+    expect(webAdapter.resolveShareUrl(absoluteUrl)).toBe(absoluteUrl);
+    expect(tauriAdapter.resolveShareUrl(absoluteUrl)).toBe(absoluteUrl);
   });
 });

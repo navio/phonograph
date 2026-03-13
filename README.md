@@ -199,7 +199,7 @@ Build pipeline (`yarn build`) includes:
 
 These are used for discovery/proxy calls that depend on Listen Notes.
 
-Desktop parity status and known follow-up items are tracked in `docs/desktop-parity.md`.
+Desktop parity status and release-readiness notes are tracked in `docs/desktop-parity.md`.
 
 ## Quality and Testing
 

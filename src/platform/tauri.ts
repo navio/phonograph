@@ -1,6 +1,6 @@
 import type { PlatformAdapter } from "./types";
 
-const DEFAULT_WEB_ORIGIN = "https://phonograph.app";
+const DEFAULT_PUBLIC_WEB_ORIGIN = "https://phonograph.app";
 
 const trimTrailingSlash = (value: string) => value.replace(/\/+$/, "");
 
@@ -13,10 +13,12 @@ const resolveDesktopBackendOrigin = () => {
   if (configuredOrigin && configuredOrigin.trim()) {
     return trimTrailingSlash(configuredOrigin.trim());
   }
-  if (import.meta.env.DEV && typeof window !== "undefined" && window.location) {
+
+  if (import.meta.env.DEV && typeof window !== "undefined" && window.location?.origin) {
     return trimTrailingSlash(window.location.origin);
   }
-  return DEFAULT_WEB_ORIGIN;
+
+  return DEFAULT_PUBLIC_WEB_ORIGIN;
 };
 
 const resolvePublicWebOrigin = () => {
@@ -24,7 +26,8 @@ const resolvePublicWebOrigin = () => {
   if (configuredOrigin && configuredOrigin.trim()) {
     return trimTrailingSlash(configuredOrigin.trim());
   }
-  return DEFAULT_WEB_ORIGIN;
+
+  return DEFAULT_PUBLIC_WEB_ORIGIN;
 };
 
 const toAbsoluteUrl = (origin: string, path: string) => {
