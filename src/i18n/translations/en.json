@@ -82,7 +82,17 @@
   "podcastSettings.skipEnd": "Skip End",
   "podcastSettings.defaultSpeed": "Default Speed",
   "a11y.openUserManual": "Open user manual",
+  "a11y.openDesktopDownloads": "Open desktop downloads",
+  "download.title": "Download Desktop App",
+  "download.description": "Choose your Mac chip architecture to download the latest Phonograph desktop build.",
+  "download.appleSilicon": "Download for Apple Silicon",
+  "download.intel": "Download for Intel Mac",
+  "download.releaseNotes": "View Release Notes",
+  "download.warning": "If macOS warns that the app is from an unidentified developer, right-click the app and choose Open once to trust it.",
   "settings.userManual": "User Manual",
   "settings.userManualDescription": "Read the official Phonograph docs for onboarding, playback controls, and troubleshooting.",
-  "settings.openUserManual": "Open User Manual"
+  "settings.openUserManual": "Open User Manual",
+  "settings.desktopApp": "Desktop App",
+  "settings.desktopAppDescription": "Need the macOS app? Open the download page for Apple Silicon and Intel builds.",
+  "settings.openDesktopDownloads": "Open Desktop Downloads"
 }

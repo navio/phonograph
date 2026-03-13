@@ -5,6 +5,7 @@ export const PODCASTVIEW = "/podcast" as const;
 export const DISCOVERVIEW = "/discover" as const;
 export const SETTINGSVIEW = "/settings" as const;
 export const PLAYLIST = "/playlist" as const;
+export const DOWNLOADVIEW = "/download" as const;
 
 export type RoutePath =
   | typeof ROOT
@@ -12,4 +13,5 @@ export type RoutePath =
   | typeof PODCASTVIEW
   | typeof DISCOVERVIEW
   | typeof SETTINGSVIEW
-  | typeof PLAYLIST;
+  | typeof PLAYLIST
+  | typeof DOWNLOADVIEW;

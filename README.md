@@ -155,6 +155,14 @@ Build desktop bundles:
 yarn desktop:build
 ```
 
+### Desktop release + download links
+
+- Pushing a semver tag (for example `v1.3.24`) triggers `.github/workflows/desktop-release-macos.yml`.
+- The workflow publishes two stable assets to the GitHub release:
+  - `Phonograph-macOS-Apple-Silicon.dmg`
+  - `Phonograph-macOS-Intel.dmg`
+- The app exposes an in-product download screen at `/download` and a shortcut from **Settings → Desktop App**.
+
 ## Build and Preview
 
 ```bash

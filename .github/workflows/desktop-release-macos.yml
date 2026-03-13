@@ -1,0 +1,70 @@
+name: Desktop Release (macOS)
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: desktop-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release-macos:
+    name: Build and publish macOS desktop artifacts
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Sync Tauri version with package version
+        run: node scripts/sync-tauri-version.mjs
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build macOS desktop bundles
+        shell: bash
+        run: |
+          set -euo pipefail
+          yarn desktop:build -- --bundles app,dmg
+
+      - name: Prepare stable release asset names
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets
+
+          arm_dmg="$(find src-tauri/target/release/bundle -type f -name '*aarch64*.dmg' | head -n 1)"
+          intel_dmg="$(find src-tauri/target/release/bundle -type f -name '*x64*.dmg' | head -n 1)"
+
+          if [[ -z "$arm_dmg" || -z "$intel_dmg" ]]; then
+            echo "Expected both arm64 and x64 macOS DMG artifacts, but at least one is missing."
+            find src-tauri/target/release/bundle -type f || true
+            exit 1
+          fi
+
+          cp "$arm_dmg" release-assets/Phonograph-macOS-Apple-Silicon.dmg
+          cp "$intel_dmg" release-assets/Phonograph-macOS-Intel.dmg
+
+      - name: Publish release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release-assets/Phonograph-macOS-Apple-Silicon.dmg
+            release-assets/Phonograph-macOS-Intel.dmg
+          generate_release_notes: true
+          draft: false
+          prerelease: false
