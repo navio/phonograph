@@ -195,8 +195,12 @@ Build pipeline (`yarn build`) includes:
 
 - `LISTEN_NOTES_API_KEY` (preferred)
 - `LISTENNOTES` / `listennotes` (backward-compatible alternatives)
+- `VITE_DESKTOP_API_ORIGIN` (optional; desktop backend origin, defaults to `https://phonograph.app`)
+- `VITE_PUBLIC_WEB_ORIGIN` (optional; desktop share-link origin, defaults to `https://phonograph.app`)
 
 These are used for discovery/proxy calls that depend on Listen Notes.
+
+Desktop parity status and release-readiness notes are tracked in `docs/desktop-parity.md`.
 
 ## Quality and Testing
 

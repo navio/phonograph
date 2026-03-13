@@ -2,14 +2,44 @@ import PodcastEngine from "podcastsuite";
 
 const DEBUG = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 
+const DEFAULT_DESKTOP_API_ORIGIN = "https://phonograph.app";
+
+const trimTrailingSlash = (value: string) => value.replace(/\/+$/, "");
+
+const withLeadingSlash = (path: string) => (path.startsWith("/") ? path : `/${path}`);
+
+const isAbsoluteUrl = (value: string) => /^https?:\/\//i.test(value);
+
+const resolveDesktopBackendOrigin = () => {
+  const configuredOrigin = import.meta.env.VITE_DESKTOP_API_ORIGIN;
+  if (configuredOrigin && configuredOrigin.trim()) {
+    return trimTrailingSlash(configuredOrigin.trim());
+  }
+
+  return DEFAULT_DESKTOP_API_ORIGIN;
+};
+
+const resolveBackendUrl = (path: string) => {
+  if (isAbsoluteUrl(path)) {
+    return path;
+  }
+
+  const normalizedPath = withLeadingSlash(path);
+  if (location.protocol === "tauri:") {
+    return `${resolveDesktopBackendOrigin()}${normalizedPath}`;
+  }
+
+  return `//${location.host}${normalizedPath}`;
+};
+
 const proxy = DEBUG
   ? {
-      "https:": `//${location.host}/rss-full/?term=https://`,
-      "http:": `//${location.host}/rss-full/?term=http://`,
+      "https:": resolveBackendUrl("/rss-full/?term=https://"),
+      "http:": resolveBackendUrl("/rss-full/?term=http://"),
     }
   : {
-      "https:": `//${location.host}/rss-full/https://`,
-      "http:": `//${location.host}/rss-full/http://`,
+      "https:": resolveBackendUrl("/rss-full/https://"),
+      "http:": resolveBackendUrl("/rss-full/http://"),
     };
 
 const getPodcastEngine = (shouldInit = false) =>
