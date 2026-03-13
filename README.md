@@ -210,6 +210,17 @@ yarn quality
 Framework and linting standards are documented in `docs/framework-best-practices.md`.
 Current repository includes targeted tests for reducers, engine events, app store behavior, and podcast utilities.
 
+## CI and Release Automation
+
+- `Unified CI` (`.github/workflows/quality-gates.yml`) runs web quality checks on every PR/push and automatically adds desktop checks when `src-tauri/tauri.conf.json` exists.
+- `Bump Version` (`.github/workflows/version-bump.yml`) increments patch versions on `main`/`master`, commits `chore(release): vX.Y.Z`, and pushes a matching `vX.Y.Z` tag.
+- `Unified Release` (`.github/workflows/unified-release.yml`) publishes web artifacts for every `v*` tag and, when desktop sources are present, also builds signed desktop bundles per OS.
+
+Desktop release signing secrets expected by CI:
+
+- macOS: `APPLE_CERTIFICATE`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_SIGNING_IDENTITY`, `APPLE_API_ISSUER`, `APPLE_API_KEY`, `APPLE_API_PRIVATE_KEY`
+- Windows: `TAURI_WINDOWS_CERTIFICATE`, `TAURI_WINDOWS_CERTIFICATE_PASSWORD`
+
 ## Roadmap Direction
 
 - Continue hardening offline playback and sync behavior.
