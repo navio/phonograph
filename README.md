@@ -162,6 +162,14 @@ Build desktop bundles:
 yarn desktop:build
 ```
 
+Desktop CI build (enforces signing env checks on CI/tag runs):
+
+```bash
+yarn desktop:build:ci
+```
+
+Desktop scripts automatically synchronize `package.json`, `src-tauri/tauri.conf.json`, and `src-tauri/Cargo.toml` versions.
+
 ## Build and Preview
 
 ```bash
@@ -196,6 +204,8 @@ Build pipeline (`yarn build`) includes:
 - `LISTENNOTES` / `listennotes` (backward-compatible alternatives)
 - `VITE_DESKTOP_API_ORIGIN` (optional; desktop backend origin, defaults to `https://phonograph.app`)
 - `VITE_PUBLIC_WEB_ORIGIN` (optional; desktop share-link origin, defaults to `https://phonograph.app`)
+
+Desktop signing env vars are validated by `scripts/validate-desktop-signing-env.mjs` when invoked with `--force`.
 
 These are used for discovery/proxy calls that depend on Listen Notes.
 
