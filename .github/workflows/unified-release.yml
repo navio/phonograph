@@ -1,0 +1,300 @@
+name: Unified Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: unified-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  detect-targets:
+    name: Detect release targets
+    runs-on: ubuntu-latest
+    outputs:
+      has_desktop: ${{ steps.detect.outputs.has_desktop }}
+      release_tag: ${{ github.ref_name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect desktop workspace
+        id: detect
+        shell: bash
+        run: |
+          if [[ -f src-tauri/Cargo.toml && -f src-tauri/tauri.conf.json ]]; then
+            echo "has_desktop=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_desktop=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Report release targets
+        shell: bash
+        run: |
+          {
+            echo "## Unified release targets"
+            echo "| Target | Enabled |"
+            echo "| --- | --- |"
+            echo "| Tag | ${{ github.ref_name }} |"
+            echo "| Web release | true |"
+            echo "| Desktop release | ${{ steps.detect.outputs.has_desktop }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  web-release:
+    name: Build web release artifact
+    runs-on: ubuntu-latest
+    needs: detect-targets
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Validate tag matches package version
+        shell: bash
+        run: |
+          set -euo pipefail
+          package_tag="v$(node -p \"require('./package.json').version\")"
+          if [[ "$package_tag" != "${GITHUB_REF_NAME}" ]]; then
+            echo "Tag (${GITHUB_REF_NAME}) does not match package.json version (${package_tag})."
+            exit 1
+          fi
+
+      - name: Build production web bundle
+        run: yarn build
+
+      - name: Archive web distribution
+        id: archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets
+          archive="Phonograph-web-${GITHUB_REF_NAME}.tar.gz"
+          tar -czf "release-assets/${archive}" dist
+          sha256sum "release-assets/${archive}" > "release-assets/${archive}.sha256"
+          echo "archive=${archive}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload web release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-release-assets-${{ github.run_id }}
+          path: release-assets/*
+          if-no-files-found: error
+
+      - name: Report web release status
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## Web release status"
+            echo "| Stage | Result |"
+            echo "| --- | --- |"
+            echo "| Build | ${{ job.status }} |"
+            echo "| Asset | ${{ steps.archive.outputs.archive }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  desktop-release-macos:
+    name: Build macOS desktop release artifacts
+    runs-on: ${{ matrix.os }}
+    needs: detect-targets
+    if: needs.detect-targets.outputs.has_desktop == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-13
+            label: intel
+            dmg_pattern: '*x64*.dmg'
+            asset_name: Phonograph-macOS-Intel.dmg
+          - os: macos-14
+            label: apple-silicon
+            dmg_pattern: '*aarch64*.dmg'
+            asset_name: Phonograph-macOS-Apple-Silicon.dmg
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Validate tag matches package version
+        shell: bash
+        run: |
+          set -euo pipefail
+          package_tag="v$(node -p \"require('./package.json').version\")"
+          if [[ "$package_tag" != "${GITHUB_REF_NAME}" ]]; then
+            echo "Tag (${GITHUB_REF_NAME}) does not match package.json version (${package_tag})."
+            exit 1
+          fi
+
+      - name: Sync desktop versions
+        run: node scripts/sync-tauri-version.mjs
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build desktop DMG bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          yarn desktop:build -- --bundles dmg
+
+      - name: Collect stable desktop assets
+        id: collect
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets
+
+          source_dmg="$(find src-tauri/target/release/bundle -type f -name "${{ matrix.dmg_pattern }}" | head -n 1)"
+          if [[ -z "$source_dmg" ]]; then
+            echo "Could not find DMG for pattern ${{ matrix.dmg_pattern }}"
+            find src-tauri/target/release/bundle -type f || true
+            exit 1
+          fi
+
+          cp "$source_dmg" "release-assets/${{ matrix.asset_name }}"
+          shasum -a 256 "release-assets/${{ matrix.asset_name }}" > "release-assets/${{ matrix.asset_name }}.sha256"
+          echo "asset=${{ matrix.asset_name }}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload desktop release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-release-assets-${{ matrix.label }}-${{ github.run_id }}
+          path: release-assets/*
+          if-no-files-found: error
+
+      - name: Report desktop release status
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## Desktop release status (${{ matrix.label }})"
+            echo "| Stage | Result |"
+            echo "| --- | --- |"
+            echo "| Build | ${{ job.status }} |"
+            echo "| Asset | ${{ steps.collect.outputs.asset }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  publish-release:
+    name: Publish unified web + desktop release
+    runs-on: ubuntu-latest
+    needs:
+      - detect-targets
+      - web-release
+      - desktop-release-macos
+    if: always()
+    steps:
+      - name: Validate upstream job outcomes
+        shell: bash
+        run: |
+          set -euo pipefail
+          web_result="${{ needs.web-release.result }}"
+          desktop_result="${{ needs.desktop-release-macos.result }}"
+          has_desktop="${{ needs.detect-targets.outputs.has_desktop }}"
+
+          {
+            echo "## Unified release status"
+            echo "| Stage | Result |"
+            echo "| --- | --- |"
+            echo "| Web release artifact | ${web_result} |"
+            echo "| Desktop release artifacts | ${desktop_result} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [[ "$web_result" != "success" ]]; then
+            echo "Web release artifact failed; blocking release publish."
+            exit 1
+          fi
+
+          if [[ "$has_desktop" == "true" && "$desktop_result" != "success" ]]; then
+            echo "Desktop release artifacts failed; blocking release publish."
+            exit 1
+          fi
+
+      - name: Download web artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: web-release-assets-${{ github.run_id }}
+          path: release-assets
+
+      - name: Download desktop artifacts
+        if: needs.detect-targets.outputs.has_desktop == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          pattern: desktop-release-assets-*-${{ github.run_id }}
+          path: release-assets
+          merge-multiple: true
+
+      - name: Validate release payload
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          web_asset_count="$(find release-assets -maxdepth 1 -type f -name 'Phonograph-web-*.tar.gz' | wc -l | tr -d ' ')"
+          if [[ "$web_asset_count" -lt 1 ]]; then
+            echo "Missing web release archive in release-assets/."
+            exit 1
+          fi
+
+          web_hash_count="$(find release-assets -maxdepth 1 -type f -name 'Phonograph-web-*.tar.gz.sha256' | wc -l | tr -d ' ')"
+          if [[ "$web_hash_count" -lt 1 ]]; then
+            echo "Missing web release checksum in release-assets/."
+            exit 1
+          fi
+
+          if [[ "${{ needs.detect-targets.outputs.has_desktop }}" == "true" ]]; then
+            if [[ ! -f release-assets/Phonograph-macOS-Apple-Silicon.dmg || ! -f release-assets/Phonograph-macOS-Intel.dmg ]]; then
+              echo "Missing expected desktop DMG assets in release payload."
+              find release-assets -maxdepth 1 -type f || true
+              exit 1
+            fi
+
+            if [[ ! -f release-assets/Phonograph-macOS-Apple-Silicon.dmg.sha256 || ! -f release-assets/Phonograph-macOS-Intel.dmg.sha256 ]]; then
+              echo "Missing expected desktop checksum assets in release payload."
+              find release-assets -maxdepth 1 -type f || true
+              exit 1
+            fi
+          fi
+
+      - name: Publish release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.detect-targets.outputs.release_tag }}
+          name: Phonograph Release ${{ needs.detect-targets.outputs.release_tag }}
+          files: release-assets/*
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+          fail_on_unmatched_files: true
+
+      - name: Report publish status
+        if: always()
+        shell: bash
+        run: |
+          asset_count="$(find release-assets -maxdepth 1 -type f | wc -l | tr -d ' ')"
+          {
+            echo "## Publish status"
+            echo "| Field | Value |"
+            echo "| --- | --- |"
+            echo "| Release tag | ${{ needs.detect-targets.outputs.release_tag }} |"
+            echo "| Publish result | ${{ job.status }} |"
+            echo "| Asset count | ${asset_count} |"
+          } >> "$GITHUB_STEP_SUMMARY"
