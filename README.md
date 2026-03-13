@@ -149,6 +149,8 @@ yarn start
 yarn desktop:dev
 ```
 
+`desktop:dev` and `desktop:build` automatically sync `src-tauri/tauri.conf.json` and `src-tauri/Cargo.toml` versions from `package.json`.
+
 Build desktop bundles:
 
 ```bash

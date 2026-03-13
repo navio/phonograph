@@ -36,7 +36,10 @@
   ],
   "scripts": {
     "start": "vite",
+    "desktop:sync-version": "node scripts/sync-tauri-version.mjs",
+    "predesktop:dev": "yarn desktop:sync-version",
     "desktop:dev": "tauri dev",
+    "predesktop:build": "yarn desktop:sync-version",
     "desktop:build": "tauri build",
     "build": "yarn getter && vite build && yarn SEO && yarn sw && yarn docs:manuals:build && yarn lambda:build",
     "serve": "vite preview",

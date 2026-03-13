@@ -66,3 +66,17 @@ if (fs.existsSync(tauriConfigPath)) {
     // Ignore tauri config updates if the file is malformed.
   }
 }
+
+const tauriCargoTomlPath = path.join(repoRoot, "src-tauri", "Cargo.toml");
+if (fs.existsSync(tauriCargoTomlPath)) {
+  try {
+    const cargoToml = fs.readFileSync(tauriCargoTomlPath, "utf8");
+    const updatedCargoToml = cargoToml.replace(/(\[package\][\s\S]*?\nversion\s*=\s*")([^"]+)(")/, `$1${next}$3`);
+
+    if (updatedCargoToml !== cargoToml) {
+      fs.writeFileSync(tauriCargoTomlPath, updatedCargoToml);
+    }
+  } catch (e) {
+    // Ignore Cargo.toml updates if the file is malformed.
+  }
+}
