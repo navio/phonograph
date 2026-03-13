@@ -223,17 +223,34 @@ Run the local quality gate sequence with:
 yarn quality
 ```
 
-PR CI now enforces a dual-surface quality matrix:
+PR CI now runs a unified web + desktop quality pipeline:
 
-- `web-quality`: typecheck, lint, test, and production web bundle build.
-- `desktop-compile`: desktop compile smoke validation when `src-tauri/` is present.
-- `desktop-package-smoke`: unsigned desktop package smoke build and artifact upload for QA.
-- `merge-gate`: fails when any required web/desktop check fails.
-
-Desktop smoke artifacts are published as `desktop-unsigned-<run_id>` in the Actions run.
+- `web_quality`: typecheck, lint, tests, and web build artifact upload.
+- `web_coverage`: changed-file coverage gate for pull requests.
+- `desktop_quality`: cross-platform desktop compile checks when `src-tauri/` is present.
+- `ci_status`: consolidated pass/fail summary across web and desktop stages.
 
 Framework and linting standards are documented in `docs/framework-best-practices.md`.
 Current repository includes targeted tests for reducers, engine events, app store behavior, and podcast utilities.
+
+## CI and Release Automation
+
+- Unified CI workflow: `.github/workflows/quality-gates.yml`
+  - Runs web typecheck, lint, tests, build artifact upload, and PR coverage gate.
+  - Detects desktop workspace automatically and runs desktop compile checks on Linux/macOS/Windows when available.
+  - Publishes a final `CI Status Summary` job with stage-by-stage results.
+- Unified release workflow: `.github/workflows/unified-release.yml`
+  - Triggers on version tags (`v*`).
+  - Builds and uploads a web release archive (`phonograph-web-<tag>.tar.gz`) to a draft GitHub release.
+  - Builds and publishes signed desktop bundles (when `src-tauri` exists) with per-OS status summaries.
+- Version bump workflow: `.github/workflows/version-bump.yml`
+  - Bumps patch version on `main`/`master`, tags, pushes, and keeps desktop versions in sync when present.
+
+### Release Secrets
+
+- Web release: `LISTEN_NOTES_API_KEY` (preferred) or `LISTENNOTES`.
+- macOS desktop signing/notarization: `APPLE_CERTIFICATE`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_SIGNING_IDENTITY`, `APPLE_API_ISSUER`, `APPLE_API_KEY`, `APPLE_API_PRIVATE_KEY`.
+- Windows desktop signing: `TAURI_WINDOWS_CERTIFICATE`, `TAURI_WINDOWS_CERTIFICATE_PASSWORD`.
 
 ## Roadmap Direction
 
