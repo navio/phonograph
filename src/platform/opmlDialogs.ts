@@ -92,14 +92,17 @@ const writeTextFile = async (fsApi: TauriFsApi, path: string, contents: string) 
   throw new Error("Native file-write API is unavailable.");
 };
 
-export const hasNativeOpmlDialogs = () => Boolean(getTauriDialogApi() && getTauriFsApi());
+export type NativeOpmlImportStatus =
+  | { status: "selected"; text: string; fileName: string }
+  | { status: "cancelled" }
+  | { status: "unsupported" };
 
-export const importOpmlFromNativeDialog = async (): Promise<{ text: string; fileName: string } | null> => {
+export const importOpmlFromNativeDialog = async (): Promise<NativeOpmlImportStatus> => {
   const dialogApi = getTauriDialogApi();
   const fsApi = getTauriFsApi();
 
   if (!dialogApi || !fsApi?.readTextFile) {
-    return null;
+    return { status: "unsupported" };
   }
 
   const selectedPath = await dialogApi.open({
@@ -110,12 +113,13 @@ export const importOpmlFromNativeDialog = async (): Promise<{ text: string; file
   });
 
   if (!selectedPath || Array.isArray(selectedPath)) {
-    return null;
+    return { status: "cancelled" };
   }
 
   const text = await fsApi.readTextFile(selectedPath);
 
   return {
+    status: "selected",
     text,
     fileName: getFilenameFromPath(selectedPath),
   };
@@ -147,4 +151,3 @@ export const exportOpmlWithNativeDialog = async (
   await writeTextFile(fsApi, selectedPath, opmlContents);
   return "saved";
 };
-

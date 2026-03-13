@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { exportOpmlWithNativeDialog, hasNativeOpmlDialogs, importOpmlFromNativeDialog } from "./opmlDialogs";
+import { exportOpmlWithNativeDialog, importOpmlFromNativeDialog } from "./opmlDialogs";
 
 const setWindow = (value: any) => {
   Object.defineProperty(globalThis, "window", {
@@ -17,8 +17,7 @@ describe("opmlDialogs", () => {
   it("reports unsupported when native APIs are absent", async () => {
     setWindow(undefined);
 
-    expect(hasNativeOpmlDialogs()).toBe(false);
-    await expect(importOpmlFromNativeDialog()).resolves.toBeNull();
+    await expect(importOpmlFromNativeDialog()).resolves.toEqual({ status: "unsupported" });
     await expect(exportOpmlWithNativeDialog("<opml />", "subs.opml")).resolves.toBe("unsupported");
   });
 
@@ -36,6 +35,7 @@ describe("opmlDialogs", () => {
     const result = await importOpmlFromNativeDialog();
 
     expect(result).toEqual({
+      status: "selected",
       text: "<opml>hello</opml>",
       fileName: "subscriptions.opml",
     });
@@ -72,4 +72,3 @@ describe("opmlDialogs", () => {
     await expect(exportOpmlWithNativeDialog("<opml>content</opml>", "subs.opml")).resolves.toBe("cancelled");
   });
 });
-
