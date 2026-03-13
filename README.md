@@ -155,12 +155,14 @@ Build desktop bundles:
 yarn desktop:build
 ```
 
-### Desktop release + download links
+### Unified web + desktop release links
 
-- Pushing a semver tag (for example `v1.3.24`) triggers `.github/workflows/desktop-release-macos.yml`.
-- The workflow publishes two stable assets to the GitHub release:
+- Pushing a semver tag (for example `v1.3.24`) triggers `.github/workflows/unified-release.yml`.
+- The workflow always publishes a web release archive: `Phonograph-web-vX.Y.Z.tar.gz`.
+- When `src-tauri/` is present, it also publishes two stable desktop assets:
   - `Phonograph-macOS-Apple-Silicon.dmg`
   - `Phonograph-macOS-Intel.dmg`
+- Every release run emits a status table in the Actions summary for fast triage.
 - The app exposes an in-product download screen at `/download` and a shortcut from **Settings → Desktop App**.
 
 ## Build and Preview
@@ -231,12 +233,12 @@ Run the local quality gate sequence with:
 yarn quality
 ```
 
-PR CI now enforces a dual-surface quality matrix:
+PR CI now enforces a unified web+desktop quality matrix:
 
 - `web-quality`: typecheck, lint, test, and production web bundle build.
 - `desktop-compile`: desktop compile smoke validation when `src-tauri/` is present.
 - `desktop-package-smoke`: unsigned desktop package smoke build and artifact upload for QA.
-- `merge-gate`: fails when any required web/desktop check fails.
+- `merge-gate`: fails when any required web/desktop check fails and writes a summary table.
 
 Desktop smoke artifacts are published as `desktop-unsigned-<run_id>` in the Actions run.
 
