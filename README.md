@@ -155,6 +155,8 @@ Build desktop bundles:
 yarn desktop:build
 ```
 
+Desktop scripts automatically sync the Tauri app version to `package.json` before launching or packaging.
+
 ### Desktop release + download links
 
 - Pushing a semver tag (for example `v1.3.24`) triggers `.github/workflows/desktop-release-macos.yml`.
