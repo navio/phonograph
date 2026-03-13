@@ -96,6 +96,7 @@ src/
   core/            # Shared UI + playback controls
   engine/          # Audio engine wiring and events
   i18n/            # Internationalization wrappers/messages
+  platform/        # Runtime abstraction (web + tauri adapters)
   podcast/         # Podcast discovery/library/view features
   serviceworker/   # SW registration + web worker logic
   store/           # Zustand store
@@ -103,6 +104,7 @@ src/
   index.tsx
 
 lambda/            # Netlify Functions
+src-tauri/         # Tauri desktop host (Rust + tauri.conf)
 public/            # Static assets copied to dist/
 dist/              # Production build output
 docs/              # Planning and migration docs
@@ -115,6 +117,8 @@ manuals/           # User-facing manual source (VitePress)
 
 - Node.js 20+
 - Yarn
+- Rust toolchain (`rustup`)
+- Tauri CLI (installed via `yarn install`)
 
 ### Install
 
@@ -137,6 +141,18 @@ This starts:
 
 ```bash
 yarn start
+```
+
+### Run desktop shell (Tauri)
+
+```bash
+yarn desktop:dev
+```
+
+Build desktop bundles:
+
+```bash
+yarn desktop:build
 ```
 
 ## Build and Preview
@@ -171,8 +187,12 @@ Build pipeline (`yarn build`) includes:
 
 - `LISTEN_NOTES_API_KEY` (preferred)
 - `LISTENNOTES` / `listennotes` (backward-compatible alternatives)
+- `VITE_DESKTOP_API_ORIGIN` (optional; desktop backend origin, defaults to `https://phonograph.app`)
+- `VITE_PUBLIC_WEB_ORIGIN` (optional; desktop share-link origin, defaults to `https://phonograph.app`)
 
 These are used for discovery/proxy calls that depend on Listen Notes.
+
+Desktop parity status and release-readiness notes are tracked in `docs/desktop-parity.md`.
 
 ## Quality and Testing
 
