@@ -21,7 +21,7 @@
     ]
   },
   "bundle": {
-    "active": false,
+    "active": true,
     "targets": "all",
     "icon": [
       "../public/android-chrome-512x512.png",
