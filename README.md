@@ -167,6 +167,9 @@ CI/release desktop build (includes signing-env validation):
 yarn desktop:build:ci
 ```
 
+Desktop builds now include native OPML import/export dialogs backed by Tauri's
+`dialog` + `fs` plugins with scoped permissions to OPML/XML files in the user home directory.
+
 ### Desktop release + download links
 
 - Pushing a semver tag (for example `v1.3.24`) triggers `.github/workflows/desktop-release-macos.yml`.

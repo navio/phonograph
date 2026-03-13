@@ -3,5 +3,43 @@
   "identifier": "default",
   "description": "Default capabilities for the main desktop window",
   "windows": ["main"],
-  "permissions": ["core:default"]
+  "permissions": [
+    "core:default",
+    "dialog:allow-open",
+    "dialog:allow-save",
+    {
+      "identifier": "fs:allow-read-text-file",
+      "allow": [
+        {
+          "path": "$HOME/**/*.opml"
+        },
+        {
+          "path": "$HOME/**/*.xml"
+        },
+        {
+          "path": "$HOME/**/*.OPML"
+        },
+        {
+          "path": "$HOME/**/*.XML"
+        }
+      ]
+    },
+    {
+      "identifier": "fs:allow-write-text-file",
+      "allow": [
+        {
+          "path": "$HOME/**/*.opml"
+        },
+        {
+          "path": "$HOME/**/*.xml"
+        },
+        {
+          "path": "$HOME/**/*.OPML"
+        },
+        {
+          "path": "$HOME/**/*.XML"
+        }
+      ]
+    }
+  ]
 }

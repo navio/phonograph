@@ -1,5 +1,5 @@
 [package]
-name = "phonograph_desktop"
+name = "phonograph"
 version = "1.3.24"
 description = "Phonograph desktop shell"
 authors = ["Phonograph Team"]
@@ -10,6 +10,8 @@ tauri-build = { version = "2", features = [] }
 
 [dependencies]
 tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2.6.0"
+tauri-plugin-fs = "2.4.5"
 
 [features]
 default = ["custom-protocol"]
