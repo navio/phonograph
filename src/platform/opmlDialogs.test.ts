@@ -1,5 +1,18 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { exportOpmlWithNativeDialog, hasNativeOpmlDialogs, importOpmlFromNativeDialog } from "./opmlDialogs";
+
+vi.mock("@tauri-apps/plugin-dialog", () => ({
+  open: vi.fn(),
+  save: vi.fn(),
+}));
+
+vi.mock("@tauri-apps/plugin-fs", () => ({
+  readTextFile: vi.fn(),
+  writeTextFile: vi.fn(),
+}));
+
+import { open, save } from "@tauri-apps/plugin-dialog";
+import { readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
+import { exportOpmlWithNativeDialog, importOpmlFromNativeDialog } from "./opmlDialogs";
 
 const setWindow = (value: any) => {
   Object.defineProperty(globalThis, "window", {
@@ -11,31 +24,27 @@ const setWindow = (value: any) => {
 
 afterEach(() => {
   setWindow(undefined);
+  vi.clearAllMocks();
 });
 
 describe("opmlDialogs", () => {
-  it("reports unsupported when native APIs are absent", async () => {
+  it("reports unsupported when tauri runtime is absent", async () => {
     setWindow(undefined);
 
-    expect(hasNativeOpmlDialogs()).toBe(false);
-    await expect(importOpmlFromNativeDialog()).resolves.toBeNull();
+    await expect(importOpmlFromNativeDialog()).resolves.toEqual({ status: "unsupported" });
     await expect(exportOpmlWithNativeDialog("<opml />", "subs.opml")).resolves.toBe("unsupported");
   });
 
   it("imports OPML text using native open/read APIs", async () => {
-    const open = vi.fn().mockResolvedValue("/Users/alnavarro/Downloads/subscriptions.opml");
-    const readTextFile = vi.fn().mockResolvedValue("<opml>hello</opml>");
+    setWindow({ __TAURI_INTERNALS__: {} });
 
-    setWindow({
-      __TAURI__: {
-        dialog: { open, save: vi.fn() },
-        fs: { readTextFile, writeTextFile: vi.fn() },
-      },
-    });
+    vi.mocked(open).mockResolvedValue("/Users/alnavarro/Downloads/subscriptions.opml");
+    vi.mocked(readTextFile).mockResolvedValue("<opml>hello</opml>");
 
     const result = await importOpmlFromNativeDialog();
 
     expect(result).toEqual({
+      status: "selected",
       text: "<opml>hello</opml>",
       fileName: "subscriptions.opml",
     });
@@ -44,15 +53,10 @@ describe("opmlDialogs", () => {
   });
 
   it("exports OPML text with native save/write APIs", async () => {
-    const save = vi.fn().mockResolvedValue("/Users/alnavarro/Documents/subs.opml");
-    const writeTextFile = vi.fn().mockResolvedValue(undefined);
+    setWindow({ __TAURI_INTERNALS__: {} });
 
-    setWindow({
-      __TAURI__: {
-        dialog: { open: vi.fn(), save },
-        fs: { readTextFile: vi.fn(), writeTextFile },
-      },
-    });
+    vi.mocked(save).mockResolvedValue("/Users/alnavarro/Documents/subs.opml");
+    vi.mocked(writeTextFile).mockResolvedValue(undefined);
 
     const status = await exportOpmlWithNativeDialog("<opml>content</opml>", "subs.opml");
 
@@ -61,15 +65,13 @@ describe("opmlDialogs", () => {
     expect(writeTextFile).toHaveBeenCalledWith("/Users/alnavarro/Documents/subs.opml", "<opml>content</opml>");
   });
 
-  it("returns cancelled when native save dialog is dismissed", async () => {
-    setWindow({
-      __TAURI__: {
-        dialog: { open: vi.fn(), save: vi.fn().mockResolvedValue(null) },
-        fs: { readTextFile: vi.fn(), writeTextFile: vi.fn() },
-      },
-    });
+  it("returns cancelled when native dialogs are dismissed", async () => {
+    setWindow({ __TAURI_INTERNALS__: {} });
 
+    vi.mocked(open).mockResolvedValue(null);
+    vi.mocked(save).mockResolvedValue(null);
+
+    await expect(importOpmlFromNativeDialog()).resolves.toEqual({ status: "cancelled" });
     await expect(exportOpmlWithNativeDialog("<opml>content</opml>", "subs.opml")).resolves.toBe("cancelled");
   });
 });
-

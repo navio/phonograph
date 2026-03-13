@@ -26,6 +26,8 @@
     "react-intl": "^8.1.3",
     "react-router": "5.1.2",
     "react-router-dom": "^5.1.2",
+    "@tauri-apps/plugin-dialog": "^2.0.0",
+    "@tauri-apps/plugin-fs": "^2.0.0",
     "smallfetch": "^1.0.8",
     "xml2js": "^0.4.22",
     "zustand": "^5.0.3"
@@ -36,8 +38,9 @@
   ],
   "scripts": {
     "start": "vite",
-    "desktop:dev": "tauri dev",
-    "desktop:build": "tauri build",
+    "desktop:sync-version": "node scripts/sync-tauri-version.mjs",
+    "desktop:dev": "yarn desktop:sync-version && tauri dev",
+    "desktop:build": "yarn desktop:sync-version && tauri build",
     "build": "yarn getter && vite build && yarn SEO && yarn sw && yarn docs:manuals:build && yarn lambda:build",
     "serve": "vite preview",
     "docs:manuals:dev": "vitepress dev manuals",
