@@ -34,12 +34,14 @@ jobs:
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
 
       - name: Build macOS desktop bundles
         shell: bash
         run: |
           set -euo pipefail
-          yarn desktop:build -- --bundles app,dmg
+          yarn desktop:build -- --target aarch64-apple-darwin,x86_64-apple-darwin --bundles app,dmg
 
       - name: Prepare stable release asset names
         shell: bash
@@ -47,8 +49,8 @@ jobs:
           set -euo pipefail
           mkdir -p release-assets
 
-          arm_dmg="$(find src-tauri/target/release/bundle -type f -name '*aarch64*.dmg' | head -n 1)"
-          intel_dmg="$(find src-tauri/target/release/bundle -type f -name '*x64*.dmg' | head -n 1)"
+          arm_dmg="$(find src-tauri/target/release/bundle -type f \( -name '*aarch64*.dmg' -o -name '*arm64*.dmg' \) | head -n 1)"
+          intel_dmg="$(find src-tauri/target/release/bundle -type f \( -name '*x64*.dmg' -o -name '*x86_64*.dmg' \) | head -n 1)"
 
           if [[ -z "$arm_dmg" || -z "$intel_dmg" ]]; then
             echo "Expected both arm64 and x64 macOS DMG artifacts, but at least one is missing."
