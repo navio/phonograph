@@ -36,8 +36,10 @@
   ],
   "scripts": {
     "start": "vite",
-    "desktop:dev": "tauri dev",
-    "desktop:build": "tauri build",
+    "desktop:sync-version": "node scripts/sync-tauri-version.mjs",
+    "desktop:dev": "yarn desktop:sync-version && tauri dev",
+    "desktop:build": "yarn desktop:sync-version && tauri build",
+    "desktop:build:ci": "yarn desktop:sync-version && node scripts/validate-desktop-signing-env.mjs && tauri build",
     "build": "yarn getter && vite build && yarn SEO && yarn sw && yarn docs:manuals:build && yarn lambda:build",
     "serve": "vite preview",
     "docs:manuals:dev": "vitepress dev manuals",

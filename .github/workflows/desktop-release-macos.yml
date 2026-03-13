@@ -29,9 +29,6 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Sync Tauri version with package version
-        run: node scripts/sync-tauri-version.mjs
-
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
 
