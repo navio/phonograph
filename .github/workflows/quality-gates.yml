@@ -231,6 +231,15 @@ jobs:
           echo "desktop-compile: $compile_result"
           echo "desktop-package-smoke: $package_result"
 
+          {
+            echo "## Unified CI status"
+            echo "| Stage | Result |"
+            echo "| --- | --- |"
+            echo "| Web quality | ${web_result} |"
+            echo "| Desktop compile smoke | ${compile_result} |"
+            echo "| Desktop package smoke | ${package_result} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
           if [[ "$web_result" != "success" || "$compile_result" != "success" || "$package_result" != "success" ]]; then
             echo "Merge blocked: web or desktop quality checks failed."
             exit 1
