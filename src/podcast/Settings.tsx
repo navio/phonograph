@@ -34,7 +34,7 @@ import UploadFileIcon from "@mui/icons-material/UploadFile";
 import DownloadIcon from "@mui/icons-material/Download";
 
 import { initializeLibrary } from "../engine";
-import { exportOpmlWithNativeDialog, hasNativeOpmlDialogs, importOpmlFromNativeDialog } from "../platform/opmlDialogs";
+import { exportOpmlWithNativeDialog, importOpmlFromNativeDialog } from "../platform/opmlDialogs";
 import { buildOpml, parseOpml } from "./opml";
 import { importFeeds } from "./opmlImporter";
 
@@ -225,18 +225,23 @@ const Settings: React.FC = () => {
   const openFilePicker = async () => {
     if (isImporting) return;
 
-    if (hasNativeOpmlDialogs()) {
-      try {
-        const selected = await importOpmlFromNativeDialog();
-        if (!selected) return;
+    try {
+      const selected = await importOpmlFromNativeDialog();
+
+      if (selected.status === "selected") {
         await importOpmlText(selected.text);
-      } catch (err: any) {
-        setNotice({
-          open: true,
-          message: err?.message || intl.formatMessage({ id: "settings.importFailed", defaultMessage: "Failed to import OPML." }),
-          severity: "error",
-        });
+        return;
       }
+
+      if (selected.status === "cancelled") {
+        return;
+      }
+    } catch (err: any) {
+      setNotice({
+        open: true,
+        message: err?.message || intl.formatMessage({ id: "settings.importFailed", defaultMessage: "Failed to import OPML." }),
+        severity: "error",
+      });
       return;
     }
 

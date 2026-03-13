@@ -162,6 +162,8 @@ Build desktop bundles:
 yarn desktop:build
 ```
 
+Desktop builds now include native OPML import/export dialogs backed by Tauri's
+`dialog` + `fs` plugins with scoped permissions to OPML/XML files in the user home directory.
 ## Build and Preview
 
 ```bash
