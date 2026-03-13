@@ -4,6 +4,7 @@ on:
   pull_request:
   push:
     branches: [main, master]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -40,6 +41,13 @@ jobs:
 
       - name: Build web bundle
         run: yarn bundle
+
+      - name: Upload web bundle artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-bundle-${{ github.run_id }}
+          path: dist
+          if-no-files-found: error
 
   desktop-compile:
     name: Desktop compile smoke
@@ -218,6 +226,22 @@ jobs:
       - desktop-package-smoke
     if: always()
     steps:
+      - name: Publish CI status summary
+        shell: bash
+        run: |
+          {
+            echo "### CI status"
+            echo ""
+            echo "| Check | Result |"
+            echo "| --- | --- |"
+            echo "| web-quality | ${{ needs.web-quality.result }} |"
+            echo "| desktop-compile | ${{ needs.desktop-compile.result }} |"
+            echo "| desktop-package-smoke | ${{ needs.desktop-package-smoke.result }} |"
+            echo ""
+            echo "Unsigned desktop smoke artifacts: \\`desktop-unsigned-${{ github.run_id }}\\`"
+            echo "Web bundle artifact: \\`web-bundle-${{ github.run_id }}\\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Enforce required CI outcomes
         shell: bash
         run: |

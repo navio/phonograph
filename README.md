@@ -158,9 +158,11 @@ yarn desktop:build
 ### Desktop release + download links
 
 - Pushing a semver tag (for example `v1.3.24`) triggers `.github/workflows/desktop-release-macos.yml`.
-- The workflow publishes two stable assets to the GitHub release:
-  - `Phonograph-macOS-Apple-Silicon.dmg`
-  - `Phonograph-macOS-Intel.dmg`
+- The unified release workflow now publishes:
+  - Web production tarball (`phonograph-web-vX.Y.Z.tar.gz`)
+  - Desktop bundles for macOS, Linux, and Windows
+  - `SHA256SUMS.txt` for release asset verification
+- You can also run the same release train manually with `workflow_dispatch` by providing `release_tag`.
 - The app exposes an in-product download screen at `/download` and a shortcut from **Settings → Desktop App**.
 
 ## Build and Preview
@@ -239,6 +241,15 @@ PR CI now enforces a dual-surface quality matrix:
 - `merge-gate`: fails when any required web/desktop check fails.
 
 Desktop smoke artifacts are published as `desktop-unsigned-<run_id>` in the Actions run.
+Web smoke bundles are published as `web-bundle-<run_id>` in the same run.
+
+Release CI adds a unified status gate for tag publishes:
+
+- `prepare-release`: validates semver tag and package version alignment.
+- `web-release`: builds and uploads the production web release bundle.
+- `desktop-release`: builds platform-native desktop bundles across macOS/Linux/Windows.
+- `publish-release`: aggregates artifacts, generates checksums, and publishes the GitHub release.
+- `release-status`: publishes a final pass/fail summary for fast operator triage.
 
 Framework and linting standards are documented in `docs/framework-best-practices.md`.
 Current repository includes targeted tests for reducers, engine events, app store behavior, and podcast utilities.

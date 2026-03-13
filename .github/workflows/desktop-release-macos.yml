@@ -1,21 +1,77 @@
-name: Desktop Release (macOS)
+name: Unified Release (Web + Desktop)
 
 on:
   push:
     tags:
       - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Semver tag to release (vX.Y.Z). Must match package.json version."
+        required: true
+        type: string
 
 permissions:
   contents: write
 
 concurrency:
-  group: desktop-release-${{ github.ref }}
+  group: unified-release-${{ github.ref_name || github.run_id }}
   cancel-in-progress: false
 
 jobs:
-  release-macos:
-    name: Build and publish macOS desktop artifacts
-    runs-on: macos-latest
+  prepare-release:
+    name: Validate release metadata
+    runs-on: ubuntu-latest
+    outputs:
+      release_tag: ${{ steps.meta.outputs.release_tag }}
+      release_version: ${{ steps.meta.outputs.release_version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate tag and package version
+        id: meta
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            tag="${{ inputs.release_tag }}"
+          else
+            tag="${GITHUB_REF_NAME}"
+          fi
+
+          if [[ ! "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Release tag must match vX.Y.Z. Received: $tag"
+            exit 1
+          fi
+
+          version="${tag#v}"
+          package_version="$(node -p "require('./package.json').version")"
+
+          if [[ "$version" != "$package_version" ]]; then
+            echo "Tag version ($version) does not match package.json version ($package_version)."
+            exit 1
+          fi
+
+          echo "release_tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "release_version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Publish release validation summary
+        shell: bash
+        run: |
+          {
+            echo "### Release metadata"
+            echo ""
+            echo "- Tag: \`${{ steps.meta.outputs.release_tag }}\`"
+            echo "- Version: \`${{ steps.meta.outputs.release_version }}\`"
+            echo "- Source SHA: \`${GITHUB_SHA}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  web-release:
+    name: Build web release artifact
+    runs-on: ubuntu-latest
+    needs: prepare-release
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,42 +85,273 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Sync Tauri version with package version
-        run: node scripts/sync-tauri-version.mjs
-
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Build macOS desktop bundles
-        shell: bash
+      - name: Build production web deliverables
         run: |
-          set -euo pipefail
-          yarn desktop:build -- --bundles app,dmg
+          yarn bundle
+          yarn SEO
+          yarn sw
+          yarn docs:manuals:build
+          yarn lambda:build
 
-      - name: Prepare stable release asset names
+      - name: Package web artifact
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p release-assets
+          tar -czf "release-assets/phonograph-web-${{ needs.prepare-release.outputs.release_tag }}.tar.gz" dist
 
-          arm_dmg="$(find src-tauri/target/release/bundle -type f -name '*aarch64*.dmg' | head -n 1)"
-          intel_dmg="$(find src-tauri/target/release/bundle -type f -name '*x64*.dmg' | head -n 1)"
+      - name: Upload web release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-web-${{ needs.prepare-release.outputs.release_tag }}
+          path: release-assets
+          if-no-files-found: error
 
-          if [[ -z "$arm_dmg" || -z "$intel_dmg" ]]; then
-            echo "Expected both arm64 and x64 macOS DMG artifacts, but at least one is missing."
+      - name: Publish web build summary
+        shell: bash
+        run: |
+          {
+            echo "### Web release artifact"
+            echo ""
+            echo "- Uploaded artifact: \`release-web-${{ needs.prepare-release.outputs.release_tag }}\`"
+            echo "- Contents: production \`dist/\` tarball (app + docs + functions)"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  desktop-release:
+    name: Build desktop artifacts (${{ matrix.display }})
+    runs-on: ${{ matrix.os }}
+    needs: prepare-release
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - display: macOS
+            label: macos
+            os: macos-latest
+            bundles: app,dmg
+          - display: Linux
+            label: linux
+            os: ubuntu-latest
+            bundles: deb,appimage
+          - display: Windows
+            label: windows
+            os: windows-latest
+            bundles: msi,nsis
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install desktop Linux system dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgtk-3-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf
+
+          if apt-cache show libwebkit2gtk-4.1-dev >/dev/null 2>&1; then
+            sudo apt-get install -y libwebkit2gtk-4.1-dev
+          else
+            sudo apt-get install -y libwebkit2gtk-4.0-dev
+          fi
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build outputs
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+
+      - name: Sync Tauri version with package version
+        run: node scripts/sync-tauri-version.mjs
+
+      - name: Build desktop bundles
+        shell: bash
+        run: |
+          set -euo pipefail
+          yarn desktop:build -- --bundles ${{ matrix.bundles }}
+
+      - name: Collect desktop release artifacts
+        id: collect
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob globstar
+
+          mkdir -p "release-assets/${{ matrix.label }}"
+
+          case "${{ runner.os }}" in
+            macOS)
+              patterns=("src-tauri/target/release/bundle/**/*.dmg")
+              ;;
+            Linux)
+              patterns=("src-tauri/target/release/bundle/**/*.deb" "src-tauri/target/release/bundle/**/*.AppImage")
+              ;;
+            Windows)
+              patterns=("src-tauri/target/release/bundle/**/*.msi" "src-tauri/target/release/bundle/**/*.exe")
+              ;;
+            *)
+              echo "Unsupported runner OS: ${{ runner.os }}"
+              exit 1
+              ;;
+          esac
+
+          artifact_count=0
+          for pattern in "${patterns[@]}"; do
+            for file in $pattern; do
+              cp "$file" "release-assets/${{ matrix.label }}/$(basename "$file")"
+              artifact_count=$((artifact_count + 1))
+            done
+          done
+
+          if [[ "$artifact_count" -eq 0 ]]; then
+            echo "No desktop release artifacts were produced for ${{ matrix.display }}."
             find src-tauri/target/release/bundle -type f || true
             exit 1
           fi
 
-          cp "$arm_dmg" release-assets/Phonograph-macOS-Apple-Silicon.dmg
-          cp "$intel_dmg" release-assets/Phonograph-macOS-Intel.dmg
+          echo "artifact_count=$artifact_count" >> "$GITHUB_OUTPUT"
+
+      - name: Upload desktop release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-desktop-${{ matrix.label }}-${{ needs.prepare-release.outputs.release_tag }}
+          path: release-assets/${{ matrix.label }}
+          if-no-files-found: error
+
+      - name: Publish desktop build summary
+        shell: bash
+        run: |
+          {
+            echo "### Desktop release artifact (${{ matrix.display }})"
+            echo ""
+            echo "- Uploaded artifact: \`release-desktop-${{ matrix.label }}-${{ needs.prepare-release.outputs.release_tag }}\`"
+            echo "- Artifact files: \`${{ steps.collect.outputs.artifact_count }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  publish-release:
+    name: Publish GitHub release assets
+    runs-on: ubuntu-latest
+    needs:
+      - prepare-release
+      - web-release
+      - desktop-release
+    steps:
+      - name: Download all release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          pattern: release-*
+          merge-multiple: true
+
+      - name: Normalize stable macOS DMG names
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          arm_dmg="$(find release-assets -type f -name '*aarch64*.dmg' | head -n 1 || true)"
+          intel_dmg="$(find release-assets -type f -name '*x64*.dmg' | head -n 1 || true)"
+
+          if [[ -n "$arm_dmg" ]]; then
+            cp "$arm_dmg" "release-assets/Phonograph-macOS-Apple-Silicon.dmg"
+          fi
+
+          if [[ -n "$intel_dmg" ]]; then
+            cp "$intel_dmg" "release-assets/Phonograph-macOS-Intel.dmg"
+          fi
+
+      - name: Generate SHA256 checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          find release-assets -type f -print0 \
+            | sort -z \
+            | xargs -0 shasum -a 256 > release-assets/SHA256SUMS.txt
+
+      - name: Build release notes
+        shell: bash
+        run: |
+          set -euo pipefail
+          asset_count="$(find release-assets -type f | wc -l | tr -d ' ')"
+          {
+            echo "# Phonograph ${{ needs.prepare-release.outputs.release_tag }}"
+            echo ""
+            echo "Automated unified web + desktop release pipeline output."
+            echo ""
+            echo "## Included artifacts"
+            echo "- Web production bundle tarball"
+            echo "- Desktop bundles for macOS, Linux, and Windows"
+            echo "- SHA256 checksum manifest (\`SHA256SUMS.txt\`)"
+            echo ""
+            echo "Total files attached: $asset_count"
+          } > release-notes.md
 
       - name: Publish release assets
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            release-assets/Phonograph-macOS-Apple-Silicon.dmg
-            release-assets/Phonograph-macOS-Intel.dmg
+          tag_name: ${{ needs.prepare-release.outputs.release_tag }}
+          body_path: release-notes.md
+          files: release-assets/**
+          fail_on_unmatched_files: true
           generate_release_notes: true
           draft: false
           prerelease: false
+
+      - name: Publish release summary
+        shell: bash
+        run: |
+          {
+            echo "### Unified release published"
+            echo ""
+            echo "- Tag: \`${{ needs.prepare-release.outputs.release_tag }}\`"
+            echo "- Assets attached: \`$(find release-assets -type f | wc -l | tr -d ' ')\`"
+            echo "- Checksums: \`release-assets/SHA256SUMS.txt\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  release-status:
+    name: Release status gate
+    runs-on: ubuntu-latest
+    if: always()
+    needs:
+      - prepare-release
+      - web-release
+      - desktop-release
+      - publish-release
+    steps:
+      - name: Publish release status summary
+        shell: bash
+        run: |
+          {
+            echo "### Unified release status"
+            echo ""
+            echo "| Job | Result |"
+            echo "| --- | --- |"
+            echo "| prepare-release | ${{ needs.prepare-release.result }} |"
+            echo "| web-release | ${{ needs.web-release.result }} |"
+            echo "| desktop-release | ${{ needs.desktop-release.result }} |"
+            echo "| publish-release | ${{ needs.publish-release.result }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Enforce release success
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ needs.prepare-release.result }}" != "success" || \
+                "${{ needs.web-release.result }}" != "success" || \
+                "${{ needs.desktop-release.result }}" != "success" || \
+                "${{ needs.publish-release.result }}" != "success" ]]; then
+            echo "Unified release pipeline failed."
+            exit 1
+          fi
