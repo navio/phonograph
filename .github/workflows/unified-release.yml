@@ -1,0 +1,176 @@
+name: Unified Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Release tag (for example v1.4.0)"
+        required: true
+        type: string
+      make_latest:
+        description: "Mark release as latest"
+        required: false
+        default: true
+        type: boolean
+
+concurrency:
+  group: unified-release-${{ github.ref_name || inputs.release_tag }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  NODE_VERSION: 20
+
+jobs:
+  metadata:
+    runs-on: ubuntu-latest
+    outputs:
+      release_tag: ${{ steps.meta.outputs.release_tag }}
+      make_latest: ${{ steps.meta.outputs.make_latest }}
+    steps:
+      - name: Resolve release metadata
+        id: meta
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            tag="${{ inputs.release_tag }}"
+            make_latest="${{ inputs.make_latest }}"
+          else
+            tag="${{ github.ref_name }}"
+            make_latest="true"
+          fi
+
+          if ! echo "$tag" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+'; then
+            echo "Release tag must use semantic format (vX.Y.Z): $tag"
+            exit 1
+          fi
+
+          echo "release_tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "make_latest=$make_latest" >> "$GITHUB_OUTPUT"
+
+      - name: Add metadata summary
+        run: |
+          {
+            echo "### Unified release metadata"
+            echo "- Tag: \\`${{ steps.meta.outputs.release_tag }}\\`"
+            echo "- Mark latest: \\`${{ steps.meta.outputs.make_latest }}\\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  preflight:
+    needs: metadata
+    runs-on: ubuntu-latest
+    outputs:
+      desktop_enabled: ${{ steps.detect.outputs.desktop_enabled }}
+      desktop_command: ${{ steps.detect.outputs.desktop_command }}
+      desktop_reason: ${{ steps.detect.outputs.desktop_reason }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect desktop build configuration
+        id: detect
+        run: node scripts/desktop-ci.mjs --github-output
+
+      - name: Add preflight summary
+        run: |
+          {
+            echo "### Unified release preflight"
+            echo "- Desktop release enabled: \\`${{ steps.detect.outputs.desktop_enabled }}\\`"
+            echo "- Desktop command: \\`${{ steps.detect.outputs.desktop_command || 'n/a' }}\\`"
+            echo "- Detection reason: ${{ steps.detect.outputs.desktop_reason }}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  web-release:
+    needs: metadata
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build web bundle
+        run: yarn build
+
+      - name: Package web release archive
+        run: |
+          mkdir -p release-assets
+          tar -czf "release-assets/phonograph-web-${{ needs.metadata.outputs.release_tag }}.tar.gz" dist
+
+      - name: Upload web release assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-release-assets
+          path: release-assets
+          if-no-files-found: error
+
+  desktop-release:
+    needs: [metadata, preflight]
+    if: needs.preflight.outputs.desktop_enabled == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build desktop app
+        run: yarn desktop:ci
+
+      - name: Collect desktop artifacts
+        id: desktop_artifacts
+        run: node scripts/collect-desktop-artifacts.mjs --github-output
+
+      - name: Upload desktop release assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-release-${{ matrix.os }}
+          path: ${{ steps.desktop_artifacts.outputs.paths }}
+          if-no-files-found: error
+
+  publish-release:
+    needs: [metadata, web-release, desktop-release]
+    if: |
+      always() &&
+      needs.web-release.result == 'success' &&
+      (needs.desktop-release.result == 'success' || needs.desktop-release.result == 'skipped')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download release assets
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          pattern: "*-release-*"
+          merge-multiple: true
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.metadata.outputs.release_tag }}
+          name: Phonograph ${{ needs.metadata.outputs.release_tag }}
+          files: release-assets/**
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+          make_latest: ${{ needs.metadata.outputs.make_latest }}

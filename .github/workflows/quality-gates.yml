@@ -1,21 +1,58 @@
-name: Quality Gates
+name: Unified CI
 
 on:
   pull_request:
   push:
     branches: [main, master]
 
+concurrency:
+  group: unified-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: 20
+  COVERAGE_THRESHOLD: "70"
+
 jobs:
-  quality:
+  preflight:
     runs-on: ubuntu-latest
+    outputs:
+      desktop_enabled: ${{ steps.detect.outputs.desktop_enabled }}
+      desktop_command: ${{ steps.detect.outputs.desktop_command }}
+      desktop_reason: ${{ steps.detect.outputs.desktop_reason }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Detect desktop build configuration
+        id: detect
+        run: node scripts/desktop-ci.mjs --github-output
+
+      - name: Add preflight summary
+        run: |
+          {
+            echo "### Unified CI preflight"
+            echo "- Desktop build enabled: \\`${{ steps.detect.outputs.desktop_enabled }}\\`"
+            echo "- Desktop command: \\`${{ steps.detect.outputs.desktop_command || 'n/a' }}\\`"
+            echo "- Detection reason: ${{ steps.detect.outputs.desktop_reason }}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  quality:
+    needs: preflight
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ env.NODE_VERSION }}
           cache: yarn
 
       - name: Install dependencies
@@ -28,4 +65,88 @@ jobs:
         run: yarn lint:errors
 
       - name: Test
+        if: github.event_name != 'pull_request'
         run: yarn test
+
+      - name: Test with coverage
+        if: github.event_name == 'pull_request'
+        run: yarn test:coverage
+
+      - name: Enforce changed-file coverage threshold
+        if: github.event_name == 'pull_request'
+        env:
+          COVERAGE_BASE_REF: origin/${{ github.base_ref }}
+          COVERAGE_THRESHOLD: ${{ env.COVERAGE_THRESHOLD }}
+        run: |
+          git fetch origin "${{ github.base_ref }}" --depth=1
+          yarn coverage:changed
+
+  web-build:
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build web bundle
+        run: yarn build
+
+      - name: Upload web dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-dist
+          path: dist
+          if-no-files-found: error
+          retention-days: 14
+
+  desktop-build:
+    needs: [preflight, quality]
+    if: needs.preflight.outputs.desktop_enabled == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build desktop app
+        run: yarn desktop:ci
+
+      - name: Collect desktop artifacts
+        id: desktop_artifacts
+        run: node scripts/collect-desktop-artifacts.mjs --github-output
+
+      - name: Upload desktop artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.os }}
+          path: ${{ steps.desktop_artifacts.outputs.paths }}
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Add desktop summary
+        run: |
+          {
+            echo "### Desktop build (${{ matrix.os }})"
+            echo "- Artifacts discovered: ${{ steps.desktop_artifacts.outputs.count }}"
+          } >> "$GITHUB_STEP_SUMMARY"

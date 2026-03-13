@@ -207,6 +207,31 @@ Run the local quality gate sequence with:
 yarn quality
 ```
 
+## CI and Release Automation
+
+GitHub Actions now uses a unified pipeline for web and desktop delivery:
+
+- **Unified CI** (`.github/workflows/quality-gates.yml`)
+  - Runs typecheck, lint, tests, and changed-file coverage checks on pull requests.
+  - Builds the web bundle and uploads the `dist/` artifact.
+  - Auto-detects desktop build support and, when configured, builds desktop artifacts for Linux/macOS/Windows.
+
+- **Unified Release** (`.github/workflows/unified-release.yml`)
+  - Runs on semantic tags (`vX.Y.Z`) or manual dispatch.
+  - Builds and packages web release artifacts.
+  - Auto-detects desktop support and includes OS-specific desktop artifacts when available.
+  - Publishes a GitHub Release with generated release notes.
+
+Desktop detection is script-driven (`scripts/desktop-ci.mjs`) and supports common script conventions:
+
+- `desktop:build:ci`
+- `desktop:build`
+- `tauri:build`
+- `electron:build`
+- or `desktop/package.json` with a `build` script
+
+Desktop artifact collection is handled by `scripts/collect-desktop-artifacts.mjs` and scans standard output paths, with optional extra directories via `DESKTOP_ARTIFACT_DIRS`.
+
 Framework and linting standards are documented in `docs/framework-best-practices.md`.
 Current repository includes targeted tests for reducers, engine events, app store behavior, and podcast utilities.
 
