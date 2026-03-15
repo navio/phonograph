@@ -9,7 +9,7 @@ const base = {
   },
 };
 
-export type ThemeName = "legacy" | "nord" | "dracula" | "highContrast";
+export type ThemeName = "legacy" | "nord" | "dracula" | "highContrast" | "osakaJade";
 
 export const prefersDark = (): boolean =>
   typeof window !== "undefined" &&
@@ -90,6 +90,22 @@ const createAppTheme = (name: ThemeName = "nord", mode: PaletteMode = "light"): 
         secondary: { main: "#ffffff", contrastText: "#000000" },
         background: { default: "#000000", paper: "#000000" },
         text: { primary: "#ffffff" },
+      },
+    },
+    osakaJade: {
+      light: {
+        mode: "light",
+        primary: { main: "#0E7C66", contrastText: "#ffffff" },
+        secondary: { main: "#2FA48D", contrastText: "#ffffff" },
+        background: { default: "#F2FBF9", paper: "#E1F4EF" },
+        text: { primary: "#12332D", secondary: "#2D5D55" },
+      },
+      dark: {
+        mode: "dark",
+        primary: { main: "#34C3A6", contrastText: "#032A23" },
+        secondary: { main: "#9EEBD9", contrastText: "#032A23" },
+        background: { default: "#071A17", paper: "#0E2A25" },
+        text: { primary: "#D8F5EE", secondary: "#A3D8CC" },
       },
     },
   };

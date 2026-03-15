@@ -36,7 +36,7 @@ export interface PlaylistItem {
   [key: string]: unknown;
 }
 
-export type ThemeName = "legacy" | "nord" | "dracula" | "highContrast";
+export type ThemeName = "legacy" | "nord" | "dracula" | "highContrast" | "osakaJade";
 
 export type SupportedLocale = "en" | "es" | "fr" | "zh";
 

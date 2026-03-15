@@ -319,6 +319,9 @@ const Settings: React.FC = () => {
               <ToggleButton value={"highContrast"}>
                 <FormattedMessage id="settings.themeHighContrast" defaultMessage="High Contrast" />
               </ToggleButton>
+              <ToggleButton value={"osakaJade"}>
+                <FormattedMessage id="settings.themeOsakaJade" defaultMessage="Osaka Jade" />
+              </ToggleButton>
             </ToggleButtonGroup>
           </div>
 
