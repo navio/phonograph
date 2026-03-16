@@ -240,6 +240,19 @@ PR CI now enforces a dual-surface quality matrix:
 
 Desktop smoke artifacts are published as `desktop-unsigned-<run_id>` in the Actions run.
 
+Unified release automation runs in `.github/workflows/unified-release.yml` and produces:
+
+- `phonograph-web-vX.Y.Z.tar.gz` plus SHA-256 checksum from the web `dist/` build.
+- Tauri desktop installers for Linux, macOS, and Windows when `src-tauri/` is present.
+- One shared GitHub release with per-stage workflow summaries.
+
+Tag pushes trigger release publication:
+
+```bash
+git tag v1.3.25
+git push origin v1.3.25
+```
+
 Framework and linting standards are documented in `docs/framework-best-practices.md`.
 Current repository includes targeted tests for reducers, engine events, app store behavior, and podcast utilities.
 

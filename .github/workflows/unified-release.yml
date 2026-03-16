@@ -1,0 +1,270 @@
+name: Unified Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Tag to release (for example v1.3.24)"
+        required: false
+        type: string
+      draft:
+        description: "Publish as draft release"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: unified-release-${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  prepare-release:
+    name: Prepare release context
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      release_tag: ${{ steps.resolve.outputs.release_tag }}
+      is_prerelease: ${{ steps.resolve.outputs.is_prerelease }}
+      draft: ${{ steps.resolve.outputs.draft }}
+      has_desktop: ${{ steps.detect.outputs.has_desktop }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve release settings
+        id: resolve
+        shell: bash
+        env:
+          INPUT_RELEASE_TAG: ${{ inputs.release_tag }}
+          INPUT_DRAFT: ${{ inputs.draft }}
+        run: |
+          set -euo pipefail
+
+          release_tag=""
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            release_tag="${GITHUB_REF_NAME}"
+          elif [[ -n "${INPUT_RELEASE_TAG:-}" ]]; then
+            release_tag="${INPUT_RELEASE_TAG}"
+          else
+            echo "workflow_dispatch requires release_tag when not running on a tag ref."
+            exit 1
+          fi
+
+          if [[ ! "$release_tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([-.].+)?$ ]]; then
+            echo "Release tag must match v<major>.<minor>.<patch> (optionally with suffix)."
+            exit 1
+          fi
+
+          is_prerelease="false"
+          if [[ "$release_tag" == *-* ]]; then
+            is_prerelease="true"
+          fi
+
+          draft="false"
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" && "${INPUT_DRAFT:-false}" == "true" ]]; then
+            draft="true"
+          fi
+
+          echo "release_tag=$release_tag" >> "$GITHUB_OUTPUT"
+          echo "is_prerelease=$is_prerelease" >> "$GITHUB_OUTPUT"
+          echo "draft=$draft" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout release tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --tags --force
+          git checkout "${{ steps.resolve.outputs.release_tag }}"
+
+      - name: Detect desktop workspace
+        id: detect
+        shell: bash
+        run: |
+          if [[ -f src-tauri/Cargo.toml && -f src-tauri/tauri.conf.json ]]; then
+            echo "has_desktop=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_desktop=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Report release plan
+        shell: bash
+        run: |
+          {
+            echo "## Unified release plan"
+            echo "| Setting | Value |"
+            echo "| --- | --- |"
+            echo "| Release tag | ${{ steps.resolve.outputs.release_tag }} |"
+            echo "| Draft release | ${{ steps.resolve.outputs.draft }} |"
+            echo "| Pre-release | ${{ steps.resolve.outputs.is_prerelease }} |"
+            echo "| Desktop workspace detected | ${{ steps.detect.outputs.has_desktop }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  web-release:
+    name: Build and publish web artifact
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: prepare-release
+    steps:
+      - name: Checkout release tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare-release.outputs.release_tag }}
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build web distribution
+        run: yarn build
+
+      - name: Archive web distribution
+        id: archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="phonograph-web-${{ needs.prepare-release.outputs.release_tag }}.tar.gz"
+          checksum_file="${archive}.sha256"
+
+          tar -czf "$archive" dist
+          shasum -a 256 "$archive" > "$checksum_file"
+
+          echo "archive=$archive" >> "$GITHUB_OUTPUT"
+          echo "checksum_file=$checksum_file" >> "$GITHUB_OUTPUT"
+
+      - name: Upload web artifact to workflow run
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-release-${{ needs.prepare-release.outputs.release_tag }}
+          path: |
+            ${{ steps.archive.outputs.archive }}
+            ${{ steps.archive.outputs.checksum_file }}
+
+      - name: Publish web assets to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.prepare-release.outputs.release_tag }}
+          name: Phonograph Release ${{ needs.prepare-release.outputs.release_tag }}
+          draft: ${{ needs.prepare-release.outputs.draft }}
+          prerelease: ${{ needs.prepare-release.outputs.is_prerelease }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: |
+            ${{ steps.archive.outputs.archive }}
+            ${{ steps.archive.outputs.checksum_file }}
+
+      - name: Report web release status
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## Web release"
+            echo "- Artifact: ${{ steps.archive.outputs.archive }}"
+            echo "- Checksum: ${{ steps.archive.outputs.checksum_file }}"
+            echo "- Result: ${{ job.status }}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  desktop-release:
+    name: Desktop release (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    needs: [prepare-release, web-release]
+    if: needs.prepare-release.outputs.has_desktop == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, macos-latest, windows-latest]
+    steps:
+      - name: Checkout release tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare-release.outputs.release_tag }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install Linux system dependencies
+        if: matrix.os == 'ubuntu-22.04'
+        run: bash scripts/install-tauri-linux-deps.sh
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Sync Tauri version with package version
+        run: node scripts/sync-tauri-version.mjs
+
+      - name: Build and upload desktop artifacts
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ needs.prepare-release.outputs.release_tag }}
+          releaseName: Phonograph Release ${{ needs.prepare-release.outputs.release_tag }}
+          releaseBody: Automated unified web and desktop artifacts for ${{ needs.prepare-release.outputs.release_tag }}.
+          releaseDraft: ${{ needs.prepare-release.outputs.draft }}
+          prerelease: ${{ needs.prepare-release.outputs.is_prerelease }}
+          includeDebug: false
+          tauriScript: yarn desktop:build
+
+      - name: Report desktop release status
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## Desktop release (${{ matrix.os }})"
+            echo "- Result: ${{ job.status }}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  release-summary:
+    name: Release status summary
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [prepare-release, web-release, desktop-release]
+    if: always()
+    steps:
+      - name: Summarize release outcomes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          web_result="${{ needs.web-release.result }}"
+          desktop_result="${{ needs.desktop-release.result }}"
+          has_desktop="${{ needs.prepare-release.outputs.has_desktop }}"
+
+          {
+            echo "## Unified release summary"
+            echo "| Stage | Result |"
+            echo "| --- | --- |"
+            echo "| Web release | ${web_result} |"
+            echo "| Desktop release | ${desktop_result} |"
+            echo "| Desktop workspace detected | ${has_desktop} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [[ "$web_result" != "success" ]]; then
+            echo "Web release failed."
+            exit 1
+          fi
+
+          if [[ "$desktop_result" != "success" && "$desktop_result" != "skipped" ]]; then
+            echo "Desktop release failed."
+            exit 1
+          fi
