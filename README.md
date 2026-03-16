@@ -155,6 +155,21 @@ Build desktop bundles:
 yarn desktop:build
 ```
 
+Synchronize desktop manifest versions only:
+
+```bash
+yarn desktop:sync-version
+```
+
+CI/release desktop build (includes signing-env validation):
+
+```bash
+yarn desktop:build:ci
+```
+
+Desktop builds now include native OPML import/export dialogs backed by Tauri's
+`dialog` + `fs` plugins with scoped permissions to OPML/XML files in the user home directory.
+
 ### Desktop release + download links
 
 - Pushing a semver tag (for example `v1.3.24`) triggers `.github/workflows/desktop-release-macos.yml`.
@@ -195,8 +210,16 @@ Build pipeline (`yarn build`) includes:
 
 - `LISTEN_NOTES_API_KEY` (preferred)
 - `LISTENNOTES` / `listennotes` (backward-compatible alternatives)
+- `VITE_DESKTOP_API_ORIGIN` (optional; desktop backend origin, defaults to `https://phonograph.app`)
+- `VITE_PUBLIC_WEB_ORIGIN` (optional; desktop share-link origin, defaults to `https://phonograph.app`)
+
+Desktop signing validation checks these env vars when running on release refs (or with `--force`):
+- macOS: `APPLE_CERTIFICATE`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_SIGNING_IDENTITY`, `APPLE_API_ISSUER`, `APPLE_API_KEY`, `APPLE_API_KEY_PATH`
+- Windows: `TAURI_WINDOWS_CERTIFICATE`, `TAURI_WINDOWS_CERTIFICATE_PASSWORD`
 
 These are used for discovery/proxy calls that depend on Listen Notes.
+
+Desktop parity status and release-readiness notes are tracked in `docs/desktop-parity.md`.
 
 ## Quality and Testing
 

@@ -1,6 +1,7 @@
 import PodcastSearcher, { PodcastSearchResponse } from "./PodcastSearcher";
 import { appleCacheKey, getBrowserCached, setBrowserCached } from "./appleBrowserCache";
 import { bestPodcastsCacheKey, getCachedBestPodcasts, setCachedBestPodcasts } from "./popularCache";
+import platform from "../../platform";
 
 export interface PodcastSearchResult {
   title: string;
@@ -107,7 +108,7 @@ export const getPopularPodcasts = async function (query: number | null = null): 
     if (cached) return cached;
 
     try {
-      const resp = await fetch(`/apple/rss/${storefront}/podcasts/top/${limit}/podcasts.json`);
+      const resp = await fetch(platform.resolveBackendUrl(`/apple/rss/${storefront}/podcasts/top/${limit}/podcasts.json`));
       if (!resp.ok) throw new Error(`Apple top failed: ${resp.status}`);
       const data = await resp.json();
       const results = (data && data.feed && data.feed.results) || [];
@@ -157,7 +158,7 @@ export const getPopularPodcasts = async function (query: number | null = null): 
 
   const URI = "https://www.listennotes.com/c/r/";
   try {
-    const resp = await fetch(`/ln/best_podcasts?${params}`);
+    const resp = await fetch(platform.resolveBackendUrl(`/ln/best_podcasts?${params}`));
     if (!resp.ok) throw new Error(`Listen Notes best_podcasts failed: ${resp.status}`);
     const data = await resp.json();
     const { podcasts = [], name } = data;
@@ -201,7 +202,7 @@ export const resolveApplePodcastFeedUrl = async (appleId: string): Promise<strin
   const cached = await getBrowserCached<string>(cacheKey);
   if (cached) return cached;
 
-  const resp = await fetch(`/apple/lookup?id=${encodeURIComponent(id)}`);
+  const resp = await fetch(platform.resolveBackendUrl(`/apple/lookup?id=${encodeURIComponent(id)}`));
   if (!resp.ok) return null;
   const data = await resp.json();
   const result = (data && data.results && data.results[0]) || null;
@@ -238,7 +239,7 @@ export const getApplePodcastGenres = async (): Promise<PodcastGenre[]> => {
   const cached = await getBrowserCached<PodcastGenre[]>(cacheKey);
   if (cached) return cached;
 
-  const resp = await fetch(`/apple/genres?id=26`);
+  const resp = await fetch(platform.resolveBackendUrl("/apple/genres?id=26"));
   if (!resp.ok) return [];
   const data = await resp.json();
 
