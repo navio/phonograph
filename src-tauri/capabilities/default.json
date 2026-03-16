@@ -3,5 +3,9 @@
   "identifier": "default",
   "description": "Default capabilities for the main desktop window",
   "windows": ["main"],
-  "permissions": ["core:default"]
+  "permissions": [
+    "core:default",
+    "dialog:default",
+    "fs:default"
+  ]
 }
