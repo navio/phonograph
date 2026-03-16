@@ -1,0 +1,238 @@
+name: Unified Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  detect_platforms:
+    name: Detect Release Targets
+    runs-on: ubuntu-latest
+    outputs:
+      desktop_enabled: ${{ steps.detect.outputs.desktop_enabled }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect desktop workspace
+        id: detect
+        run: |
+          if [ -f src-tauri/tauri.conf.json ]; then
+            echo "desktop_enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "desktop_enabled=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Report release targets
+        run: |
+          {
+            echo "## Unified release target detection"
+            echo "- Web release: enabled"
+            echo "- Desktop release: ${{ steps.detect.outputs.desktop_enabled }}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  web_release:
+    name: Web Release Artifact
+    runs-on: ubuntu-latest
+    needs: detect_platforms
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Validate release environment
+        env:
+          LISTEN_NOTES_API_KEY: ${{ secrets.LISTEN_NOTES_API_KEY }}
+          LISTENNOTES: ${{ secrets.LISTENNOTES }}
+        run: |
+          if [ -z "${LISTEN_NOTES_API_KEY:-}" ] && [ -z "${LISTENNOTES:-}" ]; then
+            echo "Missing release secret: set LISTEN_NOTES_API_KEY (preferred) or LISTENNOTES."
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build web distribution
+        id: web_build
+        env:
+          LISTENNOTES: ${{ secrets.LISTEN_NOTES_API_KEY || secrets.LISTENNOTES }}
+        run: yarn build
+
+      - name: Archive web distribution
+        id: web_archive
+        run: |
+          archive="phonograph-web-${GITHUB_REF_NAME}.tar.gz"
+          tar -czf "$archive" dist
+          echo "WEB_RELEASE_ARCHIVE=$archive" >> "$GITHUB_ENV"
+
+      - name: Publish web release artifact
+        id: web_publish
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Phonograph Release ${{ github.ref_name }}
+          draft: true
+          prerelease: false
+          generate_release_notes: true
+          files: ${{ env.WEB_RELEASE_ARCHIVE }}
+
+      - name: Report web release status
+        if: always()
+        run: |
+          {
+            echo "## Web release"
+            echo "- Build: ${{ steps.web_build.outcome }}"
+            echo "- Archive: ${{ steps.web_archive.outcome }}"
+            echo "- Publish release asset: ${{ steps.web_publish.outcome }}"
+            echo "- Job result: ${{ job.status }}"
+            if [ -n "${WEB_RELEASE_ARCHIVE:-}" ]; then
+              echo "- Release asset: ${WEB_RELEASE_ARCHIVE}"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  desktop_release:
+    name: Desktop Release (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    needs: [detect_platforms, web_release]
+    if: needs.detect_platforms.outputs.desktop_enabled == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Linux system dependencies
+        if: matrix.os == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgtk-3-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf
+
+          if apt-cache show libwebkit2gtk-4.1-dev >/dev/null 2>&1; then
+            sudo apt-get install -y libwebkit2gtk-4.1-dev
+          else
+            sudo apt-get install -y libwebkit2gtk-4.0-dev
+          fi
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Prepare Apple API key
+        if: matrix.os == 'macos-latest'
+        shell: bash
+        env:
+          APPLE_API_PRIVATE_KEY: ${{ secrets.APPLE_API_PRIVATE_KEY }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+        run: |
+          if [ -z "$APPLE_API_PRIVATE_KEY" ] || [ -z "$APPLE_API_KEY" ]; then
+            echo "APPLE_API_PRIVATE_KEY and APPLE_API_KEY secrets are required for macOS signing"
+            exit 1
+          fi
+
+          key_file="$RUNNER_TEMP/AuthKey_${APPLE_API_KEY}.p8"
+          echo "$APPLE_API_PRIVATE_KEY" > "$key_file"
+          echo "APPLE_API_KEY_PATH=$key_file" >> "$GITHUB_ENV"
+
+      - name: Validate desktop signing configuration
+        id: desktop_signing
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
+          TAURI_WINDOWS_CERTIFICATE: ${{ secrets.TAURI_WINDOWS_CERTIFICATE }}
+          TAURI_WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.TAURI_WINDOWS_CERTIFICATE_PASSWORD }}
+        run: node scripts/validate-desktop-signing-env.mjs --force
+
+      - name: Build and publish signed desktop bundles
+        id: desktop_build_publish
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
+          TAURI_WINDOWS_CERTIFICATE: ${{ secrets.TAURI_WINDOWS_CERTIFICATE }}
+          TAURI_WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.TAURI_WINDOWS_CERTIFICATE_PASSWORD }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: Phonograph Release ${{ github.ref_name }}
+          releaseBody: Automated web and desktop release artifacts for ${{ github.ref_name }}.
+          releaseDraft: true
+          prerelease: false
+          includeDebug: false
+          tauriScript: yarn desktop:build:ci
+
+      - name: Report desktop release status
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## Desktop release (${{ matrix.os }})"
+            echo "- Signing validation: ${{ steps.desktop_signing.outcome }}"
+            echo "- Build + publish: ${{ steps.desktop_build_publish.outcome }}"
+            echo "- Job result: ${{ job.status }}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  release_status:
+    name: Release Status Summary
+    runs-on: ubuntu-latest
+    needs: [detect_platforms, web_release, desktop_release]
+    if: always()
+    steps:
+      - name: Summarize release outcome
+        run: |
+          web_release="${{ needs.web_release.result }}"
+          desktop_release="${{ needs.desktop_release.result }}"
+
+          {
+            echo "## Unified release status"
+            echo "| Stage | Result |"
+            echo "| --- | --- |"
+            echo "| Web release | ${web_release} |"
+            echo "| Desktop release | ${desktop_release} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$web_release" != "success" ]; then
+            echo "Web release failed."
+            exit 1
+          fi
+
+          if [ "$desktop_release" != "success" ] && [ "$desktop_release" != "skipped" ]; then
+            echo "Desktop release failed."
+            exit 1
+          fi
