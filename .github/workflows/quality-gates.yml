@@ -171,8 +171,16 @@ jobs:
               cp src-tauri/target/release/phonograph desktop-artifacts/
             fi
 
+            if [[ -f src-tauri/target/release/phonograph_desktop ]]; then
+              cp src-tauri/target/release/phonograph_desktop desktop-artifacts/
+            fi
+
             if [[ -f src-tauri/target/release/phonograph.exe ]]; then
               cp src-tauri/target/release/phonograph.exe desktop-artifacts/
+            fi
+
+            if [[ -f src-tauri/target/release/phonograph_desktop.exe ]]; then
+              cp src-tauri/target/release/phonograph_desktop.exe desktop-artifacts/
             fi
 
             {
