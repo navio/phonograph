@@ -1,108 +1,41 @@
+import { open, save } from "@tauri-apps/plugin-dialog";
+import { readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
+
 interface TauriDialogFilter {
   name: string;
   extensions: string[];
 }
 
-interface TauriDialogApi {
-  open: (options?: {
-    multiple?: boolean;
-    directory?: boolean;
-    filters?: TauriDialogFilter[];
-    defaultPath?: string;
-    title?: string;
-  }) => Promise<string | string[] | null>;
-  save: (options?: {
-    filters?: TauriDialogFilter[];
-    defaultPath?: string;
-    title?: string;
-  }) => Promise<string | null>;
-}
-
-interface TauriFsApi {
-  readTextFile?: (path: string) => Promise<string>;
-  writeTextFile?: ((path: string, contents: string) => Promise<void>) | ((args: { path: string; contents: string }) => Promise<void>);
-  writeFile?: (args: { path: string; contents: string | number[] | Uint8Array }) => Promise<void>;
-}
+type TauriFilePath = string | URL;
 
 const OPML_DIALOG_FILTERS: TauriDialogFilter[] = [{
   name: "OPML/XML",
   extensions: ["opml", "xml"],
 }];
 
-const getWindowAny = () => {
-  if (typeof window === "undefined") return null;
-  return window as unknown as Record<string, any>;
-};
+const isTauriRuntime = () =>
+  typeof window !== "undefined" && typeof window.__TAURI_INTERNALS__ !== "undefined";
 
-const getTauriDialogApi = (): TauriDialogApi | null => {
-  const win = getWindowAny();
-  if (!win) return null;
+const pathToString = (path: TauriFilePath) =>
+  typeof path === "string" ? path : decodeURIComponent(path.pathname);
 
-  const tauriDialog = win.__TAURI__?.dialog;
-  if (tauriDialog?.open && tauriDialog?.save) {
-    return tauriDialog as TauriDialogApi;
-  }
-
-  const internalsDialog = win.__TAURI_INTERNALS__?.plugins?.dialog;
-  if (internalsDialog?.open && internalsDialog?.save) {
-    return internalsDialog as TauriDialogApi;
-  }
-
-  return null;
-};
-
-const getTauriFsApi = (): TauriFsApi | null => {
-  const win = getWindowAny();
-  if (!win) return null;
-
-  const tauriFs = win.__TAURI__?.fs;
-  if (tauriFs?.readTextFile && (tauriFs?.writeTextFile || tauriFs?.writeFile)) {
-    return tauriFs as TauriFsApi;
-  }
-
-  const internalsFs = win.__TAURI_INTERNALS__?.plugins?.fs;
-  if (internalsFs?.readTextFile && (internalsFs?.writeTextFile || internalsFs?.writeFile)) {
-    return internalsFs as TauriFsApi;
-  }
-
-  return null;
-};
-
-const getFilenameFromPath = (path: string) => {
-  const chunks = path.split(/[\\/]/).filter(Boolean);
+const getFilenameFromPath = (path: TauriFilePath) => {
+  const normalizedPath = pathToString(path);
+  const chunks = normalizedPath.split(/[\\/]/).filter(Boolean);
   return chunks[chunks.length - 1] || "subscriptions.opml";
 };
 
-const writeTextFile = async (fsApi: TauriFsApi, path: string, contents: string) => {
-  if (fsApi.writeTextFile) {
-    try {
-      await (fsApi.writeTextFile as (path: string, contents: string) => Promise<void>)(path, contents);
-      return;
-    } catch (_error) {
-      await (fsApi.writeTextFile as (args: { path: string; contents: string }) => Promise<void>)({ path, contents });
-      return;
-    }
+export type NativeOpmlImportResult =
+  | { status: "selected"; text: string; fileName: string }
+  | { status: "cancelled" }
+  | { status: "unsupported" };
+
+export const importOpmlFromNativeDialog = async (): Promise<NativeOpmlImportResult> => {
+  if (!isTauriRuntime()) {
+    return { status: "unsupported" };
   }
 
-  if (fsApi.writeFile) {
-    await fsApi.writeFile({ path, contents });
-    return;
-  }
-
-  throw new Error("Native file-write API is unavailable.");
-};
-
-export const hasNativeOpmlDialogs = () => Boolean(getTauriDialogApi() && getTauriFsApi());
-
-export const importOpmlFromNativeDialog = async (): Promise<{ text: string; fileName: string } | null> => {
-  const dialogApi = getTauriDialogApi();
-  const fsApi = getTauriFsApi();
-
-  if (!dialogApi || !fsApi?.readTextFile) {
-    return null;
-  }
-
-  const selectedPath = await dialogApi.open({
+  const selectedPath = await open({
     title: "Import OPML",
     directory: false,
     multiple: false,
@@ -110,12 +43,13 @@ export const importOpmlFromNativeDialog = async (): Promise<{ text: string; file
   });
 
   if (!selectedPath || Array.isArray(selectedPath)) {
-    return null;
+    return { status: "cancelled" };
   }
 
-  const text = await fsApi.readTextFile(selectedPath);
+  const text = await readTextFile(selectedPath);
 
   return {
+    status: "selected",
     text,
     fileName: getFilenameFromPath(selectedPath),
   };
@@ -127,14 +61,11 @@ export const exportOpmlWithNativeDialog = async (
   opmlContents: string,
   suggestedFileName: string
 ): Promise<NativeOpmlExportStatus> => {
-  const dialogApi = getTauriDialogApi();
-  const fsApi = getTauriFsApi();
-
-  if (!dialogApi || !fsApi) {
+  if (!isTauriRuntime()) {
     return "unsupported";
   }
 
-  const selectedPath = await dialogApi.save({
+  const selectedPath = await save({
     title: "Export OPML",
     defaultPath: suggestedFileName,
     filters: OPML_DIALOG_FILTERS,
@@ -144,7 +75,6 @@ export const exportOpmlWithNativeDialog = async (
     return "cancelled";
   }
 
-  await writeTextFile(fsApi, selectedPath, opmlContents);
+  await writeTextFile(selectedPath, opmlContents);
   return "saved";
 };
-
